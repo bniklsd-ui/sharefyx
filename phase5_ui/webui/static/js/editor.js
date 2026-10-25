@@ -61,6 +61,11 @@ var cm = null;
 var cmLaden = false;
 //: Die zuletzt markierte Cursorzeile (fuer `sfx-active-line`, Schritt 11.4).
 var cmCursorZeile = null;
+// P10.5, Block 11, Schritt 11.5 (ED-2): die **To-do-Kaestchen**. Je Eintrag
+// `{mark, text, kasten}` — die Marke (das `markText` im Dokument) und das Kaestchen, das
+// sie traegt. **Der Text bleibt die Quelle**: das Kaestchen ersetzt nur die Darstellung
+// der Zeichen `[ ]`/`[x]`.
+var cmTodoMarken = [];
 var saveButtonEl;
 var archiveButtonEl;
 var closeButtonEl;
@@ -439,6 +444,11 @@ function _editorBereit() {
       viewportMargin: 20,
     });
     cm.on("change", _editorGeaendert);
+    // P10.5, Block 11, Schritt 11.5 (ED-2): die To-do-Kaestchen werden nach **jeder**
+    // Aenderung neu bestimmt -- der Text ist die Quelle, das Kaestchen nur seine
+    // Darstellung. Ein zweiter Zuhoer: `_editorGeaendert` rechnet Version und Entwurf,
+    // dieser setzt die Kaestchen.
+    cm.on("change", _todoMarkenAuffrischen);
     // P10.5, Block 11, Schritt 11.4 (ED-1): die **Cursorzeile** traegt die Klasse
     // `sfx-active-line` -- sie ist die Zeile, in der gerade geschrieben wird. Dort bleiben
     // auch die Formatierungszeichen sichtbar (s. `app.css`).
@@ -481,6 +491,121 @@ function _editorGeaendert() {
   saveDraft();
 }
 
+// -- To-do-Kaestchen (P10.5, Block 11, Schritt 11.5 -- ED-2) ---------------------------------
+//
+// **Was der Plan verlangt:** `- [ ]`/`- [x]` am Zeilenanfang werden im Live-Modus per
+// `cm.markText(..., {replacedWith: <checkbox>})` ersetzt; ein Klick schaltet **den Text im
+// Puffer**. War der Editor **vor** dem Klick unveraendert, folgt sofort `saveItem()` (mit
+// der Snapshot-`version`, Hard Rule 3; ein Konflikt oeffnet den bestehenden Dialog). War er
+// **geaendert**, gehoert der Klick zur naechsten Speicherung.
+//
+// **Der Text ist die Quelle, das Kaestchen ist die Darstellung.** Im Dokument steht
+// weiterhin `[ ]` — der Server bekommt Text, keine Sonderzeichen. Ein Kaestchen, das man
+// anhaelt, ohne zu speichern, waere ein zweiter Zustand; genau den gibt es hier nicht.
+//
+// **Warum `atomic`:** der Cursor darf nicht **in** `[ ]` hinein — der Bereich ist ein
+// Zeichen, kein Text. `atomic: true` sagt CodeMirror genau das.
+var TODO_MUSTER = /^([ \t]*[-*+][ \t]+)\[([ xX])\]/;
+//: Dieselbe Erkennung auf den **ganzen** Text — nur wenn irgendwo eine To-do-Zeile steht,
+//: lohnt das Durchsuchen der Zeilen.
+var TODO_VORHANDEN = /^[ \t]*[-*+][ \t]+\[[ xX]\]/m;
+
+function _todoKasten(erledigt) {
+  var kasten = document.createElement("input");
+  kasten.type = "checkbox";
+  kasten.checked = !!erledigt;
+  kasten.className = "sfx-todo";
+  kasten.title = erledigt ? "Erledigt — klicken zum Abhaken" : "Als erledigt markieren";
+  // **Der Klick gehoert dem Kaestchen, nicht dem Editor.** CodeMirror hoert das `mousedown`
+  // an der Huelle und setzt dort den Cursor — ohne `stopPropagation` wuerde der Klick den
+  // Cursor versetzen und der Editor den Fokus bekommen; das Kaestchen wuerde nie angehakt.
+  kasten.addEventListener("mousedown", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  });
+  kasten.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    _todoUmschalten(kasten);
+  });
+  return kasten;
+}
+
+// Der Klick schaltet **den Text im Puffer** — `[ ]` und `[x]` wechseln sich ab. Danach
+// entscheidet der Zustand **vor** dem Klick, ob gespeichert wird.
+function _todoUmschalten(kasten) {
+  if (!cm) return;
+  var mark = kasten.sfxMark;
+  var bereich = mark && mark.find();
+  if (!bereich) return;                       // der Text passt nicht mehr (waehrend des Klicks?)
+  var alt = cm.getRange(bereich.from, bereich.to);
+  var neu = null;
+  if (alt === "[ ]") neu = "[x]";
+  else if (alt === "[x]" || alt === "[X]") neu = "[ ]";
+  if (neu === null) return;
+  // **Der Zustand VOR** dem Klick: `isDirty()` vergleicht mit dem Schnappschuss, und der
+  // Klick hat den Text noch nicht geaendert — der Wert ist also der Zustand *vor* dem
+  // Klick. War der Editor unveraendert, ist der Klick ein Schreibvorgang (Hard Rule 3:
+  // mit der Version aus dem Schnappschuss). War er geaendert, gehoert der Klick zur
+  // naechsten Speicherung: ein Klick ist dann nur Puffer.
+  var sauber = !isDirty();
+  cm.replaceRange(neu, bereich.from, bereich.to);
+  if (sauber) saveItem();
+}
+
+// Die Kaestchen **bestimmen** — nach jeder Aenderung, weil der Text die Quelle ist.
+//
+// **Bestehende Marken, die noch passen, bleiben unangetastet.** Sie zu loeschen und neu zu
+// setzen wuerde das Kaestchen neu aufbauen (Flackern) — und, schlimmer, den Cursor
+// versetzen, wenn er direkt neben dem Kaestchen steht. Deshalb wird nur verglichen und nur
+// bei Abweichung ersetzt.
+function _todoMarkenAuffrischen() {
+  if (!cm) return;
+  var text = cm.getValue();
+  var gewuenscht = [];
+  // Der **Rohmodus** (ED-5) zeigt **jedes** Zeichen — also auch das `[ ]` eines To-dos.
+  // Dann gibt es keine Kaestchen.
+  if (state.mode !== "raw" && TODO_VORHANDEN.test(text)) {
+    var zeilen = text.split("\n");
+    for (var nr = 0; nr < zeilen.length; nr++) {
+      var m = TODO_MUSTER.exec(zeilen[nr]);
+      if (!m) continue;
+      gewuenscht.push({
+        von: { line: nr, ch: m[1].length },
+        bis: { line: nr, ch: m[1].length + 3 },
+        text: "[" + m[2] + "]",
+        erledigt: m[2] !== " ",
+      });
+    }
+  }
+  var offen = cmTodoMarken.slice();
+  cmTodoMarken = [];
+  gewuenscht.forEach(function (wunsch) {
+    var treffer = -1;
+    for (var i = 0; i < offen.length; i++) {
+      var eintrag = offen[i];
+      var bereich = eintrag.mark.find();
+      if (!bereich) continue;                 // die Marke ist nicht mehr im Dokument
+      if (bereich.from.line === wunsch.von.line && bereich.from.ch === wunsch.von.ch
+          && bereich.to.line === wunsch.bis.line && bereich.to.ch === wunsch.bis.ch
+          && eintrag.text === wunsch.text) {
+        treffer = i;
+        break;
+      }
+    }
+    if (treffer >= 0) {
+      cmTodoMarken.push(offen.splice(treffer, 1)[0]);
+      return;
+    }
+    var kasten = _todoKasten(wunsch.erledigt);
+    var mark = cm.markText(wunsch.von, wunsch.bis, { replacedWith: kasten, atomic: true });
+    kasten.sfxMark = mark;
+    cmTodoMarken.push({ mark: mark, text: wunsch.text, kasten: kasten });
+  });
+  // Was uebrig bleibt, passt nicht mehr (der Text wurde geaendert) — aufraeumen.
+  offen.forEach(function (eintrag) { eintrag.mark.clear(); });
+}
+
 // P10.5, Block 11, Schritt 11.3 (ED-1): **kein Moduswechsel mehr.** Vorher wechselte der
 // Editor zwischen „Vorschau" (HTML) und „Bearbeiten" (Textarea) — der Wechsel war eine
 // eigene Ansicht und damit ein Weg, auf dem ein ungespeicherter Text verloren gehen konnte.
@@ -499,6 +624,10 @@ function setRawMode(on) {
     var huelle = cm.getWrapperElement();
     if (huelle) huelle.classList.toggle("is-raw", !!on);
   }
+  // P10.5, Block 11, Schritt 11.5 (ED-5/ED-2): im Rohtext steht **jedes** Zeichen — also
+  // auch das `[ ]` eines To-dos. Die Kaestchen werden abgeraeumt und beim Zurueckschalten
+  // neu gesetzt.
+  _todoMarkenAuffrischen();
   togglePreviewButtonEl.textContent = on ? "Live" : "Rohtext";
   togglePreviewButtonEl.setAttribute("aria-pressed", on ? "true" : "false");
   // Die Formatierhilfen bleiben **aktiv** (sie schreiben in den Puffer, in beiden Ansichten

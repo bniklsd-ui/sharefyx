@@ -85,6 +85,18 @@ function cellAlignClass(token) {
 
 var TABLE_SEPARATOR_RE = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
 
+// P10.5, Block 11, Schritt 11.5 (ED-2): die **Lesesicht** zeigt das To-do-Kaestchen —
+// **deaktiviert**. Es gibt dort keinen Schreibweg: angehakt wird nur im Editor, und der
+// Editor schreibt mit `version` (Hard Rule 3). Der Sanitizer **erzwingt** `disabled` noch
+// einmal (fail-closed) — erlauben waere nicht genug.
+function _todoHtml(inhalt, itemId, assetIds) {
+  var m = /^\[([ xX])\](\s*)(.*)$/.exec(inhalt);
+  if (!m) return inlineMarkdown(inhalt, itemId, assetIds);
+  var erledigt = m[1] !== " ";
+  return '<input type="checkbox" class="md-todo" disabled' + (erledigt ? " checked" : "")
+    + "> " + inlineMarkdown(m[3], itemId, assetIds);
+}
+
 export function markdownToHtml(src, options) {
   var itemId = options && options.itemId;
   var assetIds = (options && options.assetIds) || null;
@@ -180,7 +192,9 @@ export function markdownToHtml(src, options) {
         out += "<ul>";
         listType = "ul";
       }
-      out += "<li>" + inlineMarkdown(m[1], itemId, assetIds) + "</li>";
+      // P10.5, Block 11, Schritt 11.5 (ED-2): eine To-do-Zeile traegt ihr Kaestchen —
+      // in der **Lesesicht** deaktiviert (s. `_todoHtml`).
+      out += "<li>" + _todoHtml(m[1], itemId, assetIds) + "</li>";
       i++;
       continue;
     }
@@ -224,14 +238,22 @@ export function markdownToHtml(src, options) {
 var ALLOWED_TAGS = new Set([
   "P", "BR", "STRONG", "EM", "CODE", "PRE", "H1", "H2", "H3", "H4",
   "UL", "OL", "LI", "BLOCKQUOTE", "A", "TABLE", "THEAD", "TBODY", "TR", "TD", "TH", "HR", "IMG",
+  // P10.5, Block 11, Schritt 11.5 (ED-2): das To-do-Kaestchen der **Lesesicht**. Es wird
+  // **nur** von `markdownToHtml()` erzeugt (der Quelltext ist vorher escaped), und der
+  // Sanitizer erzwingt `type="checkbox"` und `disabled` (s. unten).
+  "INPUT",
 ]);
 var ALLOWED_ATTRS = {
   A: new Set(["href", "target", "rel"]),
   TD: new Set(["class"]),
   TH: new Set(["class"]),
   IMG: new Set(["src", "alt"]),
+  INPUT: new Set(["type", "checked", "disabled", "class"]),
 };
 var ALLOWED_CELL_CLASSES = new Set(["ta-l", "ta-c", "ta-r"]);
+//: Die erlaubten Klassen am To-do-Kaestchen (ED-2) — dieselbe Strenge wie bei den
+//: Tabellen-Zellen: eine feste Menge, kein freier Text.
+var ALLOWED_TODO_CLASSES = new Set(["md-todo"]);
 
 function safeHref(href) {
   var h = (href || "").trim();
@@ -269,6 +291,15 @@ function sanitizeHtml(html) {
       });
       if ((child.tagName === "TD" || child.tagName === "TH") && child.hasAttribute("class")) {
         if (!ALLOWED_CELL_CLASSES.has(child.getAttribute("class"))) child.removeAttribute("class");
+      }
+      if (child.tagName === "INPUT") {
+        // P10.5, Block 11, Schritt 11.5 (ED-2): das To-do-Kaestchen der **Lesesicht** —
+        // ein Kaestchen, **kein Schreibweg**. `type` und `disabled` werden **erzwungen**,
+        // nicht bloss erlaubt: ein anhakbares Kaestchen waere ein Schreibweg ausserhalb
+        // des Editors — und ohne `version` (Hard Rule 3).
+        child.setAttribute("type", "checkbox");
+        child.setAttribute("disabled", "disabled");
+        if (!ALLOWED_TODO_CLASSES.has(child.getAttribute("class"))) child.removeAttribute("class");
       }
       if (child.tagName === "IMG") {
         var safeImgSrc = safeSrc(child.getAttribute("src"));

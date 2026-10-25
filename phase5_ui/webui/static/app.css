@@ -1995,6 +1995,29 @@ select.input:focus {
 /* Die Cursorzeile traegt die Klasse `sfx-active-line` (am **Wrap-Layer**, der den Text
  * enthaelt) -- daher greift die Regel oben fuer ihre Formatierungszeichen. */
 
+/* P10.5, Block 11, Schritt 11.5 (ED-2): die To-do-Kaestchen.
+ *
+ * Im **Live-Editor** (`.sfx-todo`) ist das Kaestchen bedienbar: der Klick schaltet den
+ * **Text** im Puffer (`[ ]` <-> `[x]`); war der Editor sauber, wird sofort gespeichert —
+ * mit der Version aus dem Schnappschuss (Hard Rule 3).
+ *
+ * In der **Lesesicht** (`.preview .md-todo`) ist es **deaktiviert** — dort gibt es
+ * keinen Schreibweg. Der Sanitizer erzwingt `disabled` (fail-closed), die Optik hier
+ * macht es sichtbar. */
+.sfx-todo,
+.preview .md-todo {
+  accent-color: var(--accent);
+  width: 13px;
+  height: 13px;
+  margin: 0 calc(var(--space) * 0.5) 0 0;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.preview .md-todo {
+  cursor: default;
+  opacity: .75;
+}
+
 .editor__append {
   display: flex;
   gap: var(--space);

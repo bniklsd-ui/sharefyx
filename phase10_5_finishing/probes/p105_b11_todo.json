@@ -1,0 +1,126 @@
+{
+  "probe": "p105_b11_todo",
+  "instanz": {
+    "basis": "https://127.0.0.1:18812",
+    "pid": 4087921,
+    "wegwerf": true
+  },
+  "befund": {
+    "live_editor_geladen": true,
+    "todo_kaestchen_sichtbar": true,
+    "klick_schaltet_den_puffer": true,
+    "klick_schreibt_mit_version": true,
+    "klick_bei_geaendertem_editor_nur_puffer": true,
+    "lesesicht_zeigt_deaktiviertes_kaestchen": true,
+    "rohmodus_zeigt_jedes_zeichen": true,
+    "keine_seitenfehler": true,
+    "varianten_belege": {
+      "normal": {
+        "ausgeliefert": "original",
+        "ist_die_variante": true
+      },
+      "gegenlauf": {
+        "ausgeliefert": "gegenlauf",
+        "ist_die_variante": true
+      }
+    },
+    "alle_varianten_ausgeliefert": true,
+    "gegenlauf_rote_zellen": [
+      "klick_schreibt_mit_version"
+    ],
+    "gegenlauf_bricht_genau_die_schreibzelle": true
+  },
+  "messung": {
+    "normal": {
+      "variante_ausgeliefert": "original",
+      "live_editor_da": true,
+      "kaestchen": {
+        "anzahl": 3,
+        "angehakt": 1,
+        "typen": [
+          "checkbox",
+          "checkbox",
+          "checkbox"
+        ]
+      },
+      "wert_vor": "# To-do-Item\n\n- [ ] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n",
+      "wert_nach": "# To-do-Item\n\n- [x] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n",
+      "version_vor": {
+        "version": 1,
+        "body": "# To-do-Item\n\n- [ ] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n"
+      },
+      "version_nach": {
+        "version": 2,
+        "body": "# To-do-Item\n\n- [x] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n"
+      },
+      "wert_vor_dirty": "X# To-do-Item\n\n- [x] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n",
+      "wert_nach_dirty": "X# To-do-Item\n\n- [x] offen\n- [x] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n",
+      "version_vor_dirty": {
+        "version": 2,
+        "body": "# To-do-Item\n\n- [x] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n"
+      },
+      "version_nach_dirty": {
+        "version": 2,
+        "body": "# To-do-Item\n\n- [x] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n"
+      },
+      "lesesicht": {
+        "html": "<ul><li><input type=\"checkbox\" class=\"md-todo\" disabled=\"disabled\"> offen</li><li><input type=\"checkbox\" class=\"md-todo\" disabled=\"disabled\" checked=\"\"> erledigt</li></ul>",
+        "anzahl": 2,
+        "alle_deaktiviert": true,
+        "angehakt": 1
+      },
+      "rohmodus": {
+        "kaestchen": 0,
+        "text": "X# To-do-Item\n​\n- [x] offen\n- [x] zweiter\n- [x] erledigt\n​\nEin Satz ohne Kaestchen.\n​",
+        "roh": true
+      },
+      "seitenfehler": []
+    },
+    "gegenlauf": {
+      "variante_ausgeliefert": "gegenlauf",
+      "live_editor_da": true,
+      "kaestchen": {
+        "anzahl": 3,
+        "angehakt": 2,
+        "typen": [
+          "checkbox",
+          "checkbox",
+          "checkbox"
+        ]
+      },
+      "wert_vor": "# To-do-Item\n\n- [x] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n",
+      "wert_nach": "# To-do-Item\n\n- [ ] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n",
+      "version_vor": {
+        "version": 2,
+        "body": "# To-do-Item\n\n- [x] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n"
+      },
+      "version_nach": {
+        "version": 2,
+        "body": "# To-do-Item\n\n- [x] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n"
+      },
+      "wert_vor_dirty": "X# To-do-Item\n\n- [ ] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n",
+      "wert_nach_dirty": "X# To-do-Item\n\n- [ ] offen\n- [x] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n",
+      "version_vor_dirty": {
+        "version": 2,
+        "body": "# To-do-Item\n\n- [x] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n"
+      },
+      "version_nach_dirty": {
+        "version": 2,
+        "body": "# To-do-Item\n\n- [x] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n"
+      },
+      "lesesicht": {
+        "html": "<ul><li><input type=\"checkbox\" class=\"md-todo\" disabled=\"disabled\"> offen</li><li><input type=\"checkbox\" class=\"md-todo\" disabled=\"disabled\" checked=\"\"> erledigt</li></ul>",
+        "anzahl": 2,
+        "alle_deaktiviert": true,
+        "angehakt": 1
+      },
+      "rohmodus": {
+        "kaestchen": 0,
+        "text": "X# To-do-Item\n​\n- [ ] offen\n- [x] zweiter\n- [x] erledigt\n​\nEin Satz ohne Kaestchen.\n​",
+        "roh": true
+      },
+      "seitenfehler": []
+    }
+  },
+  "alle_kriterien_erfuellt": true
+}

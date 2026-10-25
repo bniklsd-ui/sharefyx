@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-25 (Session-Block Block 11.7 rotiert — das Budget; Block 11.5 folgt im Head) | 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,48 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-25 (Block 11.7: das Budget — jede Datei genau einmal)
+
+**Ergebnis.** Das Budget hat jetzt **zwei** Zeilen: der Erstaufruf (die Shell) und der
+**nachgeladene Editor**. Die Dateiauswahl ist aus der Hand genommen: die neue Funktion
+`static_payload_files(static_dir) -> (Erstaufruf, nachgeladen)` — erstere trägt `js/*.js`,
+`app.css`, `logo.svg` und die Fonts (**roh** gezählt: woff2 ist bereits komprimiert), letztere
+alles unter `vendor/` (CodeMirror kommt erst beim **Öffnen** eines Items). **Gemessen: Erstaufruf
+206,4 KB** (Korridor 250 KB) · **Editor 69,7 KB** (Korridor 80 KB) — **sechs** Messgrößen statt
+fünf, alle im Korridor.
+
+**Der Fund: eine Datei, die niemand zählte.** Das Wortzeichen `logo.svg` (Block 7.2) stand in
+**keiner** Liste — weder im Erstaufruf noch im Editor, also in **keiner** Nutzlast. Die Messung
+meldete trotzdem „grün": sie maß eine Nutzlast, die es so nicht gibt. Der Wächter
+`tests/test_budget_coverage.py` verlangt jetzt, dass **jede** Datei unter `static/` **genau
+einmal** in einer der beiden Listen steht; die Ausnahmen (`app.html` — kommt als Shell in die
+Zeile „Erstaufruf bis interaktiv"; die Lizenztexte — die lädt der Browser nicht) sind **einmal**
+festgeschrieben und werden **genannt**, nicht geschwiegen. Die Gegenprobe benutzt **dieselbe**
+Prüffunktion wie der Wächter: eine Datei, die niemand kennt, muss ihn rot machen.
+
+**Zwei Wächter, die im Arbeitsbaum der letzten Session verloren gegangen waren, sind wieder da.**
+(1) Beim Aufteilen des Modulstatus (Block 11.4) sind die Zeilen der **aktiven** Blöcke 11, 12
+und Z aus **beiden** Listen verschwunden — der Head zeigte danach nur die geschlossenen Blöcke
+0–10, und der Wächter, der die Aufteilung band, prüfte nur die Richtung „Archiv → Head": die drei
+Zeilen fehlten in beiden Listen, also war für sie niemand zuständig. Der Wächter prüft jetzt
+**beide** Richtungen, und ein zweiter verlangt eine Zeile je Block 0–12/Z. (2) Der
+Softcap-Wächter stand **ohne Grund** auf der Streichliste — die Datei erfüllte die Grenze
+(37.711 B von 40.960 B), der Wächter war grün, und er wurde trotzdem entfernt. Ein Wächter, der
+fällt, weil jemand ihn gelöscht hat, ist kein Wächter mehr. Die Grenze wurde **nicht**
+angehoben, sondern eingehalten.
+
+**Eine Zeile der Summenzeile stand doppelt** (Block 9.3 zweimal) — beim Nachziehen entfernt.
+
+**Suite 1542 grün** (354,21 s), `doc_health` 0, `ui_budget` **6/6** (die sechste Größe ist der
+nachgeladene Editor).
+
+**Was noch nicht gebaut ist.** ED-2 (To-do-Kästchen, 11.5), ED-3 (Stufe 2, 11.6), der Roundtrip
+(11.8). **P10.5-51 bleibt ⬜** — die Live-Darstellung ist gebaut und gemessen, aber das
+**Augen-Urteil** des Nikingers steht aus.
+
+**Nächster Schritt.** 11.5 (ED-2, die To-do-Kästchen) — das letzte Stück im Editor; danach 11.6
+(Stufe 2) und 11.8 (Roundtrip).
 
 ## Session stopped — 2026-10-24 (Block 11.4: die Live-Darstellung — V211 gemessen, nicht behauptet)
 

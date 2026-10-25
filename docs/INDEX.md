@@ -42,7 +42,7 @@ updated: 2026-10-24 (B11.4: V211 gemessen; zwei neue L3-Archive) | 2026-10-24 (B
 
 - [phase10_inventory/CLAUDE.md](../phase10_inventory/CLAUDE.md) — 📗 ~8KB · Phase-10-Head: Modulstatus Steps 0–4/Z (✅; Step 4 = Plan P10.5, 2026-10-21), ein Session-Block (Planungschat)
 - [phase10_inventory/SESSIONS_ARCHIVE.md](../phase10_inventory/SESSIONS_ARCHIVE.md) — 📦 ~27KB · ältere Session-Blöcke, verbatim
-- [phase10_inventory/BAUSTELLENREGISTER.md](../phase10_inventory/BAUSTELLENREGISTER.md) — 📗 **30.822 B** (10.138 B Luft) — 76 Baustellen; die Arbeitsliste für P10.5 (Tor P10-8 offen) · die **geschlossenen** Zeilen zeigen auf `REGISTER_ARCHIVE.md`
+- [phase10_inventory/BAUSTELLENREGISTER.md](../phase10_inventory/BAUSTELLENREGISTER.md) — 📗 **31.381 B** (9.579 B Luft) — 76 Baustellen; die Arbeitsliste für P10.5 (Tor P10-8 offen) · die **geschlossenen** Zeilen zeigen auf `REGISTER_ARCHIVE.md`
 - [phase10_inventory/REGISTER_ARCHIVE.md](../phase10_inventory/REGISTER_ARCHIVE.md) — 📦 **17.549 B** · die **geschlossenen** Registerzeilen (26), verbatim (2026-10-24 gewandert)
 - [phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md](../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md) — 📦 **5.615 B** · L3-Archiv der Entscheidungsliste D-1–D-18 des Phase-10-Registers — jede Frage, ihre Empfehlung und die Antwort des Nikingers, verbatim; am 2026-10-22 aus dem Register gewandert (P10.5 Block 0, Schritt 0.8)
 - [phase10_inventory/UPDATES_ARCHIVE.md](../phase10_inventory/UPDATES_ARCHIVE.md) — 📦 **4.509 B** · L3-Archiv der `updated:`-Fäden des Phase-10-Registers, verbatim — am 2026-10-24 rotiert, weil das Register an der Grenze stand
@@ -58,8 +58,8 @@ updated: 2026-10-24 (B11.4: V211 gemessen; zwei neue L3-Archive) | 2026-10-24 (B
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing — alle Baustellen schließen; Plan `docs/concepts/phase10_5_finishing_plan.md`, Ausführer M3.1 Flash als Open-Test)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **38.030 B** · Phase-10.5-Head: Modulstatus der Blöcke 0–12/Z, Deploy-Tabelle A–D, Abnahmestand P10.5-1–61 (43 ✅ · 0 ⚠️ · 18 ⬜), offene Punkte beim Nikinger, ein Session-Block (≤ 4 KiB, DO-3)
-- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **94660 B** · L3-Archiv der älteren Session-Blöcke dieser Phase, verbatim, newest-first
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **39.593 B** · Phase-10.5-Head: Modulstatus der Blöcke 0–12/Z, Deploy-Tabelle A–D, Abnahmestand P10.5-1–61 (44 ✅ · 0 ⚠️ · 17 ⬜), offene Punkte beim Nikinger, ein Session-Block (≤ 4 KiB, DO-3)
+- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **97655 B** · L3-Archiv der älteren Session-Blöcke dieser Phase, verbatim, newest-first
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · L3-Archiv der **Startaufträge von Block 7 und Block 9** (verbatim verschoben 2026-10-23 bzw. 2026-10-24) — Schritte 7.4–7.7 und die Ankündigung der drei P1-Öffnungen
 
 

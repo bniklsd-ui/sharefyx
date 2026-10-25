@@ -13,7 +13,7 @@ down:
   - STARTUPTRAG_ARCHIVE.md                          # 📦 die Startaufträge der Blöcke 7 und 9, verbatim
   - MODULSTATUS_ARCHIVE.md                         # 📦 die ausführlichen Statusspalten der Blöcke 0–10, verbatim
   - FREIGABEN_ARCHIVE.md                           # 📦 die Freigaben der Phase, verbatim
-updated: 2026-10-25 (Block 11.7: das Budget — jede Datei genau einmal; Erstaufruf 206,4 KB, Editor 69,7 KB) | 2026-10-24 (Block 11.4: die Live-Darstellung — V211 gemessen, nicht behauptet; Probe 15/15 grün, Gegenlauf rot; der Modulstatus der Blöcke 0–10 liegt jetzt im L3-Archiv) | 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein Moduswechsel; Probe 12/12 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-25 (Block 11.5: die To-do-Kästchen — der Text bleibt die Quelle; Probe 8/8 grün, Gegenlauf rot) | 2026-10-25 (Block 11.7: das Budget — jede Datei genau einmal; Erstaufruf 206,4 KB, Editor 69,7 KB) | 2026-10-24 (Block 11.4: die Live-Darstellung — V211 gemessen, nicht behauptet; Probe 15/15 grün, Gegenlauf rot; der Modulstatus der Blöcke 0–10 liegt jetzt im L3-Archiv) | 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein Moduswechsel; Probe 12/12 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -37,7 +37,7 @@ updated: 2026-10-25 (Block 11.7: das Budget — jede Datei genau einmal; Erstauf
 | 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | 🔄 2026-10-24 |
 | 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ✅ 2026-10-24 |
 | 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | ✅ 2026-10-24 |
-| 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | 🔄 2026-10-24 — **11.1 Vendor** (CodeMirror 5.65.16, **fünf** Dateien statt drei — gemessen: der UMD-Browser-Zweig der `markdown.min.js` löst `require("../xml/xml")` **nicht** auf) · **11.2 Nachlader** (`js/editor_cm.js`: CSS → Kern → Modus-Dateien, Promise gecacht, Fehler → `null` = Textarea/Rohmodus) · **11.3 Live-Editor** (`editor.js`: `getBody()`/`setBody()`, `setRawMode(on)`, Schalter „Rohtext", Probe 12/12 grün) · **11.4 Live-Darstellung** (V211 **gemessen**: `visibility: hidden` hält die Cursorposition, `display: none`/`font-size: 0` rücken sie 2 Zeichen vor; Probe 15/15 grün) · **11.7 Budget** (`ui_budget.py`: `static_payload_files()` — **jede Datei genau einmal**; Erstaufruf **206,4 KB** ≤ 250 KB, Editor **69,7 KB** ≤ 80 KB; Wächter `tests/test_budget_coverage.py` mit Gegenprobe) |
+| 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | 🔄 2026-10-24 — **11.1 Vendor** (CodeMirror 5.65.16, **fünf** Dateien statt drei — gemessen: der UMD-Browser-Zweig der `markdown.min.js` löst `require("../xml/xml")` **nicht** auf) · **11.2 Nachlader** (`js/editor_cm.js`: CSS → Kern → Modus-Dateien, Promise gecacht, Fehler → `null` = Textarea/Rohmodus) · **11.3 Live-Editor** (`editor.js`: `getBody()`/`setBody()`, `setRawMode(on)`, Schalter „Rohtext", Probe 12/12 grün) · **11.4 Live-Darstellung** (V211 **gemessen**: `visibility: hidden` hält die Cursorposition, `display: none`/`font-size: 0` rücken sie 2 Zeichen vor; Probe 15/15 grün) · **11.5 To-do-Kästchen** (ED-2: `cm.markText(…, {replacedWith: <checkbox>, atomic: true})` — der **Text** bleibt die Quelle; Klick bei sauberem Editor speichert **sofort** mit `version`, bei geändertem nur der Puffer; Lesesicht **deaktiviert**; Probe 8/8 grün, Gegenlauf bricht genau die Schreibzelle) · **11.7 Budget** (`ui_budget.py`: `static_payload_files()` — **jede Datei genau einmal**; Erstaufruf **206,4 KB** ≤ 250 KB, Editor **69,7 KB** ≤ 80 KB; Wächter `tests/test_budget_coverage.py` mit Gegenprobe) |
 | 12 | Doku und Altlasten: DO-1, LG-6, AL-1 (Rest), AL-3, BG-2/BG-3 | Claude Code | — | ⬜ |
 | Z | Closeout P10.5 (Handover, Grafik, Rotationen) | Claude Code + Nikinger | — | ⬜ |
 
@@ -118,7 +118,7 @@ updated: 2026-10-25 (Block 11.7: das Budget — jede Datei genau einmal; Erstauf
 | P10.5-50 | Budget: Erstaufruf ≤ 250 KB, Editor ≤ 80 KB, jede Datei gezählt | ✅ | 11.7 · `ui_budget.py` (**sechs** Messgrößen, alle im Korridor): Erstaufruf **206,4 KB** (Grenze 250 KB) · **Editor nachgeladen 69,7 KB** (Grenze 80 KB) · die Dateiauswahl wandert in `static_payload_files(static_dir) -> (Erstaufruf, nachgeladen)` · Wächter `tests/test_budget_coverage.py`: **jede** Datei unter `static/` steht **genau einmal** (Ausnahmen **genannt**, nicht geschwiegen: `app.html` → Zeile „Erstaufruf bis interaktiv", Lizenztexte → der Browser lädt sie nicht) · **der Fund**: `logo.svg` (Block 7.2) stand in **keiner** Liste — die Messung meldete „grün" und maß eine Nutzlast, die es so nicht gibt · **Gegenlauf**: dieselbe Prüffunktion mit einer unbekannten Datei → rot |
 | P10.5-51 | ED-1: kein Moduswechsel, Live-Darstellung (Nikinger-Sichtung) | ⬜ | 11.3 + 11.4 gebaut · **Wegwerf `probes/p105_b11_live_probe.py`: 15 von 15 Zellen grün** — der Cursor steht nach dem Klick **exakt** auf dem geklickten Zeichen (ch 15/18/26 = erwartet), die Formatierungszeichen sind **nur auf der Cursorzeile** sichtbar, der Rohmodus zeigt jedes Zeichen, der Notausgang (Nachlader scheitert → Textarea) funktioniert, keine Seitenfehler · **V211 ✅**: die Verbergungs-Art ist **gemessen**, nicht geschätzt — `visibility: hidden` hält die Cursorposition und lässt die Zeile **nicht** springen (0,0 px), `display: none` **und** `font-size: 0` setzen den Cursor **2 Zeichen zu früh** (18 → 16, 26 → 24: genau die zwei verdeckten `**`) und lassen die Zeile um **15,66 px** springen · **Gegenlauf**: ohne den `setValue`-Fix in `editor.js` sind genau **drei** Zellen rot · **die Sichtung des Nikingers steht aus** — die Zeile wird erst ✅, wenn er das Urteil gefällt hat |
 | P10.5-52 | Roundtrip 10/10 byte-identisch, Öffnen macht nie „geändert" | ⬜ | — |
-| P10.5-53 | ED-2: Klick bei sauberem Editor schreibt mit `version`; bei geändertem nur Puffer | ⬜ | — |
+| P10.5-53 | ED-2: Klick bei sauberem Editor schreibt mit `version`; bei geändertem nur Puffer | ✅ | 11.5 · `editor.js`: `cm.markText(…, {replacedWith: <checkbox>, atomic: true})` — der **Text** bleibt die Quelle (der Klick schreibt `[ ]`/`[x]` in den Puffer, nicht den DOM-Zustand) · bei **sauberem** Editor `if (sauber) saveItem();` (mit `state.editingSnapshot.version`, Hard Rule 3), bei **geändertem** nur der Puffer · Lesesicht (`markdown.js`): `<input type="checkbox" disabled>` — der Sanitizer **erzwingt** `disabled` und `type` (fail-closed) · **Wegwerf `probes/p105_b11_todo_probe.py`: 8/8 Zellen grün** (3 Kästchen, Klick schaltet den Puffer, Version springt, geänderter Editor schreibt **nicht**, Lesesicht deaktiviert, Rohmodus zeigt jedes Zeichen) · **Gegenlauf**: `editor.js` ohne `if (sauber) saveItem();` → **genau die Schreibzelle** rot · **drei Fehler lagen im Messgerät**: das sessionStorage leeren löschte den **CSRF-Token** (jeder Write endete mit 403) · der TOTP-**Replay-Schutz** des Auth-Servers verwarf die zweite Anmeldung im selben 30-Sekunden-Fenster (401) · die „umgeschaltet"-Prüfung ersetzte **alle** `[ ]` statt einer |
 | P10.5-54 | ED-3: Vokabular gerendert, unbekannte Klasse wörtlich; `get_item` zeigt Rohtext | ⬜ | — |
 | P10.5-55 | ED-5: Rohtext-Schalter zeigt jedes Zeichen | ⬜ | — |
 | P10.5-56 | P1-11 dokumentiert; `git diff -- phase1_storage/storage` für ED-3 leer | ⬜ | — |
@@ -128,7 +128,7 @@ updated: 2026-10-25 (Block 11.7: das Budget — jede Datei genau einmal; Erstauf
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
 
-**Summe:** 43 ✅ · 0 ⚠️ · 18 ⬜ (von 61). **[2026-10-25, Block 11.7]** +1 ✅ (10-50, das Budget) ⇒ 43 ✅ · 0 ⚠️ · 18 ⬜. **[2026-10-24, Block 10.5]** +4 ✅ (10-45, 10-46, 10-47, 10-48) ⇒ 42 ✅ · 0 ⚠️ · 19 ⬜. **[2026-10-24, Block 9.3]** +2 ✅ (10-43, 10-44) ⇒ 38 ✅ · 0 ⚠️ · 23 ⬜. **[2026-10-24, Block 9.2]** +1 ✅ (10-42, RE-4 `rename_folder`) ⇒ 36 ✅ · 0 ⚠️ · 25 ⬜. **[2026-10-24, Block 9.1]** +1 ✅ (10-41, RE-7 `created_by`) ⇒ 35 ✅ · 0 ⚠️ · 26 ⬜. **[2026-10-24, Block 8]** +4 ✅ (10-36, 10-38, 10-39, 10-40) ⇒ 34 ✅ · 0 ⚠️ · 27 ⬜. **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`). **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
+**Summe:** 44 ✅ · 0 ⚠️ · 17 ⬜ (von 61). **[2026-10-25, Block 11.5]** +1 ✅ (10-53, ED-2 die To-do-Kästchen) ⇒ 44 ✅ · 0 ⚠️ · 17 ⬜. **[2026-10-25, Block 11.7]** +1 ✅ (10-50, das Budget) ⇒ 43 ✅ · 0 ⚠️ · 18 ⬜. **[2026-10-24, Block 10.5]** +4 ✅ (10-45, 10-46, 10-47, 10-48) ⇒ 42 ✅ · 0 ⚠️ · 19 ⬜. **[2026-10-24, Block 9.3]** +2 ✅ (10-43, 10-44) ⇒ 38 ✅ · 0 ⚠️ · 23 ⬜. **[2026-10-24, Block 9.2]** +1 ✅ (10-42, RE-4 `rename_folder`) ⇒ 36 ✅ · 0 ⚠️ · 25 ⬜. **[2026-10-24, Block 9.1]** +1 ✅ (10-41, RE-7 `created_by`) ⇒ 35 ✅ · 0 ⚠️ · 26 ⬜. **[2026-10-24, Block 8]** +4 ✅ (10-36, 10-38, 10-39, 10-40) ⇒ 34 ✅ · 0 ⚠️ · 27 ⬜. **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`). **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
 
 ## Offen beim Nikinger
 
@@ -170,44 +170,44 @@ updated: 2026-10-25 (Block 11.7: das Budget — jede Datei genau einmal; Erstauf
 ## Startauftrag — Block 9 (Rechte und Namen: RE-7, RE-4, RE-3) · Ausführer
 > **Verbatim verschoben** nach `STARTUPTRAG_ARCHIVE.md` (`scripts/move_sections.py`) — dort unter derselben Überschrift.
 
-## Session stopped — 2026-10-25 (Block 11.7: das Budget — jede Datei genau einmal)
+## Session stopped — 2026-10-25 (Block 11.5: die To-do-Kästchen — der Text bleibt die Quelle)
 
-**Ergebnis.** Das Budget hat jetzt **zwei** Zeilen: der Erstaufruf (die Shell) und der
-**nachgeladene Editor**. Die Dateiauswahl ist aus der Hand genommen: die neue Funktion
-`static_payload_files(static_dir) -> (Erstaufruf, nachgeladen)` — erstere trägt `js/*.js`,
-`app.css`, `logo.svg` und die Fonts (**roh** gezählt: woff2 ist bereits komprimiert), letztere
-alles unter `vendor/` (CodeMirror kommt erst beim **Öffnen** eines Items). **Gemessen: Erstaufruf
-206,4 KB** (Korridor 250 KB) · **Editor 69,7 KB** (Korridor 80 KB) — **sechs** Messgrößen statt
-fünf, alle im Korridor.
+**Ergebnis.** `- [ ]`/`- [x]` am Zeilenanfang sind im Live-Modus **anklickbar**:
+`cm.markText(…, {replacedWith: <checkbox>, atomic: true})` ersetzt die drei Zeichen durch ein
+Kästchen (`atomic`, damit der Cursor nicht **in** `[ ]` hineinwandert). **Der Text bleibt die
+Quelle** — der Klick schreibt `[ ]`/`[x]` in den **Puffer** (`cm.replaceRange`), nicht den
+DOM-Zustand des Kästchens; einen zweiten Zustand, den der Server nicht kennt, gibt es nicht.
 
-**Der Fund: eine Datei, die niemand zählte.** Das Wortzeichen `logo.svg` (Block 7.2) stand in
-**keiner** Liste — weder im Erstaufruf noch im Editor, also in **keiner** Nutzlast. Die Messung
-meldete trotzdem „grün": sie maß eine Nutzlast, die es so nicht gibt. Der Wächter
-`tests/test_budget_coverage.py` verlangt jetzt, dass **jede** Datei unter `static/` **genau
-einmal** in einer der beiden Listen steht; die Ausnahmen (`app.html` — kommt als Shell in die
-Zeile „Erstaufruf bis interaktiv"; die Lizenztexte — die lädt der Browser nicht) sind **einmal**
-festgeschrieben und werden **genannt**, nicht geschwiegen. Die Gegenprobe benutzt **dieselbe**
-Prüffunktion wie der Wächter: eine Datei, die niemand kennt, muss ihn rot machen.
+**Der Schreibweg (Hard Rule 3).** War der Editor **vor** dem Klick unverändert, folgt sofort
+`saveItem()` — mit der Version aus dem Schnappschuss (`state.editingSnapshot.version`); ein
+Konflikt öffnet den bestehenden Dialog. War er **geändert**, gehört der Klick zur nächsten
+Speicherung: nur Puffer. Der Zustand wird **vor** dem Schreiben gemessen (`var sauber =
+!isDirty();` **vor** `cm.replaceRange`) — sonst wäre der Editor durch den eigenen Klick schon
+geändert und der Klick speicherte **nie**.
 
-**Zwei Wächter, die im Arbeitsbaum der letzten Session verloren gegangen waren, sind wieder da.**
-(1) Beim Aufteilen des Modulstatus (Block 11.4) sind die Zeilen der **aktiven** Blöcke 11, 12
-und Z aus **beiden** Listen verschwunden — der Head zeigte danach nur die geschlossenen Blöcke
-0–10, und der Wächter, der die Aufteilung band, prüfte nur die Richtung „Archiv → Head": die drei
-Zeilen fehlten in beiden Listen, also war für sie niemand zuständig. Der Wächter prüft jetzt
-**beide** Richtungen, und ein zweiter verlangt eine Zeile je Block 0–12/Z. (2) Der
-Softcap-Wächter stand **ohne Grund** auf der Streichliste — die Datei erfüllte die Grenze
-(37.711 B von 40.960 B), der Wächter war grün, und er wurde trotzdem entfernt. Ein Wächter, der
-fällt, weil jemand ihn gelöscht hat, ist kein Wächter mehr. Die Grenze wurde **nicht**
-angehoben, sondern eingehalten.
+**Die Lesesicht hat keinen Schreibweg.** `markdown.js` rendert `<input type="checkbox"
+disabled>` — und der Sanitizer **erzwingt** `disabled` und `type="checkbox"` (fail-closed:
+erlauben wäre nicht genug). Im Rohmodus (ED-5) steht jedes Zeichen: die Kästchen werden
+abgeräumt, das `[ ]` ist wieder Text.
 
-**Eine Zeile der Summenzeile stand doppelt** (Block 9.3 zweimal) — beim Nachziehen entfernt.
+**Wegwerf `probes/p105_b11_todo_probe.py`: 8/8 Zellen grün** (Port 18812) — 3 Kästchen, der
+Klick schaltet den Puffer, die Version springt, der geänderte Editor schreibt **nicht**, die
+Lesesicht ist deaktiviert, der Rohmodus zeigt jedes Zeichen. Der **Gegenlauf** liefert
+`editor.js` **ohne** `if (sauber) saveItem();` und macht **genau die Schreibzelle** rot.
+Zehn neue Wächter in `tests/test_editor_todo.py` (u. a.: der Klick schreibt in den **Puffer**,
+`isDirty()` wird **vor** dem Schreiben gemessen, der Sanitizer **erzwingt** `disabled`).
 
-**Suite 1542 grün** (354,21 s), `doc_health` 0, `ui_budget` **6/6** (die sechste Größe ist der
-nachgeladene Editor).
+**Drei Fehler lagen im Messgerät, nicht im Produkt.** (1) Das sessionStorage zu leeren löschte
+den **CSRF-Token** (er liegt dort) — jeder Write endete mit **403**. (2) Der TOTP-**Replay-Schutz**
+des Auth-Servers (`totp_replay`) verwarf die zweite Anmeldung, weil sie im **selben**
+30-Sekunden-Fenster lag — **401**; die Probe wartet jetzt auf ein neues Fenster. (3) Die
+„umgeschaltet"-Prüfung ersetzte **alle** `[ ]` statt einer und meldete „nicht umgeschaltet",
+obwohl der Klick genau richtig gearbeitet hatte.
 
-**Was noch nicht gebaut ist.** ED-2 (To-do-Kästchen, 11.5), ED-3 (Stufe 2, 11.6), der Roundtrip
-(11.8). **P10.5-51 bleibt ⬜** — die Live-Darstellung ist gebaut und gemessen, aber das
-**Augen-Urteil** des Nikingers steht aus.
+**Ein Doku-Fund:** der erste Register-Eintrag legte seine Notiz als **neue Zelle** an — der
+Wächter `test_table_shape.py` (Phantom-Spalte) wurde rot. Die Notiz gehoert in die **letzte**
+Zelle, wie bei ED-1.
 
-**Nächster Schritt.** 11.5 (ED-2, die To-do-Kästchen) — das letzte Stück im Editor; danach 11.6
-(Stufe 2) und 11.8 (Roundtrip).
+**Suite 1552 grün** (340,87 s), `doc_health` 0, `ui_budget` **6/6** (Erstaufruf **209,3 KB** ≤ 250 KB).
+
+**Nächster Schritt.** 11.6 (ED-3, die Format-Konvention Stufe 2) — danach 11.8 (Roundtrip).

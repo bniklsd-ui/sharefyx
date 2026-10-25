@@ -1,0 +1,57 @@
+{
+  "messung": {
+    "variante_ausgeliefert": "gegenlauf",
+    "live_editor_da": true,
+    "kaestchen": {
+      "anzahl": 3,
+      "angehakt": 2,
+      "typen": [
+        "checkbox",
+        "checkbox",
+        "checkbox"
+      ]
+    },
+    "wert_vor": "# To-do-Item\n\n- [x] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n",
+    "wert_nach": "# To-do-Item\n\n- [ ] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n",
+    "version_vor": {
+      "version": 2,
+      "body": "# To-do-Item\n\n- [x] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n"
+    },
+    "version_nach": {
+      "version": 2,
+      "body": "# To-do-Item\n\n- [x] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n"
+    },
+    "wert_vor_dirty": "X# To-do-Item\n\n- [ ] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n",
+    "wert_nach_dirty": "X# To-do-Item\n\n- [ ] offen\n- [x] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n",
+    "version_vor_dirty": {
+      "version": 2,
+      "body": "# To-do-Item\n\n- [x] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n"
+    },
+    "version_nach_dirty": {
+      "version": 2,
+      "body": "# To-do-Item\n\n- [x] offen\n- [ ] zweiter\n- [x] erledigt\n\nEin Satz ohne Kaestchen.\n"
+    },
+    "lesesicht": {
+      "html": "<ul><li><input type=\"checkbox\" class=\"md-todo\" disabled=\"disabled\"> offen</li><li><input type=\"checkbox\" class=\"md-todo\" disabled=\"disabled\" checked=\"\"> erledigt</li></ul>",
+      "anzahl": 2,
+      "alle_deaktiviert": true,
+      "angehakt": 1
+    },
+    "rohmodus": {
+      "kaestchen": 0,
+      "text": "X# To-do-Item\n​\n- [ ] offen\n- [x] zweiter\n- [x] erledigt\n​\nEin Satz ohne Kaestchen.\n​",
+      "roh": true
+    },
+    "seitenfehler": []
+  },
+  "zellen": {
+    "live_editor_geladen": true,
+    "todo_kaestchen_sichtbar": true,
+    "klick_schaltet_den_puffer": true,
+    "klick_schreibt_mit_version": false,
+    "klick_bei_geaendertem_editor_nur_puffer": true,
+    "lesesicht_zeigt_deaktiviertes_kaestchen": true,
+    "rohmodus_zeigt_jedes_zeichen": true,
+    "keine_seitenfehler": true
+  }
+}
