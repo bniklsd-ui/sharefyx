@@ -65,6 +65,18 @@
      nicht — sie sind hier **neu** und aus demselben Dunkelheits-Familie abgeleitet. */
   --format-gruen:  #46B37A;
   --format-gelb:   #D9A03C;
+  /* Der Editor ist eine **helle Schreibfläche** (bewusst, 2026-10-25): auf Hell gilt Dunkel.
+   * Die UI-Töne `--text`/`--accent` sind für den dunklen Grund gemacht und würden dort
+   * verschwinden — deshalb eigene Töne, alle ≥ 4,5:1 auf `--editor-bg`. */
+  --editor-bg:     #D8DDE5;
+  --editor-text:   #12161C;
+  --editor-faint:  #4A5262;
+  --editor-select: #B7C6E4;
+  --editor-link:   #1B4FB5;
+  --editor-rot:    #A8211B;
+  --editor-blau:   #1B4FB5;
+  --editor-gruen:  #17663A;
+  --editor-gelb:   #7A5600;
 
   --warn:          #E5A93C;   /* Konflikt */
   --danger:        #E5484D;   /* Widerruf, Archivieren */
@@ -1961,20 +1973,20 @@ select.input:focus {
   flex: 1;
   min-width: 0;
   height: 100%;
-  background: none;
-  color: var(--text);
+  background: var(--editor-bg);
+  color: var(--editor-text);
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.6;
 }
 .CodeMirror-lines { padding: calc(var(--space) * 2) calc(var(--space) * 3); }
-.CodeMirror-cursor { border-left: 2px solid var(--text); }
-.CodeMirror-selected { background: var(--accent-quiet); }
-.CodeMirror-focused .CodeMirror-selected { background: var(--accent-quiet); }
+.CodeMirror-cursor { border-left: 2px solid var(--editor-text); }
+.CodeMirror-selected { background: var(--editor-select); }
+.CodeMirror-focused .CodeMirror-selected { background: var(--editor-select); }
 .CodeMirror pre.CodeMirror-line { padding: 0; }
 
 /* Die Live-Darstellung: die Markdown-Zeichen bekommen die Optik der Ausgabe. */
-.CodeMirror .cm-header { color: var(--text); font-weight: 600; }
+.CodeMirror .cm-header { color: var(--editor-text); font-weight: 600; }
 .CodeMirror .cm-header-1 { font-size: 1.3em; line-height: 1.35; }
 .CodeMirror .cm-header-2 { font-size: 1.18em; }
 .CodeMirror .cm-header-3 { font-size: 1.08em; }
@@ -1983,11 +1995,21 @@ select.input:focus {
 .CodeMirror .cm-header-6 { font-size: 1em; }
 .CodeMirror .cm-strong { font-weight: 700; }
 .CodeMirror .cm-em { font-style: italic; }
-.CodeMirror .cm-link { color: var(--accent); text-decoration: underline; }
-.CodeMirror .cm-url { color: var(--text-faint); }
-.CodeMirror .cm-quote { color: var(--text-muted); font-style: italic; }
-.CodeMirror .cm-comment { color: var(--text-faint); }
-.CodeMirror .cm-formatting { color: var(--text-faint); }
+.CodeMirror .cm-link { color: var(--editor-link); text-decoration: underline; }
+.CodeMirror .cm-url { color: var(--editor-faint); }
+.CodeMirror .cm-quote { color: var(--editor-faint); font-style: italic; }
+.CodeMirror .cm-comment { color: var(--editor-faint); }
+.CodeMirror .cm-formatting { color: var(--editor-faint); }
+/* Der Format-Overlay (ED-3): die Farbe des Textes, ohne Unterstreichung (das Markdown-
+ * Modul hält `[Text]` fuer einen Verweis; die Farbe gehört dem Format). Nach `.cm-link`,
+ * gleiche Spezifität — die spätere Regel gewinnt. */
+.CodeMirror .cm-md-c-rot { color: var(--editor-rot); text-decoration: none; }
+.CodeMirror .cm-md-c-blau { color: var(--editor-blau); text-decoration: none; }
+.CodeMirror .cm-md-c-gruen { color: var(--editor-gruen); text-decoration: none; }
+.CodeMirror .cm-md-c-gelb { color: var(--editor-gelb); text-decoration: none; }
+.CodeMirror .cm-md-plain { color: var(--editor-text); text-decoration: none; }
+/* Listen-/Aufgabentext: der Markdown-Modus faerbt ihn `variable-2` (Standard: Blau) — hier ist es Text. */
+.CodeMirror .cm-variable-2, .CodeMirror .cm-variable-3 { color: var(--editor-text); }
 
 /* Die Formatierungszeichen sind auf den **anderen** Zeilen unsichtbar (s. der Kommentar
  * oben). Die Cursorzeile traegt sie sichtbar -- dort schreibt der Mensch gerade. */

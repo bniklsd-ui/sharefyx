@@ -76,7 +76,11 @@ function ladeCss(pfad) {
     link.setAttribute("data-cm-css", pfad);
     link.onload = function () { resolve(); };
     link.onerror = function () { reject(new Error("CSS nicht ladbar: " + pfad)); };
-    document.head.appendChild(link);
+    // **Vor** `app.css`: bei gleicher Spezifitaet gewinnt die spaetere Datei — das vendorte
+    // CSS darf unsere Regeln nicht uebertrumpfen (Befund der Sichtung, 2026-10-25).
+    var app = document.querySelector('link[rel="stylesheet"][href$="app.css"]');
+    if (app && app.parentNode) app.parentNode.insertBefore(link, app);
+    else document.head.appendChild(link);
   });
 }
 

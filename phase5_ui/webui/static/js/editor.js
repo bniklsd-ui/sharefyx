@@ -430,15 +430,39 @@ function renderCreatedByLine(item) {
 // Der Stream gehoert dem Overlay (CM5 faehrt Overlay und Modus auf **zwei** Streams) — der
 // Zaehler `stream.pos` ist also der Overlay-eigene, nicht der des Markdown-Modus.
 function _formatOverlayToken(stream) {
+  // **Drei Stuecke**, stateless ueber Vorausschau und das Zeichen davor: `[` (Zeichen),
+  // der Text (Farbe), `]{.rot}` (Zeichen). Die **Zeichen** tragen `formatting` — dieselbe
+  // Klasse wie die Markdown-Zeichen, also blendet `app.css` sie auf den anderen Zeilen aus.
+  // Eine **unbekannte** Klasse bleibt wörtlich (kein Stueck wird erkannt). Eine Groesse
+  // allein faerbt nichts (sie wuerde die Zeilenhoehe aendern), nimmt dem Text aber die
+  // Verweis-Optik des Markdown-Modus (`md-plain`).
+  var V = FORMAT_VOKABULAR;
+  function klasse(a, b) {
+    var k = [a, b].filter(Boolean);
+    for (var n = 0; n < k.length; n++) if (!V.farben[k[n]] && !V.groessen[k[n]]) return null;
+    for (var f = 0; f < k.length; f++) if (V.farben[k[f]]) return V.farben[k[f]];
+    return k.length ? "md-plain" : null;
+  }
   var rest = stream.string.slice(stream.pos);
-  var m = /\[([^\]\n]+)\]\{\.([a-z]+)(?: \.([a-z]+))?\}/.exec(rest);
-  if (!m) { stream.skipToEnd(); return null; }
-  // Bis zur Form vorruecken — der Vorspann bleibt **unformatiert**.
-  var ziel = stream.pos + m.index;
-  while (stream.pos < ziel) stream.next();
-  var treffer = stream.match(/\[([^\]\n]+)\]\{\.([a-z]+)(?: \.([a-z]+))?\}/);
-  if (!treffer) { stream.skipToEnd(); return null; }
-  return FORMAT_VOKABULAR.farben[treffer[2]] || null;
+  var davor = stream.pos > 0 ? stream.string.charAt(stream.pos - 1) : "";
+  if (stream.sol() && /^:::/.test(rest)) { stream.skipToEnd(); return "formatting"; }
+  var m = /^\[([^\]\n]+)\]\{\.([a-z]+)(?: \.([a-z]+))?\}/.exec(rest);
+  if (m && klasse(m[2], m[3])) {
+    stream.next();                                   // das `[`
+    return "formatting";
+  }
+  var am = /^([^\]\n]+)\]\{\.([a-z]+)(?: \.([a-z]+))?\}/.exec(rest);
+  if (davor === "[" && am && klasse(am[2], am[3])) {
+    stream.pos += am[1].length;                      // der Text
+    return klasse(am[2], am[3]);
+  }
+  var zm = /^\]\{\.([a-z]+)(?: \.([a-z]+))?\}/.exec(rest);
+  if (zm && klasse(zm[1], zm[2]) && /\[[^\]\n]+$/.test(stream.string.slice(0, stream.pos))) {
+    stream.pos += zm[0].length;                      // `]{.rot}`
+    return "formatting";
+  }
+  stream.next();
+  return null;
 }
 
 // P10.5, Block 11, Schritt 11.3 (ED-1): der Live-Editor entsteht **beim Öffnen** eines
