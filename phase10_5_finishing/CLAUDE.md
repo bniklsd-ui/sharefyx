@@ -133,6 +133,20 @@ Ende); die **Belegte** stehen im Commit und im Session-Block.
 ## Startauftrag — Block 9 (Rechte und Namen: RE-7, RE-4, RE-3) · Ausführer
 > **Verbatim verschoben** nach `STARTUPTRAG_ARCHIVE.md` (`scripts/move_sections.py`) — dort unter derselben Überschrift.
 
+## Nächste Session — Aufträge des Nikingers (2026-10-25, **nicht** jetzt beheben)
+
+1. **Größe im Editor:** `klein`/`groß` sollen im Live-Editor **tatsächlich** die Schriftgröße
+   ändern (heute bewusst nur in der Vorschau, weil die Zeilenhöhe springt — das Springen ist
+   dann zu lösen, nicht die Größe wegzulassen).
+2. **Knopffarben vereinheitlichen** auf das blau-leicht-transparente Design — **erst Punkt 3
+   ansehen**: die Überarbeitung der Knopfleiste macht diesen Punkt womöglich überflüssig.
+3. **Die ganze Knopfleiste überarbeiten, an Word orientiert:** ähnliche Knöpfe, vor allem die
+   **Reihenfolge 1:1 wie in Word** (eine allgemeine Anordnung ist nicht urheberrechtlich
+   geschützt). Betrifft `app.html` (Werkzeugleiste), `editor.js`, `app.css`, Probe/Wächter.
+4. **Screenshots der ganzen Gehirnkarte** (nicht nur der Ausschnitt im Übersichtspanel) für das
+   Urteil des Nikingers (P10.5-37). Der Dateiversand ist in dieser Umgebung nicht möglich
+   (kein Projekt-Thread): Bilder liegen unter `docs/screenshots/`; alternativ als Artifact.
+
 ## Session stopped — 2026-10-25 (Block 12: Doku und Altlasten)
 
 **Ergebnis.** DO-1, LG-6, AL-1/AL-3, BG-2/BG-3 und die Register-Bilanz sind erledigt.
