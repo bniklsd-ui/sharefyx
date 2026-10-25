@@ -168,11 +168,12 @@ CSS **hinter** `app.css` an, bei gleicher Spezifität gewinnt es (`.CodeMirror`,
 `.cm-link`). (B) Das **Format-Overlay färbt nichts**: `[rot]{.rot}` erscheint als blauer Link plus
 Text `{.rot}`, `app.css` kennt keine `cm-…`-Regel dazu (11.6 hatte das als „nicht gemessen“ benannt).
 (C) `::: {.zentriert}` bleibt Rohtext. Cursorzeile, To-do-Kästchen, Rohtext, UI-4 sehen richtig aus.
-**Entscheidung Nikinger (2026-10-25): die Fläche bleibt hell** (leicht abgedunkelt, `--editor-bg`),
-auf Hell gilt Dunkel — eigene `--editor-*`-Töne statt der UI-Töne. **Behoben:** (A) Vendor-CSS
-wird **vor** `app.css` eingefügt, Editor-Töne ≥ 4,5:1; (B) Overlay zerlegt `[Text]{.rot}` in
-Zeichen (ausgeblendet außerhalb der Cursorzeile) und Text (Farbe); (C) `:::`-Zeilen sind
-Zeichen (Ausrichtung selbst zeigt nur die Vorschau). Suite **1576 grün**. **P10.5-51 bleibt ⬜**
+**Entscheidung Nikinger (2026-10-25): die Fläche bleibt dunkel** (die bisherige Farbe, gern noch
+etwas dunkler → `--editor-bg` `#0C1017`, tiefer als das Panel; ein erster Entwurf mit heller
+Fläche war ein Missverständnis und ist zurückgenommen). Text und Format-Farben sind die hellen
+UI-Töne. **Behoben:** (A) Vendor-CSS wird **vor** `app.css` eingefügt; (B) Overlay zerlegt
+`[Text]{.rot}` in Zeichen (ausgeblendet außerhalb der Cursorzeile) und Text (Farbe); (C) `:::`-Zeilen
+sind Zeichen (Ausrichtung selbst zeigt nur die Vorschau). Suite **1576 grün**. **P10.5-51 bleibt ⬜**
 bis zur Sichtung der neuen Bilder.
 
 **Nächster Schritt.** **Block Z (Closeout)** — erst nach P10.5-27/28 live (Nikinger). Beim

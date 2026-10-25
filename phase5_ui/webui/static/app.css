@@ -65,18 +65,18 @@
      nicht — sie sind hier **neu** und aus demselben Dunkelheits-Familie abgeleitet. */
   --format-gruen:  #46B37A;
   --format-gelb:   #D9A03C;
-  /* Der Editor ist eine **helle Schreibfläche** (bewusst, 2026-10-25): auf Hell gilt Dunkel.
-   * Die UI-Töne `--text`/`--accent` sind für den dunklen Grund gemacht und würden dort
-   * verschwinden — deshalb eigene Töne, alle ≥ 4,5:1 auf `--editor-bg`. */
-  --editor-bg:     #D8DDE5;
-  --editor-text:   #12161C;
-  --editor-faint:  #4A5262;
-  --editor-select: #B7C6E4;
-  --editor-link:   #1B4FB5;
-  --editor-rot:    #A8211B;
-  --editor-blau:   #1B4FB5;
-  --editor-gruen:  #17663A;
-  --editor-gelb:   #7A5600;
+  /* Der Editor bleibt **dunkel** (Nikinger 2026-10-25: „die bisherige Farbe, gern noch etwas
+   * dunkler"): eine Schreibfläche, die tiefer liegt als das Panel. Auf Dunkel gilt Hell —
+   * die UI-Töne passen, die Format-Farben sind die hellen Tokens oben. */
+  --editor-bg:     #0C1017;
+  --editor-text:   var(--text);
+  --editor-faint:  var(--text-faint);
+  --editor-link:   var(--accent);
+  --editor-select: rgba(62,141,243,.30);
+  --editor-rot:    var(--danger);
+  --editor-blau:   var(--accent);
+  --editor-gruen:  var(--format-gruen);
+  --editor-gelb:   var(--format-gelb);
 
   --warn:          #E5A93C;   /* Konflikt */
   --danger:        #E5484D;   /* Widerruf, Archivieren */
