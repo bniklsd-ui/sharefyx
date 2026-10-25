@@ -60,6 +60,11 @@
   --accent:        #3E8DF3;   /* das einzige Blau */
   --accent-quiet:  rgba(62,141,243,.14);
   --accent-line:   rgba(62,141,243,.40);
+  /* P10.5, Block 11, Schritt 11.6 (ED-3): die **Farben der Format-Konvention**. Rot und
+     Blau sind die vorhandenen Tokens (`--danger`, `--accent`); Grün und Gelb gab es noch
+     nicht — sie sind hier **neu** und aus demselben Dunkelheits-Familie abgeleitet. */
+  --format-gruen:  #46B37A;
+  --format-gelb:   #D9A03C;
 
   --warn:          #E5A93C;   /* Konflikt */
   --danger:        #E5484D;   /* Widerruf, Archivieren */
@@ -2017,6 +2022,39 @@ select.input:focus {
   cursor: default;
   opacity: .75;
 }
+
+/* P10.5, Block 11, Schritt 11.6 (ED-3): die **Format-Konvention** (Stufe 2).
+ *
+ * Drei Gruppen: **Farbe** · **Groesse** · **Ausrichtung**. Die Klassen kommen aus dem
+ * Vokabular in `js/markdown.js` — der Sanitizer laesst **nur** diese durch, eine fremde
+ * Klasse kommt gar nicht erst an (darum sind die Regeln global und nicht nur unter
+ * `.preview`: dieselben Klassen nutzt der **Editor-Overlay**, der schon beim Schreiben
+ * faerbt). */
+.md-c-rot { color: var(--danger); }
+.md-c-blau { color: var(--accent); }
+.md-c-gruen { color: var(--format-gruen); }
+.md-c-gelb { color: var(--format-gelb); }
+.md-s-klein { font-size: .85em; }
+.md-s-normal { font-size: 1em; }
+.md-s-gross { font-size: 1.2em; }
+.md-a-links { text-align: left; }
+.md-a-zentriert { text-align: center; }
+.md-a-rechts { text-align: right; }
+
+/* Die **Auswahl** in der Werkzeugleiste (Farbe/Größe/Ausrichtung). Die drei Felder sind
+ * keine Formatierhilfen im alten Sinn — sie schreiben eine **Konvention** in den Text. */
+.toolbar-select {
+  background: var(--surface-raised);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: var(--fs-meta);
+  padding: 3px 6px;
+  cursor: pointer;
+}
+.toolbar-select:hover { border-color: var(--line-strong); }
+.toolbar-select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 .editor__append {
   display: flex;

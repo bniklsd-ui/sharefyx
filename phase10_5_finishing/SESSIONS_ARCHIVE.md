@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-25 (Session-Block Block 11.5 rotiert — die To-do-Kästchen; Block 11.8 folgt im Head) | 2026-10-25 (Session-Block Block 11.7 rotiert — das Budget; Block 11.5 folgt im Head) | 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-25 (Session-Block Block 11.8 rotiert — der Roundtrip; Block 11.6 folgt im Head) | 2026-10-25 (Session-Block Block 11.5 rotiert — die To-do-Kästchen; Block 11.8 folgt im Head) | 2026-10-25 (Session-Block Block 11.7 rotiert — das Budget; Block 11.5 folgt im Head) | 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,60 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-25 (Block 11.8: der Roundtrip — 10/10 byte-identisch)
+
+**Ergebnis.** Die **zehn** M7-Fixtures (Frontmatter, Listen, Tabelle, Code, Links,
+`itm_…`-Referenzen, Taskliste, Zitat, Unicode/Tabs, Whitespace) liegen als Items in der
+Wegwerf-Instanz (Port 18813). Je Item gemessen: der Editor zeigt **byte-identisch** den
+Body, `isDirty()` ist beim Öffnen **false** (der Speicher-Knopf ist deaktiviert), ein Zeichen
+tippen und wieder löschen → wieder **false**. Dazu (im Python-Teil der Probe) der
+**Plattenvergleich**: die **Item-Dateien** sind vor dem Lauf und nach dem Lauf **byte-identisch**
+(SHA-256 über alle zehn Dateien). **10/10 Zellen grün** — V201-Rest damit erledigt.
+
+**`isDirty()` wird direkt gemessen, nicht über die Oberfläche.** `editor.js` ist ein ES-Modul
+mit `export function isDirty()`; die Probe importiert es **im Browser** (`import(...)`) — das
+ist **dieselbe** Modul-Instanz, die die App benutzt (der Modul-Register ist nach URL
+geschlüsselt). Der Weg über die Oberfläche (deaktivierter Speicher-Knopf) wird **zusätzlich**
+gemessen: zwei unabhängige Größen für dieselbe Aussage.
+
+**Die Fixtures liegen jetzt im Repo** (`probes/fixtures_m7/`, byte-identisch zum
+M7-Scratchpad `~/.claude-code-tools/m7/fixtures`). Vorher wäre der Beleg von einem Scratchpad
+abhängig gewesen — **ein Beleg, den niemand wiederholen kann, ist kein Beleg**. Der Wächter
+`tests/test_probe_b11_roundtrip.py` vergleicht die Bytezahlen im Beleg mit den Dateien im
+Repo: stimmt eine nicht, wurde ein anderer Bestand gemessen.
+
+**Ein Messbefund, kein Defekt.** CM5 **zeichnet** einen Tab als Tabstopp (vier Leerzeichen) und
+das **erste** Leerzeichen einer Zeile als geschütztes Leerzeichen (` `) — das ist
+**Darstellung**, kein verborgenes Zeichen. Der erste Vergleich war byte-genau und meldete bei
+**vier** der zehn Fixtures einen Unterschied, obwohl **kein** Zeichen fehlte. Der Vergleich
+normalisiert jetzt den Whitespace (Runs zu einem Leerzeichen, Randauszug entfernt) — das ist
+genau die Aussage, die ED-5 meint: im Rohtext ist **nichts** unsichtbar (**Abnahme P10.5-55
+✅**).
+
+**Suite 1559 grün** (349,05 s), `doc_health` 0, `ui_budget` **6/6**.
+
+**Ein Werkzeug-Fund (datiert):** die zehn M7-Fixtures sind **`.md`-Dateien ohne Card** —
+`doc_health` meldete sie als „keine erkennbare Frontmatter-Card“ und „keine Zeile in
+`docs/INDEX.md`“. Sie sind **Test-Fixtures** (eine der vier dokumentierten Ausnahmen im Kopf
+der Karte, dieselbe Kategorie wie die Golden-Dateien der Phase 6.5) — `scripts/doc_health.py`
+trägt jetzt einen **Präfix-Ausgleich** (`FIXTURE_PRAEFIX`), damit eine neue Fixture **nicht
+erst im Werkzeug eingetragen** werden muss. Das ist ein Pfad **außerhalb** der §3-Liste von
+Block 11 — **bewusst, datiert** (Vorgänger: Block 8.8, drei Pfade außerhalb der Liste).
+
+**Der zweite Softcap-Schnitt — diesmal die Abnahmetabelle.** Der Head stand bei **41.398 B**
+(über 40.960 B), nachdem die Zeilen 10-52 und 10-55 dazugekommen waren. Die **geschlossenen**
+Abnahmezeilen (✅/⚠️, 46 Stück) sind ein **Snapshot** — eine geschlossene Zeile ändert sich
+nicht mehr — und sind deshalb **verbatim** nach `ABNAHME_ARCHIVE.md` (L3) gewandert; der Head
+trägt die **offenen** Zeilen (⬜) und die Summe. Das ist derselbe Schnitt wie beim Modulstatus
+in Block 11.4. **Datierte Korrektur zum Plan (§5):** der Plan sagt „61 Zeilen, gezählt im
+Phase-Head“ — gezählt werden die 61 Zeilen **weiterhin**, nur eben im Head **und** im Archiv;
+der Wächter zählt über **beide** Dateien, und ein zweiter prüft, dass keine Zeile in **beiden**
+steht. **Head: 41.398 B → 21.766 B** (19 KB Luft).
+
+**Nächster Schritt.** 11.6 (ED-3, die Format-Konvention Stufe 2) — das letzte Stück in Block 11:
+`markdown.js` (Inline- und Block-Regel), der Sanitizer (die Klassen aus einer festen Menge),
+eine Werkzeugleiste im Editor, ein CM5-Overlay, und der `_FORMAT_HINT` in `tools.py` (MCP).
 
 ## Session stopped — 2026-10-25 (Block 11.5: die To-do-Kästchen — der Text bleibt die Quelle)
 

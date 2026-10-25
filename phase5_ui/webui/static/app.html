@@ -292,6 +292,29 @@
             <button type="button" class="toolbar-btn" data-md="hr" title="Trennlinie">&mdash;</button>
             <button type="button" class="toolbar-btn" data-md="image" id="insert-image-button" title="Bild einf&uuml;gen"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg></button>
             <input type="file" id="insert-image-input" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
+            <!-- P10.5, Block 11, Schritt 11.6 (ED-3): die **Format-Konvention** (Stufe 2).
+                 Farbe und Groesse sind Inline-Formen (`[Text]{.rot}`), die Ausrichtung ein
+                 Block (`::: {.zentriert}` ... `:::`). Das Vokabular steht in `js/markdown.js`
+                 — diese Liste ist die Werkzeug-Optik, nicht die Quelle. -->
+            <select class="toolbar-select" id="format-farbe" aria-label="Farbe" title="Farbe">
+              <option value="">Farbe</option>
+              <option value="rot">Rot</option>
+              <option value="blau">Blau</option>
+              <option value="gruen">Gr&uuml;n</option>
+              <option value="gelb">Gelb</option>
+            </select>
+            <select class="toolbar-select" id="format-groesse" aria-label="Gr&ouml;&szlig;e" title="Gr&ouml;&szlig;e">
+              <option value="">Gr&ouml;&szlig;e</option>
+              <option value="klein">Klein</option>
+              <option value="normal">Normal</option>
+              <option value="gross">Gro&szlig;</option>
+            </select>
+            <select class="toolbar-select" id="format-ausrichtung" aria-label="Ausrichtung" title="Ausrichtung">
+              <option value="">Ausrichtung</option>
+              <option value="links">Links</option>
+              <option value="zentriert">Zentriert</option>
+              <option value="rechts">Rechts</option>
+            </select>
             <button type="button" class="toolbar-btn toolbar-btn--wide" id="toggle-preview" aria-pressed="false">Rohtext</button>
           </div>
         </div>

@@ -14,7 +14,7 @@ down:
   - MODULSTATUS_ARCHIVE.md                         # 📦 die ausführlichen Statusspalten der Blöcke 0–10, verbatim
   - ABNAHME_ARCHIVE.md                             # 📦 die geschlossenen Abnahmezeilen (P10.5-1–61), verbatim
   - FREIGABEN_ARCHIVE.md                           # 📦 die Freigaben der Phase, verbatim
-updated: 2026-10-25 (Block 11.8: der Roundtrip — 10/10 byte-identisch; die M7-Fixtures liegen jetzt im Repo) | 2026-10-25 (Block 11.5: die To-do-Kästchen — der Text bleibt die Quelle; Probe 8/8 grün, Gegenlauf rot) | 2026-10-25 (Block 11.7: das Budget — jede Datei genau einmal; Erstaufruf 206,4 KB, Editor 69,7 KB) | 2026-10-24 (Block 11.4: die Live-Darstellung — V211 gemessen, nicht behauptet; Probe 15/15 grün, Gegenlauf rot; der Modulstatus der Blöcke 0–10 liegt jetzt im L3-Archiv) | 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein Moduswechsel; Probe 12/12 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-25 (Block 11.6: die Format-Konvention Stufe 2 — ED-3; das Vokabular festgelegt, 9/9 Zellen grün, der Gegenlauf bricht genau die wörtlich-Zelle) | 2026-10-25 (Block 11.8: der Roundtrip — 10/10 byte-identisch; die M7-Fixtures liegen jetzt im Repo) | 2026-10-25 (Block 11.5: die To-do-Kästchen — der Text bleibt die Quelle; Probe 8/8 grün, Gegenlauf rot) | 2026-10-25 (Block 11.7: das Budget — jede Datei genau einmal; Erstaufruf 206,4 KB, Editor 69,7 KB) | 2026-10-24 (Block 11.4: die Live-Darstellung — V211 gemessen, nicht behauptet; Probe 15/15 grün, Gegenlauf rot; der Modulstatus der Blöcke 0–10 liegt jetzt im L3-Archiv) | 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein Moduswechsel; Probe 12/12 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -38,7 +38,7 @@ updated: 2026-10-25 (Block 11.8: der Roundtrip — 10/10 byte-identisch; die M7-
 | 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | 🔄 2026-10-24 |
 | 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ✅ 2026-10-24 |
 | 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | ✅ 2026-10-24 |
-| 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | 🔄 2026-10-24 — **11.1 Vendor** (CodeMirror 5.65.16, **fünf** Dateien statt drei — gemessen: der UMD-Browser-Zweig der `markdown.min.js` löst `require("../xml/xml")` **nicht** auf) · **11.2 Nachlader** (`js/editor_cm.js`: CSS → Kern → Modus-Dateien, Promise gecacht, Fehler → `null` = Textarea/Rohmodus) · **11.3 Live-Editor** (`editor.js`: `getBody()`/`setBody()`, `setRawMode(on)`, Schalter „Rohtext", Probe 12/12 grün) · **11.4 Live-Darstellung** (V211 **gemessen**: `visibility: hidden` hält die Cursorposition, `display: none`/`font-size: 0` rücken sie 2 Zeichen vor; Probe 15/15 grün) · **11.5 To-do-Kästchen** (ED-2: `cm.markText(…, {replacedWith: <checkbox>, atomic: true})` — der **Text** bleibt die Quelle; Klick bei sauberem Editor speichert **sofort** mit `version`, bei geändertem nur der Puffer; Lesesicht **deaktiviert**; Probe 8/8 grün, Gegenlauf bricht genau die Schreibzelle) · **11.7 Budget** (`ui_budget.py`: `static_payload_files()` — **jede Datei genau einmal**; Erstaufruf **209,3 KB** ≤ 250 KB, Editor **69,7 KB** ≤ 80 KB; Wächter `tests/test_budget_coverage.py` mit Gegenprobe) · **11.8 Roundtrip** (V201-Rest: die **zehn** M7-Fixtures **10/10 byte-identisch**, Öffnen macht den Editor **nicht** geändert, Dateien auf der Platte byte-identisch) |
+| 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | 🔄 2026-10-24 — **11.1 Vendor** (CodeMirror 5.65.16, **fünf** Dateien statt drei — gemessen: der UMD-Browser-Zweig der `markdown.min.js` löst `require("../xml/xml")` **nicht** auf) · **11.2 Nachlader** (`js/editor_cm.js`: CSS → Kern → Modus-Dateien, Promise gecacht, Fehler → `null` = Textarea/Rohmodus) · **11.3 Live-Editor** (`editor.js`: `getBody()`/`setBody()`, `setRawMode(on)`, Schalter „Rohtext", Probe 12/12 grün) · **11.4 Live-Darstellung** (V211 **gemessen**: `visibility: hidden` hält die Cursorposition, `display: none`/`font-size: 0` rücken sie 2 Zeichen vor; Probe 15/15 grün) · **11.5 To-do-Kästchen** (ED-2: `cm.markText(…, {replacedWith: <checkbox>, atomic: true})` — der **Text** bleibt die Quelle; Klick bei sauberem Editor speichert **sofort** mit `version`, bei geändertem nur der Puffer; Lesesicht **deaktiviert**; Probe 8/8 grün, Gegenlauf bricht genau die Schreibzelle) · **11.7 Budget** (`ui_budget.py`: `static_payload_files()` — **jede Datei genau einmal**; Erstaufruf **209,3 KB** ≤ 250 KB, Editor **69,7 KB** ≤ 80 KB; Wächter `tests/test_budget_coverage.py` mit Gegenprobe) · **11.8 Roundtrip** (V201-Rest: die **zehn** M7-Fixtures **10/10 byte-identisch**, Öffnen macht den Editor **nicht** geändert, Dateien auf der Platte byte-identisch) · **11.6 Format-Konvention** (ED-3: `markdown.js` — Vokabular **Farbe** (rot/blau/gruen/gelb) · **Größe** (klein/normal/gross) · **Ausrichtung** (links/zentriert/rechts); Inline `[Text]{.rot}`, Block `::: {.zentriert}` … `:::`; eine **unbekannte** Klasse bleibt **wörtlich**; der Sanitizer lässt `span`/`div` nur mit Klassen aus der festen Menge durch; die **Codespans** sind ausgeschnitten (darin wird **nichts** formatiert — das behebt einen Alt-Fehler); Editor: drei Felder in der Werkzeugleiste + ein **CM5-Overlay**, das `[…]{.rot}` schon beim Schreiben färbt; MCP: `_FORMAT_HINT` **wörtlich identisch** an allen fünf Body-Schreib-Werkzeugen; Probe `probes/p105_b11_markdown_probe.py`: **9/9 Zellen grün**, der Gegenlauf bricht genau die Zelle „unbekannte Klasse wörtlich“) |
 | 12 | Doku und Altlasten: DO-1, LG-6, AL-1 (Rest), AL-3, BG-2/BG-3 | Claude Code | — | ⬜ |
 | Z | Closeout P10.5 (Handover, Grafik, Rotationen) | Claude Code + Nikinger | — | ⬜ |
 
@@ -85,15 +85,15 @@ Ende); die **Belegte** stehen im Commit und im Session-Block.
 | P10.5-37 | C2-Stil: Lappen, Furchen, Zellen, Aktivierung (Nikinger-Sichtung) | ⬜ | 8.1–8.4 gebaut und **gemessen**: Lappenfläche **137 492 px** (Deckung 5 % wie die Vorlage), Kontur 55 %, Zellen mit Membranring und 2–4 Fortsätzen, drei Aktivierungsstufen · Screenshots `docs/screenshots/p105_b8_0{1..4}_*.png` — **die Zeile wird erst ✅, wenn der Nikinger das Bild beurteilt hat** |
 | P10.5-49 | Live nach Deploy D: Ereignisse kommen über **beide** Eingänge an (V212 ✅) | ⬜ | — |
 | P10.5-51 | ED-1: kein Moduswechsel, Live-Darstellung (Nikinger-Sichtung) | ⬜ | 11.3 + 11.4 gebaut · **Wegwerf `probes/p105_b11_live_probe.py`: 15 von 15 Zellen grün** — der Cursor steht nach dem Klick **exakt** auf dem geklickten Zeichen (ch 15/18/26 = erwartet), die Formatierungszeichen sind **nur auf der Cursorzeile** sichtbar, der Rohmodus zeigt jedes Zeichen, der Notausgang (Nachlader scheitert → Textarea) funktioniert, keine Seitenfehler · **V211 ✅**: die Verbergungs-Art ist **gemessen**, nicht geschätzt — `visibility: hidden` hält die Cursorposition und lässt die Zeile **nicht** springen (0,0 px), `display: none` **und** `font-size: 0` setzen den Cursor **2 Zeichen zu früh** (18 → 16, 26 → 24: genau die zwei verdeckten `**`) und lassen die Zeile um **15,66 px** springen · **Gegenlauf**: ohne den `setValue`-Fix in `editor.js` sind genau **drei** Zellen rot · **die Sichtung des Nikingers steht aus** — die Zeile wird erst ✅, wenn er das Urteil gefällt hat |
-| P10.5-54 | ED-3: Vokabular gerendert, unbekannte Klasse wörtlich; `get_item` zeigt Rohtext | ⬜ | — |
-| P10.5-56 | P1-11 dokumentiert; `git diff -- phase1_storage/storage` für ED-3 leer | ⬜ | — |
+
+
 | P10.5-57 | keine 📗/🔄/🟡-Datei > 40 KB (`doc_health` 0, Oversize-`find`) | ⬜ | — |
 | P10.5-58 | `ROADMAP.md` < 30 KB, Wächter grün | ⬜ | — |
 | P10.5-59 | Register-Bilanz per Skript, jede P10.5-Zeile mit Beleg | ⬜ | — |
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
 
-**Summe:** 46 ✅ · 0 ⚠️ · 15 ⬜ (von 61). **[2026-10-25, Block 11.8]** +2 ✅ (10-52 der Roundtrip, 10-55 der Rohmodus) ⇒ 46 ✅ · 0 ⚠️ · 15 ⬜. **[2026-10-25, Block 11.5]** +1 ✅ (10-53, ED-2 die To-do-Kästchen) ⇒ 44 ✅ · 0 ⚠️ · 17 ⬜. **[2026-10-25, Block 11.7]** +1 ✅ (10-50, das Budget) ⇒ 43 ✅ · 0 ⚠️ · 18 ⬜. **[2026-10-24, Block 10.5]** +4 ✅ (10-45, 10-46, 10-47, 10-48) ⇒ 42 ✅ · 0 ⚠️ · 19 ⬜. **[2026-10-24, Block 9.3]** +2 ✅ (10-43, 10-44) ⇒ 38 ✅ · 0 ⚠️ · 23 ⬜. **[2026-10-24, Block 9.2]** +1 ✅ (10-42, RE-4 `rename_folder`) ⇒ 36 ✅ · 0 ⚠️ · 25 ⬜. **[2026-10-24, Block 9.1]** +1 ✅ (10-41, RE-7 `created_by`) ⇒ 35 ✅ · 0 ⚠️ · 26 ⬜. **[2026-10-24, Block 8]** +4 ✅ (10-36, 10-38, 10-39, 10-40) ⇒ 34 ✅ · 0 ⚠️ · 27 ⬜. **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`) — **über beide Dateien**, seit die geschlossenen Zeilen im Archiv stehen. **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
+**Summe:** 48 ✅ · 0 ⚠️ · 13 ⬜ (von 61). **[2026-10-25, Block 11.6]** +2 ✅ (10-54 ED-3 die Format-Konvention, 10-56 die P1-Ankündigung) ⇒ 48 ✅ · 0 ⚠️ · 13 ⬜. **[2026-10-25, Block 11.8]** +2 ✅ (10-52 der Roundtrip, 10-55 der Rohmodus) ⇒ 46 ✅ · 0 ⚠️ · 15 ⬜. **[2026-10-25, Block 11.5]** +1 ✅ (10-53, ED-2 die To-do-Kästchen) ⇒ 44 ✅ · 0 ⚠️ · 17 ⬜. **[2026-10-25, Block 11.7]** +1 ✅ (10-50, das Budget) ⇒ 43 ✅ · 0 ⚠️ · 18 ⬜. **[2026-10-24, Block 10.5]** +4 ✅ (10-45, 10-46, 10-47, 10-48) ⇒ 42 ✅ · 0 ⚠️ · 19 ⬜. **[2026-10-24, Block 9.3]** +2 ✅ (10-43, 10-44) ⇒ 38 ✅ · 0 ⚠️ · 23 ⬜. **[2026-10-24, Block 9.2]** +1 ✅ (10-42, RE-4 `rename_folder`) ⇒ 36 ✅ · 0 ⚠️ · 25 ⬜. **[2026-10-24, Block 9.1]** +1 ✅ (10-41, RE-7 `created_by`) ⇒ 35 ✅ · 0 ⚠️ · 26 ⬜. **[2026-10-24, Block 8]** +4 ✅ (10-36, 10-38, 10-39, 10-40) ⇒ 34 ✅ · 0 ⚠️ · 27 ⬜. **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`) — **über beide Dateien**, seit die geschlossenen Zeilen im Archiv stehen. **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
 
 ## Offen beim Nikinger
 
@@ -135,56 +135,49 @@ Ende); die **Belegte** stehen im Commit und im Session-Block.
 ## Startauftrag — Block 9 (Rechte und Namen: RE-7, RE-4, RE-3) · Ausführer
 > **Verbatim verschoben** nach `STARTUPTRAG_ARCHIVE.md` (`scripts/move_sections.py`) — dort unter derselben Überschrift.
 
-## Session stopped — 2026-10-25 (Block 11.8: der Roundtrip — 10/10 byte-identisch)
+## Session stopped — 2026-10-25 (Block 11.6: die Format-Konvention — ED-3)
 
-**Ergebnis.** Die **zehn** M7-Fixtures (Frontmatter, Listen, Tabelle, Code, Links,
-`itm_…`-Referenzen, Taskliste, Zitat, Unicode/Tabs, Whitespace) liegen als Items in der
-Wegwerf-Instanz (Port 18813). Je Item gemessen: der Editor zeigt **byte-identisch** den
-Body, `isDirty()` ist beim Öffnen **false** (der Speicher-Knopf ist deaktiviert), ein Zeichen
-tippen und wieder löschen → wieder **false**. Dazu (im Python-Teil der Probe) der
-**Plattenvergleich**: die **Item-Dateien** sind vor dem Lauf und nach dem Lauf **byte-identisch**
-(SHA-256 über alle zehn Dateien). **10/10 Zellen grün** — V201-Rest damit erledigt.
+**Ergebnis.** Die **Format-Konvention Stufe 2** ist gebaut und an der Wegwerf-Instanz
+(Port 18814) gemessen: **neun von neun Zellen grün**, der **Gegenlauf** bricht **genau die
+eine** Zelle, die er brechen soll. P10.5-54 ✅ und P10.5-56 ✅ ⇒ **48 ✅ · 0 ⚠️ · 13 ⬜**.
 
-**`isDirty()` wird direkt gemessen, nicht über die Oberfläche.** `editor.js` ist ein ES-Modul
-mit `export function isDirty()`; die Probe importiert es **im Browser** (`import(...)`) — das
-ist **dieselbe** Modul-Instanz, die die App benutzt (der Modul-Register ist nach URL
-geschlüsselt). Der Weg über die Oberfläche (deaktivierter Speicher-Knopf) wird **zusätzlich**
-gemessen: zwei unabhängige Größen für dieselbe Aussage.
+**Das Vokabular (eine Entscheidung dieser Session — im Plan nicht festgelegt):** Farbe
+`rot|blau|gruen|gelb`, Größe `klein|normal|gross`, Ausrichtung `links|zentriert|rechts`.
+Inline `[Text]{.rot}` (höchstens **eine** Farbe und **eine** Größe), Block `::: {.zentriert}`
+… `:::`. Eine **unbekannte** Klasse bleibt **wörtlich** — der Renderer erfindet keine Klasse,
+die es nicht gibt.
 
-**Die Fixtures liegen jetzt im Repo** (`probes/fixtures_m7/`, byte-identisch zum
-M7-Scratchpad `~/.claude-code-tools/m7/fixtures`). Vorher wäre der Beleg von einem Scratchpad
-abhängig gewesen — **ein Beleg, den niemand wiederholen kann, ist kein Beleg**. Der Wächter
-`tests/test_probe_b11_roundtrip.py` vergleicht die Bytezahlen im Beleg mit den Dateien im
-Repo: stimmt eine nicht, wurde ein anderer Bestand gemessen.
+**Der Server kennt die Formate nicht — und soll es nicht.** `_FORMAT_HINT` steht in
+`tools.py` **wörtlich identisch** an allen fünf Werkzeugen, die einen Body schreiben
+(`create_item`, `update_item`, `append_to_item`, `append_to_items`, `patch_item`): ein Satz im
+Text, den der Agent liest. Der Server **prüft** die Form nicht und **wandelt** sie nicht um —
+er speichert `[Text]{.rot}` als das, was es ist (der MCP-`get_item` gibt es unverändert
+zurück, in der Probe gemessen). Die Ankündigung „P1-Öffnung 11: Format-Konvention, kein Code
+in `storage/`“ steht im Öffnungs-Index von `phase1_storage/CLAUDE.md`;
+`git diff -- phase1_storage/storage` ist **leer**.
 
-**Ein Messbefund, kein Defekt.** CM5 **zeichnet** einen Tab als Tabstopp (vier Leerzeichen) und
-das **erste** Leerzeichen einer Zeile als geschütztes Leerzeichen (` `) — das ist
-**Darstellung**, kein verborgenes Zeichen. Der erste Vergleich war byte-genau und meldete bei
-**vier** der zehn Fixtures einen Unterschied, obwohl **kein** Zeichen fehlte. Der Vergleich
-normalisiert jetzt den Whitespace (Runs zu einem Leerzeichen, Randauszug entfernt) — das ist
-genau die Aussage, die ED-5 meint: im Rohtext ist **nichts** unsichtbar (**Abnahme P10.5-55
-✅**).
+**Ein Alt-Fehler mitbehoben (datiert).** Die Codespans sind jetzt **ausgeschnitten**: die
+Regeln laufen nur über den Rest. Vorher lief die Kette über den ganzen Text — `**fett**` in
+`` `**fett**` `` wurde **fett**. Das war schon vor dieser Session falsch, und die
+Format-Regel hätte denselben Fehler geerbt. Die Ausgabe ändert sich **nur** dort, wo sie
+vorher **falsch** war.
 
-**Suite 1559 grün** (349,05 s), `doc_health` 0, `ui_budget` **6/6**.
+**Drei Fehler lagen im Messgerät, nicht im Produkt.** Der MCP-Token war an die **falsche**
+Resource gebunden (`AuthSettings.resource` = `<base_url>/mcp` — ein anderer Resource ergibt
+**401**). Die Werkzeugleiste war im **DOM** nicht zu finden, weil das `app.js` den Editor beim
+Start **aus** dem DOM löst (`detachable()`, P5-AJ) — die Probe liest die ausgelieferte
+`app.html` jetzt mit dem `DOMParser` (der führt **kein** Skript aus). Und ein **Tippfehler**
+im Renderer (`nnamen` statt `namen`) wäre im Produkt **stillschweigend** gewesen: die Probe
+zeigte ihn beim ersten Lauf als `ReferenceError`.
 
-**Ein Werkzeug-Fund (datiert):** die zehn M7-Fixtures sind **`.md`-Dateien ohne Card** —
-`doc_health` meldete sie als „keine erkennbare Frontmatter-Card“ und „keine Zeile in
-`docs/INDEX.md`“. Sie sind **Test-Fixtures** (eine der vier dokumentierten Ausnahmen im Kopf
-der Karte, dieselbe Kategorie wie die Golden-Dateien der Phase 6.5) — `scripts/doc_health.py`
-trägt jetzt einen **Präfix-Ausgleich** (`FIXTURE_PRAEFIX`), damit eine neue Fixture **nicht
-erst im Werkzeug eingetragen** werden muss. Das ist ein Pfad **außerhalb** der §3-Liste von
-Block 11 — **bewusst, datiert** (Vorgänger: Block 8.8, drei Pfade außerhalb der Liste).
+**Nicht gemessen (bewusst, mit Grund):** das **CM5-Overlay** (der Editor färbt `[…]{.rot}`
+schon beim Schreiben) ist gebaut, aber **nicht** an der Wegwerf-Instanz gemessen — die Probe
+liest das Modul `markdown.js` direkt und öffnet **keinen** Editor. Die **Sichtung** des
+Nikingers steht für 11.6 wie für 11.4 und 11.5 aus.
 
-**Der zweite Softcap-Schnitt — diesmal die Abnahmetabelle.** Der Head stand bei **41.398 B**
-(über 40.960 B), nachdem die Zeilen 10-52 und 10-55 dazugekommen waren. Die **geschlossenen**
-Abnahmezeilen (✅/⚠️, 46 Stück) sind ein **Snapshot** — eine geschlossene Zeile ändert sich
-nicht mehr — und sind deshalb **verbatim** nach `ABNAHME_ARCHIVE.md` (L3) gewandert; der Head
-trägt die **offenen** Zeilen (⬜) und die Summe. Das ist derselbe Schnitt wie beim Modulstatus
-in Block 11.4. **Datierte Korrektur zum Plan (§5):** der Plan sagt „61 Zeilen, gezählt im
-Phase-Head“ — gezählt werden die 61 Zeilen **weiterhin**, nur eben im Head **und** im Archiv;
-der Wächter zählt über **beide** Dateien, und ein zweiter prüft, dass keine Zeile in **beiden**
-steht. **Head: 41.398 B → 21.766 B** (19 KB Luft).
+**Suite 1573 grün** (342,04 s), `doc_health` 0, `ui_budget` **6/6** — der Erstaufruf ist seit 11.7 um **4,4 KB** gewachsen (die Werkzeugleiste, die neun Klassen, der Overlay): **213,7 KB** ≤ 250 KB, der Editor **69,7 KB** ≤ 80 KB.
 
-**Nächster Schritt.** 11.6 (ED-3, die Format-Konvention Stufe 2) — das letzte Stück in Block 11:
-`markdown.js` (Inline- und Block-Regel), der Sanitizer (die Klassen aus einer festen Menge),
-eine Werkzeugleiste im Editor, ein CM5-Overlay, und der `_FORMAT_HINT` in `tools.py` (MCP).
+**Nächster Schritt.** **Block 12 (Doku und Altlasten)** — der letzte Vollblock, und er ist
+**nur `.md`**: DO-1 (die drei Heads unter 40 KB, `move_sections.py`), LG-6 (`ROADMAP.md` < 30 KB
+→ `docs/ROADMAP_ARCHIVE.md`), AL-1/AL-3 (die P6-Matrix), BG-2/BG-3 (die P9-Matrix), und die
+Register-Bilanz per Skript (P10.5-57/58/59). Danach **Block Z** (Closeout).

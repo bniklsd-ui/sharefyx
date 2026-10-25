@@ -5,7 +5,7 @@
 import { state, editorPart, activeSpaceWritable, setCreateControlsPresent, setViewTitle, listViewTitle } from "./state.js";
 import { el, toast } from "./toasts.js";
 import { api, reportUnexpectedError } from "./api.js";
-import { markdownToHtml } from "./markdown.js";
+import { markdownToHtml, FORMAT_VOKABULAR } from "./markdown.js";
 import { loadItems, loadOverview, renderList, renderListSlot } from "./list.js";
 import { renderRail } from "./tree.js";
 import { confirmDialog, showConflictDialog, openLinkPicker } from "./dialogs.js";
@@ -421,6 +421,26 @@ function renderCreatedByLine(item) {
     : "";
 }
 
+// P10.5, Block 11, Schritt 11.6 (ED-3): der **Overlay-Token** des Live-Editors.
+//
+// **Nur die Farbe.** Eine Groessen-Klasse aendert die Zeilenhoehe — und ein Editor, in dem
+// die Zeilen springen, ist schlimmer als ein Editor, der die Groesse erst in der Vorschau
+// zeigt. Die Ausrichtung ist ein **Block** und laesst sich im Fliesstext nicht faerben.
+//
+// Der Stream gehoert dem Overlay (CM5 faehrt Overlay und Modus auf **zwei** Streams) — der
+// Zaehler `stream.pos` ist also der Overlay-eigene, nicht der des Markdown-Modus.
+function _formatOverlayToken(stream) {
+  var rest = stream.string.slice(stream.pos);
+  var m = /\[([^\]\n]+)\]\{\.([a-z]+)(?: \.([a-z]+))?\}/.exec(rest);
+  if (!m) { stream.skipToEnd(); return null; }
+  // Bis zur Form vorruecken — der Vorspann bleibt **unformatiert**.
+  var ziel = stream.pos + m.index;
+  while (stream.pos < ziel) stream.next();
+  var treffer = stream.match(/\[([^\]\n]+)\]\{\.([a-z]+)(?: \.([a-z]+))?\}/);
+  if (!treffer) { stream.skipToEnd(); return null; }
+  return FORMAT_VOKABULAR.farben[treffer[2]] || null;
+}
+
 // P10.5, Block 11, Schritt 11.3 (ED-1): der Live-Editor entsteht **beim Öffnen** eines
 // Items, nicht beim Laden der Seite — der Erstaufruf bleibt ohne Editor (das Budget
 // „Editor nachgeladen"). Bis der Editor da ist, trägt die **Textarea** den Text (der
@@ -453,6 +473,10 @@ function _editorBereit() {
     // `sfx-active-line` -- sie ist die Zeile, in der gerade geschrieben wird. Dort bleiben
     // auch die Formatierungszeichen sichtbar (s. `app.css`).
     cm.on("cursorActivity", function () { _cursorZeileSetzen(); });
+    // P10.5, Block 11, Schritt 11.6 (ED-3): der **Overlay** — `[Text]{.rot}` faerbt sich
+    // schon **beim Schreiben**, nicht erst in der Vorschau. Das ist der Unterschied
+    // zwischen einem Format und einem Format, das man erst nach dem Speichern sieht.
+    cm.addOverlay({ token: _formatOverlayToken });
     if (cm.getValue() !== text) cm.setValue(text);
     // Der Editor kann mitten im Tippen eintreffen — der Cursor bleibt, wo der Mensch war.
     try {
@@ -1100,6 +1124,98 @@ export function init() {
       if (action) action();
     });
   });
+
+  // P10.5, Block 11, Schritt 11.6 (ED-3): die **Format-Konvention** in der Werkzeugleiste.
+  // Drei Felder: Farbe · Groesse · Ausrichtung. Die Farbe und die Groesse sind **Inline**
+  // (`[Text]{.rot}`), die Ausrichtung ist ein **Block** (`::: {.zentriert}` … `:::`).
+  //
+  // **Die Form wird erkannt, nicht blind gesetzt.** Liegt die Auswahl in einer bereits
+  // vorhandenen Form, wandert die neue Klasse **in dieselbe Form** (`[Text]{.rot .gross}`)
+  // — ein Nesting (`[[Text]{.rot}]{.gross}`) waere nicht falsch, aber unlesbar und beim
+  // Rendern kaputt (die Klammer-Regel laesst kein `]` im Text zu).
+  var formatFarbeEl = document.getElementById("format-farbe");
+  var formatGroesseEl = document.getElementById("format-groesse");
+  var formatAusrichtungEl = document.getElementById("format-ausrichtung");
+
+  function _formatFormFinden(text, start, end) {
+    var muster = /\[([^\]\n]+)\]\{([^}]*)\}/g;
+    var m;
+    while ((m = muster.exec(text)) !== null) {
+      var von = m.index;
+      var bis = m.index + m[0].length;
+      if (start >= von && end <= bis) {
+        return {
+          index: von,
+          laenge: m[0].length,
+          text: m[1],
+          namen: m[2].trim().split(/\s+/).filter(Boolean).map(function (n) {
+            return n.replace(/^\./, "");
+          }),
+        };
+      }
+    }
+    return null;
+  }
+
+  function _formatKlassenSetzen(gruppe, wert) {
+    var a = _textUndAuswahl();
+    var form = _formatFormFinden(a.text, a.start, a.end);
+    if (form) {
+      // **Dieselbe Gruppe ersetzen, die andere behalten:** eine zweite Farbe ist nicht
+      // erlaubt (der Renderer laesst sie wörtlich), eine Farbe plus eine Größe schon.
+      var istFarbe = gruppe === "farben";
+      var namen = form.namen.filter(function (n) {
+        return istFarbe ? !(n in FORMAT_VOKABULAR.farben) : !(n in FORMAT_VOKABULAR.groessen);
+      });
+      namen.push(wert);
+      var formText = "[" + form.text + "]{." + namen.join(" ") + "}";
+      _ersetze(
+        form.index, form.index + form.laenge, formText,
+        form.index + 1, form.index + 1 + form.text.length
+      );
+      return;
+    }
+    var selected = a.text.slice(a.start, a.end) || "Text";
+    var snippet = "[" + selected + "]{." + wert + "}";
+    _ersetze(a.start, a.end, snippet, a.start + 1, a.start + 1 + selected.length);
+  }
+
+  function _formatAusrichtungSetzen(wert) {
+    var a = _textUndAuswahl();
+    var inhalt = a.text.slice(a.start, a.end);
+    var block = "::: {." + wert + "}\n" + inhalt + "\n:::";
+    // Der Cursor landet **im** Block — zwischen der oeffnenden und der schliessenden Zeile.
+    _ersetze(
+      a.start, a.end, block,
+      a.start + ("::: {." + wert + "}\n").length,
+      a.start + ("::: {." + wert + "}\n").length + inhalt.length
+    );
+  }
+
+  if (formatFarbeEl) {
+    formatFarbeEl.addEventListener("change", function () {
+      var wert = formatFarbeEl.value;
+      if (!wert) return;
+      _formatKlassenSetzen("farben", wert);
+      formatFarbeEl.value = "";
+    });
+  }
+  if (formatGroesseEl) {
+    formatGroesseEl.addEventListener("change", function () {
+      var wert = formatGroesseEl.value;
+      if (!wert) return;
+      _formatKlassenSetzen("groessen", wert);
+      formatGroesseEl.value = "";
+    });
+  }
+  if (formatAusrichtungEl) {
+    formatAusrichtungEl.addEventListener("change", function () {
+      var wert = formatAusrichtungEl.value;
+      if (!wert) return;
+      _formatAusrichtungSetzen(wert);
+      formatAusrichtungEl.value = "";
+    });
+  }
 
   // P10.5, Block 11, Schritt 11.3 (ED-1/ED-5): der Schalter heißt "Rohtext" und schaltet
   // **innerhalb** des Live-Editors zwischen Live-Darstellung und Rohtext (kein Moduswechsel

@@ -1,0 +1,85 @@
+{
+  "farbe": {
+    "erwartet": "md-c-rot",
+    "gemessen": "md-c-rot",
+    "ok": true
+  },
+  "groesse": {
+    "erwartet": "md-s-klein",
+    "gemessen": "md-s-klein",
+    "ok": true
+  },
+  "farbe_und_groesse": {
+    "erwartet": "md-c-rot md-s-gross",
+    "gemessen": "md-c-rot md-s-gross",
+    "ok": true
+  },
+  "unbekannte_klasse_woertlich": {
+    "erwartet": true,
+    "gemessen": false,
+    "ok": false,
+    "html": "<p><span class=\"md-c-rot\">fremd</span></p>"
+  },
+  "ausrichtung": {
+    "erwartet": "md-a-zentriert",
+    "gemessen": "md-a-zentriert",
+    "ok": true
+  },
+  "html_woertlich": {
+    "erwartet": true,
+    "gemessen": true,
+    "ok": true
+  },
+  "codespan_unformatiert": {
+    "erwartet": true,
+    "gemessen": true,
+    "ok": true
+  },
+  "werkzeugleiste": {
+    "erwartet": {
+      "farbe": [
+        "rot",
+        "blau",
+        "gruen",
+        "gelb"
+      ],
+      "groesse": [
+        "klein",
+        "normal",
+        "gross"
+      ],
+      "ausrichtung": [
+        "links",
+        "zentriert",
+        "rechts"
+      ]
+    },
+    "gemessen": {
+      "farbe": [
+        "rot",
+        "blau",
+        "gruen",
+        "gelb"
+      ],
+      "groesse": [
+        "klein",
+        "normal",
+        "gross"
+      ],
+      "ausrichtung": [
+        "links",
+        "zentriert",
+        "rechts"
+      ]
+    },
+    "ok": true
+  },
+  "mcp_get_item_rohtext": {
+    "erwartet": "alle Formen woertlich im Text",
+    "gemessen": {
+      "fehlend": [],
+      "laenge": 296
+    },
+    "ok": true
+  }
+}

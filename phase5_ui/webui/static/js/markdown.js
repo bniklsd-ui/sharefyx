@@ -15,6 +15,79 @@
 // inert. Einzige Folge: `>` (Zitat-Marker) kommt als `&gt;` an, die Zitat-Erkennung matcht
 // deshalb gegen `&gt;`, nicht `>`.
 
+// -- Format-Konvention Stufe 2 (P10.5, Block 11, Schritt 11.6 -- ED-3) ----------------------
+//
+// **Das Vokabular.** Drei Gruppen, jede eine **feste** Menge: Farben · Groessen ·
+// Ausrichtungen. Ein unbekanntes `.irgendwas` bleibt **wörtlich** — im Text steht dann
+// genau das, was der Mensch geschrieben hat.
+//
+// **Zwei Formen.** Inline: `[Text]{.rot}` (höchstens **eine** Farbe und höchstens **eine**
+// Größe). Block: `::: {.zentriert}` … `:::` (eine Ausrichtung; der Inhalt wird rekursiv
+// gerendert).
+//
+// **Warum das im Client steht und nicht im Server.** Die Konvention ist **Format**, keine
+// Semantik: der Server speichert den Text, wie er ist (P10.5-I — „kein Code in
+// `storage/`"), und erst der Browser rendert ihn. Ein Server, der die Klassen kennt, wäre
+// ein Server, der Inhalte interpretiert — genau das verbietet das Kernprinzip.
+var FORMAT_FARBEN = {
+  "rot": "md-c-rot",
+  "blau": "md-c-blau",
+  "gruen": "md-c-gruen",
+  "gelb": "md-c-gelb",
+};
+var FORMAT_GROESSEN = {
+  "klein": "md-s-klein",
+  "normal": "md-s-normal",
+  "gross": "md-s-gross",
+};
+var FORMAT_AUSRICHTUNGEN = {
+  "links": "md-a-links",
+  "zentriert": "md-a-zentriert",
+  "rechts": "md-a-rechts",
+};
+
+//: Die Inline-Form des Plans: `\[([^\]\n]+)\]\{((?:\.[a-z]+)(?: \.[a-z]+)?)\}`.
+var FORMAT_INLINE_RE = /\[([^\]\n]+)\]\{((?:\.[a-z]+)(?: \.[a-z]+)?)\}/g;
+
+//: Die Klassen einer Inline-Form: **höchstens eine Farbe und höchstens eine Größe**.
+//: Alles andere — unbekannt, zwei Farben, zwei Größen — liefert `null`, und der Text
+//: bleibt **wörtlich**.
+function _formatInlineKlassen(klassen) {
+  var namen = klassen.trim().split(/\s+/).map(function (n) { return n.replace(/^\./, ""); });
+  var farbe = null;
+  var groesse = null;
+  for (var i = 0; i < namen.length; i++) {
+    var name = namen[i];
+    if (FORMAT_FARBEN[name]) {
+      if (farbe) return null;          // **zwei** Farben: nicht erlaubt
+      farbe = FORMAT_FARBEN[name];
+    } else if (FORMAT_GROESSEN[name]) {
+      if (groesse) return null;        // **zwei** Größen: nicht erlaubt
+      groesse = FORMAT_GROESSEN[name];
+    } else {
+      return null;                     // unbekannte Klasse: **wörtlich**
+    }
+  }
+  if (!farbe && !groesse) return null;
+  return [farbe, groesse].filter(Boolean).join(" ");
+}
+
+//: Die Klassen einer Block-Form: **nur** Ausrichtungen (eine). Alles andere → `null`.
+function _formatBlockKlassen(klassen) {
+  var namen = klassen.trim().split(/\s+/).map(function (n) { return n.replace(/^\./, ""); });
+  if (namen.length !== 1) return null;
+  return FORMAT_AUSRICHTUNGEN[namen[0]] || null;
+}
+
+//: **Eine** Quelle fuer das Vokabular: der Editor (Werkzeugleiste und Overlay) laedt
+//: dieselbe Liste, die der Renderer kennt. Zwei Listen waeren zwei Wahrheiten — und die
+//: Werkzeugleiste koennte etwas anbieten, das der Renderer nicht kennt.
+export var FORMAT_VOKABULAR = {
+  farben: FORMAT_FARBEN,
+  groessen: FORMAT_GROESSEN,
+  ausrichtungen: FORMAT_AUSRICHTUNGEN,
+};
+
 function escapeHtml(value) {
   return String(value == null ? "" : value)
     .replace(/&/g, "&amp;")
@@ -47,10 +120,40 @@ function resolveAssetSrc(src, itemId) {
 // als Einheit (`\` + `[` oder `]`); nach dem Match wird `\[`/`\]` im Text wieder zu `[`/`]`
 // unescaped, damit der gerenderte Link-Text die Klammern literal zeigt.
 function inlineMarkdown(escaped, itemId, assetIds) {
+  // **Die Codespans zuerst.** Ein Codespan ist der einzige Bereich, in dem **keine**
+  // Formatierung stattfindet — sie werden ausgeschnitten, die Regeln laufen nur über den
+  // Rest, und am Ende kommen sie unverändert zurück.
+  //
+  // **Warum das neu ist (2026-10-25, Block 11.6):** die alte Kette lief über den ganzen
+  // Text, also auch **innerhalb** eines Codespans — `**fett**` in `` `**fett**` `` wurde
+  // **fett**. Die neue Format-Regel hätte denselben Fehler geerbt (`` `[x]{.rot}` `` wäre
+  // rot geworden). Der Schnitt ist eine Korrektur, kein Umbau: die Ausgabe ändert sich nur
+  // dort, wo sie vorher **falsch** war.
+  var teile = escaped.split(/(`[^`]+`)/g);
+  var raus = [];
+  for (var i = 0; i < teile.length; i++) {
+    if (i % 2) {
+      // Der Codespan: nur der `<code>`-Rahmen, **keine** weitere Formatierung.
+      raus.push(teile[i].replace(/^`([^`]+)`$/, "<code>$1</code>"));
+    } else {
+      raus.push(_inlineRegeln(teile[i], itemId, assetIds));
+    }
+  }
+  return raus.join("");
+}
+
+function _inlineRegeln(escaped, itemId, assetIds) {
   return escaped
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
+    // P10.5, Block 11, Schritt 11.6 (ED-3): die **Format-Konvention** — *vor* den Links,
+    // wie im Plan. Ein unbekanntes `.irgendwas` (oder zwei Farben) bleibt **wörtlich**.
+    .replace(FORMAT_INLINE_RE, function (whole, text, klassen) {
+      var erlaubt = _formatInlineKlassen(klassen);
+      if (!erlaubt) return whole;
+      return '<span class="' + erlaubt + '">' + text + "</span>";
+    })
     // Bildzweig MUSS vor dem Link-Replace laufen (P6.5-J) — sonst frisst die Link-Regex das
     // `[alt](src)` eines `![alt](src)` und das führende `!` bleibt als Text übrig.
     // Phase 8.5 P8.5-6: Alt-Text darf `\[` / `\]` enthalten (siehe Kommentar oben).
@@ -100,7 +203,15 @@ function _todoHtml(inhalt, itemId, assetIds) {
 export function markdownToHtml(src, options) {
   var itemId = options && options.itemId;
   var assetIds = (options && options.assetIds) || null;
-  var lines = escapeHtml(src).replace(/\r\n/g, "\n").split("\n");
+  // **Einmal** escapen, dann die Zeilen rendern. Der Block `::: {...}` rendert seinen
+  // Inhalt **rekursiv** — und der Aufruf darf **nicht** noch einmal escapen (sonst stünde
+  // `&amp;` im Text statt `&`).
+  return _markdownZeilen(
+    escapeHtml(src).replace(/\r\n/g, "\n").split("\n"), itemId, assetIds
+  );
+}
+
+function _markdownZeilen(lines, itemId, assetIds) {
   var out = "";
   var i = 0;
   var listType = null;
@@ -122,6 +233,33 @@ export function markdownToHtml(src, options) {
   while (i < lines.length) {
     var line = lines[i];
     var m;
+
+    // P10.5, Block 11, Schritt 11.6 (ED-3): der Block `::: {.zentriert}` … `:::`. Der
+    // Inhalt wird **rekursiv** gerendert (eine Liste mit einer Tabelle darin bleibt eine
+    // Tabelle). **Keine Verschachtelung**: ein `:::` im Inhalt beendet den Block.
+    // **Kein Ende oder unbekannte Klasse → wörtlich**: die `:::`-Zeilen bleiben Text, die
+    // Ausrichtung greift nicht.
+    if ((m = line.match(/^:::[ \t]*\{([^}]*)\}[ \t]*$/))) {
+      flushParagraph();
+      closeList();
+      var blockKlassen = _formatBlockKlassen(m[1]);
+      var inner = [];
+      var geschlossen = false;
+      i++;
+      while (i < lines.length) {
+        if (/^:::[ \t]*$/.test(lines[i])) { geschlossen = true; i++; break; }
+        inner.push(lines[i]);
+        i++;
+      }
+      if (!geschlossen || !blockKlassen) {
+        paragraph.push(line);
+        inner.forEach(function (z) { paragraph.push(z); });
+        continue;
+      }
+      out += '<div class="' + blockKlassen + '">'
+        + _markdownZeilen(inner, itemId, assetIds) + "</div>";
+      continue;
+    }
 
     if (/^```/.test(line)) {
       flushParagraph();
@@ -242,6 +380,9 @@ var ALLOWED_TAGS = new Set([
   // **nur** von `markdownToHtml()` erzeugt (der Quelltext ist vorher escaped), und der
   // Sanitizer erzwingt `type="checkbox"` und `disabled` (s. unten).
   "INPUT",
+  // P10.5, Block 11, Schritt 11.6 (ED-3): die **Format-Konvention** — `span` (Inline) und
+  // `div` (Block). Nur mit `class` aus der festen Menge (s. `ALLOWED_FORMAT_CLASSES`).
+  "SPAN", "DIV",
 ]);
 var ALLOWED_ATTRS = {
   A: new Set(["href", "target", "rel"]),
@@ -249,11 +390,21 @@ var ALLOWED_ATTRS = {
   TH: new Set(["class"]),
   IMG: new Set(["src", "alt"]),
   INPUT: new Set(["type", "checked", "disabled", "class"]),
+  SPAN: new Set(["class"]),
+  DIV: new Set(["class"]),
 };
 var ALLOWED_CELL_CLASSES = new Set(["ta-l", "ta-c", "ta-r"]);
 //: Die erlaubten Klassen am To-do-Kaestchen (ED-2) — dieselbe Strenge wie bei den
 //: Tabellen-Zellen: eine feste Menge, kein freier Text.
 var ALLOWED_TODO_CLASSES = new Set(["md-todo"]);
+//: Die erlaubten Klassen der **Format-Konvention** (ED-3) — **eine feste Menge**, aus dem
+//: Vokabular oben. Eine Klasse, die nicht darin steht, wird entfernt; der **Inhalt**
+//: bleibt (es geht nur die Auszeichnung verloren, nicht der Text).
+var ALLOWED_FORMAT_CLASSES = new Set(
+  Object.keys(FORMAT_FARBEN).map(function (k) { return FORMAT_FARBEN[k]; })
+    .concat(Object.keys(FORMAT_GROESSEN).map(function (k) { return FORMAT_GROESSEN[k]; }))
+    .concat(Object.keys(FORMAT_AUSRICHTUNGEN).map(function (k) { return FORMAT_AUSRICHTUNGEN[k]; }))
+);
 
 function safeHref(href) {
   var h = (href || "").trim();
@@ -300,6 +451,19 @@ function sanitizeHtml(html) {
         child.setAttribute("type", "checkbox");
         child.setAttribute("disabled", "disabled");
         if (!ALLOWED_TODO_CLASSES.has(child.getAttribute("class"))) child.removeAttribute("class");
+      }
+      if (child.tagName === "SPAN" || child.tagName === "DIV") {
+        // P10.5, Block 11, Schritt 11.6 (ED-3): die **Format-Konvention**. Die Klassen
+        // kommen aus einer **festen Menge** — jede andere Klasse wird entfernt, der
+        // **Inhalt bleibt**. (Dieselbe Strenge wie bei den Tabellen-Zellen: ein freier
+        // Klassenname waere ein freier CSS-Hook.)
+        if (child.hasAttribute("class")) {
+          var formatKlassen = child.getAttribute("class").split(/\s+/).filter(function (k) {
+            return ALLOWED_FORMAT_CLASSES.has(k);
+          });
+          if (formatKlassen.length) child.setAttribute("class", formatKlassen.join(" "));
+          else child.removeAttribute("class");
+        }
       }
       if (child.tagName === "IMG") {
         var safeImgSrc = safeSrc(child.getAttribute("src"));

@@ -1377,6 +1377,28 @@ def test_both_write_tools_carry_the_assignee_hint_verbatim(described_mcp):
     assert "updated_by setzt der Server" in tools._ASSIGNEE_HINT
 
 
+def test_all_five_write_tools_carry_the_format_hint_verbatim(described_mcp):
+    """P10.5 Block 11, Schritt 11.6 (ED-3): die **Format-Konvention** steht woertlich
+    identisch in allen **fuenf** Werkzeugen, die einen Body schreiben.
+
+    Dieselbe Begründung wie bei `_ASSIGNEE_HINT`: die Formate sind eine Konvention
+    zwischen Client und Mensch, und der Agent liest den Text, in dem sie steht. Fuenf
+    Werkzeuge mit fuenf Wortlautvarianten wären fuenf Regeln — und eine davon gewinnt,
+    ohne dass es jemand gemerkt haette.
+
+    Der Server **prueft** die Form nicht und **wandelt** sie nicht um: er speichert
+    `[Text]{.rot}` als das, was es ist. Der Hinweis ist eine Anweisung an den Client,
+    keine Zusage des Servers."""
+    for name in ("create_item", "update_item", "append_to_item", "append_to_items",
+                 "patch_item"):
+        assert tools._FORMAT_HINT in _description_of(described_mcp, name), name
+    # Das Vokabular muss **vollstaendig** benannt sein: ein Agent, der eine Klasse erfindet,
+    # schreibt etwas, das woertlich bleibt.
+    for name in ("rot", "blau", "gruen", "gelb", "klein", "normal", "gross",
+                 "links", "zentriert", "rechts"):
+        assert f".{name}" in tools._FORMAT_HINT, name
+
+
 def test_no_mcp_tool_accepts_updated_by(tools_map):
     """P9-AA ueber MCP: `update_item` und `create_item` haben **keinen** `updated_by`-Parameter.
     Ueber FastMCP laeuft ein unbekanntes Argument als Tool-Fehler, nicht als stiller

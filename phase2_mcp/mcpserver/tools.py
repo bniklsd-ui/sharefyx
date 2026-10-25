@@ -203,6 +203,26 @@ _ASSIGNEE_HINT = (
     "schreiben."
 )
 
+# P10.5, Block 11, Schritt 11.6 (ED-3): die **Format-Konvention** (Stufe 2) für die
+# Text-Werkzeuge. Wörtlich identisch an allen **fünf** Werkzeugen, die einen Body
+# schreiben (`create_item`, `update_item`, `append_to_item`, `append_to_items`,
+# `patch_item`) — zwei Wortlautvarianten wären zwei Definitionen derselben Regel
+# (dieselbe Begründung wie bei `_ASSIGNEE_HINT`).
+#
+# **Warum das in der Werkzeugbeschreibung steht und nicht im Code.** Die Formate sind eine
+# **Konvention zwischen Client und Mensch**, keine Semantik: der Server speichert den
+# Text, wie er ist, und kennt die Klassen nicht (Kernprinzip: der Server interpretiert
+# keinen Inhalt). Er **prüft** die Form nicht und **wandelt** sie nicht um — er speichert
+# `[Text]{.rot}` als das, was es ist, und die Weboberfläche zeigt es farbig.
+_FORMAT_HINT = (
+    "Text, den du schreibst, darf formatiert sein — die Format-Konvention: Farben als "
+    "[Text]{.rot}, [Text]{.blau}, [Text]{.gruen}, [Text]{.gelb}; Größen als [Text]{.klein}, "
+    "[Text]{.normal}, [Text]{.gross}; Ausrichtung als Block ::: {.zentriert} … ::: (auch "
+    ".links und .rechts). Eine Farbe und eine Größe dürfen zusammen stehen: "
+    "[Text]{.rot .gross}. Unbekannte Klassen bleiben wörtlich — schreibe keine. Die "
+    "Weboberfläche zeigt dieselben Formate."
+)
+
 
 def _format_dt(value: datetime) -> str:
     """Gleiche Formatierung wie `storage.store._format_dt` — Dateitext und JSON-Ausgabe zeigen
@@ -650,7 +670,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "folder=<pfad> legt es in einen Unterordner. Liefert standardmäßig eine Quittung "
             "statt des vollen Texts — return_body=True holt ihn zurück. "
             + _status_hint() + " " + WRITE_TOOL_DIVISION + " " + _LIST_SPACES_POINTER
-            + " " + _TITLE_NOT_ID_HINT + " " + _ASSIGNEE_HINT
+            + " " + _TITLE_NOT_ID_HINT + " " + _ASSIGNEE_HINT + " " + _FORMAT_HINT
         ),
         annotations={
             "readOnlyHint": False,
@@ -737,7 +757,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "ihn zurück. Sichtbarkeit/Freigaben (visibility/share_read/share_write) gehen über "
             "kein Tool, nur über die UI. "
             + _status_hint() + " " + WRITE_TOOL_DIVISION + " " + _LIST_SPACES_POINTER
-            + " " + _ASSIGNEE_HINT
+            + " " + _ASSIGNEE_HINT + " " + _FORMAT_HINT
         ),
         annotations={
             "readOnlyHint": False,
@@ -917,7 +937,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "Aufruf: übergib einen Text mit Zeilenumbrüchen — ein Aufruf, ein Commit, eine "
             "Versionserhöhung. Die Quittung enthält die neue version; du brauchst zwischen "
             "aufeinanderfolgenden Appends kein erneutes get_item. "
-            + WRITE_TOOL_DIVISION
+            + WRITE_TOOL_DIVISION + " " + _FORMAT_HINT
         ),
         annotations={
             "readOnlyHint": False,
@@ -944,6 +964,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "nicht. Das Ergebnis nennt je Eintrag ok:true (neue version) oder ok:false (error + "
             "detail). Bei conflict: wie bei append_to_item — das Item neu lesen und nur diesen "
             "Eintrag wiederholen. Für ein einzelnes Item reicht append_to_item. " + WRITE_TOOL_DIVISION
+            + " " + _FORMAT_HINT
         ),
         annotations={
             "readOnlyHint": False,
@@ -989,7 +1010,7 @@ def register(mcp: FastMCP, *, store: Store, permissions: Permissions) -> dict[st
             "ganze Aufruf fehl und nichts wird geschrieben. Braucht die zuletzt gelesene "
             "version. Liefert standardmäßig eine Quittung statt des vollen Texts — "
             "return_body=True holt ihn zurück. "
-            + WRITE_TOOL_DIVISION
+            + WRITE_TOOL_DIVISION + " " + _FORMAT_HINT
         ),
         annotations={
             "readOnlyHint": False,
