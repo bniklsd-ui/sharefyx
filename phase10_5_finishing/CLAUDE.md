@@ -13,7 +13,7 @@ down:
   - STARTUPTRAG_ARCHIVE.md                          # 📦 die Startaufträge der Blöcke 7 und 9, verbatim
   - MODULSTATUS_ARCHIVE.md                         # 📦 die ausführlichen Statusspalten der Blöcke 0–10, verbatim
   - FREIGABEN_ARCHIVE.md                           # 📦 die Freigaben der Phase, verbatim
-updated: 2026-10-24 (Block 11.4: die Live-Darstellung — V211 gemessen, nicht behauptet; Probe 15/15 grün, Gegenlauf rot; der Modulstatus der Blöcke 0–10 liegt jetzt im L3-Archiv) | 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein Moduswechsel; Probe 12/12 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-25 (Block 11.7: das Budget — jede Datei genau einmal; Erstaufruf 206,4 KB, Editor 69,7 KB) | 2026-10-24 (Block 11.4: die Live-Darstellung — V211 gemessen, nicht behauptet; Probe 15/15 grün, Gegenlauf rot; der Modulstatus der Blöcke 0–10 liegt jetzt im L3-Archiv) | 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein Moduswechsel; Probe 12/12 grün) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -37,6 +37,9 @@ updated: 2026-10-24 (Block 11.4: die Live-Darstellung — V211 gemessen, nicht b
 | 8 | Karte: Gehirnkarte C2 | Ausführer (+ Claude Code Smoke/Sichtung) | C | 🔄 2026-10-24 |
 | 9 | Rechte und Namen: RE-7 (P1-12), RE-4 (P1-13), RE-3 (P1-14) | Ausführer | D | ✅ 2026-10-24 |
 | 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | D | ✅ 2026-10-24 |
+| 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | 🔄 2026-10-24 — **11.1 Vendor** (CodeMirror 5.65.16, **fünf** Dateien statt drei — gemessen: der UMD-Browser-Zweig der `markdown.min.js` löst `require("../xml/xml")` **nicht** auf) · **11.2 Nachlader** (`js/editor_cm.js`: CSS → Kern → Modus-Dateien, Promise gecacht, Fehler → `null` = Textarea/Rohmodus) · **11.3 Live-Editor** (`editor.js`: `getBody()`/`setBody()`, `setRawMode(on)`, Schalter „Rohtext", Probe 12/12 grün) · **11.4 Live-Darstellung** (V211 **gemessen**: `visibility: hidden` hält die Cursorposition, `display: none`/`font-size: 0` rücken sie 2 Zeichen vor; Probe 15/15 grün) · **11.7 Budget** (`ui_budget.py`: `static_payload_files()` — **jede Datei genau einmal**; Erstaufruf **206,4 KB** ≤ 250 KB, Editor **69,7 KB** ≤ 80 KB; Wächter `tests/test_budget_coverage.py` mit Gegenprobe) |
+| 12 | Doku und Altlasten: DO-1, LG-6, AL-1 (Rest), AL-3, BG-2/BG-3 | Claude Code | — | ⬜ |
+| Z | Closeout P10.5 (Handover, Grafik, Rotationen) | Claude Code + Nikinger | — | ⬜ |
 
 > **Die ausführlichen Statusspalten der Blöcke 0–10 stehen verbatim in
 > [`MODULSTATUS_ARCHIVE.md`](MODULSTATUS_ARCHIVE.md) (L3) — hier trägt der Modulstatus den
@@ -112,7 +115,7 @@ updated: 2026-10-24 (Block 11.4: die Live-Darstellung — V211 gemessen, nicht b
 | P10.5-47 | P10.5-S: geänderter Editor nie überschrieben; Neuladen trägt frische `version` | ✅ | 10.2 + 10.3 gebaut (Hinweisband, `reloadFromServer`) · **10.5 Wegwerf**: der Browser tippt in das offene Item (`v1` → `v1+`), **danach** schreibt ein zweiter Principal denselben Space → das Band erscheint („Geändert von alpha — neu laden?"), der **getippte Text steht unverändert drin** (kein Überschreiben) · die Versionsanzeige stand vorher auf `v1` und bleibt `v1+` (der Entwurf ist ungespeichert, die Serverversion ist die alte) |
 | P10.5-48 | Shutdown ≤ 10 s mit offenen Streams | ✅ | 10.2 gebaut (`timeout_graceful_shutdown=5`, **V213**: uvicorn 0.54.0) · **10.5 Wegwerf**: SIGTERM (nur über die PID-Datei) bei **offenem Stream** → der Prozess ist nach **5,22 s** weg (Grenze 10); das Server-Log zeigt „Cancel 1 running task(s), timeout graceful shutdown exceeded" nach 5 s · **die Probe startet den Produktiv-Code** (`phase2_mcp/scripts/serve.py`), nicht eine Kopie — sonst würde sie eine Attrappe messen |
 | P10.5-49 | Live nach Deploy D: Ereignisse kommen über **beide** Eingänge an (V212 ✅) | ⬜ | — |
-| P10.5-50 | Budget: Erstaufruf ≤ 250 KB, Editor ≤ 80 KB, jede Datei gezählt | ⬜ | — |
+| P10.5-50 | Budget: Erstaufruf ≤ 250 KB, Editor ≤ 80 KB, jede Datei gezählt | ✅ | 11.7 · `ui_budget.py` (**sechs** Messgrößen, alle im Korridor): Erstaufruf **206,4 KB** (Grenze 250 KB) · **Editor nachgeladen 69,7 KB** (Grenze 80 KB) · die Dateiauswahl wandert in `static_payload_files(static_dir) -> (Erstaufruf, nachgeladen)` · Wächter `tests/test_budget_coverage.py`: **jede** Datei unter `static/` steht **genau einmal** (Ausnahmen **genannt**, nicht geschwiegen: `app.html` → Zeile „Erstaufruf bis interaktiv", Lizenztexte → der Browser lädt sie nicht) · **der Fund**: `logo.svg` (Block 7.2) stand in **keiner** Liste — die Messung meldete „grün" und maß eine Nutzlast, die es so nicht gibt · **Gegenlauf**: dieselbe Prüffunktion mit einer unbekannten Datei → rot |
 | P10.5-51 | ED-1: kein Moduswechsel, Live-Darstellung (Nikinger-Sichtung) | ⬜ | 11.3 + 11.4 gebaut · **Wegwerf `probes/p105_b11_live_probe.py`: 15 von 15 Zellen grün** — der Cursor steht nach dem Klick **exakt** auf dem geklickten Zeichen (ch 15/18/26 = erwartet), die Formatierungszeichen sind **nur auf der Cursorzeile** sichtbar, der Rohmodus zeigt jedes Zeichen, der Notausgang (Nachlader scheitert → Textarea) funktioniert, keine Seitenfehler · **V211 ✅**: die Verbergungs-Art ist **gemessen**, nicht geschätzt — `visibility: hidden` hält die Cursorposition und lässt die Zeile **nicht** springen (0,0 px), `display: none` **und** `font-size: 0` setzen den Cursor **2 Zeichen zu früh** (18 → 16, 26 → 24: genau die zwei verdeckten `**`) und lassen die Zeile um **15,66 px** springen · **Gegenlauf**: ohne den `setValue`-Fix in `editor.js` sind genau **drei** Zellen rot · **die Sichtung des Nikingers steht aus** — die Zeile wird erst ✅, wenn er das Urteil gefällt hat |
 | P10.5-52 | Roundtrip 10/10 byte-identisch, Öffnen macht nie „geändert" | ⬜ | — |
 | P10.5-53 | ED-2: Klick bei sauberem Editor schreibt mit `version`; bei geändertem nur Puffer | ⬜ | — |
@@ -125,7 +128,7 @@ updated: 2026-10-24 (Block 11.4: die Live-Darstellung — V211 gemessen, nicht b
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
 
-**Summe:** 42 ✅ · 0 ⚠️ · 19 ⬜ (von 61). **[2026-10-24, Block 10.5]** +4 ✅ (10-45, 10-46, 10-47, 10-48) ⇒ 42 ✅ · 0 ⚠️ · 19 ⬜. **[2026-10-24, Block 9.3]** +2 ✅ (10-43, 10-44) ⇒ 38 ✅ · 0 ⚠️ · 23 ⬜. **[2026-10-24, Block 9.3]** +2 ✅ (10-43, 10-44) ⇒ 38 ✅ · 0 ⚠️ · 23 ⬜. **[2026-10-24, Block 9.2]** +1 ✅ (10-42, RE-4 `rename_folder`) ⇒ 36 ✅ · 0 ⚠️ · 25 ⬜. **[2026-10-24, Block 9.1]** +1 ✅ (10-41, RE-7 `created_by`) ⇒ 35 ✅ · 0 ⚠️ · 26 ⬜. **[2026-10-24, Block 8]** +4 ✅ (10-36, 10-38, 10-39, 10-40) ⇒ 34 ✅ · 0 ⚠️ · 27 ⬜. **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`). **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
+**Summe:** 43 ✅ · 0 ⚠️ · 18 ⬜ (von 61). **[2026-10-25, Block 11.7]** +1 ✅ (10-50, das Budget) ⇒ 43 ✅ · 0 ⚠️ · 18 ⬜. **[2026-10-24, Block 10.5]** +4 ✅ (10-45, 10-46, 10-47, 10-48) ⇒ 42 ✅ · 0 ⚠️ · 19 ⬜. **[2026-10-24, Block 9.3]** +2 ✅ (10-43, 10-44) ⇒ 38 ✅ · 0 ⚠️ · 23 ⬜. **[2026-10-24, Block 9.2]** +1 ✅ (10-42, RE-4 `rename_folder`) ⇒ 36 ✅ · 0 ⚠️ · 25 ⬜. **[2026-10-24, Block 9.1]** +1 ✅ (10-41, RE-7 `created_by`) ⇒ 35 ✅ · 0 ⚠️ · 26 ⬜. **[2026-10-24, Block 8]** +4 ✅ (10-36, 10-38, 10-39, 10-40) ⇒ 34 ✅ · 0 ⚠️ · 27 ⬜. **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`). **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
 
 ## Offen beim Nikinger
 
@@ -167,54 +170,44 @@ updated: 2026-10-24 (Block 11.4: die Live-Darstellung — V211 gemessen, nicht b
 ## Startauftrag — Block 9 (Rechte und Namen: RE-7, RE-4, RE-3) · Ausführer
 > **Verbatim verschoben** nach `STARTUPTRAG_ARCHIVE.md` (`scripts/move_sections.py`) — dort unter derselben Überschrift.
 
-## Session stopped — 2026-10-24 (Block 11.4: die Live-Darstellung — V211 gemessen, nicht behauptet)
+## Session stopped — 2026-10-25 (Block 11.7: das Budget — jede Datei genau einmal)
 
-**Ergebnis.** Die Live-Darstellung steht: das CM5-Grundlayout, die Token-Stile (`.cm-header-1…6`,
-`.cm-strong`, `.cm-em`, `.cm-link`, `.cm-quote`, `.cm-comment`), der gedimmte `.cm-formatting` und
-die **Cursorzeile** (`sfx-active-line` auf dem **Wrap**-Layer — der Background-Layer ist eine
-eigene Ebene hinter der Zeile, dort findet der Nachfahr die Formatierungszeichen nicht). Der
-Rohmodus (`.is-raw`) blendet die Hervorhebung weg.
+**Ergebnis.** Das Budget hat jetzt **zwei** Zeilen: der Erstaufruf (die Shell) und der
+**nachgeladene Editor**. Die Dateiauswahl ist aus der Hand genommen: die neue Funktion
+`static_payload_files(static_dir) -> (Erstaufruf, nachgeladen)` — erstere trägt `js/*.js`,
+`app.css`, `logo.svg` und die Fonts (**roh** gezählt: woff2 ist bereits komprimiert), letztere
+alles unter `vendor/` (CodeMirror kommt erst beim **Öffnen** eines Items). **Gemessen: Erstaufruf
+206,4 KB** (Korridor 250 KB) · **Editor 69,7 KB** (Korridor 80 KB) — **sechs** Messgrößen statt
+fünf, alle im Korridor.
 
-**V211 ist gemessen, nicht behauptet.** Der Plan verlangt den Vergleich `display: none` gegen
-`font-size: 0`, Kriterium ist die **korrekte Cursorposition nach dem Klick**. Die Probe fährt
-**alle drei** Arten an der Wegwerf-Instanz (`probes/p105_b11_live_probe.py`, Port 18811) und misst
-je **drei** Klickstellen: `visibility: hidden` hält den Cursor **exakt** (ch 15/18/26 = erwartet)
-und die Zeile springt **nicht** (0,0 px); `display: none` **und** `font-size: 0` setzen ihn
-**2 Zeichen zu früh** (18 → 16, 26 → 24 — genau die Zahl der verdeckten `**`) und die Zeile
-springt beim Hineinwechseln um **15,66 px**. **Ausgeliefert wird `visibility: hidden`.**
+**Der Fund: eine Datei, die niemand zählte.** Das Wortzeichen `logo.svg` (Block 7.2) stand in
+**keiner** Liste — weder im Erstaufruf noch im Editor, also in **keiner** Nutzlast. Die Messung
+meldete trotzdem „grün": sie maß eine Nutzlast, die es so nicht gibt. Der Wächter
+`tests/test_budget_coverage.py` verlangt jetzt, dass **jede** Datei unter `static/` **genau
+einmal** in einer der beiden Listen steht; die Ausnahmen (`app.html` — kommt als Shell in die
+Zeile „Erstaufruf bis interaktiv"; die Lizenztexte — die lädt der Browser nicht) sind **einmal**
+festgeschrieben und werden **genannt**, nicht geschwiegen. Die Gegenprobe benutzt **dieselbe**
+Prüffunktion wie der Wächter: eine Datei, die niemand kennt, muss ihn rot machen.
 
-**Drei Fehler lagen im Messgerät, nicht im Produkt.** Die CSP (`style-src 'self'`, ohne
-`'unsafe-inline'`) **blockiert Inline-`<style>`** — die erste Fassung schaltete die Variante so
-um und maß **drei gleiche Werte**: grün, ohne etwas gemessen zu haben. Die Variante kommt jetzt
-**same-origin** (`page.route` auf `/ui/static/app.css`) und wird **im Browser zurückgelesen**
-(`--p105-variante`). Der Anker war **deklarations**spezifisch (`visibility: hidden`), sonst traf
-er die **Farb**-Regel `.CodeMirror .cm-formatting` — dieselbe Datei, und die Verbergung blieb
-unberührt. Und `display: none` lässt `visibility` auf „visible" stehen: sichtbar ist nur, was
-**Geometrie** hat (Breite > 0).
+**Zwei Wächter, die im Arbeitsbaum der letzten Session verloren gegangen waren, sind wieder da.**
+(1) Beim Aufteilen des Modulstatus (Block 11.4) sind die Zeilen der **aktiven** Blöcke 11, 12
+und Z aus **beiden** Listen verschwunden — der Head zeigte danach nur die geschlossenen Blöcke
+0–10, und der Wächter, der die Aufteilung band, prüfte nur die Richtung „Archiv → Head": die drei
+Zeilen fehlten in beiden Listen, also war für sie niemand zuständig. Der Wächter prüft jetzt
+**beide** Richtungen, und ein zweiter verlangt eine Zeile je Block 0–12/Z. (2) Der
+Softcap-Wächter stand **ohne Grund** auf der Streichliste — die Datei erfüllte die Grenze
+(37.711 B von 40.960 B), der Wächter war grün, und er wurde trotzdem entfernt. Ein Wächter, der
+fällt, weil jemand ihn gelöscht hat, ist kein Wächter mehr. Die Grenze wurde **nicht**
+angehoben, sondern eingehalten.
 
-**Ein Produktfehler, gefunden und behoben.** `cm.setValue()` ersetzt das ganze Dokument und
-nimmt die Zeilenklassen mit; CM5 feuert dabei **kein** `cursorActivity`. `clearDetail()` setzt
-`cm` **nicht** auf null — beim **Wechsel** auf ein zweites Item bleibt der Editor also geladen,
-und `setBody` setzt ihn über `cm.setValue`. Steht der Cursor dabei auf Zeile 0 (so ist es
-direkt nach dem Öffnen), greift die Kurzprüfung in `_cursorZeileSetzen()`
-(`cmCursorZeile === zeile`) — und die Cursorzeile bleibt **unmarkiert**, ihre
-Formatierungszeichen unsichtbar. `setBody()` setzt den Marker-Zustand deshalb **vor** dem
-`setValue` zurück und setzt ihn danach neu. **Gegenlauf:** ohne den Fix sind genau **drei** Zellen
-rot (`cursorzeile_markiert`, `cursorzeile_markiert_nach_zurueck`,
-`formatierung_auf_der_cursorzeile_sichtbar`).
+**Eine Zeile der Summenzeile stand doppelt** (Block 9.3 zweimal) — beim Nachziehen entfernt.
 
-**Weiter gemessen (Block 11.3 unverändert):** der Notausgang (der Nachlader scheitert → die
-Textarea trägt den Text), der Rohmodus (jedes Zeichen sichtbar), keine Seitenfehler.
-**15 von 15 Zellen grün** (`probes/p105_b11_live.json`); der Gegenlauf liegt daneben
-(`p105_b11_live_gegenlauf.json`). Sieben neue Wächter in `tests/test_probe_b11_live.py` — einer
-prüft, dass **jede** Variante wirklich ausgeliefert wurde (die CSP-Falle), einer die
-V211-Entscheidung an den Beleg, einer den `setValue`-Fix am Quelltext.
+**Suite 1542 grün** (354,21 s), `doc_health` 0, `ui_budget` **6/6** (die sechste Größe ist der
+nachgeladene Editor).
 
-**Suite 1529 grün** (345,98 s), `doc_health` 0, `ui_budget` 5/5.
+**Was noch nicht gebaut ist.** ED-2 (To-do-Kästchen, 11.5), ED-3 (Stufe 2, 11.6), der Roundtrip
+(11.8). **P10.5-51 bleibt ⬜** — die Live-Darstellung ist gebaut und gemessen, aber das
+**Augen-Urteil** des Nikingers steht aus.
 
-**Was noch nicht gebaut ist.** ED-2 (To-do-Kästchen, 11.5), ED-3 (Stufe 2, 11.6), das Budget
-(11.7) und der Roundtrip (11.8). **P10.5-51 bleibt ⬜** — die Live-Darstellung ist gebaut und
-gemessen, aber das **Augen-Urteil** des Nikingers steht aus.
-
-**Nächster Schritt.** 11.7 (der Budget-Wächter „Editor nachgeladen ≤ 80 KB") — das ist die
-Abnahme P10.5-50 und der kürzeste Weg zu einer geschlossenen Block-11-Zeile; danach 11.5 (ED-2).
+**Nächster Schritt.** 11.5 (ED-2, die To-do-Kästchen) — das letzte Stück im Editor; danach 11.6
+(Stufe 2) und 11.8 (Roundtrip).

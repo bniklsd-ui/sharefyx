@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""ui_budget.py — misst die vier Größen aus Plan §5 Step 8 / P5-AD gegen eine **temporäre**
-Instanz mit synthetischem Bestand (≥ 200 Items). Nie gegen den echten `DATA_ROOT`, nie gegen
-einen laufenden Dienst: gebaut wie `ui_smoke.py`, in-process über `httpx.ASGITransport`, kein
-Port, kein Netz.
+"""ui_budget.py — misst die Größen aus Plan §5 Step 8 / P5-AD (und den Editor-Korridor aus
+P10.5-H) gegen eine **temporäre** Instanz mit synthetischem Bestand (≥ 200 Items). Nie gegen den
+echten `DATA_ROOT`, nie gegen einen laufenden Dienst: gebaut wie `ui_smoke.py`, in-process über
+`httpx.ASGITransport`, kein Port, kein Netz.
 
 **Warum messen statt schätzen (P5-AD):** `[VERIFY]` V10 stand seit P1 offen als „die Nutzlast
 sollte klein genug sein". Eine Zahl, die niemand gemessen hat, ist eine Meinung. Dieses Skript
@@ -17,7 +17,18 @@ Die vier Korridore (Plan §5 Step 8):
 | `GET /api/v1/items?limit=50` roh / gzip      | < 64 KB / < 12 KB       |
 | `GET /api/v1/items/{id}` typisch             | < 8 KB                  |
 | `app.js` + `app.css` + Font, gzip            | < 250 KB gesamt         |
+| **Editor nachgeladen (gzip)**                | **< 80 KB** (P10.5-H)   |
 | Erstaufruf `/ui/` bis interaktiv, Bytes ges. | < 400 KB                |
+
+**Die Dateiauswahl ist eine Zusage (P10.5 Block 11, Schritt 11.7).** Sie steht in
+`static_payload_files(static_dir) -> (Erstaufruf, nachgeladen)`: der **Erstaufruf** ist alles,
+was ein frischer Browser fuer die Shell laedt (`js/*.js`, `app.css`, das Wortzeichen
+`logo.svg`, die Fonts roh), der **nachgeladene Editor** ist `vendor/**` (CodeMirror kommt erst
+beim Oeffnen eines Items, Block 11.2). **Jede Datei unter `static/` steht genau einmal in einer
+der beiden Listen** — ausser `app.html` (das kommt als Shell ueber `/ui/` in die Erstaufruf-
+Messung) und den Lizenztexten (die laedt der Browser nicht). Der Wächter
+`phase10_5_finishing/tests/test_budget_coverage.py` prueft das; bis 2026-10-24 stand
+`logo.svg` in **keiner** Liste, und die Messung meldete trotzdem „grün".
 
 „Bis interaktiv" heißt hier konkret: alles, was ein frischer Browser laden muss, bevor die Shell
 etwas anzeigen kann — `app.html` + `app.css` + `app.js` + Font (gzip, statische Dateien) plus die
@@ -104,6 +115,30 @@ class Metric:
     @property
     def ok(self) -> bool:
         return self.value_bytes < self.budget_bytes
+
+
+def static_payload_files(static_dir: Path) -> tuple[list[Path], list[Path]]:
+    """Die Dateien der statischen Nutzlast in **zwei** Klassen: **(Erstaufruf, nachgeladen)**.
+
+    * **Erstaufruf** — alles, was ein frischer Browser fuer die Shell laedt: die
+      ES-Module unter `js/`, `app.css` und das Wortzeichen `logo.svg`. Dazu die **Fonts**:
+      die zaehlen **roh** (woff2 ist bereits komprimiert; ein zweiter Durchlauf macht sie
+      minimal groesser, nicht kleiner) — sie stehen in derselben Liste und sind am Suffix
+      erkennbar.
+    * **Nachgeladen** — `vendor/**`: der Editor (CodeMirror 5) wird erst beim **Oeffnen**
+      eines Items geladen (P10.5 Block 11.2) und ist damit **nicht** Teil des Erstaufrufs.
+
+    **Jede Datei unter `static/` gehoert in genau eine der beiden Listen** — der Wächter
+    `phase10_5_finishing/tests/test_budget_coverage.py` prueft das. Zwei Dateien sind
+    bewusst **nicht** dabei: `app.html` (das kommt als Shell ueber `/ui/` in die Zeile
+    „Erstaufruf bis interaktiv") und die Lizenztexte (`fonts/OFL.txt` — die lädt der
+    Browser nicht, sie liegen dem Repo bei).
+    """
+    erstaufruf = sorted((static_dir / "js").glob("*.js"))
+    erstaufruf += [static_dir / "app.css", static_dir / "logo.svg"]
+    erstaufruf += sorted((static_dir / "fonts").glob("*.woff2"))
+    nachgeladen = sorted(p for p in (static_dir / "vendor").rglob("*") if p.is_file())
+    return erstaufruf, nachgeladen
 
 
 @dataclass
@@ -247,19 +282,31 @@ async def _measure(data_root: Path) -> list[Metric]:
         #    zählt roh, genau wie ein Server sie ausliefert.
         static_total = 0
         static_parts = []
-        js_names = tuple(f"js/{p.name}" for p in sorted((DEFAULT_STATIC_DIR / "js").glob("*.js")))
-        for name in js_names + ("app.css",):
-            payload = (DEFAULT_STATIC_DIR / name).read_bytes()
-            size = _gz(payload)
+        erstaufruf, nachgeladen = static_payload_files(DEFAULT_STATIC_DIR)
+        for path in erstaufruf:
+            if path.suffix == ".woff2":
+                # woff2 ist bereits komprimiert -- zaehlen **roh**, wie der Server es liefert.
+                size = path.stat().st_size
+                static_parts.append(f"{path.name} {_kb(size)} (bereits komprimiert)")
+            else:
+                size = _gz(path.read_bytes())
+                static_parts.append(f"{path.relative_to(DEFAULT_STATIC_DIR)} {_kb(size)}")
             static_total += size
-            static_parts.append(f"{name} {_kb(size)}")
-        fonts = sorted((DEFAULT_STATIC_DIR / "fonts").glob("*.woff2"))
-        for font in fonts:
-            size = font.stat().st_size
-            static_total += size
-            static_parts.append(f"{font.name} {_kb(size)} (bereits komprimiert)")
         metrics.append(Metric(
             "app.js + app.css + Font (gzip)", static_total, 250 * KB, ", ".join(static_parts),
+        ))
+
+        # 3b) Der **nachgeladene Editor** (P10.5 Block 11.2/11.7): CodeMirror kommt erst beim
+        #     Oeffnen eines Items -- also nicht im Erstaufruf, aber eine eigene Messgroesse
+        #     mit einem eigenen Korridor (80 KB, P10.5-H).
+        editor_total = 0
+        editor_parts = []
+        for path in nachgeladen:
+            size = _gz(path.read_bytes())
+            editor_total += size
+            editor_parts.append(f"{path.relative_to(DEFAULT_STATIC_DIR)} {_kb(size)}")
+        metrics.append(Metric(
+            "Editor nachgeladen (gzip)", editor_total, 80 * KB, ", ".join(editor_parts),
         ))
 
         # 4) Erstaufruf /ui/ bis interaktiv.

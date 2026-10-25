@@ -58,8 +58,8 @@ updated: 2026-10-24 (B11.4: V211 gemessen; zwei neue L3-Archive) | 2026-10-24 (B
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing — alle Baustellen schließen; Plan `docs/concepts/phase10_5_finishing_plan.md`, Ausführer M3.1 Flash als Open-Test)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **36.972 B** · Phase-10.5-Head: Modulstatus der Blöcke 0–12/Z, Deploy-Tabelle A–D, Abnahmestand P10.5-1–61 (42 ✅ · 0 ⚠️ · 19 ⬜), offene Punkte beim Nikinger, ein Session-Block (≤ 4 KiB, DO-3)
-- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **90673 B** · L3-Archiv der älteren Session-Blöcke dieser Phase, verbatim, newest-first
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **38.030 B** · Phase-10.5-Head: Modulstatus der Blöcke 0–12/Z, Deploy-Tabelle A–D, Abnahmestand P10.5-1–61 (43 ✅ · 0 ⚠️ · 18 ⬜), offene Punkte beim Nikinger, ein Session-Block (≤ 4 KiB, DO-3)
+- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **94660 B** · L3-Archiv der älteren Session-Blöcke dieser Phase, verbatim, newest-first
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · L3-Archiv der **Startaufträge von Block 7 und Block 9** (verbatim verschoben 2026-10-23 bzw. 2026-10-24) — Schritte 7.4–7.7 und die Ankündigung der drei P1-Öffnungen
 
 

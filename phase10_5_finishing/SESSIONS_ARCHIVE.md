@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,58 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-24 (Block 11.4: die Live-Darstellung — V211 gemessen, nicht behauptet)
+
+**Ergebnis.** Die Live-Darstellung steht: das CM5-Grundlayout, die Token-Stile (`.cm-header-1…6`,
+`.cm-strong`, `.cm-em`, `.cm-link`, `.cm-quote`, `.cm-comment`), der gedimmte `.cm-formatting` und
+die **Cursorzeile** (`sfx-active-line` auf dem **Wrap**-Layer — der Background-Layer ist eine
+eigene Ebene hinter der Zeile, dort findet der Nachfahr die Formatierungszeichen nicht). Der
+Rohmodus (`.is-raw`) blendet die Hervorhebung weg.
+
+**V211 ist gemessen, nicht behauptet.** Der Plan verlangt den Vergleich `display: none` gegen
+`font-size: 0`, Kriterium ist die **korrekte Cursorposition nach dem Klick**. Die Probe fährt
+**alle drei** Arten an der Wegwerf-Instanz (`probes/p105_b11_live_probe.py`, Port 18811) und misst
+je **drei** Klickstellen: `visibility: hidden` hält den Cursor **exakt** (ch 15/18/26 = erwartet)
+und die Zeile springt **nicht** (0,0 px); `display: none` **und** `font-size: 0` setzen ihn
+**2 Zeichen zu früh** (18 → 16, 26 → 24 — genau die Zahl der verdeckten `**`) und die Zeile
+springt beim Hineinwechseln um **15,66 px**. **Ausgeliefert wird `visibility: hidden`.**
+
+**Drei Fehler lagen im Messgerät, nicht im Produkt.** Die CSP (`style-src 'self'`, ohne
+`'unsafe-inline'`) **blockiert Inline-`<style>`** — die erste Fassung schaltete die Variante so
+um und maß **drei gleiche Werte**: grün, ohne etwas gemessen zu haben. Die Variante kommt jetzt
+**same-origin** (`page.route` auf `/ui/static/app.css`) und wird **im Browser zurückgelesen**
+(`--p105-variante`). Der Anker war **deklarations**spezifisch (`visibility: hidden`), sonst traf
+er die **Farb**-Regel `.CodeMirror .cm-formatting` — dieselbe Datei, und die Verbergung blieb
+unberührt. Und `display: none` lässt `visibility` auf „visible" stehen: sichtbar ist nur, was
+**Geometrie** hat (Breite > 0).
+
+**Ein Produktfehler, gefunden und behoben.** `cm.setValue()` ersetzt das ganze Dokument und
+nimmt die Zeilenklassen mit; CM5 feuert dabei **kein** `cursorActivity`. `clearDetail()` setzt
+`cm` **nicht** auf null — beim **Wechsel** auf ein zweites Item bleibt der Editor also geladen,
+und `setBody` setzt ihn über `cm.setValue`. Steht der Cursor dabei auf Zeile 0 (so ist es
+direkt nach dem Öffnen), greift die Kurzprüfung in `_cursorZeileSetzen()`
+(`cmCursorZeile === zeile`) — und die Cursorzeile bleibt **unmarkiert**, ihre
+Formatierungszeichen unsichtbar. `setBody()` setzt den Marker-Zustand deshalb **vor** dem
+`setValue` zurück und setzt ihn danach neu. **Gegenlauf:** ohne den Fix sind genau **drei** Zellen
+rot (`cursorzeile_markiert`, `cursorzeile_markiert_nach_zurueck`,
+`formatierung_auf_der_cursorzeile_sichtbar`).
+
+**Weiter gemessen (Block 11.3 unverändert):** der Notausgang (der Nachlader scheitert → die
+Textarea trägt den Text), der Rohmodus (jedes Zeichen sichtbar), keine Seitenfehler.
+**15 von 15 Zellen grün** (`probes/p105_b11_live.json`); der Gegenlauf liegt daneben
+(`p105_b11_live_gegenlauf.json`). Sieben neue Wächter in `tests/test_probe_b11_live.py` — einer
+prüft, dass **jede** Variante wirklich ausgeliefert wurde (die CSP-Falle), einer die
+V211-Entscheidung an den Beleg, einer den `setValue`-Fix am Quelltext.
+
+**Suite 1529 grün** (345,98 s), `doc_health` 0, `ui_budget` 5/5.
+
+**Was noch nicht gebaut ist.** ED-2 (To-do-Kästchen, 11.5), ED-3 (Stufe 2, 11.6), das Budget
+(11.7) und der Roundtrip (11.8). **P10.5-51 bleibt ⬜** — die Live-Darstellung ist gebaut und
+gemessen, aber das **Augen-Urteil** des Nikingers steht aus.
+
+**Nächster Schritt.** 11.7 (der Budget-Wächter „Editor nachgeladen ≤ 80 KB") — das ist die
+Abnahme P10.5-50 und der kürzeste Weg zu einer geschlossenen Block-11-Zeile; danach 11.5 (ED-2).
 
 ## Session stopped — 2026-10-24 (Block 11.3: der Live-Editor — ein Text, eine Quelle, kein Moduswechsel)
 

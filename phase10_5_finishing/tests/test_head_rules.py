@@ -128,19 +128,27 @@ def _modulstatus_zeilen(text: str) -> dict[str, list[str]]:
         if not line.startswith("|"):
             break
         spalten = [s.strip() for s in line.split("|")]
-        if len(spalten) < 6 or not spalten[1].isdigit():
+        # Die Block-Kennung ist eine Zahl **oder** „Z" (der Closeout-Block) — nur Ziffern
+        # zu pruefen wuerde genau diese eine Zeile verschleiern.
+        if len(spalten) < 6 or not re.fullmatch(r"[0-9]+|Z", spalten[1]):
             continue
         zeilen.setdefault(spalten[1], []).append(line)
     return zeilen
 
 
 def test_the_modulstatus_short_rows_and_the_archive_agree():
-    """**Der Kurzstand im Head und die Vollzeilen im Archiv sind derselbe Stand.**
+    """**Der Kurzstand im Head und die Vollzeilen im Archiv sind derselbe Stand** — in
+    **beiden** Richtungen.
 
-    Der Modulstatus wurde am 2026-10-24 (Block 11.4) aufgeteilt: der Head trägt den **Kurzstand**
-    (Block, Inhalt, Zuständigkeit, Deploy, Status), das L3-Archiv die **ausführlichen**
-    Statusspalten. Die vier Spalten, die der Head noch trägt, müssen im Archiv **byte-gleich**
-    wiederkehren — sonst wäre der Head eine Zusammenfassung, die irgendwann falsch wird.
+    * Jede Zeile des **Archivs** hat im Head eine Zeile, und die vier Spalten, die der Head
+      noch traegt (Block, Inhalt, Wer, Deploy), sind **byte-gleich**.
+    * Jede Zeile des **Heads**, die nicht im Archiv steht, traegt ihren **vollstaendigen**
+      Stand — die aktiven Bloecke (11, 12, Z) gehoeren nicht ins Archiv.
+
+    **Zwei Richtungen, weil zwei Listen es sind.** Der erste Wächter (2026-10-24) pruefte nur
+    „das Archiv hat eine Zeile, der Head auch" — und bemerkte deshalb nicht, dass beim
+    Aufteilen die Zeilen der **aktiven** Bloecke 11, 12 und Z aus **beiden** Listen
+    verschwunden waren. `test_the_modulstatus_carries_every_block` schliesst diese Luecke.
     """
     head = HEAD.read_text(encoding="utf-8")
     assert MODULSTATUS_ARCHIV.exists(), f"das Archiv fehlt: {MODULSTATUS_ARCHIV}"
@@ -148,31 +156,75 @@ def test_the_modulstatus_short_rows_and_the_archive_agree():
 
     kurz_zeilen = _modulstatus_zeilen(head)
     voll_zeilen = _modulstatus_zeilen(archiv)
-    assert kurz_zeilen, "der Modulstatus des Heads trägt keine Block-Zeilen"
-    assert voll_zeilen, "das Archiv trägt keine Block-Zeilen"
+    assert kurz_zeilen, "der Modulstatus des Heads traegt keine Block-Zeilen"
+    assert voll_zeilen, "das Archiv traegt keine Block-Zeilen"
 
-    for nummer, zeilen in kurz_zeilen.items():
-        assert nummer in voll_zeilen, (
-            f"der Block {nummer} steht im Head, aber nicht im Archiv — die Aufteilung ist "
-            "unvollständig"
+    for nummer, zeilen in voll_zeilen.items():
+        assert nummer in kurz_zeilen, (
+            f"der Block {nummer} steht im Archiv, aber nicht im Head — der Kurzstand traegt "
+            "ihn nicht"
         )
-        kurz = zeilen[0]
-        voll = voll_zeilen[nummer][0]
+        kurz = kurz_zeilen[nummer][0]
+        voll = zeilen[0]
         for spalte in range(1, 5):     # Block, Inhalt, Wer, Deploy
             assert kurz.split("|")[spalte] == voll.split("|")[spalte], (
                 f"Block {nummer}: Spalte {spalte} weicht zwischen Head und Archiv ab — "
                 f"{kurz.split('|')[spalte]!r} != {voll.split('|')[spalte]!r}"
             )
         assert len(kurz) <= len(voll), (
-            f"Block {nummer}: die Kurzzeile im Head ist länger als die Vollzeile im Archiv — "
+            f"Block {nummer}: die Kurzzeile im Head ist laenger als die Vollzeile im Archiv — "
             "dann ist nichts verschoben worden"
         )
 
+    # Die aktiven Bloecke stehen **nur** im Head — und dort mit ihrem vollen Stand.
+    for nummer, zeilen in kurz_zeilen.items():
+        if nummer in voll_zeilen:
+            continue
+        status = zeilen[0].split("|")[5]
+        assert any(marker in status for marker in ("✅", "🔄", "⬜")), (
+            f"der Block {nummer} steht nur im Head, traegt aber **keinen** Status "
+            f"({status!r}) — die aktiven Bloecke gehoeren nicht ins Archiv"
+        )
+
+
+#: Die Bloecke, die der Modulstatus **alle** tragen muss (Plan §0.2: „eine Zeile je Block
+#: 0–12/Z mit Status-Spalte").
+ERWARTETE_BLOECKE = [str(n) for n in range(0, 13)] + ["Z"]
+
+
+def test_the_modulstatus_carries_every_block():
+    """**Jeder** Block 0–12 und Z braucht eine Zeile — der Modulstatus ist die Karte der
+    Phase, keine Auswahl.
+
+    **Wie dieser Fehler passieren konnte (2026-10-24, Block 11.4):** beim Aufteilen des
+    Modulstatus (Kurzstand in den Head, ausführliche Statusspalten in das L3-Archiv) sind die
+    Zeilen der **aktiven** Blöcke 11, 12 und Z verloren gegangen — der Head zeigte danach nur
+    die geschlossenen Blöcke 0–10. Der Wächter, der die Aufteilung band (Zeile fuer Zeile
+    gegen das Archiv), prüfte nur die Richtung „Archiv → Head" und merkte es **nicht**: die
+    drei Zeilen fehlten in **beiden** Listen, also war fuer sie niemand zustaendig.
+    """
+    head = HEAD.read_text(encoding="utf-8")
+    zeilen = _modulstatus_zeilen(head)
+    fehlend = [b for b in ERWARTETE_BLOECKE if b not in zeilen]
+    assert not fehlend, (
+        f"der Modulstatus traegt keine Zeile fuer den Block {fehlend} — der Plan verlangt eine "
+        "Zeile je Block 0–12/Z"
+    )
+
 
 def test_the_head_stays_under_the_softcap():
-    """**Der Softcap ist eine Obergrenze, kein Ziel** — der Head stand am 2026-10-24 (Block 11.4)
-    bei **43.183 B**, über den 40.960 B. Erschöpft ist die Reserve für die nächsten Blöcke, sonst
-    muss wieder ein Abschnitt verschoben werden — und das ist teurer als der rechtzeitige Schnitt.
+    """**Der Softcap ist eine Obergrenze, kein Ziel** — und der Head muss sie **halten**.
+
+    **Der Weg, den der Head nahm (2026-10-24, Block 11.4):** beim Bau von Block 11.4 stand er
+    bei **43.183 B** — über der Grenze (40.960 B). Die ausführlichen Statusspalten der
+    geschlossenen Blöcke wandern in `MODULSTATUS_ARCHIVE.md` (L3), der Head trägt den
+    Kurzstand; er steht seitdem bei ~37 KB, also mit Reserve für die nächsten Blöcke.
+
+    **Der Wächter stand im Arbeitsbaum vom 2026-10-25 ohne Grund auf der Streichliste** — die
+    Datei erfüllte die Grenze, der Wächter war grün, und trotzdem wurde er entfernt. Ein
+    Wächter, der fällt, weil jemand ihn gelöscht hat, ist kein Wächter mehr: der nächste
+    Block, der den Head über die Grenze schiebt, fällt dann **ohne rote Zeile** durch.
+    Deshalb steht er wieder hier — mit der Grenze **nicht** angehoben, sondern eingehalten.
     """
     groesse = len(HEAD.read_bytes())
     assert groesse <= 40 * 1024, (
