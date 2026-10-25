@@ -1,6 +1,6 @@
 ---
 status: snapshot
-purpose: Plan Phase 10.5 (Finishing — alle Baustellen schließen) gegen main@e5a1879 — Locks P10.5-A–W, Blöcke 0–12 + Z mit Schritten, Ankern, Tests, Abnahme P10.5-1–61 (je Probe und Gegenlauf), Deploys A–D, [VERIFY] ab V207, Rückgabe-Auslöser. Arbeitsliste bleibt das Register.
+purpose: Plan Phase 10.5 (Finishing — alle Baustellen schließen) gegen main@e5a1879 — Locks P10.5-A–W, Blöcke 0–13 + Z mit Schritten, Ankern, Tests, Abnahme P10.5-1–64 (je Probe und Gegenlauf), Deploys A–D, [VERIFY] ab V207, Rückgabe-Auslöser. Arbeitsliste bleibt das Register.
 read-when: vor jedem P10.5-Block — §0–§2 ganz, dann NUR den eigenen Block (grep -n '^## Block')
 detail: L2
 up: ../../ROADMAP.md
@@ -11,7 +11,7 @@ down:
   - ../../phase10_inventory/messung/M1_browser.md   # D-3 = Z1–Z4, Probe Event-Loop/Fokus
   - ../../phase10_inventory/messung/M7_editor.md    # CM5-Messung (Editor Stufe 1)
   - ./phase10_intake.md                             # §9 Note an eurofyx-fleet (Kontextgrenze 400 K)
-updated: 2026-10-22 (Block 0 Schritt 0.5 gebaut: INDEX gekürzt 40.772 → 36.889 B, Archiv docs/INDEX_KURZUNG_ARCHIVE.md, Plan-Hebel gemessen zu klein) | 2026-10-21 (Nachtrag: Block-0-Reihenfolge, 0.8 Register-Luft, /mcp gemessen, Proben-Quelle) | 2026-10-21 (freigegeben: Plan, P10-C/P10.5-O, P10.5-N beide Richtungen, Tor P10-8) | 2026-10-20 (angelegt — P10.5-Planungschat, Claude Code/Opus; Fragen R1/R2 vom Nikinger beantwortet)
+updated: 2026-10-25 (Block 13 als datierter Nachtrag: die vier Aufträge des Nikingers — die Größen wirken live, die Knopfleiste nach Word, die Knopffarben transparent-blau, die ganze Gehirnkarte; Abnahme P10.5-62/63/64) | 2026-10-22 (Block 0 Schritt 0.5 gebaut: INDEX gekürzt 40.772 → 36.889 B, Archiv docs/INDEX_KURZUNG_ARCHIVE.md, Plan-Hebel gemessen zu klein) | 2026-10-21 (Nachtrag: Block-0-Reihenfolge, 0.8 Register-Luft, /mcp gemessen, Proben-Quelle) | 2026-10-21 (freigegeben: Plan, P10-C/P10.5-O, P10.5-N beide Richtungen, Tor P10-8) | 2026-10-20 (angelegt — P10.5-Planungschat, Claude Code/Opus; Fragen R1/R2 vom Nikinger beantwortet)
 ---
 # Phase 10.5 — Finishing (Plan)
 
@@ -239,6 +239,7 @@ oder den Keyring.
 | 10 | Suche und Realtime: LG-1, LG-2 | Ausführer (+ Claude Code Proben) | L | D | `phase5_ui/webui/**` (neu `events.py`, `js/realtime.js`), `phase2_mcp/mcpserver/app.py`, `phase2_mcp/scripts/serve.py`, Tests |
 | 11 | Editor: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | L | D | `phase5_ui/webui/**` (neu `static/vendor/codemirror/`), `phase5_ui/scripts/ui_budget.py`, `phase5_ui/THIRD_PARTY_LICENSES.md`, `phase2_mcp/mcpserver/tools.py` (Beschreibungstexte), Tests |
 | 12 | Doku + Altlasten: DO-1, LG-6, AL-1/3, BG-2/3-Nachzug | Claude Code | S | — | nur `.md` und Doku-Skripte |
+| 13 | **Nachtrag 2026-10-25** (die vier Aufträge des Nikingers): UI-8 (die Größen wirken live), UI-9 (die Knopfleiste nach Word), UI-10 (die Knopffarben) | Claude Code (Sichtung Nikinger) | M | D | `phase5_ui/webui/**`, `phase5_ui/vendor/lucide/**`, `phase5_ui/scripts/build_icon_sprite.py`, `phase5_ui/THIRD_PARTY_LICENSES.md`, Tests, `phase10_5_finishing/probes/` |
 | Z | Closeout P10.5 (Prompt 3) | Claude Code + Nikinger | S | — | nur `.md`/`.svg` |
 
 **Reihenfolge-Logik:** Das Dringende kommt zuerst (BT-1). Die Performance kommt vor allem Sichtbaren, weil jede spätere Browser-Probe
@@ -986,7 +987,7 @@ Je Item: öffnen → `isDirty() === false` → speichern ist nicht nötig → Da
 | **P10.5-55** | ED-5: Rohtext-Schalter zeigt jedes Zeichen | Playwright | — |
 | **P10.5-56** | P1-11 dokumentiert; `git diff -- phase1_storage/storage` für ED-3 leer | `git diff --stat` | — |
 
-### Deploy D — `v3.1.8` (nach Block 9–11)
+### Deploy D — `v3.1.8` (nach Block 9–11 **und 13**)
 
 §2.5. **Live-Prüfungen (Nikinger):** P10.5-49 (Realtime über Domain **und** Funnel, V212) · Editor mit echtem Item (Sichtung) ·
 Kästchen-Klick · Umbenennen eines Test-Team-Spaces (danach zurück) · Neustart-Dauer im Journal (≤ 10 s, lesend).
@@ -1009,6 +1010,65 @@ Kästchen-Klick · Umbenennen eines Test-Team-Spaces (danach zurück) · Neustar
 
 **Abnahme:** **P10.5-57** keine 📗/🔄/🟡-Datei > 40 KB (`doc_health` 0, Oversize-`find`) · **P10.5-58** `ROADMAP.md` < 30 KB, Wächter grün ·
 **P10.5-59** Register-Bilanz per Skript, jede P10.5-Zeile mit Beleg.
+
+---
+
+## Block 13 — Die vier Aufträge des Nikingers (Claude Code; Sichtung Nikinger)
+
+> **[2026-10-25, datierter Nachtrag]** Dieser Block stand **nicht** im freigegebenen Plan: die vier
+> Aufträge kamen am 2026-10-25 **nach** der Freigabe (sie stehen im Phase-Head unter „Nächste
+> Session" verbatim). Der Plan bleibt 📕 — deshalb ist dieser Abschnitt ein **datierter Nachtrag**,
+> kein Umbau. **Register:** UI-8, UI-9, UI-10 (im Register neu angelegt).
+> **Deploy:** die Änderungen fahren mit **Deploy D** (`v3.1.8`) mit — Deploy D war beim Bau dieses
+> Blocks noch nicht ausgeliefert.
+
+**Die Reihenfolge der Aufträge (vom Nikinger vorgegeben):** Punkt 2 (Farben) **hinter** Punkt 3
+(Leiste) — „erst Punkt 3 ansehen; die Überarbeitung der Knopfleiste macht diesen Punkt womöglich
+überflüssig". Gebaut wurde deshalb **erst die Leiste**, dann die Farben **auf dem Ergebnis**.
+
+**13.1 Die Größe wirkt im Live-Editor (UI-8).** Die Format-Konvention (Block 11.6) kennt die Stufen
+`klein`/`normal`/`groß`; im **Vorschau-Renderer** wirkten sie, im **CM5-Editor** nicht — dort sprang
+die Zeilenhöhe, und genau darum waren sie dort weggelassen. **Die Ursache ist gemessen, nicht
+geraten:** CM5 rechnet die Zeilenhöhe **einmal** (`defaultTextHeight`, aus 50 Zeilen) und setzt daraus
+die Höhe *jeder* Zeile; eine abweichende Prozent-`line-height` im Span macht die Zeile höher als die
+berechnete. **Die Lösung:** feste Pixel-Zeilenhöhe (`.CodeMirror { line-height: 21px }`) und
+`line-height: 0` auf den Größen-Spans — der Span ändert die Schriftgröße, **nicht** die Zeilenhöhe,
+und die Baseline bleibt, weil `0` den Zeilenhöhen-Beitrag des Spans aufhebt. Der Overlay liefert jetzt
+**Farbe und Größe** (`editor.js :: _formatOverlayToken`), in **beliebiger Reihenfolge** im Text
+(`[Text]{.rot .klein}` wie `[Text]{.klein .rot}`).
+
+**13.2 Die Knopfleiste nach Word (UI-9).** Die Werkzeugleiste ist neu gebaut: **fünf Gruppen** in
+**Words Ribbon-Reihenfolge** (Schriftart · Absatz · Formatvorlagen · Einfügen · Modus-Schalter ganz
+rechts) mit **Trennern** dazwischen, **alle Knöpfe gleich** (26 × 24 px, gleiche Ecke, gleiche
+Fläche) und **ohne HTML-Entity-Zeichen** als Icons (`</>`, `•`, `—` sind weg — Verbotsliste §0.3
+Punkt 1). Die Icons kommen aus dem **Lucide-Sprite**; die fünf neuen (`code`, `heading`, `list`,
+`list-ordered`, `minus`) sind **vendored** (Tarball `1.38.0`, SHA-256 `d28944cfc6…` **verifiziert**,
+alle vendored Dateien byteweise gegen den Tarball geprüft). **B** und **I** bleiben Buchstaben —
+genau wie in Word.
+
+**13.3 Die Knopffarben (UI-10).** Die Standardfläche wird auf das **blaue, halbtransparente** Design
+umgestellt (`--btn-std-fill` = `rgba(62,141,243,.20)`, Hover `.28`, Active `.10`, Linie `.40`) — das
+ist die **datierte Umkehr** der P9-Entscheidung vom 2026-10-01 („Buttons deckend, nicht
+halbtransparent"), begründet mit der späteren Erfahrung aus der Rail-Auswahl (`--select-fill`). Weil
+die Fläche heller wird, musste die **Vorsichtfarbe** mit: `--caution` von `#F06A6E` auf **`#FF8A8E`**
+— der Kontrast ist **nachgerechnet** (`tests/test_contrast.py` komponiert die rgba-Stops über alle
+vier Untergründe): Minimum **4,76:1** statt 4,10:1 (Ruhe) bzw. 3,59:1 (Hover) der alten Farbe.
+
+**13.4 Die ganze Gehirnkarte (Sichtung).** Die bisherigen Bilder (Block 8) zeigten den **Ausschnitt**,
+den das Panel am Bildschirmrand zeigt. Die Karte ist **frei zoom- und verschiebbar** (`graph.js`: Rad
+= Zoom 50 %..250 %, Doppelklick = Ansicht zurück); die neuen Bilder nutzen ein **großes Fenster**
+(1920 × 1200) und die **kleinste** Zoomstufe (50 %) — so passt die Welt der Knoten vollständig ins
+Bild. **P10.5-37 bleibt ⬜:** die Zeile wird erst ✅, wenn der Nikinger das Bild beurteilt hat.
+
+**Abnahme Block 13**
+
+| # | Kriterium | Probe | Gegenlauf |
+|---|---|---|---|
+| **P10.5-62** | `klein`/`groß` ändern im Live-Editor die Schriftgröße; die Zeilenhöhe bleibt gleich; der Cursor steht exakt auf dem Zeichen | `probes/p105_b13_knopfleiste_probe.py` (8 Zellen) | alte Fassung → **5 Zellen rot** |
+| **P10.5-63** | Die Leiste trägt die Word-Reihenfolge, fünf Gruppen mit Trennern, gleiche Knöpfe, keine Entity-Icons | dieselbe Probe + `tests/test_knopfleiste_word.py` (9 Wächter) | alte Fassung → rot |
+| **P10.5-64** | Die Standardfläche ist das blaue, halbtransparente Design; die Vorsichtfarbe hält ≥ 4,5:1 auf allen vier Untergründen | dieselbe Probe + `tests/test_contrast.py` | alte Fassung → rot |
+
+---
 
 ---
 
@@ -1046,4 +1106,4 @@ V120 (Block 7). **Bleibt draußen:** V203 (eurofyx-fleet), V150 (Termin).
 
 Statusregel wie P9/P10: ✅ erfüllt mit Beleg am Ort · ⚠️ erfüllt in anderer Form, Abweichung benannt · ⬜ offen. Seit P8.5 zählt vom
 Nikinger geprüfte Wegwerf-Automation als live (Memory). Kriterien, die an einer Identität hängen (Fabian, zweites Konto), zählen so
-nicht. **61 Zeilen** (P10.5-1–61), gezählt im Phase-Head. Die Phase ist ✅, wenn alle Zeilen ✅/⚠️ sind und P10.5-27/28 ✅.
+nicht. **64 Zeilen** (P10.5-1–64), gezählt im Phase-Head **und** im Abnahme-Archiv (**[2026-10-25]** +3 Zeilen aus Block 13 — 62/63/64; die älteren Zeilen bleiben unverändert). Die Phase ist ✅, wenn alle Zeilen ✅/⚠️ sind und P10.5-27/28 ✅.

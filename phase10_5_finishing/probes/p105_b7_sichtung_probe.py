@@ -246,18 +246,38 @@ with sync_playwright() as p:
         zeilen: document.querySelectorAll('.list__row').length,
         titel: document.title,
     })""")
+    # **[2026-10-25, Block 13 — die Messstelle ist korrigiert, nicht das Kriterium.]**
+    # Das Kriterium des Nikingers lautet „die Kanten der Auswahl tragen die Kanten der
+    # **Suchzeile**" — die *Zeile*, nicht das *Eingabefeld*. Seit dem Volltext-Schalter
+    # (P10.5 Block 10, LG-1, 2026-10-24) steht **links neben dem Eingabefeld** ein
+    # Schalter (`#search-in-body`): das Eingabefeld beginnt jetzt 71 px weiter rechts
+    # (gemessen 2026-10-25: 328 statt 257), die **Zeile** aber beginnt wie vorher bei 257.
+    # Die alte Messstelle (das Eingabefeld) mass also etwas, das die Zeile nie war — und
+    # meldete rot, obwohl die Kanten der Auswahl weiterhin die der Zeile tragen. **Die
+    # alte Messstelle wird nicht mehr benutzt** (sie ist im JSON als `suchfeld_*`
+    # weiterhin enthalten, damit der Unterschied nachlesbar bleibt).
     out["auswahl"] = page.evaluate("""() => {
         const sel = document.getElementById('list-assignee');
+        const zeile = document.querySelector('.list__search');
         const suche = document.getElementById('search-input');
         const knopf = document.getElementById('new-item-button');
         const liste = document.getElementById('list');
-        if (!sel || !suche || !knopf || !liste) return null;
-        const sr = sel.getBoundingClientRect(), ur = suche.getBoundingClientRect();
+        if (!sel || !zeile || !suche || !knopf || !liste) return null;
+        const sr = sel.getBoundingClientRect(), zr = zeile.getBoundingClientRect();
+        // Die **Innenkante** der Zeile (Box + Innenpolster links): da sitzt das erste
+        // Bedienelement der Zeile — vorher das Suchfeld, heute der Volltext-Schalter.
+        const zs = getComputedStyle(zeile);
+        const zInnenLinks = zr.left + (parseFloat(zs.paddingLeft) || 0);
+        const zInnenRechts = zr.right - (parseFloat(zs.paddingRight) || 0);
+        const ur = suche.getBoundingClientRect();
         const kr = knopf.getBoundingClientRect(), lr = liste.getBoundingClientRect();
         return { sichtbar: !sel.hidden, links: sr.left, rechts: sr.right, breite: sr.width,
-                 suche_links: ur.left, suche_rechts: ur.right,
+                 zeile_links: zInnenLinks, zeile_rechts: zInnenRechts,
+                 zeile_box_links: zr.left, zeile_box_rechts: zr.right,
+                 suchfeld_links: ur.left, suchfeld_rechts: ur.right,
                  knopf_rechts: kr.right, liste_links: lr.left, liste_rechts: lr.right,
-                 abstand_links: sr.left - ur.left, abstand_rechts: kr.right - sr.right,
+                 abstand_links: sr.left - zInnenLinks, abstand_rechts: kr.right - sr.right,
+                 abstand_suchfeld: sr.left - ur.left,
                  abstand_liste: lr.right - sr.right,
                  margin: getComputedStyle(sel).margin };
     }""")

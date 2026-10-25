@@ -11,7 +11,7 @@ down:
   - ENTSCHEIDUNGEN_ARCHIVE.md               # 📦 §12 Entscheidungsliste D-1–D-18, verbatim (2026-10-22 gewandert)
   - REGISTER_ARCHIVE.md                    # 📦 die geschlossenen Zeilen, verbatim (2026-10-24 gewandert)
   - UPDATES_ARCHIVE.md                      # 📦 die älteren `updated:`-Fäden dieses Registers, verbatim (2026-10-24 rotiert)
-updated: 2026-10-25 (B12: das P10.5-Register trägt an jeder P10.5-Zeile einen Marker; Bilanz per register_bilanz.py — 42 ✅ · 4 ⬜) | 2026-10-24 (B11.4 ✅ — die Live-Darstellung steht; V211 gemessen: `visibility: hidden`; die **geschlossenen** Zeilen sind ins L3-Archiv gewandert, das Register trägt wieder 10.440 B Luft) | 2026-10-24 (B11.3 ✅ — der Live-Editor steht: ein Text, eine Quelle, kein Moduswechsel) | ältere Einträge: phase10_inventory/UPDATES_ARCHIVE.md
+updated: 2026-10-25 (B13: drei neue Zeilen — UI-8 die Editor-Größen, UI-9 die Knopfleiste nach Word, UI-10 die Knopffarben; Bilanz 49 P10.5-Zeilen: 43 ✅ · 6 ⬜) | 2026-10-25 (B12: das P10.5-Register trägt an jeder P10.5-Zeile einen Marker; Bilanz per register_bilanz.py — 42 ✅ · 4 ⬜) | 2026-10-24 (B11.4 ✅ — die Live-Darstellung steht; V211 gemessen: `visibility: hidden`; die **geschlossenen** Zeilen sind ins L3-Archiv gewandert, das Register trägt wieder 10.440 B Luft) | 2026-10-24 (B11.3 ✅ — der Live-Editor steht: ein Text, eine Quelle, kein Moduswechsel) | ältere Einträge: phase10_inventory/UPDATES_ARCHIVE.md
 ---
 # Phase 10 — Baustellenregister
 
@@ -106,6 +106,9 @@ P10 Step 2) · Wissen (kein Bau, nur festgehalten) · erledigt (mit Beleg). „E
 | UI-5 | Kontrast der Vorsicht-Beschriftung 4,38:1 (unter AA 4,5:1) | Handover §4.8, B17 | `.btn.action--caution` mit `color: var(--caution)` · **[2026-10-18]** D-7 ja: hellere Vorsichtfarbe nur für Text | S | — | D-7 | ✅ 10-33 (B7.5) · P10.5 (Empfehlung: schließen) |
 | UI-6 | Assignee-Picker und -Filter | P9-Plan §15 | der Editor hat Feld und Vorschlagsliste (`editor.js:263ff.`); Filter in der Liste fehlt | S | — | nein | ✅ 10-34 (B7.6) · P10.5 |
 | UI-7 | Handy-Oberfläche | Nikinger 2026-10-08 | Desktop-Untergrenze 1024 px; eine Handy-App wird ein eigenes Design | — | — | nein | P11 |
+| UI-8 | **Die Größe wirkt im Live-Editor** (`klein`/`groß`) | Nikinger 2026-10-25 | die Stufen der Format-Konvention (ED-3) wirkten **nur in der Vorschau**; im CM5-Editor sprang die Zeilenhöhe — die Ursache ist gemessen: CM5 rechnet `defaultTextHeight` **einmal** (aus 50 Zeilen), eine Prozent-`line-height` im Span macht die Zeile höher als die berechnete | S | — | nein | ✅ 10-62 (B13.1) · P10.5 |
+| UI-9 | **Die Knopfleiste nach Word** (Reihenfolge 1:1, gleiche Knöpfe, Gruppen mit Trennern) | Nikinger 2026-10-25 | die Leiste trug die HTML-Entity-Zeichen `</>`, `•`, `—` als Icons (Verbotsliste §0.3 Punkt 1) und eine eigene Anordnung; die nötigen Icons fehlten im Sprite (nur `chevron-left` war handgepflegt, ohne Quelldatei) | M | — | nein | ✅ 10-63 (B13.2) · P10.5 |
+| UI-10 | **Die Knopffarben**: das blaue, halbtransparente Design für alle Knöpfe | Nikinger 2026-10-25 | `--btn-std-fill` war **deckend** (P9-Entscheidung 2026-10-01), während die Rail-Auswahl (`--select-fill`) halbtransparent ist; mit der helleren Fläche fiel die Vorsichtfarbe `#F06A6E` im Hover auf 3,59:1 (unter AA) | S | — | nein | ✅ 10-64 (B13.3) · P10.5 |
 
 ## 7 Rechte und Spaces (RE)
 

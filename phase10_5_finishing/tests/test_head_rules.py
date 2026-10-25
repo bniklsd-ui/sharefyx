@@ -87,8 +87,13 @@ def _abnahme_zeilen() -> list[str]:
 
     **Seit 2026-10-25 (Block 11.8) sind sie geteilt:** die geschlossenen Zeilen (✅/⚠️)
     stehen **verbatim** im L3-Archiv `ABNAHME_ARCHIVE.md` (der Head stand über dem
-    Softcap), die offenen (⬜) im Head. Der Plan §5 zählt die 61 Zeilen — das Zählen
+    Softcap), die offenen (⬜) im Head. Der Plan §5 zählt die Zeilen — das Zählen
     läuft deshalb über **beide** Dateien.
+
+    **Die Zahl ist nicht festgemacht, sie ist eine Zusage über den Plan:** Block 13 hat
+    drei Zeilen (62/63/64) hinzugefügt, der Plan §5 sagt seither „64 Zeilen". Wer eine
+    Zeile hinzufügt, muss **hier und im Plan** dieselbe Zahl schreiben — sonst prüft der
+    Wächter eine andere Menge als die, die der Plan verspricht.
     """
     zeilen: list[str] = []
     for datei in (HEAD, ABNAHME_ARCHIV):
@@ -112,7 +117,7 @@ def test_the_acceptance_sum_matches_the_table():
     geschlossenen Zeilen stehen im L3-Archiv `ABNAHME_ARCHIVE.md`.
     """
     rows = _abnahme_zeilen()
-    assert len(rows) == 61, f"die Abnahmetabelle hat {len(rows)} Zeilen, erwartet 61"
+    assert len(rows) == 64, f"die Abnahmetabelle hat {len(rows)} Zeilen, erwartet 64"
     counted = {
         "✅": sum(1 for line in rows if "| ✅ |" in line),
         "⚠️": sum(1 for line in rows if "| ⚠️ |" in line),
@@ -147,9 +152,9 @@ def test_the_closed_rows_are_in_the_archive_and_the_open_ones_in_the_head():
     assert not (nummern_head & nummern_archiv), (
         f"diese Zeilen stehen in beiden Listen: {sorted(nummern_head & nummern_archiv)}"
     )
-    assert len(nummern_head | nummern_archiv) == 61, (
+    assert len(nummern_head | nummern_archiv) == 64, (
         f"zusammen tragen die beiden Listen {len(nummern_head | nummern_archiv)} Zeilen, "
-        "erwartet 61"
+        "erwartet 64"
     )
 
 
@@ -235,8 +240,9 @@ def test_the_modulstatus_short_rows_and_the_archive_agree():
 
 
 #: Die Bloecke, die der Modulstatus **alle** tragen muss (Plan §0.2: „eine Zeile je Block
-#: 0–12/Z mit Status-Spalte").
-ERWARTETE_BLOECKE = [str(n) for n in range(0, 13)] + ["Z"]
+#: 0–12/Z mit Status-Spalte" — **Block 13** kam am 2026-10-25 als datierter Nachtrag dazu:
+#: die vier Auftraege des Nikingers).
+ERWARTETE_BLOECKE = [str(n) for n in range(0, 14)] + ["Z"]
 
 
 def test_the_modulstatus_carries_every_block():

@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-10-25 (B12: DO-1/LG-6 — drei Heads und ROADMAP unter dem Softcap, vier neue L3-Archive) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-10-25 (B13: Knopfleiste nach Word, Editor-Größen live, Knopffarben, ganze Gehirnkarte) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -29,7 +29,7 @@ updated: 2026-10-25 (B12: DO-1/LG-6 — drei Heads und ROADMAP unter dem Softcap
 ## Root & governance
 
 - [docs/INDEX.md](./INDEX.md) — 🔗 **diese Karte** (L0) · **37.948 B — unter dem 40-KiB-Softcap** (V145 ✅) · die Karten-Chronik steht in `docs/INDEX_ENTRIES_ARCHIVE.md` · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
-- [CLAUDE.md](../CLAUDE.md) — 📗 **37524 B** (vor der Rotation 114.771 B) · Wurzel-Regelwerk: Kernprinzip der dumme Server, **neun Hard Rules** (1 keine Secrets in Dateien · 3 kein Write ohne `version` · 4 Schreibrechte folgen der Mitgliedschaft · 6 nie ein offener Port · 8 Commit ⇒ Doc-Update · 9 nie `pkill -f`, nie den systemd-Dienst), Working style, Doku-Hygiene und **Current state** (Session-Bloecke, newest-first, **kein** Ein-Block-Limit — P9-A). **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [CLAUDE.md](../CLAUDE.md) — 📗 **38106 B** (vor der Rotation 114.771 B) · Wurzel-Regelwerk: Kernprinzip der dumme Server, **neun Hard Rules** (1 keine Secrets in Dateien · 3 kein Write ohne `version` · 4 Schreibrechte folgen der Mitgliedschaft · 6 nie ein offener Port · 8 Commit ⇒ Doc-Update · 9 nie `pkill -f`, nie den systemd-Dienst), Working style, Doku-Hygiene und **Current state** (Session-Bloecke, newest-first, **kein** Ein-Block-Limit — P9-A). **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [README.md](../README.md) — 📗 ~7KB · human overview + machine setup (venv, keyring, run, smoke test); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [ROADMAP.md](../ROADMAP.md) — 📗 **26.457 B** · Phasen 1–10.5, Scope, Status (LG-6: Phase 8.5 → `ROADMAP_ARCHIVE.md`) · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/ROADMAP_ARCHIVE.md](./ROADMAP_ARCHIVE.md) — 📦 **11.544 B** · abgeschlossene Roadmap-Abschnitte, verbatim
@@ -54,14 +54,14 @@ updated: 2026-10-25 (B12: DO-1/LG-6 — drei Heads und ROADMAP unter dem Softcap
 - [docs/concepts/phase10_intake.md](./concepts/phase10_intake.md) — 📗 ~28KB · Sammelstelle, Herkunft des Registers: Wünsche 2026-10-08/-16, Erbe P9, Fleet-Notizen §5–§7, Notes **an** Fleet §8 (GLM verworfen) und §9 (P10.5: Kontextgrenze 400 K)
 - [docs/concepts/phase10_karte_c_stil_1.svg](./concepts/phase10_karte_c_stil_1.svg) — 📕 Karten-Entwürfe: `phase10_karte_entwurf_{a,b,c}.svg` (erste Runde, Wahl C) und `phase10_karte_c_stil_{1,2,3}.svg` (Stile der Gehirnkarte, gewählt C2); `phase10_logo_entwuerfe{,_c,_mix,_final}.svg` (Logo D-6, vier Runden)
 - [docs/concepts/PHASE10_CLOSEOUT_HANDOVER.md](./concepts/PHASE10_CLOSEOUT_HANDOVER.md) — 📕 ~14KB · Abschluss-Handover P10 → P10.5: Planungsdossier (Step 4 + Tor wandern), offene Entscheidungen, [VERIFY]-Bilanz
-- [docs/concepts/phase10_5_finishing_plan.md](./concepts/phase10_5_finishing_plan.md) — 📕 ~93KB · Plan P10.5 gegen `main@e5a1879`, freigegeben 2026-10-21: Locks P10.5-A–W, Blöcke 0–12/Z, Deploys A–D, Abnahme P10.5-1–61, V207–V219
+- [docs/concepts/phase10_5_finishing_plan.md](./concepts/phase10_5_finishing_plan.md) — 📕 ~101KB · Plan P10.5 gegen `main@e5a1879`, freigegeben 2026-10-21: Locks P10.5-A–W, Blöcke 0–13/Z, Deploys A–D, Abnahme P10.5-1–64, V207–V219
 - [docs/concepts/phase10_inventory_uebersicht.svg](./concepts/phase10_inventory_uebersicht.svg) — 📕 ~16KB · Phase-10-Übersichtsgrafik 1080×1080 (Closeout 2026-10-20, gerendert und angesehen)
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing — alle Baustellen schließen; Plan `docs/concepts/phase10_5_finishing_plan.md`)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **24357 B** · Phase-10.5-Head: Modulstatus der Blöcke 0–12/Z, Deploy-Tabelle A–D, Abnahmestand (51 ✅ · 0 ⚠️ · 10 ⬜; geschlossene Zeilen im Archiv), offene Punkte beim Nikinger, ein Session-Block (≤ 4 KiB, DO-3)
-- [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **25.331 B** · L3-Archiv der **geschlossenen** Abnahmezeilen (P10.5-1–61), verbatim aus dem Head verschoben
-- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **108.657 B** · L3-Archiv der älteren Session-Blöcke dieser Phase, verbatim, newest-first
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **27.263 B** · Phase-10.5-Head: Modulstatus der Blöcke 0–13/Z, Deploy-Tabelle A–D, Abnahmestand (54 ✅ · 0 ⚠️ · 10 ⬜), offene Punkte beim Nikinger, ein Session-Block (≤ 4 KiB, DO-3)
+- [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **28.058 B** · L3-Archiv der **geschlossenen** Abnahmezeilen (P10.5-1–64), verbatim aus dem Head
+- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **112.375 B** · L3-Archiv der älteren Session-Blöcke dieser Phase, verbatim, newest-first
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · L3-Archiv der **Startaufträge von Block 7 und Block 9** (verbatim verschoben 2026-10-23/24)
 
 
@@ -196,7 +196,7 @@ doppelt hier gelistet.)*
 - [docs/INDEX_KURZUNG_ARCHIVE.md](./INDEX_KURZUNG_ARCHIVE.md) — 📦 **11.961 B** · L3-Archiv der aus der Karte gekürzten Texte — die acht Abschnittsköpfe und fünf Kartenzeilen-Chroniken, verbatim (die letzten zwei am 2026-10-24, DO-2-Luft); die Karte trägt wieder Stand, dieses Archiv die Chronik des Kürzens
 
 - [docs/INDEX_UPDATES_ARCHIVE.md](./INDEX_UPDATES_ARCHIVE.md) — 📦 **21.626 B** · L3-Archiv der `updated:`-Kette **dieser** Datei, verbatim, newest-first. Erste Rotation 2026-09-19 von Hand; **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
-- [docs/PROJECT_SESSION_LOG.md](./PROJECT_SESSION_LOG.md) — 📦 **263.688 B** (vor der 24-Block-Rotation 101.450 B) · L3-Archiv der historischen `[YYYY-MM-DD]`-Session-Bloecke aus `CLAUDE.md` §Current state, newest-first, plus §Frontmatter-Archiv (die `updated:`-Kette der Wurzel-`CLAUDE.md`, 28 Eintraege, verbatim seit 2026-09-13). Wer die Chronik einer alten Phase sucht, faengt hier an, nicht im Wurzel-Head
+- [docs/PROJECT_SESSION_LOG.md](./PROJECT_SESSION_LOG.md) — 📦 **265.040 B** (vor der 24-Block-Rotation 101.450 B) · L3-Archiv der historischen `[YYYY-MM-DD]`-Session-Bloecke aus `CLAUDE.md` §Current state, newest-first, plus §Frontmatter-Archiv (die `updated:`-Kette der Wurzel-`CLAUDE.md`, 28 Eintraege, verbatim seit 2026-09-13). Wer die Chronik einer alten Phase sucht, faengt hier an, nicht im Wurzel-Head
 
 ## Referenzmaterial (nicht Teil des Plan/Konzept/Handover-Trios)
 

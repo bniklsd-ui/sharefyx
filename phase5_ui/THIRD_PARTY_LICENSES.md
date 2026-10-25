@@ -13,8 +13,12 @@ liegen jeweils daneben (`LICENSE` oder `OFL.txt`).
   `phase5_ui/scripts/build_icon_sprite.py`
 - **Lizenz:** ISC-Lizenz fuer neue Icons; MIT-Lizenz (Cole Bemis, 2013-) als Erbe des
   Feather-Projekts fuer die Icons, die Lucide aus Feather uebernommen hat -- konkret in
-  unserem Subset: `chevron-down`, `chevron-right`, `info`, `link`, `log-out`, `plus`,
-  `search`, `x`. Volltext im vendored `LICENSE`.
+  unserem Subset: `chevron-down`, `chevron-left`, `chevron-right`, `code`, `info`,
+  `link`, `log-out`, `minus`, `plus`, `search`, `x`. Volltext im vendored `LICENSE`.
+  **[2026-10-25, P10.5 Block 13.2]** `code` und `minus` kamen mit der Knopfleiste nach Word
+  dazu (die Werkzeugleiste trug vorher die HTML-Entity-Zeichen `</>` und `—`);
+  `chevron-left` am selben Tag nachgetragen (das Symbol stand im Sprite, die
+  Quelldatei war nie vendored — der Sprite war damit nicht reproduzierbar).
 
 ## IBM Plex Sans + Mono
 

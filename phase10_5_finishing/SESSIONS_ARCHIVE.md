@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-25 (Session-Block Block 11.8 rotiert — der Roundtrip; Block 11.6 folgt im Head) | 2026-10-25 (Session-Block Block 11.5 rotiert — die To-do-Kästchen; Block 11.8 folgt im Head) | 2026-10-25 (Session-Block Block 11.7 rotiert — das Budget; Block 11.5 folgt im Head) | 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-25 (Session-Block Block 12 rotiert — Doku und Altlasten; Block 13 folgt im Head) | 2026-10-25 (Session-Block Block 11.8 rotiert — der Roundtrip; Block 11.6 folgt im Head) | 2026-10-25 (Session-Block Block 11.5 rotiert — die To-do-Kästchen; Block 11.8 folgt im Head) | 2026-10-25 (Session-Block Block 11.7 rotiert — das Budget; Block 11.5 folgt im Head) | 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,53 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-25 (Block 12: Doku und Altlasten)
+
+**Ergebnis.** DO-1, LG-6, AL-1/AL-3, BG-2/BG-3 und die Register-Bilanz sind erledigt.
+P10.5-57/58/59 ✅ ⇒ **51 ✅ · 0 ⚠️ · 10 ⬜**. `doc_health` 0; Oversize-`find`: 29 Treffer, alle
+📕/📦. `ROADMAP.md` **26.457 B**, INDEX **37.948 B** (3.012 B Luft). Suite **1576 grün**.
+
+**DO-1.** Heads: 8.6 **109.230 → 23.614 B**, 8 **47.861 → 34.225 B**, 6 **41.032 → 34.801 B**,
+verbatim per `move_sections.py`. Neu: `phase8_6_ui_polish/{MODULE_STATUS,UPDATES}_ARCHIVE.md`,
+`docs/ROADMAP_ARCHIVE.md`. **Fund:** die 8.6-`updated:`-Kette war **mehrzeilig** (21 Fäden,
+33 KB); `rotate_index_updates.sh` kennt nur einzeilige und sah **einen** Eintrag. Einmal-Skript,
+Rückprobe: Fäden + Trenner = Original byteweise.
+
+**AL-1/AL-3.** Nachzug als Abschnitt in `phase6_shares/CLAUDE.md` (die Matrix selbst steht im
+📕-Handover): die zehn AL-1-Zeilen **7 ✅ · 2 ⚠️ · 1 ⬜** (Zeile 15). **BG-2/BG-3:** P9-124/127
+⚠️ → ✅ mit den M5-Belegen vom 2026-10-18.
+
+**Register (P10.5-59).** `scripts/register_bilanz.py`: 46 P10.5-Zeilen, **40 ✅ · 6 ⬜**, 0 ohne
+Marker. ⬜: KA-1, ED-1, UI-4 (Sichtung) · AL-1 (Zeile 15) · **PF-3** (der 107,3-ms-Wert ist der
+M2-Bench; die Live-Messung 10-18 entscheidet) · **PA-7** (Live-Läufe 27/28; aus dem Archiv
+zurück ins Register, Zeiger-Zeilen müssen geschlossen sein).
+
+**P10.5-E — Dateien außerhalb von „nur `.md`“, mit Grund.** `phase9_hardening/tests/`
+`test_acceptance_numbers.py` (Bilanz 121/12 → 123/10: BG-2/3), `test_table_shape.py` und
+`test_updated_chain.py` (die bekannten Fundstellen zogen mit den verschobenen Abschnitten um
+bzw. sind repariert) · `shorten_index_headings.py` (Kartentext der Phase-8-Zeile nachgezogen) ·
+neu `register_bilanz.py` + `test_register_bilanz.py` (Auftrag „per Skript“). Kein Produktcode;
+**die drei Phase-9-Test-Edits kann der Nikinger vetoen.**
+
+**Nachtrag, Sichtungsbilder (Wegwerf, Port 18793)** — `probes/p105_sichtung_screens.py`, Bilder
+`docs/screenshots/p105_sichtung_01–07_*.png` (rote Kästen mit Nummern). **Drei Befunde, die erst das
+Bild zeigt:** (A) Der Editor ist **weiß** in der dunklen UI — `editor_cm.js` hängt das vendorte
+CSS **hinter** `app.css` an, bei gleicher Spezifität gewinnt es (`.CodeMirror`, `.cm-header`,
+`.cm-link`). (B) Das **Format-Overlay färbt nichts**: `[rot]{.rot}` erscheint als blauer Link plus
+Text `{.rot}`, `app.css` kennt keine `cm-…`-Regel dazu (11.6 hatte das als „nicht gemessen“ benannt).
+(C) `::: {.zentriert}` bleibt Rohtext. Cursorzeile, To-do-Kästchen, Rohtext, UI-4 sehen richtig aus.
+**Entscheidung Nikinger (2026-10-25): die Fläche bleibt dunkel** (die bisherige Farbe, gern noch
+etwas dunkler → `--editor-bg` `#0C1017`, tiefer als das Panel; ein erster Entwurf mit heller
+Fläche war ein Missverständnis und ist zurückgenommen). Text und Format-Farben sind die hellen
+UI-Töne. **Behoben:** (A) Vendor-CSS wird **vor** `app.css` eingefügt; (B) Overlay zerlegt
+`[Text]{.rot}` in Zeichen (ausgeblendet außerhalb der Cursorzeile) und Text (Farbe); (C) `:::`-Zeilen
+sind Zeichen (Ausrichtung selbst zeigt nur die Vorschau). Suite **1576 grün**. **P10.5-51 bleibt ⬜**
+bis zur Sichtung der neuen Bilder.
+
+**Nächster Schritt.** Zuerst die **vier Aufträge** (Abschnitt „Nächste Session“ oben: Editor-
+größen, Knopfleiste nach Word, Knopffarben, ganze Gehirnkarte), dann Sichtung P10.5-51/37.
+**Block Z (Closeout)** erst nach P10.5-27/28 live (Nikinger). Beim Nikinger: Deploy C `v3.1.7`, P10.5-37/32/51 (Sichtung), 22, 18, 25, 27/28, AL-1 Zeile 15, V203.
 
 ## Session stopped — 2026-10-25 (Block 11.6: die Format-Konvention — ED-3)
 

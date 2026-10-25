@@ -280,43 +280,83 @@
       <div class="panel panel--body">
         <div class="panel__head">
           <span class="panel__title">Text <span class="panel__sub">Markdown</span></span>
+          <!-- P10.5, Block 13.2 (2026-10-25): die **Knopfleiste nach Word**.
+               Reihenfolge **1:1** nach dem Start-Ribbon von Word (eine allgemeine Anordnung ist
+               nicht urheberrechtlich geschuetzt — Nikinger-Auftrag). Die Abbildung:
+
+               | Word (Start-Ribbon)      | hier                                    |
+               |---------------------------|-----------------------------------------|
+               | Schriftart: B · I · Code  | Fett · Kursiv · Code                    |
+               |   Textfarbe · Schriftgröße | Farbe · Größe                           |
+               | Absatz: Aufzählung ·      | Liste · Nummerierung · Ausrichtung      |
+               |   Nummerierung · Ausricht.|                                         |
+               | Formatvorlagen:           | Überschrift · Zitat                     |
+               |   Überschrift · Zitat     |                                         |
+               | (Reiter „Einfügen":)      | Bild · Trennlinie · Link                |
+               |   Bilder · Linien · Links |                                         |
+
+               **Warum so herum:** Words Ribbon-Gruppen kommen in der Reihenfolge
+               Zwischenablage → **Schriftart** → **Absatz** → **Formatvorlagen** → Bearbeiten;
+               die Gruppe „Einfügen" holt der Reiter „Einfügen" dorthin (Bilder → Linien →
+               Links). Der Modus-Schalter „Rohtext" ist **keine** Formatierung, sondern ein
+               Ansichts-Schalter — er steht deshalb ganz rechts (Words Ansichtsumschalter).
+
+               Die Buttons sind **alle gleich** (gleiche Box, gleiche Ecke, gleiche Fläche) und
+               tragen das Lucide-Sprite — die HTML-Entity-Zeichen `</>`, `•` und `—` sind weg
+               (Verbotsliste §0.3 Punkt 1: keine Emoji, keine HTML-Entity-Zeichen als Icons).
+               Nur **B** und **I** bleiben Buchstaben — genau wie in Word. -->
           <div class="editor__toolbar" id="editor-toolbar">
-            <button type="button" class="toolbar-btn" data-md="bold" title="Fett">B</button>
-            <button type="button" class="toolbar-btn" data-md="italic" title="Kursiv">I</button>
-            <button type="button" class="toolbar-btn" data-md="code" title="Code">&lt;/&gt;</button>
-            <button type="button" class="toolbar-btn" data-md="link" title="Link"><svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg></button>
-            <button type="button" class="toolbar-btn" data-md="h" title="&Uuml;berschrift">H</button>
-            <button type="button" class="toolbar-btn" data-md="quote" title="Zitat"><svg class="icon" aria-hidden="true"><use href="#i-quote"></use></svg></button>
-            <button type="button" class="toolbar-btn" data-md="ul" title="Liste">&bull;</button>
-            <button type="button" class="toolbar-btn" data-md="ol" title="Nummerierung">1.</button>
-            <button type="button" class="toolbar-btn" data-md="hr" title="Trennlinie">&mdash;</button>
-            <button type="button" class="toolbar-btn" data-md="image" id="insert-image-button" title="Bild einf&uuml;gen"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg></button>
-            <input type="file" id="insert-image-input" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
-            <!-- P10.5, Block 11, Schritt 11.6 (ED-3): die **Format-Konvention** (Stufe 2).
-                 Farbe und Groesse sind Inline-Formen (`[Text]{.rot}`), die Ausrichtung ein
-                 Block (`::: {.zentriert}` ... `:::`). Das Vokabular steht in `js/markdown.js`
-                 — diese Liste ist die Werkzeug-Optik, nicht die Quelle. -->
-            <select class="toolbar-select" id="format-farbe" aria-label="Farbe" title="Farbe">
-              <option value="">Farbe</option>
-              <option value="rot">Rot</option>
-              <option value="blau">Blau</option>
-              <option value="gruen">Gr&uuml;n</option>
-              <option value="gelb">Gelb</option>
-            </select>
-            <select class="toolbar-select" id="format-groesse" aria-label="Gr&ouml;&szlig;e" title="Gr&ouml;&szlig;e">
-              <option value="">Gr&ouml;&szlig;e</option>
-              <option value="klein">Klein</option>
-              <option value="normal">Normal</option>
-              <option value="gross">Gro&szlig;</option>
-            </select>
-            <select class="toolbar-select" id="format-ausrichtung" aria-label="Ausrichtung" title="Ausrichtung">
-              <option value="">Ausrichtung</option>
-              <option value="links">Links</option>
-              <option value="zentriert">Zentriert</option>
-              <option value="rechts">Rechts</option>
-            </select>
-            <button type="button" class="toolbar-btn toolbar-btn--wide" id="toggle-preview" aria-pressed="false">Rohtext</button>
+            <div class="toolbar-group" data-word-group="schriftart">
+              <button type="button" class="toolbar-btn" data-md="bold" title="Fett" aria-label="Fett"><span class="toolbar-btn__glyph toolbar-btn__glyph--bold">B</span></button>
+              <button type="button" class="toolbar-btn" data-md="italic" title="Kursiv" aria-label="Kursiv"><span class="toolbar-btn__glyph toolbar-btn__glyph--italic">I</span></button>
+              <button type="button" class="toolbar-btn" data-md="code" title="Code" aria-label="Code"><svg class="icon" aria-hidden="true"><use href="#i-code"></use></svg></button>
+              <!-- P10.5, Block 11, Schritt 11.6 (ED-3): die **Format-Konvention** (Stufe 2).
+                   Farbe und Groesse sind Inline-Formen (`[Text]{.rot}`), die Ausrichtung ein
+                   Block (`::: {.zentriert}` ... `:::`). Das Vokabular steht in `js/markdown.js`
+                   — diese Liste ist die Werkzeug-Optik, nicht die Quelle. -->
+              <select class="toolbar-select" id="format-farbe" aria-label="Farbe" title="Farbe">
+                <option value="">Farbe</option>
+                <option value="rot">Rot</option>
+                <option value="blau">Blau</option>
+                <option value="gruen">Gr&uuml;n</option>
+                <option value="gelb">Gelb</option>
+              </select>
+              <select class="toolbar-select" id="format-groesse" aria-label="Gr&ouml;&szlig;e" title="Gr&ouml;&szlig;e">
+                <option value="">Gr&ouml;&szlig;e</option>
+                <option value="klein">Klein</option>
+                <option value="normal">Normal</option>
+                <option value="gross">Gro&szlig;</option>
+              </select>
+            </div>
+            <div class="toolbar-group" data-word-group="absatz">
+              <button type="button" class="toolbar-btn" data-md="ul" title="Liste" aria-label="Liste"><svg class="icon" aria-hidden="true"><use href="#i-list"></use></svg></button>
+              <button type="button" class="toolbar-btn" data-md="ol" title="Nummerierung" aria-label="Nummerierung"><svg class="icon" aria-hidden="true"><use href="#i-list-ordered"></use></svg></button>
+              <select class="toolbar-select" id="format-ausrichtung" aria-label="Ausrichtung" title="Ausrichtung">
+                <option value="">Ausrichtung</option>
+                <option value="links">Links</option>
+                <option value="zentriert">Zentriert</option>
+                <option value="rechts">Rechts</option>
+              </select>
+            </div>
+            <div class="toolbar-group" data-word-group="vorlagen">
+              <button type="button" class="toolbar-btn" data-md="h" title="&Uuml;berschrift" aria-label="&Uuml;berschrift"><svg class="icon" aria-hidden="true"><use href="#i-heading"></use></svg></button>
+              <button type="button" class="toolbar-btn" data-md="quote" title="Zitat" aria-label="Zitat"><svg class="icon" aria-hidden="true"><use href="#i-quote"></use></svg></button>
+            </div>
+            <div class="toolbar-group" data-word-group="einfuegen">
+              <button type="button" class="toolbar-btn" data-md="image" id="insert-image-button" title="Bild einf&uuml;gen" aria-label="Bild einf&uuml;gen"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg></button>
+              <button type="button" class="toolbar-btn" data-md="hr" title="Trennlinie" aria-label="Trennlinie"><svg class="icon" aria-hidden="true"><use href="#i-minus"></use></svg></button>
+              <button type="button" class="toolbar-btn" data-md="link" title="Link" aria-label="Link"><svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg></button>
+            </div>
+            <div class="toolbar-group toolbar-group--modus">
+              <button type="button" class="toolbar-btn toolbar-btn--wide" id="toggle-preview" aria-pressed="false">Rohtext</button>
+            </div>
           </div>
+          <!-- Die Datei-Auswahl des Bild-Knopfes. **Ausserhalb** der Werkzeugleiste: ein
+               Element zwischen zwei Gruppen wuerde sie vom Nachbarn trennen — und die
+               Trenner-Regel `.toolbar-group + .toolbar-group` greift nur bei
+               *direkten* Geschwistern (der Modus-Schalter haette sonst keinen Trenner
+               bekommen). Das Element ist `hidden` und hat keinen Platzbedarf. -->
+          <input type="file" id="insert-image-input" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
         </div>
         <div class="asset-strip" id="asset-strip"></div>
         <div class="editor__body" id="editor-body">
@@ -759,16 +799,15 @@
   <symbol id="i-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="m6 9 6 6 6-6" />
   </symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m15 18-6-6 6-6" />
+  </symbol>
   <symbol id="i-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="m9 18 6-6-6-6" />
   </symbol>
-  <!-- P9-AQ (2026-10-05): Spiegel von i-chevron-right, gleiche viewBox und dieselben
-       Stroke-Attribute. Eigenes Symbol statt einer `transform`-Regel: die Icons werden
-       ueberall als <use href> eingebunden, eine Drehregel muesste in icons.js und wuerde
-       jeden Traeger treffen. `i-log-out` ist bewusst nicht wiederverwendet -- das ist
-       Abmelden, und die Verwechslung waere billig. -->
-  <symbol id="i-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="m15 18-6-6 6-6" />
+  <symbol id="i-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m16 18 6-6-6-6" />
+      <path d="m8 6-6 6 6 6" />
   </symbol>
   <symbol id="i-folder-input" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M2 9V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-1" />
@@ -777,6 +816,11 @@
   </symbol>
   <symbol id="i-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+  </symbol>
+  <symbol id="i-heading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 12h12" />
+      <path d="M6 20V4" />
+      <path d="M18 20V4" />
   </symbol>
   <symbol id="i-house" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
@@ -796,10 +840,29 @@
       <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
       <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
   </symbol>
+  <symbol id="i-list-ordered" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 5h10" />
+      <path d="M11 12h10" />
+      <path d="M11 19h10" />
+      <path d="M4 4h1v5" />
+      <path d="M4 9h2" />
+      <path d="M6.5 20H3.4c0-1 2.6-1.925 2.6-3.5a1.5 1.5 0 0 0-2.6-1.02" />
+  </symbol>
+  <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 5h.01" />
+      <path d="M3 12h.01" />
+      <path d="M3 19h.01" />
+      <path d="M8 5h13" />
+      <path d="M8 12h13" />
+      <path d="M8 19h13" />
+  </symbol>
   <symbol id="i-log-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="m16 17 5-5-5-5" />
       <path d="M21 12H9" />
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+  </symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12h14" />
   </symbol>
   <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M5 12h14" />

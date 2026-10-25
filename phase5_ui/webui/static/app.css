@@ -92,15 +92,27 @@
   --select-fill-quiet:  linear-gradient(180deg, rgba(62,141,243,.10), rgba(62,141,243,.04));
   --select-line:        var(--accent-line);
   --select-line-quiet:  rgba(62,141,243,.20);
-  /* Standardknopf (P9, Nikinger 2026-10-01): EXAKT das Bild des #home-button auf der
-     schwarzen Rail -- --select-fill/--select-line dort auf #000 verrechnet und als DECKENDE
-     Werte festgeschrieben. Die halbtransparenten Originale sehen auf dem grauen Dialog-Panel
-     sichtbar blauer aus (gemessen Mitte (21,34,52) statt (8,19,33)); deckend sieht der Knopf
-     auf jedem Untergrund gleich aus. Hover/Active: dieselbe Rechnung mit .30/.13 bzw. .10/.04. */
-  --btn-std-fill:        linear-gradient(180deg, #0C1C31, #050B13);
-  --btn-std-fill-hover:  linear-gradient(180deg, #132A49, #081220);
-  --btn-std-fill-active: linear-gradient(180deg, #060E18, #02060A);
-  --btn-std-line:        #1D4374;  /* .40-Kante über dem eigenen Fill (nicht über Schwarz) */
+  /* Standardknopf (P10.5, Block 13.3, 2026-10-25 — Nikinger-Auftrag: „Knopffarben
+     vereinheitlichen auf das blau-leicht-transparente Design").
+     **Das ist genau die Fläche des aktiven Rail-Knopfs** (`--select-fill`, s. oben): ein Blau,
+     halbtransparent, zwei Deckkraft-Stufen (oben .20, unten .08). Der Standardknopf sieht
+     damit aus wie der Rail-Knopf und nicht mehr wie ein eigener Button-Typ.
+
+     **Datierte Umkehrung der Entscheidung vom 2026-10-01 (P9).** Damals stand hier
+     `linear-gradient(180deg, #0C1C31, #050B13)` — **deckend**, weil die halbtransparenten
+     Originale auf dem grauen Dialog-Panel sichtbar blauer aussahen (gemessen: Mitte
+     (21,34,52) statt (8,19,33)); der Knopf sollte auf jedem Untergrund gleich aussehen. Der
+     Nikinger entschied am 2026-10-25 umgekehrt: **halbtransparent** ist die gewollte Optik.
+     Der Grund von damals ist damit bewusst aufgegeben — das ist eine Entscheidung des
+     Menschen, keine Widerlegung.
+
+     Hover/Active: dieselben zwei Deckkraft-Stufen, nur hoeher (.28/.12 bzw. .10/.04). Die
+     Kante ist `--accent-line` (rgba 62,141,243,.40) — derselbe Wert wie bei der Auswahl:
+     ein Blau, zwei Deckkraft-Stufen. */
+  --btn-std-fill:        linear-gradient(180deg, rgba(62,141,243,.20), rgba(62,141,243,.08));
+  --btn-std-fill-hover:  linear-gradient(180deg, rgba(62,141,243,.28), rgba(62,141,243,.12));
+  --btn-std-fill-active: linear-gradient(180deg, rgba(62,141,243,.10), rgba(62,141,243,.04));
+  --btn-std-line:        rgba(62,141,243,.40);  /* = --accent-line */
 
   /* Vorsicht -- Aktionen mit Rueckweg-Kosten (Abmelden, Archivieren). Gleicher Wert wie
      --danger, anderer Anlass: --danger meldet, dass etwas schiefging; --caution warnt,
@@ -109,8 +121,14 @@
      [2026-10-24, P10.5 7.5 UI-5, D-7] Nicht mehr derselbe Wert: --caution ist die *Text*-Farbe auf
      der Standardknopf-Flaeche (Beschriftung, kein Fuellton) und ein Text braucht WCAG AA (4,5:1).
      #E5484D hatte auf --btn-std-fill 4,38:1 (Hover 3,69:1); #F06A6E hat 5,70:1 (Hover 4,81:1).
-     Waechter: phase10_5_finishing/tests/test_contrast.py. */
-  --caution:        #F06A6E;
+     [2026-10-25, P10.5 Block 13.3] **Noch einmal heller: #FF8A8E.** Die Standardflaeche ist
+     jetzt **halbtransparent** (s. `--btn-std-fill`), der Untergrund kommt also durch — auf dem
+     Editor-Kopf (`--surface-raised` #1B2027) liegt der Knopf heller als auf der schwarzen
+     Rail. #F06A6E haette dort nur 4,10:1 (Hover 3,59:1) erreicht, also **unter AA**;
+     #FF8A8E erreicht 5,43:1 (Hover 4,76:1). Der Waechter rechnet die Flaeche jetzt **ein**
+     (`phase10_5_finishing/tests/test_contrast.py`) — vorher rechnete er gegen deckende Hex-
+     Stops, und eine halbtransparente Flaeche haette er gar nicht geprueft (leer gefunden). */
+  --caution:        #FF8A8E;
 
   /* Farbsemantik Space-Kategorien (Phase 8 Block C C3, Plan §4.C3 P8-I) -- drei Kategorien,
      eine Farbe pro Kategorie. Statusfarben oben bleiben unveraendert (Akzent=interaktiv,
@@ -1814,37 +1832,75 @@ select.input:focus {
   margin: 0;   /* Traeger hat schon margin-bottom */
 }
 
+/* -- Die Werkzeugleiste (P10.5, Block 13.2, 2026-10-25: nach Word) -----------------------
+ *
+ * **Gruppen wie im Word-Ribbon:** eine duenne Linie zwischen den Gruppen, die Reihenfolge
+ * der Gruppen ist Words (Schriftart → Absatz → Formatvorlagen → Einfügen), der Modus-
+ * Schalter steht ganz rechts. Die Reihenfolge der Knöpfe steht wortgleich im Markup-
+ * Kommentar in `app.html` — dort steht auch die Abbildung auf Words Ribbon.
+ *
+ * **Alle Knöpfe sind gleich:** gleiche Höhe, gleiche Rundung, gleiche Fläche, gleiche
+ * Kante. Der Unterschied ist die *Art* der Beschriftung (Buchstabe, Icon, Auswahlfeld),
+ * nicht die Form. */
 .editor__toolbar {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0;
   margin-left: auto;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
+.editor__toolbar .toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.editor__toolbar .toolbar-group + .toolbar-group {
+  margin-left: 4px;
+  padding-left: 5px;
+  border-left: 1px solid var(--line);
+}
+/* Der Modus-Schalter (Rohtext) ist keine Formatierung: er steht **ganz rechts**, wie
+   Words Ansichtsumschalter in der Statuszeile. `margin-left: auto` schiebt ihn ans
+ * Ende der Leiste; die Spezifitaet (0,2,0) muss die der Gruppen-Regel (0,2,0) schlagen —
+   gleiche Spezifitaet, spaeter im Stylesheet gewinnt. */
+.editor__toolbar .toolbar-group--modus { margin-left: auto; }
+
 .toolbar-btn {
   /* P9, Nikinger-Entscheidung 2026-10-01 (zweite Runde am selben Tag): die Formatierhilfen der
-     Textleiste tragen jetzt dieselben deckenden Tokens wie `.btn` (siehe `--btn-std-*` in :root)
+     Textleiste tragen jetzt dieselben Tokens wie `.btn` (siehe `--btn-std-*` in :root)
      und nicht mehr die alte graue Plastik aus `--btn-face-*`. Der Weg dorthin war eine Messung:
      `.toolbar-btn` stand als einziger echter Knopf noch auf `--btn-face-top`, nachdem `.btn` am
      Vortag umgestellt worden war — eine zweite Knopfoptik im selben Panel ist genau das, was die
-     erste Runde an `.account-nav` beanstandet hat. **Maße und Typografie bleiben unberührt**
-     (24px Höhe, Monospace, `--text-muted`) — die Formatierhilfen sind eine Werkzeugleiste, kein
-     Dialog; sie unterscheiden sich in der Größe, nicht in der Sorte. Der äußere Schlagschatten
-     (`0 1px 2px rgba(0,0,0,.45)`) fällt weg, weil `.btn` ihn auch nicht mehr trägt — sonst wäre
-     der Pixelvergleich mit `#home-button` genau an der Unterkante um 2 px daneben. */
+     erste Runde an `.account-nav` beanstandet hat.
+     [2026-10-25, P10.5 Block 13.2] **Ein Knopf, eine Form:** `inline-flex` zentriert den
+     Inhalt (vorher stand der Text im Inline-Fluss und war nicht zentriert), die Schrift ist
+     die UI-Schrift (nicht Mono — die Werkzeugleiste ist kein Code-Feld), und die Icon-Größe
+     ist fest 14 px (`.toolbar-btn .icon`), damit ein Icon und ein Buchstabe gleich viel
+     Platz bekommen. Maße und Typografie der **Buttons** bleiben unberührt (24px Höhe,
+     `--text-muted`) — die Formatierhilfen sind eine Werkzeugleiste, kein Dialog; sie
+     unterscheiden sich in der Größe, nicht in der Sorte. */
   background: var(--btn-std-fill);
   border: 1px solid var(--btn-std-line);
   border-radius: var(--radius-sm);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
   color: var(--text-muted);
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 12px;
   min-width: 26px;
   height: 24px;
   padding: 0 4px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
+/* Die zwei Buchstaben (wie in Word): B und I sind **Buchstaben**, keine Icons — sie stehen
+   deshalb in der UI-Schrift, nicht im Sprite. */
+.toolbar-btn__glyph--bold { font-weight: 700; }
+.toolbar-btn__glyph--italic { font-style: italic; }
+/* Die Icons der Werkzeugleiste: 14 px, damit sie neben den Buchstaben nicht dünn wirken. */
+.editor__toolbar .toolbar-btn .icon { width: 14px; height: 14px; }
 .toolbar-btn:hover {
   background: var(--btn-std-fill-hover);
   color: var(--text);
@@ -1977,7 +2033,19 @@ select.input:focus {
   color: var(--editor-text);
   font-family: var(--font-mono);
   font-size: 13px;
-  line-height: 1.6;
+  /* **Feste Zeilenhoehe in px**, nicht `1.6` (P10.5 Block 13.1, 2026-10-25).
+   *
+   * Der Grund ist die **Schriftgroesse im Live-Editor**: eine Zeile, in der `[Text]{.gross}`
+   * steht, waere mit einer relativen Zeilenhoehe (`1.6`) 1,2-mal so hoch wie ihre Nachbarn —
+   * die Zeilen sprangen, und CM5 rechnet alle Zeilen mit **einer** gemessenen Texthoehe
+   * (`defaultTextHeight`, s. `vendor/codemirror/codemirror.min.js`). Mit einer **Laenge** in px
+   * erbt der span die Zeilenhoehe unveraendert: seine Zeilenbox bleibt 21 px, der Text wird
+   * groesser, die Zeile nicht. Das ist die Loesung des Sprungens — die Groesse wegzulassen
+   * waere die zweite, schlechtere Haelfte.
+   *
+   * 21 px = 13 px Schrift * 1.6 (der alte Wert, gerundet) — die Zeilenhoehe aendert sich also
+   * um 0,2 px gegenueber vorher, der Text springt nicht mehr. */
+  line-height: 21px;
 }
 .CodeMirror-lines { padding: calc(var(--space) * 2) calc(var(--space) * 3); }
 .CodeMirror-cursor { border-left: 2px solid var(--editor-text); }
@@ -1985,9 +2053,14 @@ select.input:focus {
 .CodeMirror-focused .CodeMirror-selected { background: var(--editor-select); }
 .CodeMirror pre.CodeMirror-line { padding: 0; }
 
-/* Die Live-Darstellung: die Markdown-Zeichen bekommen die Optik der Ausgabe. */
+/* Die Live-Darstellung: die Markdown-Zeichen bekommen die Optik der Ausgabe.
+ *
+ * **Die Ueberschriften tragen keine eigene Zeilenhoehe** (P10.5 Block 13.1, 2026-10-25):
+ * sie erben die feste Hoehe von `.CodeMirror` (21 px). CM5 rechnet mit **einer** Zeilenhoehe
+ * fuer alle Zeilen — eine Ueberschrift mit eigener, groesserer Zeilenhoehe waere im DOM
+ * hoeher als im Modell, und die Zeilen darunter stuenden daneben. */
 .CodeMirror .cm-header { color: var(--editor-text); font-weight: 600; }
-.CodeMirror .cm-header-1 { font-size: 1.3em; line-height: 1.35; }
+.CodeMirror .cm-header-1 { font-size: 1.3em; }
 .CodeMirror .cm-header-2 { font-size: 1.18em; }
 .CodeMirror .cm-header-3 { font-size: 1.08em; }
 .CodeMirror .cm-header-4,
@@ -2008,6 +2081,22 @@ select.input:focus {
 .CodeMirror .cm-md-c-gruen { color: var(--editor-gruen); text-decoration: none; }
 .CodeMirror .cm-md-c-gelb { color: var(--editor-gelb); text-decoration: none; }
 .CodeMirror .cm-md-plain { color: var(--editor-text); text-decoration: none; }
+/* Die **Groesse** im Live-Editor (P10.5 Block 13.1, 2026-10-25 — der Auftrag des Nikingers:
+ * `klein`/`gross` sollen die Schriftgroesse wirklich aendern). Die Werte sind dieselben wie
+ * in der Vorschau (`.md-s-*`), aber **unter `.CodeMirror`**, damit die Vorschau und der
+ * Editor getrennt bleiben.
+ *
+ * **`line-height: 0` ist der Trick gegen das Springen** (gemessen: ohne das war die Zeile
+ * mit `[gross]` **22 px** hoch statt 21 px — der Sprung, den der Nikinger nicht mehr sehen
+ * wollte). Eine groessere Schrift hebt die Grundlinie an, und die Zeilenbox waere dadurch
+ * ~1 px hoeher; die Zeile darunter rueckte nach. Mit `line-height: 0` traegt der span
+ * **keine eigene Zeilenbox** mehr: die Grundlinie bleibt die der Zeile, die **Glyphen**
+ * sitzen genau so wie vorher (die Grundlinie bestimmt die Lage, nicht die Zeilenhoehe), und
+ * die Zeile bleibt **21 px**. Der Text passt trotzdem hinein: bei 1,2 em (15,6 px Schrift)
+ * liegt der Oberlapp bei 0,1 px — die fuehrende Reserve der 21-px-Zeile reicht. */
+.CodeMirror .cm-md-s-klein { font-size: .85em; line-height: 0; }
+.CodeMirror .cm-md-s-normal { font-size: 1em; line-height: 0; }
+.CodeMirror .cm-md-s-gross { font-size: 1.2em; line-height: 0; }
 /* Listen-/Aufgabentext: der Markdown-Modus faerbt ihn `variable-2` (Standard: Blau) — hier ist es Text. */
 .CodeMirror .cm-variable-2, .CodeMirror .cm-variable-3 { color: var(--editor-text); }
 
@@ -2064,18 +2153,36 @@ select.input:focus {
 .md-a-rechts { text-align: right; }
 
 /* Die **Auswahl** in der Werkzeugleiste (Farbe/Größe/Ausrichtung). Die drei Felder sind
- * keine Formatierhilfen im alten Sinn — sie schreiben eine **Konvention** in den Text. */
+ * keine Formatierhilfen im alten Sinn — sie schreiben eine **Konvention** in den Text.
+ *
+ * [2026-10-25, P10.5 Block 13.2] **Wie die Buttons** — gleiche Höhe (24 px), gleiche Fläche,
+ * gleiche Kante, gleiche Rundung; dazu ein **eigener** Chevron statt des nativen Pfeils (der
+ * ist Betriebssystem-Optik und passt nicht zu den App-Knöpfen; s. `select.input`).
+ *
+ * **Die `background-color` ist nichtKosmetik:** Chromium nimmt für die **Aufklappliste** die
+ * `background-color` des Selects. Die blaue Fläche ist ein *Verlauf* (also `background-image`),
+ * die Farbe darunter ist der Panel-Kopf (#161C24) — damit ist die Liste dunkel, und die
+ *Flaeche des Feldes ist genau die Komposition, die es ohnehin auf dem Panel-Kopf gäbe. */
 .toolbar-select {
-  background: var(--surface-raised);
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--panel-body-head);
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A7B2BF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>"),
+    var(--btn-std-fill);
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 0.45em center, 0 0;
+  background-size: 0.7em 0.7em, 100% 100%;
   color: var(--text);
-  border: 1px solid var(--line);
+  border: 1px solid var(--btn-std-line);
   border-radius: var(--radius-sm);
-  font: inherit;
+  font-family: var(--font-ui);
   font-size: var(--fs-meta);
-  padding: 3px 6px;
+  height: 24px;
+  padding: 0 1.6em 0 8px;
   cursor: pointer;
 }
-.toolbar-select:hover { border-color: var(--line-strong); }
+.toolbar-select:hover { border-color: var(--accent-line); }
 .toolbar-select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 .editor__append {

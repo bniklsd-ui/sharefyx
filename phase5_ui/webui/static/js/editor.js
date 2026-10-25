@@ -423,25 +423,55 @@ function renderCreatedByLine(item) {
 
 // P10.5, Block 11, Schritt 11.6 (ED-3): der **Overlay-Token** des Live-Editors.
 //
-// **Nur die Farbe.** Eine Groessen-Klasse aendert die Zeilenhoehe — und ein Editor, in dem
-// die Zeilen springen, ist schlimmer als ein Editor, der die Groesse erst in der Vorschau
-// zeigt. Die Ausrichtung ist ein **Block** und laesst sich im Fliesstext nicht faerben.
+// **Farbe *und* Groesse.** Bis 2026-10-25 trug der Live-Editor nur die Farbe: eine
+// Groessen-Klasse aendert die Schriftgroesse, und die Zeilenhoehe sprang — ein Editor, in
+// dem die Zeilen springen, ist schlimmer als ein Editor, der die Groesse erst in der Vorschau
+// zeigt. **Das Springen ist jetzt geloest** (Nikinger-Auftrag 2026-10-25): `app.css` gibt dem
+// Editor eine **feste Zeilenhoehe in px** (`.CodeMirror { line-height: 21px; }`), damit die
+// Zeilenbox nicht mit der Schrift wächst. Die Groesse wirkt damit sofort. Die Ausrichtung ist
+// ein **Block** und laesst sich im Fliesstext weiterhin nicht faerben.
 //
 // Der Stream gehoert dem Overlay (CM5 faehrt Overlay und Modus auf **zwei** Streams) — der
 // Zaehler `stream.pos` ist also der Overlay-eigene, nicht der des Markdown-Modus.
 function _formatOverlayToken(stream) {
   // **Drei Stuecke**, stateless ueber Vorausschau und das Zeichen davor: `[` (Zeichen),
-  // der Text (Farbe), `]{.rot}` (Zeichen). Die **Zeichen** tragen `formatting` — dieselbe
-  // Klasse wie die Markdown-Zeichen, also blendet `app.css` sie auf den anderen Zeilen aus.
-  // Eine **unbekannte** Klasse bleibt wörtlich (kein Stueck wird erkannt). Eine Groesse
-  // allein faerbt nichts (sie wuerde die Zeilenhoehe aendern), nimmt dem Text aber die
-  // Verweis-Optik des Markdown-Modus (`md-plain`).
+  // der Text (Farbe + Groesse), `]{.rot}` (Zeichen). Die **Zeichen** tragen `formatting` —
+  // dieselbe Klasse wie die Markdown-Zeichen, also blendet `app.css` sie auf den anderen
+  // Zeilen aus. Eine **unbekannte** Klasse bleibt wörtlich (kein Stueck wird erkannt).
+  //
+  // **Die Klassenliste:** hoechstens **eine** Farbe und hoechstens **eine** Groesse. CM5
+  // setzt vor jeden Namen ein `cm-` (`cm-md-c-rot`), deshalb stehen hier die **nackten**
+  // Namen aus `markdown.js` — dieselben, die die Vorschau in die Klassenliste schreibt.
+  // Ohne Farbe kommt `md-plain` dazu: der Markdown-Modus faerbt `[Text]` wie einen Verweis,
+  // und eine reine Groesse soll den Text nicht wie einen Link aussehen lassen.
+  //
+  // **Die Reihenfolge im Text ist frei** (`[Text]{.gross .rot}` ist dasselbe wie
+  // `[Text]{.rot .gross}`) — deshalb wird **jeder** Name gegen **beide** Vokabulare
+  // geprueft und nicht "die erste ist die Farbe". Die Renderer-Regel gilt wortgleich:
+  // zwei Farben, zwei Groessen oder eine unbekannte Klasse bleiben **woertlich**.
   var V = FORMAT_VOKABULAR;
   function klasse(a, b) {
-    var k = [a, b].filter(Boolean);
-    for (var n = 0; n < k.length; n++) if (!V.farben[k[n]] && !V.groessen[k[n]]) return null;
-    for (var f = 0; f < k.length; f++) if (V.farben[k[f]]) return V.farben[k[f]];
-    return k.length ? "md-plain" : null;
+    var r = [];
+    var farbe = null;
+    var groesse = null;
+    var namen = [a, b].filter(Boolean);
+    for (var i = 0; i < namen.length; i++) {
+      var n = namen[i];
+      if (V.farben[n]) {
+        if (farbe) return null;                 // **zwei** Farben: nicht erlaubt
+        farbe = V.farben[n];
+      } else if (V.groessen[n]) {
+        if (groesse) return null;               // **zwei** Groessen: nicht erlaubt
+        groesse = V.groessen[n];
+      } else {
+        return null;                            // unbekannte Klasse: **woertlich**
+      }
+    }
+    if (!farbe && !groesse) return null;
+    if (farbe) r.push(farbe);
+    if (groesse) r.push(groesse);
+    if (!farbe) r.push("md-plain");
+    return r.join(" ");
   }
   var rest = stream.string.slice(stream.pos);
   var davor = stream.pos > 0 ? stream.string.charAt(stream.pos - 1) : "";

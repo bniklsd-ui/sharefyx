@@ -42,18 +42,34 @@ EDITOR_MAX = 80 * 1024
 def _load():
     """Das Skript als Modul laden. Es importiert die Server-Pakete (`webui`, `storage`, …) —
     die liegen im Dev-venv installiert; ohne sie könnte der Wächter die Dateiauswahl nicht
-    prüfen, und eine **zweite** Auswahl im Test wäre die Fehlerklasse, die er verhindert."""
+    prüfen, und eine **zweite** Auswahl im Test wäre die Fehlerklasse, die er verhindert.
+
+    **Der `sys.path` wird danach wiederhergestellt (2026-10-25, P10.5 Block 13).** Das
+    Einfügen der Phase-Verzeichnisse macht die **repo-lokalen** `*.egg-info` für
+    `importlib.metadata` sichtbar — und damit sieht der Wächter
+    `phase9_hardening/tests/test_step_h_deps.py` (der die installierten Distributionen gegen
+    `constraints.txt` prüft) jede Paket-Distribution **zweimal**: einmal als editable
+    Installation (mit `direct_url.json`) und einmal als nacktes `egg-info` im Repo (ohne) —
+    das zweite zählt als „installiert, aber nicht gepinnt" und der Test wird **rot**, obwohl
+    nichts driftet. Die Reihenfolge in `pytest.ini` (`testpaths`) hat die Phase-10.5-Tests
+    **hinten** — deshalb fiel es bisher niemandem auf; in jeder anderen Reihenfolge fiel es
+    auf. Der Test stellt den Zustand jetzt wieder her, statt ihn zu hinterlassen."""
+    vorher = list(sys.path)
     for pfad in ("phase2_mcp", "phase4_auth", "phase5_ui", "phase1_storage"):
         eintrag = str(REPO_ROOT / pfad)
         if eintrag not in sys.path:
             sys.path.insert(0, eintrag)
-    spec = importlib.util.spec_from_file_location("ui_budget_unter_test", SCRIPT)
-    module = importlib.util.module_from_spec(spec)
-    # **Das Modul muss in `sys.modules` stehen**, bevor es ausgeführt wird: die `@dataclass`-
-    # Dekoratoren lösen ihre Annotationen über `sys.modules[cls.__module__]` auf — ohne den
-    # Eintrag bekommen sie `None` und die Deklaration bricht mitten in der Auswertung ab.
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
+    try:
+        spec = importlib.util.spec_from_file_location("ui_budget_unter_test", SCRIPT)
+        module = importlib.util.module_from_spec(spec)
+        # **Das Modul muss in `sys.modules` stehen**, bevor es ausgeführt wird: die
+        # `@dataclass`-Dekoratoren lösen ihre Annotationen über `sys.modules[cls.__module__]`
+        # auf — ohne den Eintrag bekommen sie `None` und die Deklaration bricht mitten in
+        # der Auswertung ab.
+        sys.modules[spec.name] = module
+        spec.loader.exec_module(module)
+    finally:
+        sys.path[:] = vorher
     return module
 
 

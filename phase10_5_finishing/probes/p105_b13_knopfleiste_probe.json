@@ -1,0 +1,222 @@
+{
+  "probe": "p105_b13_knopfleiste",
+  "instanz": {
+    "basis": "http://127.0.0.1:35707",
+    "pid": 242803,
+    "wegwerf": true
+  },
+  "gegenlauf": null,
+  "befund": {
+    "groesse_wirkt": true,
+    "zeile_springt_nicht": true,
+    "cursor_auf_dem_zeichen": true,
+    "reihenfolge_word": true,
+    "knoepfe_gleich": true,
+    "gruppen_vier": true,
+    "flaeche_transparent_blau": true,
+    "keine_entity_icons": true
+  },
+  "alle_ok": true,
+  "messung": {
+    "schrift": {
+      "basis": "13px",
+      "klein": "11.05px",
+      "klein_klasse": "cm-link cm-overlay cm-md-s-klein cm-md-plain",
+      "normal": "13px",
+      "normal_klasse": "cm-link cm-overlay cm-md-s-normal cm-md-plain",
+      "gross": "15.6px",
+      "gross_klasse": "cm-link cm-overlay cm-md-s-gross cm-md-plain"
+    },
+    "zeilenhoehe": {
+      "klein": 21,
+      "normal": 21,
+      "gross": 21
+    },
+    "ziel": {
+      "x": 284,
+      "y": 377.171875,
+      "ch": 1
+    },
+    "reihenfolge": [
+      "bold",
+      "italic",
+      "code",
+      "format-farbe",
+      "format-groesse",
+      "ul",
+      "ol",
+      "format-ausrichtung",
+      "h",
+      "quote",
+      "image",
+      "hr",
+      "link",
+      "toggle-preview"
+    ],
+    "knoepfe": [
+      {
+        "md": "bold",
+        "w": 26,
+        "h": 24
+      },
+      {
+        "md": "italic",
+        "w": 26,
+        "h": 24
+      },
+      {
+        "md": "code",
+        "w": 26,
+        "h": 24
+      },
+      {
+        "md": "ul",
+        "w": 26,
+        "h": 24
+      },
+      {
+        "md": "ol",
+        "w": 26,
+        "h": 24
+      },
+      {
+        "md": "h",
+        "w": 26,
+        "h": 24
+      },
+      {
+        "md": "quote",
+        "w": 26,
+        "h": 24
+      },
+      {
+        "md": "image",
+        "w": 26,
+        "h": 24
+      },
+      {
+        "md": "hr",
+        "w": 26,
+        "h": 24
+      },
+      {
+        "md": "link",
+        "w": 26,
+        "h": 24
+      },
+      {
+        "md": "toggle-preview",
+        "w": 64,
+        "h": 24
+      }
+    ],
+    "icons": [
+      {
+        "md": "bold",
+        "icon": false,
+        "w": 26,
+        "h": 24
+      },
+      {
+        "md": "italic",
+        "icon": false,
+        "w": 26,
+        "h": 24
+      },
+      {
+        "md": "code",
+        "icon": true,
+        "w": 14,
+        "h": 14
+      },
+      {
+        "md": "ul",
+        "icon": true,
+        "w": 14,
+        "h": 14
+      },
+      {
+        "md": "ol",
+        "icon": true,
+        "w": 14,
+        "h": 14
+      },
+      {
+        "md": "h",
+        "icon": true,
+        "w": 14,
+        "h": 14
+      },
+      {
+        "md": "quote",
+        "icon": true,
+        "w": 14,
+        "h": 14
+      },
+      {
+        "md": "image",
+        "icon": true,
+        "w": 14,
+        "h": 14
+      },
+      {
+        "md": "hr",
+        "icon": true,
+        "w": 14,
+        "h": 14
+      },
+      {
+        "md": "link",
+        "icon": true,
+        "w": 14,
+        "h": 14
+      },
+      {
+        "md": "toggle-preview",
+        "icon": false,
+        "w": 64,
+        "h": 24
+      }
+    ],
+    "gruppen": [
+      {
+        "name": "schriftart",
+        "kinder": 5,
+        "trenner": "0px"
+      },
+      {
+        "name": "absatz",
+        "kinder": 3,
+        "trenner": "1px"
+      },
+      {
+        "name": "vorlagen",
+        "kinder": 2,
+        "trenner": "1px"
+      },
+      {
+        "name": "einfuegen",
+        "kinder": 3,
+        "trenner": "1px"
+      },
+      {
+        "name": null,
+        "kinder": 1,
+        "trenner": "1px"
+      }
+    ],
+    "flaeche": {
+      "archivieren": "linear-gradient(rgba(62, 141, 243, 0.2), rgba(62, 141, 243, 0.08))",
+      "toolbar": "linear-gradient(rgba(62, 141, 243, 0.2), rgba(62, 141, 243, 0.08))",
+      "hover": "linear-gradient(180deg, rgba(62,141,243,.28), rgba(62,141,243,.12))"
+    },
+    "entities": []
+  },
+  "cursor": {
+    "line": 6,
+    "ch": 1
+  },
+  "cursor_ziel_ch": 1,
+  "seitenfehler": [],
+  "fehler": null
+}
