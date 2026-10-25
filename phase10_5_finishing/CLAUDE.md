@@ -177,6 +177,8 @@ Nikingers steht für 11.6 wie für 11.4 und 11.5 aus.
 
 **Suite 1573 grün** (342,04 s), `doc_health` 0, `ui_budget` **6/6** — der Erstaufruf ist seit 11.7 um **4,4 KB** gewachsen (die Werkzeugleiste, die neun Klassen, der Overlay): **213,7 KB** ≤ 250 KB, der Editor **69,7 KB** ≤ 80 KB.
 
+**Die Abbruchprüfung am Blockende (P10.5-E, Basis `f43a7a4~1`).** `git diff --stat f43a7a4~1..HEAD -- . ':!<die Blockpfade>'` nennt neben den erlaubten Pfaden **zwei** Dateien: `scripts/doc_health.py` (der Fixture-Präfix-Ausgleich aus 11.8 — **bewusst, datiert**, im Archiv-Block vom 2026-10-25 offengelegt) und `phase10_5_finishing/scripts/shorten_index_headings.py` (aus 11.4: der Karten-Text des `INDEX_ENTRIES_ARCHIVE`-Eintrags nachgezogen, damit das Skript den Index wieder erzeugen kann). Beides **Doku-Werkzeuge**, kein Produktcode — **hier offengelegt, nicht stillschweigend**.
+
 **Nächster Schritt.** **Block 12 (Doku und Altlasten)** — der letzte Vollblock, und er ist
 **nur `.md`**: DO-1 (die drei Heads unter 40 KB, `move_sections.py`), LG-6 (`ROADMAP.md` < 30 KB
 → `docs/ROADMAP_ARCHIVE.md`), AL-1/AL-3 (die P6-Matrix), BG-2/BG-3 (die P9-Matrix), und die
