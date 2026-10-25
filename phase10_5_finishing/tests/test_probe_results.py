@@ -28,6 +28,9 @@ PROBE_DIR = REPO_ROOT / "phase10_5_finishing" / "probes"
 GRUEN = PROBE_DIR / "p105_b10_realtime.json"
 GEGENLAUF = PROBE_DIR / "p105_b10_realtime_gegenlauf.json"
 HEAD = REPO_ROOT / "phase10_5_finishing" / "CLAUDE.md"
+#: Die **geschlossenen** Abnahmezeilen stehen seit 2026-10-25 (Block 11.8) im L3-Archiv --
+#: der Head trägt nur die offenen Zeilen (Softcap-Schnitt, siehe `test_head_rules.py`).
+ABNAHME_ARCHIV = REPO_ROOT / "phase10_5_finishing" / "ABNAHME_ARCHIVE.md"
 
 #: Die Fristen aus der Abnahme (P10.5-46 und P10.5-48).
 LATENZ_MAX_MS = 2000
@@ -92,8 +95,10 @@ def test_the_head_counts_the_probe_cells_in_its_acceptance_table():
     """Die Doku und der Beleg müssen dieselbe Zahl tragen: der Abnahmestand nennt P10.5-45,
     46, 47 und 48 als erfüllt — das sind genau die vier Abnahmezeilen, die diese Probe belegt
     (plus die Ereignis-Zelle der Zeile 46)."""
-    head = HEAD.read_text(encoding="utf-8")
+    # **Head und Archiv**: die geschlossenen Zeilen stehen seit Block 11.8 im Archiv.
+    tabellen = [HEAD.read_text(encoding="utf-8"), ABNAHME_ARCHIV.read_text(encoding="utf-8")]
     for nummer in ("P10.5-45", "P10.5-46", "P10.5-47", "P10.5-48"):
-        zeile = [z for z in head.splitlines() if z.startswith(f"| {nummer} |")]
-        assert zeile, f"{nummer} steht nicht in der Abnahmetabelle des Heads"
+        zeile = [z for tabelle in tabellen for z in tabelle.splitlines()
+                 if z.startswith(f"| {nummer} |")]
+        assert zeile, f"{nummer} steht in keiner der beiden Abnahmetabellen"
         assert "| ✅ |" in zeile[0], f"{nummer} ist nicht als erfüllt markiert"

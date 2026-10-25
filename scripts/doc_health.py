@@ -28,6 +28,20 @@ CARD_EXEMPT = {
     "phase5_ui/vendor/lucide/README.md",
 }
 
+#: Die **M7-Fixtures** des Roundtrips (P10.5 Block 11, Schritt 11.8) sind **Test-Fixtures**,
+#: keine Dokumente: sie tragen keine Card und stehen in keiner Karte. Das ist eine der vier
+#: dokumentierten Ausnahmen in `docs/INDEX.md`s eigenem Kopf („Test-Fixtures (Card brüche den
+#: Byte-Vergleich)") — dieselbe Kategorie wie die Golden-Dateien der Phase 6.5 oben. Als
+#: **Praefix**, nicht als zehn Einzelzeilen: die Dateien tragen den Namen der Fixture, und
+#: eine neue Fixture soll nicht erst im Werkzeug eingetragen werden müssen.
+FIXTURE_PRAEFIX = "phase10_5_finishing/probes/fixtures_m7/"
+
+
+def _ist_exempt(rel_str: str) -> bool:
+    """Ausgenommen: die benannten Dateien **oder** eine Test-Fixture unter dem Praefix."""
+    return rel_str in CARD_EXEMPT or rel_str.startswith(FIXTURE_PRAEFIX)
+
+
 INDEX_LINE_EXEMPT = CARD_EXEMPT
 
 IGNORE_DIR_PARTS = {".git", ".pytest_cache", "node_modules", ".venv", "vendor/plex"}
@@ -52,7 +66,7 @@ def check_index_lines(repo_root: Path, index_text: str) -> list[str]:
     findings = []
     for rel, _path in _iter_markdown(repo_root):
         rel_str = str(rel)
-        if rel_str in INDEX_LINE_EXEMPT:
+        if _ist_exempt(rel_str):
             continue
         if rel_str == "docs/INDEX.md":
             continue
@@ -82,7 +96,7 @@ def check_header_cards(repo_root: Path) -> list[str]:
     findings = []
     for rel, path in _iter_markdown(repo_root):
         rel_str = str(rel)
-        if rel_str in CARD_EXEMPT:
+        if _ist_exempt(rel_str):
             continue
         text = path.read_text(encoding="utf-8", errors="replace")
         fm = _parse_frontmatter(text)
@@ -127,7 +141,7 @@ def check_updown_links(repo_root: Path) -> list[str]:
     findings = []
     for rel, path in _iter_markdown(repo_root):
         rel_str = str(rel)
-        if rel_str in CARD_EXEMPT:
+        if _ist_exempt(rel_str):
             continue
         text = path.read_text(encoding="utf-8", errors="replace")
         if not text.startswith("---"):

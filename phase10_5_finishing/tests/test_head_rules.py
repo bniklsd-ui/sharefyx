@@ -26,6 +26,8 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 HEAD = REPO_ROOT / "phase10_5_finishing" / "CLAUDE.md"
+#: Das L3-Archiv der **geschlossenen** Abnahmezeilen (der Head trägt die offenen).
+ABNAHME_ARCHIV = REPO_ROOT / "phase10_5_finishing" / "ABNAHME_ARCHIVE.md"
 MARKER = "## Session stopped"
 LIMIT_BYTES = 4096
 
@@ -80,6 +82,24 @@ def test_the_block_measurement_ends_at_the_next_heading():
     text = "## Session stopped — 2026-10-22\n\nkurz\n\n## Nächster Abschnitt\n\nviel Text\n"
     assert _session_block_bytes(text) == len("## Session stopped — 2026-10-22\n\nkurz\n\n".encode("utf-8"))
 
+def _abnahme_zeilen() -> list[str]:
+    """Die Abnahmezeilen aus dem Head **und** aus dem Archiv.
+
+    **Seit 2026-10-25 (Block 11.8) sind sie geteilt:** die geschlossenen Zeilen (✅/⚠️)
+    stehen **verbatim** im L3-Archiv `ABNAHME_ARCHIVE.md` (der Head stand über dem
+    Softcap), die offenen (⬜) im Head. Der Plan §5 zählt die 61 Zeilen — das Zählen
+    läuft deshalb über **beide** Dateien.
+    """
+    zeilen: list[str] = []
+    for datei in (HEAD, ABNAHME_ARCHIV):
+        if not datei.exists():
+            continue
+        for line in datei.read_text(encoding="utf-8").split("\n"):
+            if re.match(r"^\| P10\.5-\d+ \|", line):
+                zeilen.append(line)
+    return zeilen
+
+
 def test_the_acceptance_sum_matches_the_table():
     """Die **Summe-Zeile** muss zur Abnahmetabelle gehören — und wird sonst von Hand gepflegt.
 
@@ -87,22 +107,49 @@ def test_the_acceptance_sum_matches_the_table():
     40 ⬜", die Tabelle trug **20** ✅ — der Zähler war schon vor diesem Block falsch (Block 5 hat
     eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Wer die Summe im Kopf pflegt,
     pflegt zwei Zahlen an zwei Orten; das ist die Fehlerklasse, die dieser Wächter beendet.
+
+    **Seit 2026-10-25 (Block 11.8)** zählt der Wächter über **beide** Dateien: die
+    geschlossenen Zeilen stehen im L3-Archiv `ABNAHME_ARCHIVE.md`.
     """
-    head = HEAD.read_text(encoding="utf-8")
-    rows = [line for line in head.split("\n") if re.match(r"^\| P10\.5-\d+ \|", line)]
+    rows = _abnahme_zeilen()
     assert len(rows) == 61, f"die Abnahmetabelle hat {len(rows)} Zeilen, erwartet 61"
     counted = {
         "✅": sum(1 for line in rows if "| ✅ |" in line),
         "⚠️": sum(1 for line in rows if "| ⚠️ |" in line),
         "⬜": sum(1 for line in rows if "| ⬜ |" in line),
     }
+    head = HEAD.read_text(encoding="utf-8")
     match = re.search(r"\*\*Summe:\*\* (\d+) ✅ · (\d+) ⚠️ · (\d+) ⬜", head)
     assert match, "der Head trägt keine '**Summe:** … ✅ · … ⚠️ · … ⬜'-Zeile"
     claimed = tuple(int(value) for value in match.groups())
     assert claimed == (counted["✅"], counted["⚠️"], counted["⬜"]), (
         f"die Summe-Zeile behauptet {claimed}, die Tabelle trägt "
         f"({counted['✅']}, {counted['⚠️']}, {counted['⬜']}) — eine Zeile abhaken heißt auch, "
-        f"die Summe nachzuziehen"
+        "die Summe nachzuziehen"
+    )
+
+
+def test_the_closed_rows_are_in_the_archive_and_the_open_ones_in_the_head():
+    """**Die Teilung ist eine Zusage.** Die geschlossenen Zeilen stehen **im Archiv**, die
+    offenen **im Head** — und keine Zeile steht in beiden (das wäre doppelt gezählt)."""
+    head_zeilen = [z for z in HEAD.read_text(encoding="utf-8").split("\n")
+                   if re.match(r"^\| P10\.5-\d+ \|", z)]
+    archiv_zeilen = [z for z in ABNAHME_ARCHIV.read_text(encoding="utf-8").split("\n")
+                      if re.match(r"^\| P10\.5-\d+ \|", z)]
+    assert all("| ⬜ |" in z for z in head_zeilen), (
+        "der Head traegt eine geschlossene Zeile — die gehoert ins Archiv"
+    )
+    assert all(("| ✅ |" in z) or ("| ⚠️ |" in z) for z in archiv_zeilen), (
+        "das Archiv traegt eine offene Zeile — die gehoert in den Head"
+    )
+    nummern_head = {z.split("|")[1].strip() for z in head_zeilen}
+    nummern_archiv = {z.split("|")[1].strip() for z in archiv_zeilen}
+    assert not (nummern_head & nummern_archiv), (
+        f"diese Zeilen stehen in beiden Listen: {sorted(nummern_head & nummern_archiv)}"
+    )
+    assert len(nummern_head | nummern_archiv) == 61, (
+        f"zusammen tragen die beiden Listen {len(nummern_head | nummern_archiv)} Zeilen, "
+        "erwartet 61"
     )
 
 
