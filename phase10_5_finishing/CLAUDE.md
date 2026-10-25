@@ -144,8 +144,9 @@ Ende); die **Belegte** stehen im Commit und im Session-Block.
    **Reihenfolge 1:1 wie in Word** (eine allgemeine Anordnung ist nicht urheberrechtlich
    geschützt). Betrifft `app.html` (Werkzeugleiste), `editor.js`, `app.css`, Probe/Wächter.
 4. **Screenshots der ganzen Gehirnkarte** (nicht nur der Ausschnitt im Übersichtspanel) für das
-   Urteil des Nikingers (P10.5-37). Der Dateiversand ist in dieser Umgebung nicht möglich
-   (kein Projekt-Thread): Bilder liegen unter `docs/screenshots/`; alternativ als Artifact.
+   Urteil des Nikingers (P10.5-37). **Bilder zeigen:** `SendUserFile` geht hier nicht (kein
+   Projekt-Thread); was geht: die PNG mit `Read` lesen — der Nikinger sieht sie dann auch
+   (bestätigt 2026-10-25). Vorlage: `probes/p105_sichtung_screens.py`.
 
 ## Session stopped — 2026-10-25 (Block 12: Doku und Altlasten)
 
@@ -190,5 +191,6 @@ UI-Töne. **Behoben:** (A) Vendor-CSS wird **vor** `app.css` eingefügt; (B) Ove
 sind Zeichen (Ausrichtung selbst zeigt nur die Vorschau). Suite **1576 grün**. **P10.5-51 bleibt ⬜**
 bis zur Sichtung der neuen Bilder.
 
-**Nächster Schritt.** **Block Z (Closeout)** — erst nach P10.5-27/28 live (Nikinger). Beim
-Nikinger: Deploy C `v3.1.7`, P10.5-37/32/51 (Sichtung), 22, 18, 25, 27/28, AL-1 Zeile 15, V203.
+**Nächster Schritt.** Zuerst die **vier Aufträge** (Abschnitt „Nächste Session“ oben: Editor-
+größen, Knopfleiste nach Word, Knopffarben, ganze Gehirnkarte), dann Sichtung P10.5-51/37.
+**Block Z (Closeout)** erst nach P10.5-27/28 live (Nikinger). Beim Nikinger: Deploy C `v3.1.7`, P10.5-37/32/51 (Sichtung), 22, 18, 25, 27/28, AL-1 Zeile 15, V203.
