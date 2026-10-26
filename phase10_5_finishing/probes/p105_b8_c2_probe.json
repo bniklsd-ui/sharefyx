@@ -26,7 +26,7 @@
   },
   "furche": {
     "contours_compared": 3,
-    "separation_px": 16.5,
+    "separation_px": 8,
     "ok": true
   },
   "bahnen": {

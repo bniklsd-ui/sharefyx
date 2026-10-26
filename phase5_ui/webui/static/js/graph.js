@@ -171,6 +171,35 @@ const LAYOUT_KEY_PREFIX = "sfx:graph:layout:v1:";  // Plan 8.5 (KA-2)
 const LAYOUT_MAX_ENTRIES = 2000;                    // Plan 8.5
 const LAYOUT_SAVE_DELAY_MS = 1000;                  // Plan 8.5: gedrosselt 1 s
 
+// -- P10.5 Block 14, Schritt 14.1: das Kartenlayout als Weltgenerator ----------------------------
+//
+// Drei Schichten, wie ein Weltgenerator (Plan
+// `docs/concepts/phase10_5_block14_kartenlayout_plan.md` §1): der **Seed** bestimmt zuerst die
+// groben Regionen, darin die Strukturen, darin das Detail -- "zufaellig, aber geordnet".
+//
+//   L1  eine **Region je Space**     -- der eigene Space in der Mitte, die anderen auf einer
+//                                       Goldwinkel-Spirale darum; die **Reihenfolge** ist der
+//                                       Hash des Space-Namens (nicht die Item-Zahl: die
+//                                       Item-Zahl waechst mit jedem neuen Item, der Hash nicht)
+//   L2  **Ordner-Inseln** je Region  -- die Ordner auf einer kleinen Spirale um den Anker,
+//                                       der Hash des Ordnernamens entscheidet die Reihenfolge
+//   L3  **Items** in der Insel        -- Goldwinkel-Spirale (Sonnenblumenmuster: dicht, ohne
+//                                       Ueberlappung), Reihenfolge = Hash der Item-ID
+//
+// Der **Zufall** ist `seedJitter()` (FNV-1a ueber die ID) -- **kein** `Math.random()`
+// (P8.6-D2: die Karte darf beim Oeffnen nicht "fliegen").
+//
+// **Alle Zahlen sind Startwerte**, justiert durch Messung in Schritt 14.4 (Plan §2.1) --
+// nicht geschaetzt uebernommen.
+const REGION_ITEM_STEP = 22;    // Startwert, gemessen in 14.4 -- der Radius je Item
+const REGION_PAD = 30;          // Startwert, gemessen in 14.4 -- der Grundradius je Region
+const REGION_GAP = 40;          // Startwert, gemessen in 14.4 -- der Abstand zweier Regionen
+const ISLAND_FACTOR = 0.55;     // Startwert, gemessen in 14.4 -- der Anteil der Region, den die
+                                //   Ordner-Inseln einnehmen
+const ITEM_STEP = 14;           // Startwert, gemessen in 14.4 -- der Abstand der Items in der Insel
+const ITEM_JITTER_PX = 8;       // Startwert, gemessen in 14.4 -- die Amplitude des Item-Jitters
+const GOLDEN_ANGLE = 2.399963229728653;  // 137,50776405003785 Grad in Radiant
+
 const COLORS = Object.freeze({
   bg: "#0B0D10",          // wird nicht gezeichnet -- Canvas ist transparent, darunter die .surface
   edge: "#7E8A98",        // explizite Kanten -- gedämpftes Slate
@@ -474,22 +503,186 @@ function buildFolderEdges(nodeList) {
   return edges;
 }
 
-function seedInitialPositions() {
-  // Streuung um den Canvas-Mittelpunkt -- deterministisch per Item-ID (P8.6-D2, P8.6-M;
-  // vorher Math.random(), die Karte "flog" beim Oeffnen).
+// -- P10.5 Block 14, Schritt 14.1: die Welt-Geometrie (L1 Regionen, L2 Inseln, L3 Spiralen) ----
+//
+// **Die Regionen (L1).** Je Space eine Region um einen **Anker**: der eigene Space in der
+// Mitte der Leinwand, die anderen auf einer **Goldwinkel-Spirale** darum. Der Radius einer
+// Region waechst mit der Wurzel der Item-Zahl (`REGION_ITEM_STEP * sqrt(n) + REGION_PAD`).
+//
+// **Die Ordner-Inseln (L2).** Innerhalb der Region liegen die Ordner auf einer kleinen
+// Spirale: der Ordner `j` sitzt im Winkel `137,5078 Grad * j` vom Anker, im Abstand
+// `ISLAND_FACTOR * Radius * sqrt(j / F)`. Die **Wurzel** (`folder: ""`) ist die Insel **am
+// Anker** selbst.
+//
+// **Die Items (L3).** Innerhalb einer Insel liegen die Items auf einer Goldwinkel-Spirale:
+// der Item `i` (nach Hash der ID sortiert) im Winkel `137,5078 Grad * i`, im Abstand
+// `ITEM_STEP * sqrt(i)`, plus dem Jitter aus dem Hash der ID.
+//
+// **Der Zufall ist der Hash, nicht der Zufallsgenerator** (P8.6-D2): dieselbe ID ergibt
+// dieselbe Position, immer -- auf jedem Rechner, in jeder Sitzung.
+//
+// **Exportiert**, damit der Wächter-Harness (`probes/p105_b14_layout_probe.mjs`, Node) die
+// reine Geometrie **ohne Browser** messen kann -- dieselbe Rolle, die `state.js`s `state`
+// fuer den C2-Harness hat. Es ist kein Testhaken: die Funktion ist rechnend und tut nichts
+// ausser der Geometrie.
+export function computeRegions(nodeList, cx, cy, ownSpace) {
+  // -- 1) die Knoten je Space -------------------------------------------------------------------
+  var bySpace = Object.create(null);
+  var i;
+  for (i = 0; i < nodeList.length; i++) {
+    var node = nodeList[i];
+    var name = node.space || "";
+    if (!bySpace[name]) bySpace[name] = [];
+    bySpace[name].push(node);
+  }
+
+  // -- 2) die Reihenfolge der Anker -------------------------------------------------------------
+  // Der **eigene** Space ist Index 0 (sein Anker ist der Ursprung), die anderen folgen nach
+  // dem **Hash ihres Namens** -- nicht nach der Item-Zahl: die Item-Zahl aendert sich mit
+  // jedem neuen Item, der Hash nicht (Plan §2.1). Das ist die halbe Stabilitaet von
+  // Abnahme P10.5-68.
   //
-  // **P10.5 Block 8, Schritt 8.5 (KA-2):** zuerst die **gemerkten** Positionen (Plan 8.5),
-  // fuer den Rest der Ring mit dem Hash-Jitter; unbekannte IDs werden ignoriert.
+  // **Der eigene Space belegt Index 0 auch dann, wenn er noch keine Items hat** -- sonst
+  // wuerde das erste Item im eigenen Space alle Anker verschieben.
+  var namen = Object.keys(bySpace);
+  var eigen = ownSpace ? ownSpace : null;
+  var fremde = [];
+  for (i = 0; i < namen.length; i++) {
+    if (namen[i] !== eigen) fremde.push(namen[i]);
+  }
+  fremde.sort(byHash);
+  var reihenfolge = eigen ? [eigen].concat(fremde) : fremde;
+
+  // -- 3) die Radien und der Abstand der Anker -------------------------------------------------
+  var radien = Object.create(null);
+  var maxR = 0;
+  for (i = 0; i < reihenfolge.length; i++) {
+    var rName = reihenfolge[i];
+    var anzahl = bySpace[rName] ? bySpace[rName].length : 0;
+    var radius = REGION_ITEM_STEP * Math.sqrt(anzahl) + REGION_PAD;
+    radien[rName] = radius;
+    if (radius > maxR) maxR = radius;
+  }
+  // `SLOT` haengt **nur** am groessten Space: ein neues Item in einem kleineren Space
+  // aendert ihn nicht -- die Anker bleiben byte-gleich (Abnahme P10.5-68). Nur ein Item im
+  // groessten Space vergroessert ihn (und verschiebt damit alle Anker).
+  var slot = 2 * maxR + REGION_GAP;
+
+  // -- 4) die Anker -----------------------------------------------------------------------------
+  // Der eigene Space in der Mitte, die anderen auf der Goldwinkel-Spirale: der Winkelabstand
+  // ist immer derselbe, der Abstand waechst mit sqrt(k) -- so liegt kein Space auf einem
+  // anderen. `theta0` kommt aus dem Hash des eigenen Space: **jede Person sieht "ihre" Welt**,
+  // und immer dieselbe.
+  var theta0 = (hashString(ownSpace || "") >>> 0) / 4294967296 * 2 * Math.PI;
+  var spaces = Object.create(null);
+  var pos = Object.create(null);
+  for (var k = 0; k < reihenfolge.length; k++) {
+    var spaceName = reihenfolge[k];
+    var winkel = k === 0 ? theta0 : theta0 + k * GOLDEN_ANGLE;
+    var abstand = k === 0 ? 0 : slot * Math.sqrt(k);
+    var ax = cx + Math.cos(winkel) * abstand;
+    var ay = cy + Math.sin(winkel) * abstand;
+    var space = {
+      name: spaceName,
+      x: ax,
+      y: ay,
+      radius: radien[spaceName],
+      angle: winkel,
+      folders: Object.create(null),
+    };
+    spaces[spaceName] = space;
+
+    // -- 5) die Ordner-Inseln (L2) --------------------------------------------------------------
+    var mitte = Object.create(null);
+    var knoten = bySpace[spaceName] || [];
+    for (i = 0; i < knoten.length; i++) {
+      var ordner = knoten[i].folder || "";
+      if (!mitte[ordner]) mitte[ordner] = [];
+      mitte[ordner].push(knoten[i]);
+    }
+    var ordnerNamen = [];
+    for (var key in mitte) {
+      if (!Object.prototype.hasOwnProperty.call(mitte, key)) continue;
+      if (key !== "") ordnerNamen.push(key);
+    }
+    ordnerNamen.sort(byHash);
+    var F = ordnerNamen.length;
+    var inseln = [{ name: "", x: ax, y: ay, angle: winkel }];
+    for (var j = 0; j < F; j++) {
+      var jwinkel = winkel + (j + 1) * GOLDEN_ANGLE;
+      var jabstand = space.radius * ISLAND_FACTOR * Math.sqrt((j + 1) / F);
+      inseln.push({
+        name: ordnerNamen[j],
+        x: ax + Math.cos(jwinkel) * jabstand,
+        y: ay + Math.sin(jwinkel) * jabstand,
+        angle: jwinkel,
+      });
+    }
+
+    // -- 6) die Items je Insel (L3) --------------------------------------------------------------
+    for (var ins = 0; ins < inseln.length; ins++) {
+      var insel = inseln[ins];
+      var liste = (mitte[insel.name] || []).slice().sort(byIdHash);
+      var ids = [];
+      for (var t = 0; t < liste.length; t++) {
+        var item = liste[t];
+        var iwinkel = insel.angle + t * GOLDEN_ANGLE;
+        var irad = ITEM_STEP * Math.sqrt(t);
+        pos[item.id] = [
+          insel.x + Math.cos(iwinkel) * irad + seedJitter(item.id, 1) * ITEM_JITTER_PX,
+          insel.y + Math.sin(iwinkel) * irad + seedJitter(item.id, 2) * ITEM_JITTER_PX,
+        ];
+        ids.push(item.id);
+      }
+      space.folders[insel.name] = {
+        name: insel.name,
+        x: insel.x,
+        y: insel.y,
+        angle: insel.angle,
+        items: ids,
+      };
+    }
+  }
+  return { order: reihenfolge, spaces: spaces, pos: pos };
+}
+
+// Die Sortierung **nach Hash**: aufsteigend; bei einem Gleichstand entscheidet der Name --
+// der Hash kann kollidieren, und die Reihenfolge muss trotzdem eindeutig sein (sonst waere
+// die Karte zwischen zwei Laeufen eine andere).
+function byHash(a, b) {
+  var ha = hashString(a);
+  var hb = hashString(b);
+  if (ha !== hb) return ha - hb;
+  return a < b ? -1 : (a > b ? 1 : 0);
+}
+
+// Die Sortierung der **Items** nach dem Hash ihrer ID (L3).
+function byIdHash(a, b) {
+  var ha = hashString(a.id);
+  var hb = hashString(b.id);
+  if (ha !== hb) return ha - hb;
+  return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0);
+}
+
+function seedInitialPositions() {
+  // **Der Seed** (Plan §2): die Welt-Geometrie aus `computeRegions()` -- eine Region je Space,
+  // darin die Ordner-Inseln, darin die Items auf einer Goldwinkel-Spirale.
+  //
+  // **P10.5 Block 8, Schritt 8.5 (KA-2):** zuerst die **gemerkten** Positionen (Plan 8.5);
+  // unbekannte IDs werden ignoriert.
   //
   // **Datierte Entscheidung (2026-10-24, Abweichung vom Plan-Wortlaut, Code schlaegt Plan):**
   // ein gemerkter Knoten wird **festgehalten** (`pinned`), nicht nur gesaet -- sonst schiebt
   // die Simulation die gemerkte Karte beim naechsten Oeffnen wieder auseinander und KA-2
   // waere nicht erfuellt. Belegt von `probes/p105_b8_karte_probe.py` (Neuladen haelt die
   // Position) und `probes/p105_b8_c2_probe.mjs`.
+  //
+  // **Ein Knoten, der heute schon eine Position hat** (P9-34: die Karte springt beim
+  // Wiedereintritt nicht), bleibt, wo er ist -- gesaet wird nur, wer noch nirgends war.
   var stored = loadStoredLayout();
   var cx = cssWidth / 2;
   var cy = cssHeight / 2;
-  var spread = Math.min(cssWidth, cssHeight) / 4;
+  var regionen = computeRegions(nodes, cx, cy, state.ownSpace);
   for (var i = 0; i < nodes.length; i++) {
     var n = nodes[i];
     var pos = stored[n.id];
@@ -499,9 +692,11 @@ function seedInitialPositions() {
       n.pinned = true;
       pinnedIds[n.id] = true;
     } else if (n.x === 0 && n.y === 0) {
-      var angle = (i / Math.max(1, nodes.length)) * 2 * Math.PI;
-      n.x = cx + Math.cos(angle) * spread + seedJitter(n.id, 1) * 30;
-      n.y = cy + Math.sin(angle) * spread + seedJitter(n.id, 2) * 30;
+      var ziel = regionen.pos[n.id];
+      if (ziel) {
+        n.x = ziel[0];
+        n.y = ziel[1];
+      }
     }
     n.vx = 0;
     n.vy = 0;
@@ -527,13 +722,25 @@ function startLayout() {
 // unkorrelierte Werte -- genau das, was ein Jitter braucht. Ein
 // `Math.sin(seed)*10000 % 1`-Trick korreliert bei aehnlichen Eingaben, und
 // `itm_…`-IDs sind einander aehnlich.
-function seedJitter(id, salt) {
+//
+// **P10.5 Block 14, Schritt 14.1:** die Rechnung selbst liegt jetzt in `hashString()` --
+// Plan §2.1 ("dieselbe Funktion wie `seedJitter`, als `hashString()` herausgezogen"). Die
+// Reihenfolge bleibt: erst der Hash, **dann** der Salt. Die Werte sind **bitidentisch** zu
+// den vorigen (der C2-Waechter `probes/p105_b8_c2_probe.mjs` misst die Fortsaetze der
+// Zellen -- sie haengen an genau diesem Hash).
+export function hashString(str) {
   var h = 2166136261;
-  for (var i = 0; i < id.length; i++) {
-    h ^= id.charCodeAt(i);
+  var s = String(str);
+  for (var i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
     h = Math.imul(h, 16777619);
   }
-  h ^= salt;
+  return h >>> 0;
+}
+
+// Der **Jitter** aus dem Hash: -0.5 .. +0.5, wie (Math.random() - 0.5).
+function seedJitter(id, salt) {
+  var h = hashString(id) ^ salt;
   return ((h >>> 0) / 4294967295) - 0.5;   // -0.5 .. +0.5, wie (Math.random() - 0.5)
 }
 

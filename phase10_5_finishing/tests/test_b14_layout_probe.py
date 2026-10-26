@@ -15,12 +15,18 @@ der Wächter statisch, würde ein Schritt, der eine Zelle kaputtmacht, unauffäl
 
 | Schritt (Plan §4) | was grün werden muss |
 |---|---|
-| 14.0 (dieser Stand) | `determinismus`, `budget` — die anderen vier sind **rot** (Basislinie) |
-| 14.1 | `determinismus` bleibt grün (L1–L3) |
+| 14.0 (Basislinie) | `determinismus`, `budget` — die anderen vier sind **rot** (Basislinie) |
+| 14.1 (**dieser Stand**) | `determinismus` bleibt grün (L1–L3) — die vier roten Zellen bleiben rot, **aber ihre Zahlen wandern**: die Regionen von 57,2 % auf 82,2 %, das neue Item liegt jetzt **in** der Region seines Space |
 | 14.2 | `regionen` **und** `stabilitaet` werden grün (L4: Anker-Gravitation) |
 | 14.3 | `kamera` wird grün (`fitView()`) |
 | 14.35 | `beschriftungen` wird grün (§2.7) |
 | 14.4 | **alle** grün + jeder Gegenlauf rot an genau seiner Zelle |
+
+**Die Zahlen sind mitgeprueft, nicht nur die `ok`-Flags** (der Test
+`test_the_measured_numbers_are_the_ones_the_cells_stand_on`): ein Schritt, der eine Zelle
+kaputtmacht, muss die Zahlen mitnehmen — sonst wuerde der Wächter die Bewegung der Zahlen
+uebersehen. Die Zahlen der Basislinie (14.0) und des Stands 14.1 stehen beide im Diff
+dieser Datei — **datiert**, weil sich der Code geaendert hat.
 
 **Gegenprobe:** derselbe Wächter muss an einem **manipulierten** Beleg rot werden — und die
 Gegenprobe ruft **dieselbe Testfunktion** auf (nicht eine nachgebaute Logik: ein Wächter, der
@@ -118,12 +124,16 @@ def test_the_measured_numbers_are_the_ones_the_cells_stand_on():
         "die beiden Laeufe muessen dieselbe Knotenmenge gehabt haben")
     assert det["max_abweichung_px"] <= 1.0
 
-    # Regionen (P10.5-66): 87 von 152 Knoten liegen beim Schwerpunkt ihres Space
+    # Regionen (P10.5-66): **125** von 152 Knoten liegen beim Schwerpunkt ihres Space.
+    # **[Datierte Korrektur 2026-10-26, Schritt 14.1]:** die Basislinie (14.0) trug **87**
+    # (57,2 %) — mit dem **neuen Seed** (L1–L3: eine Region je Space, Ordner-Inseln,
+    # Item-Spirale) sind es **125** (82,2 %). Die Zelle bleibt **rot** (unter 95 %): die
+    # Zentrums-Gravitation zieht die Regionen noch zusammen — das ist die Aufgabe von 14.2.
     reg = m["regionen"]
     assert reg["knoten"] == SEED_SUMME
-    assert reg["richtig"] == 87
-    assert reg["anteil"] == pytest.approx(87 / SEED_SUMME, abs=1e-9)
-    assert reg["anteil"] < 0.95, "die Basislinie ist unter der 95-%-Schwelle"
+    assert reg["richtig"] == 125
+    assert reg["anteil"] == pytest.approx(125 / SEED_SUMME, abs=1e-9)
+    assert reg["anteil"] < 0.95, "die Regionen sind noch nicht getrennt (14.2)"
 
     # Kamera (P10.5-67): fuellt, passt — der Umriss sitzt aber weit ausserhalb der Mitte
     kam = m["kamera"]
@@ -139,11 +149,14 @@ def test_the_measured_numbers_are_the_ones_the_cells_stand_on():
     assert bes["gezeichnet"] >= 2, "es sind genug Beschriftungen gezeichnet worden"
     assert len(bes["ueberlappungen"]) >= 1, "die Basislinie hat Ueberlappungen"
 
-    # Stabilitaet (P10.5-68): die anderen Spaces haben sich weit mehr als 2 px bewegt, und
-    # das neue Item liegt nicht in der Region seines Space
+    # Stabilitaet (P10.5-68): die anderen Spaces haben sich weit mehr als 2 px bewegt.
+    # **[Datierte Korrektur 2026-10-26, Schritt 14.1]:** das neue Item liegt jetzt **in der
+    # Region seines Space** (der Seed legt es dorthin — in der Basislinie 14.0 lag es noch
+    # 118 px von einem fremden Space entfernt). Die Zelle bleibt **rot**, weil die **Verschiebung
+    # der anderen Spaces** noch 233 px betraegt — das ist die Zentrums-Gravitation (14.2).
     stab = m["stabilitaet"]
     assert stab["median_verschiebung_px"] > 2.0
-    assert stab["in_eigener_region"] is False
+    assert stab["in_eigener_region"] is True, "das neue Item gehoert in die Region seines Space"
 
     # Budget (P10.5-69): 200 Knoten, 3 s, 0 Frames, die Karte ist gemalt
     bud = m["budget"]
