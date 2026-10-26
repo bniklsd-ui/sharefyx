@@ -9,6 +9,14 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
+## 2026-10-26
+- Version 4.0: der Editor ist jetzt ein Live-Editor — Markdown wird beim Schreiben hervorgehoben, To-dos sind Kästchen, und Farbe und Größe lassen sich im Text setzen. Den Schalter „Rohtext" gibt es nicht mehr.
+- Die Knopfleiste des Editors folgt jetzt der Reihenfolge von Word: Schriftart, Absatz, Formatvorlagen, Einfügen. Die Knöpfe sind einheitlich groß und blau-transparent.
+- Ordner lassen sich umbenennen — alle Items darin ziehen mit um.
+- Team-Spaces lassen sich umbenennen; der eigene Home-Space bleibt wie er ist.
+- In den Einstellungen bleibt der geöffnete Space in der Liste markiert, solange sein Fenster offen ist.
+- Die Verknüpfungskarte zeigt auf Wunsch die ganze Karte auf einmal (Zoom bis 50 %).
+
 ## 2026-10-24
 - Die Verknüpfungskarte hat einen neuen Look: Die Verbindungen laufen als Bahnen zwischen runden Zellen, und jeder Space bekommt einen eigenen Bereich.
 - In der Karte kannst du jetzt suchen und filtern — nach Text, nach Art und nach Status. Die Zahl der Treffer steht in der Statuszeile.
