@@ -14,7 +14,7 @@ down:
   - MODULSTATUS_ARCHIVE.md                         # 📦 die ausführlichen Statusspalten der Blöcke 0–10, verbatim
   - ABNAHME_ARCHIVE.md                             # 📦 die geschlossenen Abnahmezeilen (P10.5-1–61), verbatim
   - FREIGABEN_ARCHIVE.md                           # 📦 die Freigaben der Phase, verbatim
-updated: 2026-10-25 (Block 13: die vier Aufträge des Nikingers gebaut — Editor-Größen live, Knopfleiste nach Word, Knopffarben transparent-blau, ganze Gehirnkarte; P10.5-62/63/64 ✅, 54 ✅ · 10 ⬜) | 2026-10-25 (Block 12: Doku und Altlasten — DO-1, LG-6, AL-1/AL-3, BG-2/BG-3, Register-Bilanz per Skript; P10.5-57/58/59 ✅, 51 ✅ · 10 ⬜) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-26 (Block 14.0: die Basislinie des Kartenlayouts — die Probe steht, die Abnahmezeilen 65–71 sind im Head; rot in Regionen/Kamera/Beschriftungen/Stabilität, grün in Determinismus/Budget; B5 widerlegt) | 2026-10-25 (Block 13: die vier Aufträge des Nikingers gebaut — Editor-Größen live, Knopfleiste nach Word, Knopffarben transparent-blau, ganze Gehirnkarte; P10.5-62/63/64 ✅, 54 ✅ · 10 ⬜) | 2026-10-25 (Block 12: Doku und Altlasten — DO-1, LG-6, AL-1/AL-3, BG-2/BG-3, Register-Bilanz per Skript; P10.5-57/58/59 ✅, 51 ✅ · 10 ⬜) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -41,7 +41,7 @@ updated: 2026-10-25 (Block 13: die vier Aufträge des Nikingers gebaut — Edito
 | 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | 🔄 2026-10-24 — **11.1 Vendor** (CodeMirror 5.65.16, **fünf** Dateien statt drei — gemessen: der UMD-Browser-Zweig der `markdown.min.js` löst `require("../xml/xml")` **nicht** auf) · **11.2 Nachlader** (`js/editor_cm.js`: CSS → Kern → Modus-Dateien, Promise gecacht, Fehler → `null` = Textarea/Rohmodus) · **11.3 Live-Editor** (`editor.js`: `getBody()`/`setBody()`, `setRawMode(on)`, Schalter „Rohtext", Probe 12/12 grün) · **11.4 Live-Darstellung** (V211 **gemessen**: `visibility: hidden` hält die Cursorposition, `display: none`/`font-size: 0` rücken sie 2 Zeichen vor; Probe 15/15 grün) · **11.5 To-do-Kästchen** (ED-2: `cm.markText(…, {replacedWith: <checkbox>, atomic: true})` — der **Text** bleibt die Quelle; Klick bei sauberem Editor speichert **sofort** mit `version`, bei geändertem nur der Puffer; Lesesicht **deaktiviert**; Probe 8/8 grün, Gegenlauf bricht genau die Schreibzelle) · **11.7 Budget** (`ui_budget.py`: `static_payload_files()` — **jede Datei genau einmal**; Erstaufruf **209,3 KB** ≤ 250 KB, Editor **69,7 KB** ≤ 80 KB; Wächter `tests/test_budget_coverage.py` mit Gegenprobe) · **11.8 Roundtrip** (V201-Rest: die **zehn** M7-Fixtures **10/10 byte-identisch**, Öffnen macht den Editor **nicht** geändert, Dateien auf der Platte byte-identisch) · **11.6 Format-Konvention** (ED-3: `markdown.js` — Vokabular **Farbe** (rot/blau/gruen/gelb) · **Größe** (klein/normal/gross) · **Ausrichtung** (links/zentriert/rechts); Inline `[Text]{.rot}`, Block `::: {.zentriert}` … `:::`; eine **unbekannte** Klasse bleibt **wörtlich**; der Sanitizer lässt `span`/`div` nur mit Klassen aus der festen Menge durch; die **Codespans** sind ausgeschnitten (darin wird **nichts** formatiert — das behebt einen Alt-Fehler); Editor: drei Felder in der Werkzeugleiste + ein **CM5-Overlay**, das `[…]{.rot}` schon beim Schreiben färbt; MCP: `_FORMAT_HINT` **wörtlich identisch** an allen fünf Body-Schreib-Werkzeugen; Probe `probes/p105_b11_markdown_probe.py`: **9/9 Zellen grün**, der Gegenlauf bricht genau die Zelle „unbekannte Klasse wörtlich“) |
 | 12 | Doku und Altlasten: DO-1, LG-6, AL-1 (Rest), AL-3, BG-2/BG-3 | Claude Code | — | ✅ 2026-10-25 — **DO-1** (die drei Heads: 8.6 109.230 → 23.614 B, 8 47.861 → 34.225 B, 6 41.032 → 34.801 B; verbatim per `move_sections.py`, die 33-KB-Kette von 8.6 per Skript in `UPDATES_ARCHIVE.md`) · **LG-6** (`ROADMAP.md` 37.197 → 26.457 B, Phase 8.5 → `docs/ROADMAP_ARCHIVE.md`) · **AL-1/AL-3** (P6-Nachzug in `phase6_shares/CLAUDE.md`) · **BG-2/BG-3** (P9-124/127 ⚠️ → ✅, Bilanz 123/10/1) · **Register-Bilanz** per `scripts/register_bilanz.py` (46 P10.5-Zeilen: 40 ✅ · 6 ⬜) |
 | 13 | Aufträge des Nikingers: UI-8 (die Größen wirken live), UI-9 (die Knopfleiste nach Word), UI-10 (die Knopffarben) | Claude Code (Sichtung Nikinger) | D | ✅ 2026-10-25 — **13.1** (die Stufen wirken im **Live-Editor**: Basis 13 px, `klein` 11,05 px, `normal` 13 px, `groß` 15,6 px; die **Zeilenhöhe bleibt 21 px** in allen drei Stufen — die Ursache war die Prozent-`line-height`: CM5 rechnet `defaultTextHeight` **einmal** (aus 50 Zeilen); der Overlay liefert Farbe **und** Größe in beliebiger Reihenfolge) · **13.2** (die Leiste: **fünf** Gruppen in Words Ribbon-Reihenfolge, alle Knöpfe 26 × 24 px, Trenner dazwischen, **keine** HTML-Entity-Zeichen als Icons; **B** und **I** bleiben Buchstaben; die fünf neuen Icons aus dem Lucide-Tarball **1.38.0**, SHA-256 **verifiziert**) · **13.3** (die Fläche: `--btn-std-fill` = `rgba(62,141,243,.20)` — die **datierte Umkehr** der P9-Entscheidung vom 2026-10-01; `--caution` `#F06A6E` → **`#FF8A8E`**, Kontrast **nachgerechnet**: 4,76:1 statt 3,59:1) · **13.4** (die **ganze** Karte: 1920 × 1200, Zoom 50 % — die Welt der Knoten vollständig im Bild) · Probe `probes/p105_b13_knopfleiste_probe.py` **8/8 grün**, der Gegenlauf **5 Zellen rot**; Wächter `tests/test_knopfleiste_word.py` (9) und `tests/test_contrast.py` (3) grün · **Fund:** `i-chevron-left` stand im Sprite, die Quelldatei war **nie** vendored — der Sprite war damit nicht aus dem Bestand reproduzierbar; nachgetragen und **alle 25** vendored Dateien byteweise gegen den Tarball geprüft |
-| 14 | Kartenlayout „zufällig, aber geordnet“ (Nikinger 2026-10-26) — Plan `docs/concepts/phase10_5_block14_kartenlayout_plan.md` | Ausführer (opencode) + Claude Code (Bilder) | D | ⬜ Plan 2026-10-26, **E1–E4 beantwortet** (E1 entfällt: KA-2 nie live) — Startauftrag = Plan §6; wartet auf das Go des Nikingers |
+| 14 | Kartenlayout „zufällig, aber geordnet“ (Nikinger 2026-10-26) — Plan `docs/concepts/phase10_5_block14_kartenlayout_plan.md` | Ausführer (opencode) + Claude Code (Bilder) | D | 🔄 2026-10-26 — **14.0 (Basislinie) ✅**: die Probe `probes/p105_b14_layout_probe.py` steht (Wegwerf auf **TLS**, freier Port je Lauf, eigener Datenbaum und eigene `auth.sqlite3` je Lauf, Stopp nur über die PID-Datei; 5 Spaces, 152 Items, **IDs und Uhr eingefroren** — auch **im Server**, sonst war die Basislinie laufverschieden) und misst **gegen den heutigen Code**: **rot** in `regionen` (**57,2 %** statt 95 %), `kamera` (der Umriss sitzt **43,8 px** neben der Mitte, Unsicherheit **0,65 px**), `beschriftungen` (**5** überlappende Paare) und `stabilitaet` (Median **327,9 px**; das neue Item **164,2 px** von seinem Space, **118,4 px** von einem fremden); **grün** in `determinismus` (**0,0 px** über 152 Knoten) und `budget` (**201** Knoten, **2,53 s**, **0** Frames bei reduced motion, die Karte ist gemalt) · **sechs Befunde an der Messung selbst** (im Plan §0/§5 datiert nachgezogen): der Canvas-Hash taugt **nicht** als Ruhe-Signal (die Karte wird zuerst zweimal unverändert gezeichnet → „Ruhe“ vor dem ersten Tick), `store.search()` sortiert nach `updated` (die Wanduhr macht die Knoten-Reihenfolge und damit den Saat-Ring laufverschieden), die **serverseitig** erzeugten Items trugen **zufällige IDs** und **Wanduhr-Zeitstempel** (der Saat-Jitter ist ein Hash der ID — die Karte war zwischen zwei Läufen eine andere), und **B5 ist widerlegt** (die Karte passt bei 100 % und füllt 68,5 %; die 16 Radschritte des B15-Skripts fuhren auf `ZOOM_MIN` und verkleinerten sie) · **vier Falsch-Grün-Pfade geschlossen** (Advisor-Runde): die Beschriftungs-Zelle war grün, wenn die App nur die Fokus-Beschriftung zeichnet; die Determinismus-Zelle zählte die gemeinsamen Knoten nicht; die Ruhe-Messung trennte den Burst bei *jedem* Abstand > 300 ms (eine Lastspitze hätte die Budget-Zelle grün gemacht); ein Seitenfehler im Graph-Code machte keine Zelle rot · **Wächter** `tests/test_b14_layout_probe.py` (7 Tests: die Zellen-Zuordnung, die **Zahlen** hinter den Zellen, drei Gegenproben — darunter eine, die **dieselbe** Testfunktion mit untergeschobenem Beleg aufruft) · Suite **1590** grün · **nächster Schritt: 14.1** (L1–L3 in `graph.js`) |
 | Z | Closeout P10.5 (Handover, Grafik, Rotationen) | Claude Code + Nikinger | — | ⬜ |
 
 > **Die ausführlichen Statusspalten der Blöcke 0–10 stehen verbatim in
@@ -65,12 +65,16 @@ updated: 2026-10-25 (Block 13: die vier Aufträge des Nikingers gebaut — Edito
 
 ## Abnahmestand
 
-**64 Zeilen** (P10.5-1–64) — **geteilt**: die **geschlossenen** Zeilen (✅/⚠️) stehen
+**71 Zeilen** (P10.5-1–71) — **geteilt**: die **geschlossenen** Zeilen (✅/⚠️) stehen
 **verbatim** in [`ABNAHME_ARCHIVE.md`](ABNAHME_ARCHIVE.md) (L3), hier stehen die **offenen**
 (⬜) und die Summe. **[2026-10-25, Block 13]** +3 Zeilen (62/63/64) — die älteren Zeilen
-unverändert. Zählregel (Plan §5): ✅ erfüllt mit Beleg am Ort · ⚠️ erfüllt in anderer
-Form, Abweichung benannt · ⬜ offen. Die Kriterien stehen wortgleich im Plan (je Block am
-Ende); die **Belegte** stehen im Commit und im Session-Block.
+unverändert. **[2026-10-26, Block 14.0]** +7 Zeilen (65–71 — die Abnahmezeilen des
+Kartenlayouts, aus dem Plan `docs/concepts/phase10_5_block14_kartenlayout_plan.md` §5).
+Zählregel (Plan §5): ✅ erfüllt mit Beleg am Ort · ⚠️ erfüllt in anderer Form, Abweichung
+benannt · ⬜ offen. Die Kriterien der Blöcke 14 stehen **wortgleich** im Plan
+(`docs/concepts/phase10_5_block14_kartenlayout_plan.md` §5), die älteren Zeilen sind Kurzfassungen
+(je Block am Ende des jeweiligen Plans); die **Belegte**
+stehen im Commit und im Session-Block.
 
 > **Datierte Korrektur zum Plan (2026-10-25, Block 11.8).** Der Plan §5 sagt „**61 Zeilen**,
 > gezählt im Phase-Head". Der Head stand beim Bau von Block 11.8 bei **41.398 B** — über dem
@@ -88,8 +92,15 @@ Ende); die **Belegte** stehen im Commit und im Session-Block.
 
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
+| P10.5-65 | Determinismus: zwei frische Ladevorgänge (leerer Speicher) → max. Abweichung ≤ 1 px | ⬜ | — |
+| P10.5-66 | Regionen: ≥ 95 % der Knoten liegen dem Schwerpunkt **ihres** Space am nächsten (5 Spaces, 30/32/30/30/30) | ⬜ | — |
+| P10.5-67 | Kamera: nach dem Einschwingen, **ohne** Rad, füllt der Inhalt ≥ 60 % der Leinwand auf mindestens einer Achse | ⬜ | — |
+| P10.5-68 | Stabilität: +1 Item in einem nicht-größten Space → Median-Verschiebung der Knoten **anderer** Spaces ≤ 2 px (frischer Lauf); in einer **gemerkten** Karte landet das neue Item in der Region seines Space | ⬜ | — |
+| P10.5-69 | Budget und Bestand: 200 Knoten ≤ 3 s bis Ruhe · reduced motion 0 Frames (P10.5-40) · Block-8-Proben grün | ⬜ | — |
+| P10.5-70 | Sichtung: drei Kartenbilder (5 Spaces, 30/32/30/30/30) — „zufällig, aber geordnet" | ⬜ | — |
+| P10.5-71 | Beschriftungen: bei Fokus auf einen Knoten mit ≥ 5 Nachbarn überlappen sich **keine** zwei gezeichneten Beschriftungs-Rechtecke; die Fokus-Beschriftung ist immer da | ⬜ | — |
 
-**Summe:** 57 ✅ · 0 ⚠️ · 7 ⬜ (von 64). **[2026-10-26, Nikinger-Sichtung]** +3 ✅ (10-32 UI-4, 10-37 C2-Stil, 10-51 Editor live) ⇒ 57 ✅ · 0 ⚠️ · 7 ⬜. **[2026-10-25, Block 13]** +3 ✅ (10-62 die Editor-Größen, 10-63 die Knopfleiste nach Word, 10-64 die Knopffarben) ⇒ 54 ✅ · 0 ⚠️ · 10 ⬜. **[2026-10-25, Block 12]** +3 ✅ (10-57 Oversize, 10-58 ROADMAP, 10-59 Register-Bilanz) ⇒ 51 ✅ · 0 ⚠️ · 10 ⬜. **[2026-10-25, Block 11.6]** +2 ✅ (10-54 ED-3 die Format-Konvention, 10-56 die P1-Ankündigung) ⇒ 48 ✅ · 0 ⚠️ · 13 ⬜. **[2026-10-25, Block 11.8]** +2 ✅ (10-52 der Roundtrip, 10-55 der Rohmodus) ⇒ 46 ✅ · 0 ⚠️ · 15 ⬜. **[2026-10-25, Block 11.5]** +1 ✅ (10-53, ED-2 die To-do-Kästchen) ⇒ 44 ✅ · 0 ⚠️ · 17 ⬜. **[2026-10-25, Block 11.7]** +1 ✅ (10-50, das Budget) ⇒ 43 ✅ · 0 ⚠️ · 18 ⬜. **[2026-10-24, Block 10.5]** +4 ✅ (10-45, 10-46, 10-47, 10-48) ⇒ 42 ✅ · 0 ⚠️ · 19 ⬜. **[2026-10-24, Block 9.3]** +2 ✅ (10-43, 10-44) ⇒ 38 ✅ · 0 ⚠️ · 23 ⬜. **[2026-10-24, Block 9.2]** +1 ✅ (10-42, RE-4 `rename_folder`) ⇒ 36 ✅ · 0 ⚠️ · 25 ⬜. **[2026-10-24, Block 9.1]** +1 ✅ (10-41, RE-7 `created_by`) ⇒ 35 ✅ · 0 ⚠️ · 26 ⬜. **[2026-10-24, Block 8]** +4 ✅ (10-36, 10-38, 10-39, 10-40) ⇒ 34 ✅ · 0 ⚠️ · 27 ⬜. **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`) — **über beide Dateien**, seit die geschlossenen Zeilen im Archiv stehen. **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
+**Summe:** 57 ✅ · 0 ⚠️ · 14 ⬜ (von 71). **[2026-10-26, Block 14.0]** +7 Zeilen (65–71 — das Kartenlayout; die **Basislinie** ist in `regionen`, `kamera`, `beschriftungen` und `stabilitaet` **rot**, das ist gewollt und gemessen) ⇒ 57 ✅ · 0 ⚠️ · 14 ⬜. **[2026-10-26, Nikinger-Sichtung]** +3 ✅ (10-32 UI-4, 10-37 C2-Stil, 10-51 Editor live) ⇒ 57 ✅ · 0 ⚠️ · 7 ⬜. **[2026-10-25, Block 13]** +3 ✅ (10-62 die Editor-Größen, 10-63 die Knopfleiste nach Word, 10-64 die Knopffarben) ⇒ 54 ✅ · 0 ⚠️ · 10 ⬜. **[2026-10-25, Block 12]** +3 ✅ (10-57 Oversize, 10-58 ROADMAP, 10-59 Register-Bilanz) ⇒ 51 ✅ · 0 ⚠️ · 10 ⬜. **[2026-10-25, Block 11.6]** +2 ✅ (10-54 ED-3 die Format-Konvention, 10-56 die P1-Ankündigung) ⇒ 48 ✅ · 0 ⚠️ · 13 ⬜. **[2026-10-25, Block 11.8]** +2 ✅ (10-52 der Roundtrip, 10-55 der Rohmodus) ⇒ 46 ✅ · 0 ⚠️ · 15 ⬜. **[2026-10-25, Block 11.5]** +1 ✅ (10-53, ED-2 die To-do-Kästchen) ⇒ 44 ✅ · 0 ⚠️ · 17 ⬜. **[2026-10-25, Block 11.7]** +1 ✅ (10-50, das Budget) ⇒ 43 ✅ · 0 ⚠️ · 18 ⬜. **[2026-10-24, Block 10.5]** +4 ✅ (10-45, 10-46, 10-47, 10-48) ⇒ 42 ✅ · 0 ⚠️ · 19 ⬜. **[2026-10-24, Block 9.3]** +2 ✅ (10-43, 10-44) ⇒ 38 ✅ · 0 ⚠️ · 23 ⬜. **[2026-10-24, Block 9.2]** +1 ✅ (10-42, RE-4 `rename_folder`) ⇒ 36 ✅ · 0 ⚠️ · 25 ⬜. **[2026-10-24, Block 9.1]** +1 ✅ (10-41, RE-7 `created_by`) ⇒ 35 ✅ · 0 ⚠️ · 26 ⬜. **[2026-10-24, Block 8]** +4 ✅ (10-36, 10-38, 10-39, 10-40) ⇒ 34 ✅ · 0 ⚠️ · 27 ⬜. **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`) — **über beide Dateien**, seit die geschlossenen Zeilen im Archiv stehen. **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
 
 ## Offen beim Nikinger
 
@@ -153,35 +164,59 @@ Ende); die **Belegte** stehen im Commit und im Session-Block.
 **P10.5-51** (Editor Stufe 1) und **P10.5-32** (UI-4) — drei Bilder, drei Urteile; die Deploys
 **C** (`v3.1.7`) und **D** (`v3.1.8`, jetzt **mit** den Änderungen aus Block 13) liegen beim Nikinger.
 
-## Session stopped — 2026-10-26 (Nachzug Block 13: v4.0.0, Space-Auswahl, Rohtext weg)
+## Session stopped — 2026-10-26 (Block 14.0: die Basislinie des Kartenlayouts)
 
-**Ergebnis.** Drei Wünsche des Nikingers umgesetzt, Suite **1586 grün**, Bilder von der
-Wegwerf-Instanz (`probes/p105_b14_screens.py`, freier Port, eigener Datenbaum, PID-Datei) unter
-`docs/screenshots/p105_b14_0{1,2,3,4}_*.png`. **Nicht committet, nicht deployt** — Deploy C/D
-und die Sichtungen P10.5-37/51/32 liegen weiter beim Nikinger.
+**Ergebnis.** Schritt **14.0** des Plans (`docs/concepts/phase10_5_block14_kartenlayout_plan.md`):
+die **Basislinie** — die Probe `probes/p105_b14_layout_probe.py` misst **gegen den heutigen
+Code**. Kein Produktcode, kein Deploy. Beleg: `probes/p105_b14_layout_probe.json`.
 
-1. **Version `v4.0.0`** (`app.html` `.rail__version`) — Nikinger: „lieber auf V4, da große
-   Änderung". Die Form `v4.0.0` (drei Segmente, wie `v3.1.x`) ist **meine** Wahl; will er `v4`
-   oder `v4.0`, ist es eine Zeile. Die Entscheidung selbst ist seine (Memory
-   `project-ui-version-scheme`: Minor/Major-Sprung = Nikinger).
-2. **Einstellungen: die Auswahl bleibt in Stufe 3.** Öffnet man einen Space (Stufe 3), trägt
-   die Space-Zeile in Stufe 2 `aria-current="true"` — wie der Menüpunkt in Stufe 1. Vorher
-   wurde die Zeile nur beim Neuzeichnen der Liste markiert, nie beim Klick. `settings.js ::
-   show()` meldet den Zustand von Stufe 3 per Ereignis `sfx:settings-detail` (Import wäre ein
-   Zyklus, dieselbe Form wie `sfx:open-panel`); `spaces.js` markiert danach. Gemessen:
-   Detail offen → Menü `true`, Zeile `true`; Detail zu → Menü `true`, Zeile `false`.
-3. **Rohtext-Schalter entfernt** (`#toggle-preview`, Gruppe `toolbar-group--modus`, CSS-Regel,
-   Listener). `setRawMode()` bleibt als interner Pfad (`opts.mode === "raw"`, Notausgang), ist
-   aber für Nutzer nicht mehr erreichbar. Tests `test_knopfleiste_word`, `test_editor_live`,
-   `test_static_routes` nachgezogen (Knopf **fehlt** jetzt, ist nicht mehr Pflicht).
+**Die Probe.** Wegwerf-Instanz auf **TLS** (freier Port je Lauf, eigener Datenwurzelbaum und
+eigene `auth.sqlite3` je Lauf, Stopp **nur** über die PID-Datei). TLS, weil `require_csrf()` den
+Browser-Origin gegen `SPACE_PUBLIC_BASE_URL` prüft — ohne TLS **nicht schreiben** (P10.5-68).
+5 Spaces, **152** Items (30/32/30/30/30), **IDs und Uhr eingefroren** — auch **im Wegwerf-Server**
+(siehe Befund 4). Jetzt: **zwei Läufe hintereinander liefern denselben Beleg byteweise**.
 
-**Auffällig.** Der Wegwerf-Server beendet sich auf SIGTERM nicht binnen 10 s (SIGKILL über die
-PID-Datei) — gleiches Verhalten schon in B13, bisher nicht untersucht.
+**Die Zellen (Rohdaten).**
 
-**Nachtrag (Nikinger 2026-10-26):** `v4.0.0` bestätigt. **Sonderauftrag P10.6 (nur notiert, nicht begonnen):** 20–30-s-Intro-Film für `v4.0.0` (Product-Launch-Stil), Vollbild beim ersten Start, im Update-Log wieder aufrufbar; eigener Plan nötig, ggf. temporäre VM von eurofleet — Zeile in `ROADMAP.md`. **Offen für Deploy D:** ein `v4.0.0`-Block in `docs/UPDATE_LOG.md` (`health_gate --require-todays-update-log`); Deploy C (`v3.1.7`) ist mit dem Badge `v4.0.0` auf diesem Branch nicht mehr getrennt auslieferbar — Entscheidung beim Nikinger (C überspringen, D = alles).
+| Zelle (Abnahme) | Wert | Status |
+|---|---|---|
+| `determinismus` (65) | max. Abweichung **0,0 px** (152 Knoten) | ✅ |
+| `regionen` (66) | **57,2 %** (87/152) — die Spaces liegen ineinander | ❌ |
+| `kamera` (67) | Füllgrad **68,5 %**, passt, aber der Umriss **43,8 px** neben der Mitte (Unsicherheit 0,65 px) | ❌ |
+| `beschriftungen` (71) | **5** überlappende Paare (Fokus-Beschriftung ist da) | ❌ |
+| `stabilitaet` (68) | Median **327,9 px**; das neue Item **164,2 px** von seinem Space, **118,4 px** von einem fremden | ❌ |
+| `budget` (69) | **201** Knoten, **2,53 s** bis Ruhe, **0** Frames (reduced motion), Karte gemalt | ✅ |
 
-**[2026-10-26 Korrektur, Session-Start]** Beide offenen Posten oben sind erledigt: der Nachzug ist committet (`8aba4d4`), der `## 2026-10-26`-Block steht in `docs/UPDATE_LOG.md` (`f529fff` — der Commit zog den Head nicht nach, Hard Rule 8; hiermit nachgeholt). **Deploy D wartet bewusst** auf P10.6 („alles inklusive Product Video"). **Falle:** `health_gate --require-todays-update-log` prüft das **Tagesdatum** — läuft D nicht am 2026-10-26, muss der Update-Log-Block auf den Deploy-Tag umdatiert werden.
+**Sechs Befunde an der Messung selbst** (im Plan §0/§5 datiert):
+1. **Der Canvas-Hash taugt nicht als Ruhe-Signal.** Die Karte wird zuerst zweimal
+   **unverändert** gezeichnet (Seed steht, die Simulation hat noch nicht gerechnet) → die erste
+   Messung maß den **Saat-Ring**. Ersatz: der `requestAnimationFrame` **aus graph.js** (er hört
+   auf, wenn `alpha` unter `ALPHA_MIN` ist).
+2. **`store.search()` sortiert nach `updated`** — die Item-Zeitstempel sind die Wanduhr → die
+   Knoten-Reihenfolge und damit der Saat-Ring waren laufverschieden (Welt-Umrisse zwischen
+   596×889 px und 463×1020 px). Die Probe friert **IDs und Uhr** ein.
+3. **B5 ist widerlegt** (Plan §0): die Karte passt bei 100 % und füllt 68,5 % — heute steht sie
+   **schief**, nicht zu groß (die 16 Radschritte des B15-Skripts fuhren auf `ZOOM_MIN`).
+4. **Die serverseitig erzeugten Items waren der Rest der Nicht-Reproduzierbarkeit**: zufällige
+   IDs (`secrets.token_hex` — der Saat-Jitter ist ein **Hash der ID**) und Wanduhr-Zeitstempel
+   (die Sortierung nach `-updated` wechselt über die Sekundengrenze). Der Server bekam feste IDs
+   und eine **eingefrorene Uhr mit Zähler**.
+5. **Vier Falsch-Grün-Pfade in der Probe** (Advisor-Runde, geschlossen): die Beschriftungs-Zelle
+   war grün, wenn die App **nur** die Fokus-Beschriftung zeichnet; die Determinismus-Zelle
+   verglich die gemeinsamen Knoten nicht; die Ruhe-Messung trennte den Simulations-Burst bei
+   **jedem** Abstand > 300 ms (eine Lastspitze hätte die Budget-Zelle grün gemacht — jetzt zählt
+   die **gesamte** Spanne); ein **Seitenfehler** im Graph-Code machte keine Zelle rot.
+6. **Zoom und Pan kamen aus zwei Bestimmungen** (die Anzeige rundet auf ganze Prozent). Jetzt
+   **ein** Zoom für alles; die Probe weist die **Unsicherheit** aus (**0,65 px**).
 
-**[2026-10-26 Nachsichtung]** Nikinger gegen einen Word-Screenshot: Leiste jetzt **Größe · F · K · Code · Farbe | Liste · Nummerierung · Ausrichtung · Trennlinie | Überschrift · Zitat | Bild · Link** (Schriftgrad vor F/K, Farbe zuletzt, Linie = Words Rahmen-Menü am Ende von Absatz). Wächter + B13-Probe-Soll nachgezogen. Karte mit Masse: `probes/p105_b15_screens.py` (5 Spaces × 30 Items, vier per `.share.yml`-`read:`) → `docs/screenshots/p105_b15_0{1..5}_*.png`. Rest der Bilder: vom Nikinger abgenommen.
+**Wächter.** `tests/test_b14_layout_probe.py` (7 Tests): Zellen-Zuordnung, die **Zahlen** hinter
+den Zellen, **drei Gegenproben** (die wichtigste ruft **dieselbe** Testfunktion mit
+untergeschobenem Beleg auf). Suite **1590** grün, `doc_health` 0.
 
-**[2026-10-26 Block 14]** Nikinger: „die Karte selbst ist großartig, aber das Layout sieht nicht gut aus — zufällig, aber in einer Ordnung (wie Minecraft)“. Plan geschrieben (`docs/concepts/phase10_5_block14_kartenlayout_plan.md`); Bau durch opencode nach Freigabe und E1–E4. Die Abnahmezeilen P10.5-65–70 kommen erst mit der Freigabe in den Head. **Nachtrag:** E1–E4 beantwortet (Plan §3), Beschriftungen kommen mit in Block 14 (+P10.5-71). **Sichtung:** P10.5-32/37/51 ✅ mit Zitat (Abnahme-Archiv) ⇒ 57 ✅ · 0 ⚠️ · 7 ⬜.
+**INDEX.** Zehn veraltete Bytezahlen nachgezogen; **zwei** bleiben alt (die Zeilen, die
+`shorten_index_headings.py` **eingefroren** hat — das Skript zu ändern ist hier nicht erlaubt).
+Karte **37.911 B** (3.049 B Luft).
+
+**Nächster Schritt:** **14.1** — L1–L3 in `graph.js`: `hashString()`, `computeRegions()`,
+neuer `seedInitialPositions()` (Space-Regionen → Ordner-Inseln → Item-Spirale). Danach 14.2
+(L4), 14.3 (`fitView()`), 14.35 (Beschriftungen). Je Schritt ein Commit.

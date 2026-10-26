@@ -26,7 +26,30 @@ updated: 2026-10-26 (E1–E4 beantwortet: E1 entfällt — KA-2 nie live; E2 nei
 | B3 | Federn (Z. 627–648): Kanten **quer** zwischen Spaces sind genauso stark und kurz wie Kanten im Space | jede Querverbindung zieht zwei Spaces ineinander |
 | B4 | `saveLayout()` (Z. 1377) merkt **jeden** Knoten nach jedem Einschwingen; `seedInitialPositions()` hält gemerkte Knoten **fest** (`pinned`) | ein neues Item landet auf dem globalen Ring statt bei seinen Nachbarn (die gemerkten bleiben fest) |
 | B6 | `drawLabels()` (Z. 923): jede Beschriftung wird gezeichnet, ohne Prüfung gegen die schon gezeichneten | Beschriftungen überdecken sich (Fokusbild: „Gamma Protokoll 28“ / „Gamma Frage 14“) |
-| B5 | Keine Kamera-Anpassung; `ZOOM_MIN` 0,5 (Z. 141), Start-Zoom 1 | bei 151 Knoten füllt der Inhalt bei 50 % ≈ 40 % der Leinwand; die Probe musste 16 Radschritte „drehen" |
+| B5 | Keine Kamera-Anpassung; `ZOOM_MIN` 0,5 (Z. 141), Start-Zoom 1 | bei 151 Knoten füllt der Inhalt bei 50 % ≈ 40 % der Leinwand; die Probe musste 16 Radschritte „drehen" — **Korrektur 2026-10-26 (gemessen, Schritt 14.0):** die Karte **passt** bei 100 % und füllt **68,5 %** der Leinwand (Welt 777 × 494 px in 1134 × 1061 px). Die 16 Radschritte fuhren auf `ZOOM_MIN` (50 %) und **verkleinerten** die Karte — der Effekt ist im Bild (`p105_b15_03_map_ganz.png`) gut sichtbar (leere Ränder). Der Befund bleibt als **Ursache** richtig (es gibt keine Kamera-Anpassung), seine **Wirkung** war falsch gelesen: die Karte ist heute nicht zu groß, sie steht **schief** (der Umriss sitzt 43,8 px neben der Mitte — die Zentrums-Gravitation zieht den **Schwerpunkt**, nicht den Umriss) |
+
+> **Datierte Korrektur an §0 B5 (2026-10-26, Schritt 14.0, `probes/p105_b14_layout_probe.py`):**
+> gemessen, nicht vermutet — die Belegzahlen stehen in `phase10_5_finishing/probes/p105_b14_layout_probe.json`.
+> Zwei weitere Befunde aus derselben Messung, die die **Planung** betreffen:
+> **(a)** der Canvas-Hash taugt **nicht** als Ruhe-Signal (die Karte wird zuerst zweimal
+> unverändert gezeichnet — der Seed steht, die Simulation hat noch nicht gerechnet; die erste
+> Probe-Messung erklärte die Karte daraufhin für „zur Ruhe gekommen" und maß den **Saat-Ring**
+> statt des Gleichgewichts: der Welt-Umriss war um die Hälfte zu klein); **(b)** `store.search()`
+> sortiert nach `-updated`, und die Item-Zeitstempel sind die **Wanduhr** — die Knoten-Reihenfolge
+> in `/api/v1/graph` und damit der Saat-Ring sind laufverschieden (gemessen: Welt-Umrisse zwischen
+> 596 × 889 px und 463 × 1020 px). Beides ist **Datensatz**, nicht Produktcode: die Probe friert
+> deshalb IDs (`files.generate_id()`) **und** Uhr (`Store(now_fn=…)`) ein.
+>
+> **Datierte Ergänzung (2026-10-26, Schritt 14.0, nach der Advisor-Runde):** das Einfrieren
+> musste **auch den Server** treffen — die Items, die die Probe über die API anlegt, bekamen
+> (1) **zufällige IDs** (`secrets.token_hex`) und (2) **Wanduhr-Zeitstempel**. Beides macht die
+> Karte laufverschieden: der Saat-Jitter ist ein **Hash der ID**, und die Sortierung nach
+> `-updated` wechselt, sobald zwei Items über eine Sekundengrenze fallen (gemessen: die 48
+> Extra-Items standen im einen Lauf mit `0x91a…`, im anderen mit `0x92c…` vorn — zwei
+> verschiedene Karten). Der Wegwerf-Server bekommt darum eine **eingefrorene Uhr mit Zähler**
+> (jedes neue Item: 2026-01-02 12:00 + n Sekunden — jünger als der Seed-Stand) und
+> **deterministische IDs** (`0x901` aufwärts). Seitdem ist der Beleg **byteweise
+> reproduzierbar**: zwei Läufe hintereinander liefern dieselbe Datei (bis auf den Zeitstempel).
 
 **Was bleibt, wie es ist (gelockt):** der C2-Stil (Lappen, Furchen, Bahnen, Zellen — Block 8; der
 Nikinger: „die Karte selbst ist großartig"), die Farben je **Kategorie** (`nodeColor()` = Rail,
@@ -130,9 +153,9 @@ Einfluss auf die Positionen.
 
 | Schritt | Inhalt | Fertig, wenn |
 |---|---|---|
-| **14.0** | Vorbedingung + **Basislinie**: Probe `probes/p105_b14_layout_probe.py` (aus `p105_b15_screens.py`: Wegwerf-Instanz, freier Port, eigener Datenbaum, PID-Datei; 5×30-Seed) mit den Zellen aus §5, **gegen den heutigen Code** | Probe läuft; die Basislinie ist **rot** in Regionen/Kamera (das ist der Beleg, dass die Zellen messen) — JSON neben der Probe |
+| **14.0** | Vorbedingung + **Basislinie**: Probe `probes/p105_b14_layout_probe.py` (aus `p105_b15_screens.py`: Wegwerf-Instanz, freier Port, eigener Datenbaum, PID-Datei; **152 Items** statt 5×30 — siehe die datierte Abweichung in §5) mit den Zellen aus §5, **gegen den heutigen Code** | Probe läuft; die Basislinie ist **rot** in `regionen`/`kamera`/`beschriftungen`/`stabilitaet` (das ist der Beleg, dass die Zellen messen) — JSON neben der Probe |
 | **14.1** | L1–L3: `hashString()`, `computeRegions()`, neuer `seedInitialPositions()` | Determinismus-Zelle grün |
-| **14.2** | L4: Anker-Gravitation, Querfedern, `ALPHA_START_SEEDED`; `CENTER_GRAVITY` raus | Regionen-Zelle grün; Budget-Zelle grün |
+| **14.2** | L4: Anker-Gravitation, Querfedern, `ALPHA_START_SEEDED`; `CENTER_GRAVITY` raus | Regionen-Zelle grün **und** Stabilität-Zelle grün (P10.5-68: ein neues Item verschiebt die Anker nur, wenn es den größten Space vergrößert); Budget-Zelle grün |
 | **14.3** | `fitView()` + Doppelklick; ggf. `ZOOM_MIN` (E3) | Kamera-Zelle grün; E3-Wert im Bericht |
 | **14.35** | Beschriftungen ohne Überlappung (§2.7) | Beschriftungs-Zelle grün |
 | **14.4** | Konstanten justieren (nur §2-Konstanten), Gegenläufe, Block-8-Proben neu fahren | alle Zellen grün, jeder Gegenlauf rot an **genau** seiner Zelle; `p105_b8_karte_probe.py` + `p105_b8_c2_probe.mjs` grün |
@@ -142,17 +165,58 @@ Einfluss auf die Positionen.
 `x, y` in den `localStorage` — die Probe liest sie (`page.evaluate`) und verbindet sie mit
 `/api/v1/graph` (Space, Ordner). **Kein** Test-Haken im Produktcode.
 
-## §5 Abnahme (neue Zeilen P10.5-65–71, kommen mit dem Baubeginn in den Head)
+> **[2026-10-26, Schritt 14.0 — erledigt]** Die Basislinie steht: `probes/p105_b14_layout_probe.py`
+> und `p105_b14_layout_probe.json` (Wegwerf-Instanz auf TLS, freier Port je Lauf, eigener
+> Datenwurzelbaum und eigene `auth.sqlite3` je Lauf, Stopp nur über die PID-Datei). **Rot** in
+> `regionen` (**57,2 %** statt 95 %), `kamera` (der Umriss sitzt **43,8 px** neben der Mitte),
+> `beschriftungen` (**5** überlappende Paare, die Fokus-Beschriftung ist da) und `stabilitaet`
+> (Median **327,9 px**; das neue Item liegt **164,2 px** von seinem Space entfernt, aber nur
+> **118,4 px** von einem fremden). **Grün** in `determinismus` (**0,0 px** über 152 Knoten) und
+> `budget` (**201** Knoten, **2,53 s** bis Ruhe, **0** Frames bei reduced motion, die Karte ist
+> gemalt). Die Abweichungen vom Plan-Seed und die Mess-Befunde stehen in §0 und §5.
+> **Der Beleg ist byteweise reproduzierbar** (zwei Läufe, dieselbe Datei bis auf den
+> Zeitstempel) — das war erst nach dem Einfrieren von **Server-IDs und Server-Uhr** der Fall
+> (§0, datierte Ergänzung).
+
+## §5 Abnahme (neue Zeilen P10.5-65–71 — **stehen seit 2026-10-26 (Block 14.0) im Head**)
 
 | # | Kriterium | Messung | Gegenlauf (muss rot werden) |
 |---|---|---|---|
 | **P10.5-65** | Determinismus: zwei frische Ladevorgänge (leerer Speicher) → max. Abweichung ≤ 1 px | Probe | `seedJitter` → `Math.random` |
-| **P10.5-66** | Regionen: ≥ 95 % der Knoten liegen dem Schwerpunkt **ihres** Space am nächsten (5×30) | Probe | `ANCHOR_GRAVITY` → Leinwandmitte |
+| **P10.5-66** | Regionen: ≥ 95 % der Knoten liegen dem Schwerpunkt **ihres** Space am nächsten (5 Spaces, 30/32/30/30/30 — siehe die datierte Seed-Abweichung unten) | Probe | `ANCHOR_GRAVITY` → Leinwandmitte |
 | **P10.5-67** | Kamera: nach dem Einschwingen, **ohne** Rad, füllt der Inhalt ≥ 60 % der Leinwand auf mindestens einer Achse | Probe | `fitView()` aus |
 | **P10.5-68** | Stabilität: +1 Item in einem nicht-größten Space → Median-Verschiebung der Knoten **anderer** Spaces ≤ 2 px (frischer Lauf); in einer **gemerkten** Karte landet das neue Item in der Region seines Space | Probe | Space-Reihenfolge nach Item-Zahl statt Hash |
 | **P10.5-69** | Budget und Bestand: 200 Knoten ≤ 3 s bis Ruhe · reduced motion 0 Frames (P10.5-40) · Block-8-Proben grün | Probe | `ALPHA_START_SEEDED` → 1 und `ALPHA_DECAY` → 0,995 (Budget reißt) |
-| **P10.5-70** | Sichtung: drei Kartenbilder (5×30) — „zufällig, aber geordnet" | Nikinger | — |
+| **P10.5-70** | Sichtung: drei Kartenbilder (5 Spaces, 30/32/30/30/30) — „zufällig, aber geordnet" | Nikinger | — |
 | **P10.5-71** | Beschriftungen: bei Fokus auf einen Knoten mit ≥ 5 Nachbarn überlappen sich **keine** zwei gezeichneten Beschriftungs-Rechtecke; die Fokus-Beschriftung ist immer da | Probe (Rechtecke über `measureText` nachgerechnet) | Kollisionsprüfung aus |
+
+> **Datierte Präzisierung der Kamera-Zelle (2026-10-26, Schritt 14.0).** „Füllt ≥ 60 %" allein
+> kann die Zelle nicht tragen: wäre der Inhalt **größer** als die Leinwand, wäre der Füllgrad
+> *über* 100 % und die Zelle grün, obwohl der Nutzer den größten Teil der Karte nie sieht.
+> Gemessen werden deshalb **drei** Stücke: **Füllgrad** (≥ 60 % auf einer Achse), **Passung**
+> (der Inhalt passt in die Leinwand) und **Zentrierung** (der Umriss liegt in der Mitte,
+> ≤ 3 px) — die beiden letzten sind genau die Eigenschaften, die `fitView()` setzt (Plan §2.5:
+> „Zoom so, dass der Inhalt passt, Pan auf die Mitte"). Erst damit ist der Gegenlauf
+> „`fitView()` aus" überhaupt erkennbar.
+>
+> **Datierte Abweichung vom Seed (2026-10-26, Schritt 14.0).** Der Plan-Seed sagt „5×30". Die
+> Probe sät **152** Items: `alpha` 30, `beta` **32**, `gamma` 30, `delta` 30, `epsilon` 30.
+> Grund: §2.1 verlangt, dass ein neues Item die Anker **nur** verschiebt, wenn es den
+> **größten** Space vergrößert — bei fünf gleich grossen Spaces wäre „nicht-größter Space"
+> undefiniert und P10.5-68 unmöglich. **Und:** die Probe friert die Item-IDs
+> (`files.generate_id()`) **und** die **Uhr** (`Store(now_fn=…)`) ein — sonst wäre der Datensatz
+> und damit die Basislinie laufverschieden (§0). **Das gilt für den Server genauso:** die über
+> die API angelegten Items bekommen im Wegwerf-Server ebenfalls feste IDs und eine
+> **eingefrorene Uhr mit Zähler** — sonst wandert die Sortierung nach `-updated` über die
+> Sekundengrenze und die Karte ist zwischen zwei Läufen eine andere (§0, datierte Ergänzung).
+>
+> **Datierte Präzisierung des Kamera-Werts (2026-10-26, Schritt 14.0).** Zoom und Pan kommen aus
+> **einer** Bestimmung (dem Modus der Pan-Kandidaten): die Anzeige rundet auf ganze Prozent
+> (`(zoom*100).toFixed(0)` = 1), die Rechnung braucht den **verfeinerten** Zoom (0,9994) —
+> sonst rechnen Füllgrad und Zentrierung mit einem anderen Zoom als der Pan. Die Probe weist
+> die **Unsicherheit** der Bestimmung aus (**0,65 px** — die Streuung der Pan-Kandidaten plus
+> der Zoom-Rasterfehler); sie ist um eine Größenordnung kleiner als der gemessene Versatz
+> (**43,8 px**) und trägt die Aussage nicht.
 
 ## §6 Startauftrag — Block 14 · Ausführer (opencode)
 
@@ -165,8 +229,7 @@ Bahnen-/Zellen-Zeichnung (Block 8), `docs/UPDATE_LOG.md` (14.5, Claude Code).
 
 **Anker (Stand `59ca205`):** `seedInitialPositions()` Z. 477 · `startLayout()` Z. 514 ·
 `seedJitter()` Z. 530 · `runSimulation()` Z. 540 / `settle()` Z. 561 · `applyForces()` Z. 603
-(Gravitation Z. 650) · Konstanten Z. 120–141 · `LAYOUT_KEY_PREFIX` Z. 170 · `loadStoredLayout()`/
-`loadStoredLayout()`/`saveLayout()` Z. 1364/1377 · `drawLabels()` Z. 923 · `onWheel()` Z. 1563.
+(Gravitation Z. 650) · Konstanten Z. 120–141 · `LAYOUT_KEY_PREFIX` Z. 170 · `loadStoredLayout()`/`saveLayout()` Z. 1364/1377 · `drawLabels()` Z. 923 · `onWheel()` Z. 1563.
 
 **Regeln:** Proben **nur** an der Wegwerf-Instanz (eigener Port, tmp-`DATA_ROOT`,
 tmp-`auth.sqlite3`, Playwright aus `~/.claude-code-tools/e2e-venv`), Stopp **nur** über die
