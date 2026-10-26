@@ -233,3 +233,7 @@ damit ausdrücklich überholt. §7-Abnahmematrix, C0-Anti-AI-Audit, Z-Closeout-B
 ## `phase5_ui/THIRD_PARTY_LICENSES.md`
 
 **[2026-09-10, P8.6 Step 0]** Lucide ISC/MIT + Plex OFL. als vendored Bibliotheken unter `phase5_ui/vendor/`; **keine L1-Card** (dokumentierte Ausnahme der Card-Pflicht — Lizenztext gehört zu den vier Ausnahmen in Plan §1.3), INDEX-Zeile aber fällig (sie betrifft die Card, nicht den Index)
+
+## `phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md`
+
+**[2026-10-26, gekürzt für die INDEX-Luft (P10.5-2), Block-14-Planzeile]** Wortlaut der Kartenzeile bis dahin:L3-Archiv der Entscheidungsliste D-1–D-18 des Phase-10-Registers — jede Frage, ihre Empfehlung und die Antwort des Nikingers, verbatim; am 2026-10-22 aus dem Register gewandert (P10.5 Block 0, Schritt 0.8)
