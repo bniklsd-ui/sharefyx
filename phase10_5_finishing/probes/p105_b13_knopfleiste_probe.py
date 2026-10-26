@@ -81,11 +81,10 @@ HTML_FILE = REPO_ROOT / "phase5_ui/webui/static/app.html"
 # im Browser. Ein Wächter, der nur die Quelle liest, wäre die Kopie davon — der Browser
 # ist die Wahrheit (die Quelle kann eine Reihenfolge haben, die der Browser umsortiert).
 WORD_REIHENFOLGE = [
-    "bold", "italic", "code", "format-farbe", "format-groesse",
-    "ul", "ol", "format-ausrichtung",
+    "format-groesse", "bold", "italic", "code", "format-farbe",
+    "ul", "ol", "format-ausrichtung", "hr",
     "h", "quote",
-    "image", "hr", "link",
-    "toggle-preview",
+    "image", "link",
 ]
 
 # Die Gegenläufe: (Datei, alter Text, neuer Text). **Die Anker sind eindeutig** (eine

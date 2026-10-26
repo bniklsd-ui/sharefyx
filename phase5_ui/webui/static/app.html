@@ -284,16 +284,20 @@
                Reihenfolge **1:1** nach dem Start-Ribbon von Word (eine allgemeine Anordnung ist
                nicht urheberrechtlich geschuetzt — Nikinger-Auftrag). Die Abbildung:
 
-               | Word (Start-Ribbon)      | hier                                    |
-               |---------------------------|-----------------------------------------|
-               | Schriftart: B · I · Code  | Fett · Kursiv · Code                    |
-               |   Textfarbe · Schriftgröße | Farbe · Größe                           |
-               | Absatz: Aufzählung ·      | Liste · Nummerierung · Ausrichtung      |
-               |   Nummerierung · Ausricht.|                                         |
-               | Formatvorlagen:           | Überschrift · Zitat                     |
-               |   Überschrift · Zitat     |                                         |
-               | (Reiter „Einfügen":)      | Bild · Trennlinie · Link                |
-               |   Bilder · Linien · Links |                                         |
+               | Word (Start-Ribbon)               | hier                               |
+               |-----------------------------------|------------------------------------|
+               | Schriftart: Schriftgrad · F · K · | Größe · Fett · Kursiv · Code ·     |
+               |   (Durchgestr./Hoch/Tief) · Farbe |   Farbe                            |
+               | Absatz: Aufzählung · Nummerierung | Liste · Nummerierung · Ausrichtung |
+               |   · Ausrichtung · Rahmen (Linie)  |   · Trennlinie                     |
+               | Formatvorlagen: Überschrift·Zitat | Überschrift · Zitat                |
+               | (Reiter „Einfügen":) Bilder·Links | Bild · Link                        |
+
+               **[2026-10-26, Nikinger-Sichtung gegen einen Word-Screenshot]** Die erste
+               Fassung (B13) hatte Größe hinter Farbe und die Trennlinie unter „Einfügen".
+               In Word steht der Schriftgrad **vor** F/K (erste Zeile der Gruppe), die
+               Schriftfarbe **zuletzt**, und die horizontale Linie sitzt im Rahmen-Menü
+               **am Ende von Absatz**.
 
                **Warum so herum:** Words Ribbon-Gruppen kommen in der Reihenfolge
                Zwischenablage → **Schriftart** → **Absatz** → **Formatvorlagen** → Bearbeiten;
@@ -306,6 +310,12 @@
                Nur **B** und **I** bleiben Buchstaben — genau wie in Word. -->
           <div class="editor__toolbar" id="editor-toolbar">
             <div class="toolbar-group" data-word-group="schriftart">
+              <select class="toolbar-select" id="format-groesse" aria-label="Gr&ouml;&szlig;e" title="Gr&ouml;&szlig;e">
+                <option value="">Gr&ouml;&szlig;e</option>
+                <option value="klein">Klein</option>
+                <option value="normal">Normal</option>
+                <option value="gross">Gro&szlig;</option>
+              </select>
               <button type="button" class="toolbar-btn" data-md="bold" title="Fett" aria-label="Fett"><span class="toolbar-btn__glyph toolbar-btn__glyph--bold">B</span></button>
               <button type="button" class="toolbar-btn" data-md="italic" title="Kursiv" aria-label="Kursiv"><span class="toolbar-btn__glyph toolbar-btn__glyph--italic">I</span></button>
               <button type="button" class="toolbar-btn" data-md="code" title="Code" aria-label="Code"><svg class="icon" aria-hidden="true"><use href="#i-code"></use></svg></button>
@@ -320,12 +330,6 @@
                 <option value="gruen">Gr&uuml;n</option>
                 <option value="gelb">Gelb</option>
               </select>
-              <select class="toolbar-select" id="format-groesse" aria-label="Gr&ouml;&szlig;e" title="Gr&ouml;&szlig;e">
-                <option value="">Gr&ouml;&szlig;e</option>
-                <option value="klein">Klein</option>
-                <option value="normal">Normal</option>
-                <option value="gross">Gro&szlig;</option>
-              </select>
             </div>
             <div class="toolbar-group" data-word-group="absatz">
               <button type="button" class="toolbar-btn" data-md="ul" title="Liste" aria-label="Liste"><svg class="icon" aria-hidden="true"><use href="#i-list"></use></svg></button>
@@ -336,6 +340,7 @@
                 <option value="zentriert">Zentriert</option>
                 <option value="rechts">Rechts</option>
               </select>
+              <button type="button" class="toolbar-btn" data-md="hr" title="Trennlinie" aria-label="Trennlinie"><svg class="icon" aria-hidden="true"><use href="#i-minus"></use></svg></button>
             </div>
             <div class="toolbar-group" data-word-group="vorlagen">
               <button type="button" class="toolbar-btn" data-md="h" title="&Uuml;berschrift" aria-label="&Uuml;berschrift"><svg class="icon" aria-hidden="true"><use href="#i-heading"></use></svg></button>
@@ -343,7 +348,6 @@
             </div>
             <div class="toolbar-group" data-word-group="einfuegen">
               <button type="button" class="toolbar-btn" data-md="image" id="insert-image-button" title="Bild einf&uuml;gen" aria-label="Bild einf&uuml;gen"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg></button>
-              <button type="button" class="toolbar-btn" data-md="hr" title="Trennlinie" aria-label="Trennlinie"><svg class="icon" aria-hidden="true"><use href="#i-minus"></use></svg></button>
               <button type="button" class="toolbar-btn" data-md="link" title="Link" aria-label="Link"><svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg></button>
             </div>
           </div>

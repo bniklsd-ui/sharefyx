@@ -36,10 +36,10 @@ VENDOR_ICONS = REPO_ROOT / "phase5_ui/vendor/lucide/icons"
 #: urheberrechtlich geschützt — der Nikinger-Auftrag vom 2026-10-25.
 #: Schriftart → Absatz → Formatvorlagen → Einfügen (der Rohtext-Schalter ist seit 2026-10-26 entfernt).
 WORD_REIHENFOLGE = [
-    "bold", "italic", "code", "format-farbe", "format-groesse",
-    "ul", "ol", "format-ausrichtung",
+    "format-groesse", "bold", "italic", "code", "format-farbe",
+    "ul", "ol", "format-ausrichtung", "hr",
     "h", "quote",
-    "image", "hr", "link",
+    "image", "link",
 ]
 
 #: Die vier Word-Gruppen der Leiste + der Modus-Schalter (keine Word-Gruppe: ein
