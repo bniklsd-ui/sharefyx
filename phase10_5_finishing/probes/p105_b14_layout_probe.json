@@ -1,7 +1,8 @@
 {
   "probe": "p105_b14_layout_probe",
-  "schritt": "14.0",
-  "zeit": "2026-10-26T18:13:55.306463+00:00",
+  "schritt": "14.2",
+  "gegenlauf": null,
+  "zeit": "2026-10-26T20:35:47.407035+00:00",
   "seed": {
     "spaces": 5,
     "items": 152,
@@ -24,89 +25,63 @@
     },
     "regionen": {
       "knoten": 152,
-      "richtig": 125,
-      "anteil": 0.8223684210526315,
+      "richtig": 152,
+      "anteil": 1.0,
       "schwerpunkte": {
         "alpha": [
-          719.2666666666667,
-          644.6333333333333
+          616.7,
+          524.3333333333334
         ],
         "beta": [
-          580.25,
-          360.21875
+          820.28125,
+          843.875
         ],
         "gamma": [
-          391.06666666666666,
-          572.1
+          76.0,
+          502.46666666666664
         ],
         "delta": [
-          373.8,
-          478.6
+          555.2333333333333,
+          185.8
         ],
         "epsilon": [
-          842.0666666666667,
-          498.1666666666667
+          1045.4333333333334,
+          129.56666666666666
         ]
       },
-      "beispiele_falsch": [
-        {
-          "id": "itm_00000010",
-          "space": "alpha",
-          "naechster": "epsilon"
-        },
-        {
-          "id": "itm_0000002c",
-          "space": "beta",
-          "naechster": "delta"
-        },
-        {
-          "id": "itm_00000049",
-          "space": "gamma",
-          "naechster": "delta"
-        },
-        {
-          "id": "itm_0000004d",
-          "space": "gamma",
-          "naechster": "delta"
-        },
-        {
-          "id": "itm_0000004e",
-          "space": "gamma",
-          "naechster": "delta"
-        }
-      ],
-      "ok": false
+      "beispiele_falsch": [],
+      "ok": true
     },
     "kamera": {
       "messbar": true,
-      "zoom": 1.0005996,
+      "zoom": 0.9997997599999999,
       "zoom_anzeige": 1,
       "leerwand": [
         1134,
         1061.375
       ],
       "welt": {
-        "x0": 177,
-        "x1": 1021,
-        "y0": 113,
-        "y1": 941
+        "x0": -8,
+        "x1": 1140,
+        "y0": 49,
+        "y1": 948
       },
       "bild_mass": [
-        844.5060623999999,
-        828.4964687999999
+        1147.7701244799998,
+        898.8199842399999
       ],
-      "fuellgrad": 0.7805878872217641,
+      "fuellgrad": 1.0121429669135802,
       "passt": true,
       "pan": [
-        -0.9655699245282676,
-        -0.5316729003384353
+        -0.441033536260079,
+        -0.03448890269834237
       ],
       "umriss_mitte": [
-        599.0,
-        527.0
+        566.0,
+        498.5
       ],
-      "versatz_mitte_px": 31.393590475471683,
-      "unsicherheit_px": 0.654578707300095,
+      "versatz_mitte_px": 32.32180854269836,
+      "unsicherheit_px": 0.7066020199080716,
       "zentriert": false,
       "ok": false
     },
@@ -121,55 +96,64 @@
       "ueberlappungen": [
         [
           "itm_0000003f",
-          "itm_00000045"
+          "itm_00000042"
         ],
         [
-          "itm_0000001f",
-          "itm_0000003d"
+          "itm_00000041",
+          "itm_00000042"
         ],
         [
-          "itm_00000042",
+          "itm_00000041",
           "itm_0000005c"
-        ],
-        [
-          "itm_00000044",
-          "itm_00000046"
-        ],
-        [
-          "itm_0000005c",
-          "itm_0000005d"
         ]
       ],
       "fokus_beschriftung": true,
       "genug_gezeichnet": true,
-      "zoom": 1.0005996,
+      "zoom": 0.9997997599999999,
       "pan": [
-        -0.9655699245282676,
-        -0.5316729003384353
+        -0.441033536260079,
+        -0.03448890269834237
       ],
-      "unsicherheit_px": 0.654578707300095,
-      "treffer": 36,
+      "unsicherheit_px": 0.7066020199080716,
+      "treffer": 25,
       "ok": false
     },
     "stabilitaet": {
       "wachser_space": "epsilon",
       "neues_item": "itm_00000901",
       "position_neu": [
-        814,
-        302
+        1146,
+        189
       ],
       "naechster_schwerpunkt": "epsilon",
       "in_eigener_region": true,
-      "abstand_eigener_space_px": 108.4665847162157,
-      "abstand_fremder_space_px": 118.6086000254619,
+      "abstand_eigener_space_px": 27.65863337187866,
+      "abstand_fremder_space_px": 523.0086041357255,
       "andere_spaces": 122,
-      "median_verschiebung_px": 232.96351645697658,
-      "max_verschiebung_px": 580.9931152776253,
-      "ok": false
+      "median_verschiebung_px": 0.0,
+      "max_verschiebung_px": 2.23606797749979,
+      "pruefsumme_vorher": 3754218440,
+      "pruefsumme_nachher": 4006010231,
+      "pinned_beim_start": 0,
+      "knoten_frisch": 153,
+      "kasten_frisch": {
+        "left": 753,
+        "top": 121.625,
+        "width": 1134,
+        "height": 1061.375,
+        "dw": 1134,
+        "dh": 1061,
+        "dpr": 1
+      },
+      "position_neu_frisch": [
+        1138,
+        285
+      ],
+      "ok": true
     },
     "budget": {
       "knoten": 201,
-      "pos_pruefsumme": 2355286560,
+      "pos_pruefsumme": 2427632413,
       "graph_reihenfolge": [
         "itm_00000931",
         "itm_00000930",
@@ -181,12 +165,12 @@
         "itm_0000092a"
       ],
       "graph_knoten": 201,
-      "ruhe_ms": 2530,
+      "ruhe_ms": 2147,
       "luecken_ms": [],
-      "raf_calls": 153,
+      "raf_calls": 130,
       "raf_calls_reduced_motion": 0,
-      "kern_pixel_reduced_motion": 20371,
-      "kern_pixel": 20371,
+      "kern_pixel_reduced_motion": 17932,
+      "kern_pixel": 17932,
       "grenze_ms": 3000,
       "ok": true
     }

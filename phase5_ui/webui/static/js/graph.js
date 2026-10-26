@@ -51,6 +51,10 @@ var nodes = [];
 var explicitEdges = [];   // {src, dst, kind} -- vom Server (frontmatter|body)
 var implicitEdges = [];   // {src, dst, kind} -- vom Client (tag|folder)
 var nodeById = Object.create(null);
+// P10.5 Block 14, Schritt 14.2: die **Regionen** (das Ergebnis von `computeRegions()`).
+// Die Gravitation zieht jeden Knoten zu dem Anker **seines** Space -- ohne diese Karte wuesste
+// die Kraftsimulation nicht, wohin. Sie wird beim Saeen gesetzt und beim Laden neu berechnet.
+var spaceRegions = null;
 
 var canvasEl = null;
 var ctx = null;
@@ -120,9 +124,11 @@ var tokenAtFetch = null;       // Signatur, die der letzte /graph-Abruf abgedeck
 const REPULSION_STRENGTH = 800;   // ~ Coulomb-Konstante (willkuerlich, durch Augenschein justiert)
 const SPRING_LENGTH = 60;          // Ruhelaenge in CSS-Pixeln
 const SPRING_STRENGTH = 0.05;
-const CENTER_GRAVITY = 0.012;
 const DAMPING = 0.85;
-const ALPHA_START = 1;
+// **P10.5 Block 14, Schritt 14.2:** `CENTER_GRAVITY` (0,012) und `ALPHA_START` (1) sind
+// **weg** -- ersetzt, nicht zusaetzlich (Plan §2.4): die Gravitation zieht jetzt zum **eigenen
+// Space-Anker** (`ANCHOR_GRAVITY`), und die Startenergie ist die **gesaete** (`ALPHA_START_SEEDED`).
+// Die beiden Konstanten stehen im 14.2-Block weiter unten.
 // Fix A (Plan §9.4.6 Befund A, 2026-09-02): 0.005/0.985 brauchten 351 Ticks (gemessen 5.95 s
 // bei 200 Knoten, siehe Modul-Header oben) -- 0.01/0.97 brauchen ln(0.01)/ln(0.97) ≈ 151 Ticks
 // ≈ 2.52 s, mit Marge unter dem 3s-Budget.
@@ -199,6 +205,21 @@ const ISLAND_FACTOR = 0.55;     // Startwert, gemessen in 14.4 -- der Anteil der
 const ITEM_STEP = 14;           // Startwert, gemessen in 14.4 -- der Abstand der Items in der Insel
 const ITEM_JITTER_PX = 8;       // Startwert, gemessen in 14.4 -- die Amplitude des Item-Jitters
 const GOLDEN_ANGLE = 2.399963229728653;  // 137,50776405003785 Grad in Radiant
+
+// -- P10.5 Block 14, Schritt 14.2: L4 -- die Entspannung ---------------------------------------
+//
+// Die vierte Schicht (Plan §2.4): nach dem Seed zieht jeder Knoten zu **seinem** Space-Anker
+// (vorher: zur Leinwandmitte -- das zog alle Spaces auf einen Punkt und liess die Regionen
+// verschmelzen), und die Federn **quer** zwischen zwei Spaces sind **schwach und lang** (eine
+// Querverbindung soll zwei Spaces nicht ineinander ziehen).
+//
+// **Die Startenergie ist kleiner:** der Seed liegt schon nah am Ziel, also reichen weniger
+// Ticks (`ALPHA_START_SEEDED` 0,5 statt `ALPHA_START` 1 -- die Zahl der Ticks ist
+// `ln(ALPHA_MIN / ALPHA_START) / ln(ALPHA_DECAY)`).
+const ANCHOR_GRAVITY = 0.02;           // Startwert, gemessen in 14.4 -- der Zug zum eigenen Anker
+const CROSS_SPRING_FACTOR = 0.15;      // Startwert, gemessen in 14.4 -- die Staerke der Querfeder
+const CROSS_SPRING_LENGTH_FACTOR = 3;  // Startwert, gemessen in 14.4 -- die Laenge der Querfeder
+const ALPHA_START_SEEDED = 0.5;        // Startwert, gemessen in 14.4 -- die Startenergie
 
 const COLORS = Object.freeze({
   bg: "#0B0D10",          // wird nicht gezeichnet -- Canvas ist transparent, darunter die .surface
@@ -683,6 +704,10 @@ function seedInitialPositions() {
   var cx = cssWidth / 2;
   var cy = cssHeight / 2;
   var regionen = computeRegions(nodes, cx, cy, state.ownSpace);
+  // **Die Regionen merken** (Schritt 14.2): die Gravitation zieht jeden Knoten zu dem Anker
+  // **seines** Space. Der Anker kommt aus derselben Rechnung wie der Seed -- damit zieht die
+  // Entspannung an **genau** die Stelle, an der der Seed gebaut wurde.
+  spaceRegions = regionen;
   for (var i = 0; i < nodes.length; i++) {
     var n = nodes[i];
     var pos = stored[n.id];
@@ -745,7 +770,9 @@ function seedJitter(id, salt) {
 }
 
 function runSimulation() {
-  var alpha = ALPHA_START;
+  // P10.5 Block 14, Schritt 14.2: `ALPHA_START_SEEDED` (0,5) statt `ALPHA_START` (1) -- der
+  // Seed liegt schon nah am Ziel, also reichen weniger Ticks (Plan §2.4).
+  var alpha = ALPHA_START_SEEDED;
 
   // P8.6-D4 (Plan §6.4): jede Wiederholung von `loadGraphPanel()` (Klick auf
   // Uebersicht, Refresh) startete bisher eine **zusaetzliche**
@@ -807,6 +834,12 @@ function runSimulation() {
 // Modul-Ebene (P8.6-D4): damit `runSimulation()` den vorherigen Loop abbrechen kann.
 var activeRafId = null;
 
+// -- P10.5 Block 14, Schritt 14.2: die Entspannung (L4) ------------------------------------------
+//
+// Die vierte Schicht (Plan §2.4) sitzt in **drei** Kraften: die Gravitation zieht zum
+// **eigenen Space-Anker** statt zur Leinwandmitte, die Federn **quer** zwischen zwei Spaces
+// sind schwach und lang, und die Startenergie ist die **gesaete** (der Seed liegt schon nah
+// am Ziel).
 function applyForces(alpha) {
   // 1. Repulsion paarweise (Plan §5 D2: O(n²), Cutoff-Distanz nicht noetig -- 200 Knoten
   //    reichen nicht an die Komplexitaets-Grenze, und ein Cutoff wuerde nahe Knoten seltsam
@@ -835,32 +868,43 @@ function applyForces(alpha) {
   //    "explizit solide (frontmatter/body ununterschieden)" bezieht sich auf den Render-Stil,
   //    nicht die Federstaerke; eine staerkere Frontmatter-Feder waere eine staillschweigend
   //    eingefuehrte Semantik).
+  //
+  // **P10.5 Block 14, Schritt 14.2 (Plan §2.4): die Querfeder.** Eine Kante **zwischen zwei
+  // Spaces** ist **schwach und lang**: sonst zieht sie zwei Spaces ineinander -- der Grund, warum
+  // die Regionen vorher verschmolzen sind. Der Space jedes Endpunkts kommt aus dem Knoten
+  // (der Server liefert `space` mit).
   var all = explicitEdges.concat(implicitEdges);
-  var cx = cssWidth / 2;
-  var cy = cssHeight / 2;
   for (var k = 0; k < all.length; k++) {
     var e = all[k];
     var aa = nodeById[e.src];
     var bb = nodeById[e.dst];
     if (!aa || !bb) continue;
+    var quer = aa.space !== bb.space;
+    var laenge = quer ? SPRING_LENGTH * CROSS_SPRING_LENGTH_FACTOR : SPRING_LENGTH;
+    var staerke = quer ? SPRING_STRENGTH * CROSS_SPRING_FACTOR : SPRING_STRENGTH;
     var ddx = bb.x - aa.x;
     var ddy = bb.y - aa.y;
     var d = Math.sqrt(ddx * ddx + ddy * ddy) + 0.01;
-    var stretch = d - SPRING_LENGTH;
-    var f = stretch * SPRING_STRENGTH;
+    var stretch = d - laenge;
+    var f = stretch * staerke;
     var ffx = (ddx / d) * f;
     var ffy = (ddy / d) * f;
     if (!isHeld(aa)) { aa.vx += ffx; aa.vy += ffy; }
     if (!isHeld(bb)) { bb.vx -= ffx; bb.vy -= ffy; }
   }
 
-  // 3. Zentrums-Gravitation -- haelt den Graphen in der Panel-Mitte, auch wenn der Grossteil
-  //    der Knoten am Rand landen wuerde.
+  // 3. **Anker-Gravitation** (Plan §2.4) -- jeder Knoten zieht zu dem Anker **seines** Space.
+  //    Vorher zog eine **Zentrums-Gravitation** alle Knoten zur Leinwandmitte: das zog die
+  //    Spaces auf einen Punkt und liess die Regionen verschmelzen (Befund B2 des Plans).
+  //    Der Anker kommt aus `computeRegions()` -- der eigene Space in der Mitte, die anderen auf
+  //    der Goldwinkel-Spirale.
   for (var n = 0; n < nodes.length; n++) {
     var node = nodes[n];
     if (isHeld(node)) continue;
-    node.vx += (cx - node.x) * CENTER_GRAVITY * alpha;
-    node.vy += (cy - node.y) * CENTER_GRAVITY * alpha;
+    var anker = spaceRegions && spaceRegions.spaces ? spaceRegions.spaces[node.space] : null;
+    if (!anker) continue;      // ohne Anker (unbekannter Space) zieht nichts -- der Knoten bleibt, wo er ist
+    node.vx += (anker.x - node.x) * ANCHOR_GRAVITY * alpha;
+    node.vy += (anker.y - node.y) * ANCHOR_GRAVITY * alpha;
   }
 }
 
@@ -880,6 +924,7 @@ function integrate(alpha) {
     n.vy *= DAMPING;
   }
 }
+
 function draw() {
   if (!ctx) return;
   ctx.setTransform(1, 0, 0, 1, 0, 0);

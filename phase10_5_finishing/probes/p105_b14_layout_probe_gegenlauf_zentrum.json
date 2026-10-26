@@ -1,0 +1,180 @@
+{
+  "probe": "p105_b14_layout_probe",
+  "schritt": "14.2",
+  "gegenlauf": "zentrum",
+  "zeit": "2026-10-26T20:08:53.941013+00:00",
+  "seed": {
+    "spaces": 5,
+    "items": 152,
+    "items_pro_space": {
+      "alpha": 30,
+      "beta": 32,
+      "gamma": 30,
+      "delta": 30,
+      "epsilon": 30
+    },
+    "wachser_space": "epsilon"
+  },
+  "messungen": {
+    "determinismus": {
+      "knoten": 152,
+      "knoten_lauf1": 152,
+      "gemeinsam": 152,
+      "max_abweichung_px": 0.0,
+      "ok": true
+    },
+    "regionen": {
+      "knoten": 152,
+      "richtig": 152,
+      "anteil": 1.0,
+      "schwerpunkte": {
+        "alpha": [
+          595.8333333333334,
+          534.9333333333333
+        ],
+        "beta": [
+          724.59375,
+          737.375
+        ],
+        "gamma": [
+          261.3333333333333,
+          519.0
+        ],
+        "delta": [
+          551.3666666666667,
+          297.8666666666667
+        ],
+        "epsilon": [
+          866.3333333333334,
+          282.06666666666666
+        ]
+      },
+      "beispiele_falsch": [],
+      "ok": true
+    },
+    "kamera": {
+      "messbar": true,
+      "zoom": 1.0002,
+      "zoom_anzeige": 1,
+      "leerwand": [
+        1134,
+        1061.375
+      ],
+      "welt": {
+        "x0": 182,
+        "x1": 961,
+        "y0": 201,
+        "y1": 839
+      },
+      "bild_mass": [
+        779.1558,
+        638.1276
+      ],
+      "fuellgrad": 0.6870862433862434,
+      "passt": true,
+      "pan": [
+        -0.5652974358974916,
+        -0.459917877141379
+      ],
+      "umriss_mitte": [
+        571.5,
+        520.0
+      ],
+      "versatz_mitte_px": 11.043417877141337,
+      "unsicherheit_px": 0.6392513837973954,
+      "zentriert": false,
+      "ok": false
+    },
+    "beschriftungen": {
+      "messbar": true,
+      "fokus": "itm_00000001",
+      "nachbarn": 11,
+      "kandidaten": 12,
+      "erwartet_im_bild": 12,
+      "ausserhalb_bild": 0,
+      "gezeichnet": 12,
+      "ueberlappungen": [
+        [
+          "itm_00000001",
+          "itm_00000006"
+        ],
+        [
+          "itm_00000004",
+          "itm_00000005"
+        ],
+        [
+          "itm_00000008",
+          "itm_00000018"
+        ]
+      ],
+      "fokus_beschriftung": true,
+      "genug_gezeichnet": true,
+      "zoom": 1.0002,
+      "pan": [
+        -0.5652974358974916,
+        -0.459917877141379
+      ],
+      "unsicherheit_px": 0.6392513837973954,
+      "treffer": 36,
+      "ok": false
+    },
+    "stabilitaet": {
+      "wachser_space": "epsilon",
+      "neues_item": "itm_00000901",
+      "position_neu": [
+        1013,
+        258
+      ],
+      "naechster_schwerpunkt": "epsilon",
+      "in_eigener_region": true,
+      "abstand_eigener_space_px": 73.78346698278686,
+      "abstand_fremder_space_px": 392.4245150344203,
+      "andere_spaces": 122,
+      "median_verschiebung_px": 1.0,
+      "max_verschiebung_px": 3.605551275463989,
+      "pruefsumme_vorher": 1629378887,
+      "pruefsumme_nachher": 640022921,
+      "pinned_beim_start": 0,
+      "knoten_frisch": 153,
+      "kasten_frisch": {
+        "left": 753,
+        "top": 121.625,
+        "width": 1134,
+        "height": 1061.375,
+        "dw": 1134,
+        "dh": 1061,
+        "dpr": 1
+      },
+      "position_neu_frisch": [
+        929,
+        454
+      ],
+      "ok": true
+    },
+    "budget": {
+      "knoten": 201,
+      "pos_pruefsumme": 3725419818,
+      "graph_reihenfolge": [
+        "itm_00000931",
+        "itm_00000930",
+        "itm_0000092f",
+        "itm_0000092e",
+        "itm_0000092d",
+        "itm_0000092c",
+        "itm_0000092b",
+        "itm_0000092a"
+      ],
+      "graph_knoten": 201,
+      "ruhe_ms": 2147,
+      "luecken_ms": [],
+      "raf_calls": 130,
+      "raf_calls_reduced_motion": 0,
+      "kern_pixel_reduced_motion": 20635,
+      "kern_pixel": 20635,
+      "grenze_ms": 3000,
+      "ok": true
+    }
+  },
+  "alle_kriterien_erfuellt": false,
+  "seitenfehler": []
+}

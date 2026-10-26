@@ -84,6 +84,17 @@ const GEGENLAEUFE = {
   ],
 };
 
+// -- Die Messpflaster: sie machen sichtbar, was die Regel tut (Verhalten unveraendert) ----------
+//
+// Die Zahl der **Furche-Zellen** ist der Gegenstand der Regel: ohne sie waere die Messung
+// "die Lappen beruehren sich nicht" nur ein Abstand. Mit dem neuen Layout (Schritt 14.2)
+// ruecken die Spaces auseinander und die Regel hat **keinen Gegenstand** mehr — die Zahl
+// macht genau das sichtbar (siehe `FESTE_POSITIONEN`).
+const MESS_PFLASTER = [
+  ["return { key: lobeKey(shown), lobes: lobes };",
+   "globalThis.__furrowCells = 0; for (var fi2 = 0; fi2 < furrow.length; fi2++) globalThis.__furrowCells += furrow[fi2]; return { key: lobeKey(shown), lobes: lobes };"],
+];
+
 // -- Modul laden (mit Patch) --------------------------------------------------------------------
 
 let moduleCounter = 0;
@@ -101,11 +112,23 @@ function loadGraphModule(patch, suffix) {
   // Datei-URL), damit die Kopie dasselbe Verhalten hat wie das Original.
   source = source.replace(/from "\.\/([a-z_]+\.js)"/g,
     (m, name) => 'from "' + pathToFileURL(path.join(STATIC_DIR, name)).href + '"');
+  // **Die Messpflaster:** die Zahl der Furche-Zellen (das ist der **Gegenstand** der Regel) und
+  // der Abstand der Lappen-Aussenkonturen. Sie aendern das Verhalten nicht, sie machen nur
+  // sichtbar, was die Regel tut. Der Anker ist so gewaehlt, dass ein Fehlen **laut** wird
+  // (derselbe Mechanismus wie bei den Gegenlaeufen).
+  for (const [oldText, newText] of MESS_PFLASTER) {
+    if (!source.includes(oldText)) {
+      throw new Error("Messpflaster-Anker nicht gefunden: " + JSON.stringify(oldText.slice(0, 60)));
+    }
+    source = source.replace(oldText, newText);
+  }
   moduleCounter += 1;
   const tmp = path.join(os.tmpdir(), "p105_b8_probe_" + suffix + "_" + moduleCounter + ".mjs");
   fs.writeFileSync(tmp, source, "utf8");
   return import(pathToFileURL(tmp).href);
 }
+
+
 
 // -- DOM-Shim ------------------------------------------------------------------------------------
 
@@ -325,6 +348,32 @@ const EDGES = [
 
 const PAYLOAD = { nodes: NODES, edges: EDGES };
 
+// -- Die **festen** Positionen (datierte Aenderung, 2026-10-26, Schritt 14.2) --------------------
+//
+// **Der Wächter misst die Zeichenregel, nicht das Layout.** Bis Schritt 14.2 hing die
+// Furche-Messung an einem **Unfall**: die Zentrums-Gravitation zog alle drei Spaces in einen
+// Klumpen, die Lappen zweier Spaces stiessen aneinander, und die Furche war das, was sie
+// trennte. Mit der neuen L4 (Anker-Gravitation, Querfedern — Schritt 14.2) ruecken die Spaces
+// **auseinander**: die Lappen beruehren sich nicht mehr, die Furche hat **keinen Gegenstand**
+// mehr — **gemessen**: 62 Furche-Zellen vorher, **0** nachher. Der Gegenlauf "`furche` aus"
+// blieb dadurch **gruen**, ohne dass der Fehler wiederhergestellt war (der Wächter meldete
+// genau das: „der Anker griff nicht oder die Messung prueft das Falsche").
+//
+// **Die Reparatur:** die Positionen werden **fest vorgegeben** (zwei Spaces beruehren sich
+// dort, wo die Furche etwas zu trennen hat) und ueber die **Ablage** (`localStorage`) gesetzt —
+// der Produktivcode haelt sie fest (`pinned`, Plan 8.5). Damit misst die Probe die
+// **Zeichenregel** an einem **festen** Eingang, unabhaengig vom Layout — und der Gegenlauf
+// beisst wieder. Das Layout gehoert zum Browser-Waechter (`p105_b14_layout_probe.py`).
+//
+// Die Positionen: alpha und beta **beruehren** sich (30 px Abstand, der Reach-Radius des
+// Koerpermaske ist 48 px, die Rasterzelle 8 px) => die Zellen zwischen ihnen sind die Furche;
+// gamma steht abseits.
+const FESTE_POSITIONEN = {
+  itm_a1: [300, 300], itm_a2: [300, 340], itm_a3: [300, 380],
+  itm_b1: [330, 300], itm_b2: [330, 340],
+  itm_g1: [200, 500],
+};
+
 const fetchLog = [];
 globalThis.fetch = function (url) {
   fetchLog.push(url);
@@ -360,6 +409,11 @@ const graph = await loadGraphModule(gegenlauf ? GEGENLAEUFE[gegenlauf] : null, "
 const { state } = await import(pathToFileURL(path.join(STATIC_DIR, "state.js")).href);
 state.ownSpace = "alpha";
 state.graphToken = null;
+
+// Die **festen** Positionen vor dem ersten Laden in die Ablage legen (siehe
+// `FESTE_POSITIONEN`): der Produktivcode haelt sie fest (`pinned`) — der Eingang der Probe ist
+// damit **fest** und nicht mehr vom Layout abhaengig (datierte Aenderung, 2026-10-26, 14.2).
+store.set("sfx:graph:layout:v1:alpha", JSON.stringify({ v: 1, pos: FESTE_POSITIONEN }));
 
 graph.init();
 await graph.loadGraph();
@@ -431,9 +485,14 @@ for (let i = 0; i < contourGroups.length; i++) {
   }
 }
 results.furche = {
+  // Die Zahl der Furche-Zellen: der **Gegenstand** der Regel. Sie muss groesser als null
+  // sein -- sonst gibt es nichts, was die Regel trennt (das war der Befund aus Schritt 14.2:
+  // mit dem neuen Layout bleiben die Spaces auseinander, die Furche hat keinen Gegenstand).
+  furrow_cells: globalThis.__furrowCells,
   contours_compared: contourGroups.length,
   separation_px: Math.round(lobeSeparation * 10) / 10,
-  ok: contourGroups.length >= 2 && Number.isFinite(lobeSeparation) && lobeSeparation > 0,
+  ok: globalThis.__furrowCells > 0
+      && contourGroups.length >= 2 && Number.isFinite(lobeSeparation) && lobeSeparation > 0,
 };
 
 // 3) Die Bahnen (Schritt 8.2) ------------------------------------------------------------------------

@@ -8,7 +8,7 @@ down:
   - ../../phase5_ui/webui/static/js/graph.js            # der einzige Produktcode, der sich ändert
   - ../../phase10_5_finishing/probes/p105_b15_screens.py # der 5×30-Seed, aus dem der Auftrag kam
   - phase10_5_finishing_plan.md                         # 📕 Hauptplan (§2.1 Vorbedingung, Block 8 = C2-Stil)
-updated: 2026-10-26 (E1–E4 beantwortet: E1 entfällt — KA-2 nie live; E2 nein; E3/E4 frei + Beschriftungen in Block 14) | 2026-10-26 (Entwurf, Claude Code)
+updated: 2026-10-26 (Schritt 14.2 erledigt: die L4 ist gebaut und gemessen; **datierte Korrektur** der Gegenlauf-Zuordnung in §5; der Befund „die Entspannung ist chaotisch“ — der Node-Harness bleibt Seed-only) | 2026-10-26 (E1–E4 beantwortet: E1 entfällt — KA-2 nie live; E2 nein; E3/E4 frei + Beschriftungen in Block 14) | 2026-10-26 (Entwurf, Claude Code)
 ---
 # P10.5 Block 14 — Kartenlayout: zufällig, aber geordnet
 
@@ -115,6 +115,16 @@ Minecraft würfelt nicht frei: ein **Seed** bestimmt deterministisch zuerst die 
 `CENTER_GRAVITY` entfällt (ersetzt, nicht zusätzlich). Das 3-s-Budget bei 200 Knoten (Kopf von
 `graph.js`) gilt weiter und wird **gemessen** (10-69).
 
+> **[2026-10-26, Schritt 14.2 — datiert]** Die L4 wird **im Browser** gemessen, **nicht** im
+> Node-Harness: die Entspannung ist **chaotisch** — dieselben Knoten in anderer Reihenfolge
+> ergeben am Ende eine andere Karte (Median der Endpositions-Abweichung **56,5 px**, max.
+> **190,2 px**). Der **Seed** ist davon **nicht** betroffen (reine Funktion der Daten, ohne
+> Rundung) ⇒ der Node-Harness `probes/p105_b14_layout_probe.mjs` misst weiterhin **nur den
+> Seed**; ein L4-Harness in Node wäre ein **Fehlgrün** (er misst eine andere Karte als der
+> Browser). Die Startwerte (`ANCHOR_GRAVITY = 0.02`, `CROSS_SPRING_FACTOR = 0.15`,
+> `CROSS_SPRING_LENGTH_FACTOR = 3`, `ALPHA_START_SEEDED = 0.5`) sind **Startwerte** — in 14.4
+> werden sie **gemessen** (nicht gesetzt).
+
 ### 2.5 Kamera einpassen (`fitView()`, neu)
 
 - Nach dem **ersten** Einschwingen je `loadGraph()` (nicht nach einem Drag): Umriss der
@@ -155,7 +165,7 @@ Einfluss auf die Positionen.
 |---|---|---|
 | **14.0** | Vorbedingung + **Basislinie**: Probe `probes/p105_b14_layout_probe.py` (aus `p105_b15_screens.py`: Wegwerf-Instanz, freier Port, eigener Datenbaum, PID-Datei; **152 Items** statt 5×30 — siehe die datierte Abweichung in §5) mit den Zellen aus §5, **gegen den heutigen Code** | Probe läuft; die Basislinie ist **rot** in `regionen`/`kamera`/`beschriftungen`/`stabilitaet` (das ist der Beleg, dass die Zellen messen) — JSON neben der Probe |
 | **14.1** | L1–L3: `hashString()`, `computeRegions()`, neuer `seedInitialPositions()` | Determinismus-Zelle grün ✅ **2026-10-26** |
-| **14.2** | L4: Anker-Gravitation, Querfedern, `ALPHA_START_SEEDED`; `CENTER_GRAVITY` raus | Regionen-Zelle grün **und** Stabilität-Zelle grün (P10.5-68: ein neues Item verschiebt die Anker nur, wenn es den größten Space vergrößert); Budget-Zelle grün |
+| **14.2** | L4: Anker-Gravitation, Querfedern, `ALPHA_START_SEEDED`; `CENTER_GRAVITY` raus | Regionen-Zelle grün **und** Stabilität-Zelle grün (P10.5-68: ein neues Item verschiebt die Anker nur, wenn es den größten Space vergrößert); Budget-Zelle grün ✅ **2026-10-26** — `regionen` **152/152 = 100 %**, `stabilitaet` **Median 0,0 px**, `budget` **201 Knoten in 2147 ms**; `kamera`/`beschriftungen` bleiben rot (⇒ 14.3 / 14.35) |
 | **14.3** | `fitView()` + Doppelklick; ggf. `ZOOM_MIN` (E3) | Kamera-Zelle grün; E3-Wert im Bericht |
 | **14.35** | Beschriftungen ohne Überlappung (§2.7) | Beschriftungs-Zelle grün |
 | **14.4** | Konstanten justieren (nur §2-Konstanten), Gegenläufe, Block-8-Proben neu fahren | alle Zellen grün, jeder Gegenlauf rot an **genau** seiner Zelle; `p105_b8_karte_probe.py` + `p105_b8_c2_probe.mjs` grün |
@@ -200,16 +210,57 @@ Einfluss auf die Positionen.
 > nächste Inselzentrum", das an der Klinge kippte (35,95 px gegen 36,44 px); (b) der
 > **wachsende Space verschiebt seine eigenen Inseln** um **1,1 px** (seine Region wächst mit) —
 > die gewollte Wirkung; die Abnahme zählt ausdrücklich die Knoten **anderer** Spaces.
+>
+> **[2026-10-26, Schritt 14.2 — erledigt]** Die L4 ist gebaut (`phase5_ui/webui/static/js/graph.js`):
+> `CENTER_GRAVITY` und `ALPHA_START` sind **ersetzt** (nicht ergänzt) — jetzt `ANCHOR_GRAVITY =
+> 0.02` (Startwert, in **14.4** gemessen), `CROSS_SPRING_FACTOR = 0.15`,
+> `CROSS_SPRING_LENGTH_FACTOR = 3`, `ALPHA_START_SEEDED = 0.5`; die Anker kommen aus
+> `computeRegions()` (der neue Modulstate `spaceRegions` merkt sie sich beim Seed).
+> **Gemessen an der Wegwerf-Instanz** (Browser-Probe, 5 Spaces, 201 Knoten): `regionen`
+> **152/152 = 100 %** (Basislinie 57,2 %, 14.1: 82,2 %), `stabilitaet` **Median 0,0 px**
+> (max. 2,24 px; Basislinie 327,9 px, 14.1: 233 px), `budget` **201 Knoten in 2147 ms**,
+> **0** Frames bei reduced motion. `kamera` (Füllgrad 101,2 %, Versatz 32,3 px) und
+> `beschriftungen` bleiben **rot** ⇒ **14.3** und **14.35**.
+>
+> **Drei Befunde an der Messung selbst — sie ändern den Plan, nicht nur den Bericht:**
+>
+> 1. **Die Zuordnung der Gegenläufe im Plan §5 war falsch (datierte Korrektur).** Der Plan
+>    nennt für **P10.5-66** den Gegenlauf „`ANCHOR_GRAVITY` → Leinwandmitte". Gemessen:
+>    **keine** Zelle wird rot — die Regionen-Zelle bleibt bei **100 %**. Der Gegenlauf wirkt
+>    auf die **Weltgröße**: der Kamera-Füllgrad fällt von **101,2 %** auf **68,7 %** (und der
+>    Versatz sinkt von 32,3 px auf 11,0 px). Die Anker-Gravitation ist damit **an der
+>    Regionen-Zelle nicht nachweisbar** — der Plan hat die Wirkung der **Zentrums-Gravitation**
+>    (14.1: 82,2 %) mit der Wirkung der **Anker-Gravitation** (100 %) verwechselt. Die
+>    wirksamen Gegenläufe sind: **`querfeder`** ⇒ `stabilitaet` rot (Median 29,2 px) und
+>    **`alpha`** ⇒ `budget` rot (15,3 s) **und** `stabilitaet` rot (Median 91,1 px). Alle drei
+>    Gegenläufe fahren über eine **Kopie** von `phase5_ui/webui/static` — der Arbeitsbaum bleibt
+>    unberührt.
+> 2. **Die Entspannung ist chaotisch — der Node-Harness bleibt Seed-only.** Dieselben Knoten
+>    in einer **anderen Reihenfolge** ergeben am Ende eine **andere** Karte: Median der
+>    Endpositions-Abweichung **56,5 px**, max. **190,2 px**, **86 %** der Knoten weichen um mehr
+>    als 20 px ab. Ursache: die Repulsion sammelt die Kräfte in der Reihenfolge der
+>    Knotenliste; die Rundungsfehler (1e-16) wachsen in der Relaxation zu einem **anderen
+>    Gleichgewicht**. Der **Seed** ist davon **nicht** betroffen (reine Funktion der Daten, ohne
+>    Rundung) — deshalb misst der Node-Harness weiterhin **nur den Seed**. Ein
+>    Node-Harness für die L4 würde eine **andere** Karte messen als der Browser: ein
+>    **Fehlgrün ohne Aussage**.
+> 3. **Ein „frischer" Lauf kann gepinnt sein — die Stabilitäts-Zelle wäre zwangsläufig grün.**
+>    Die Karte merkt ihre Positionen im `localStorage`; lädt die Probe in ein **gefülltes**
+>    `localStorage`, startet die Simulation **gepinnt** und die Stabilitäts-Zelle misst
+>    „nichts bewegt sich" — **grün, ohne dass etwas geprüft wurde**. Die Probe liest jetzt
+>    `pinned_beim_start` **direkt nach dem Reload** und bricht **ab**, wenn die Ablage schon
+>    gefüllt war; der Beleg führt die Prüfsummen **vorher/nachher** mit, und die Zelle ist
+>    nur grün, wenn sie sich **unterscheiden**.
 
 ## §5 Abnahme (neue Zeilen P10.5-65–71 — **stehen seit 2026-10-26 (Block 14.0) im Head**)
 
 | # | Kriterium | Messung | Gegenlauf (muss rot werden) |
 |---|---|---|---|
 | **P10.5-65** | Determinismus: zwei frische Ladevorgänge (leerer Speicher) → max. Abweichung ≤ 1 px | Probe | `seedJitter` → `Math.random` |
-| **P10.5-66** | Regionen: ≥ 95 % der Knoten liegen dem Schwerpunkt **ihres** Space am nächsten (5 Spaces, 30/32/30/30/30 — siehe die datierte Seed-Abweichung unten) | Probe | `ANCHOR_GRAVITY` → Leinwandmitte |
+| **P10.5-66** | Regionen: ≥ 95 % der Knoten liegen dem Schwerpunkt **ihres** Space am nächsten (5 Spaces, 30/32/30/30/30 — siehe die datierte Seed-Abweichung unten) | Probe | ⚠️ **kein wirksamer Gegenlauf** (14.2) — der geplante lässt die Zelle **grün**; die datierte Korrektur steht unten |
 | **P10.5-67** | Kamera: nach dem Einschwingen, **ohne** Rad, füllt der Inhalt ≥ 60 % der Leinwand auf mindestens einer Achse | Probe | `fitView()` aus |
-| **P10.5-68** | Stabilität: +1 Item in einem nicht-größten Space → Median-Verschiebung der Knoten **anderer** Spaces ≤ 2 px (frischer Lauf); in einer **gemerkten** Karte landet das neue Item in der Region seines Space | Probe | Space-Reihenfolge nach Item-Zahl statt Hash |
-| **P10.5-69** | Budget und Bestand: 200 Knoten ≤ 3 s bis Ruhe · reduced motion 0 Frames (P10.5-40) · Block-8-Proben grün | Probe | `ALPHA_START_SEEDED` → 1 und `ALPHA_DECAY` → 0,995 (Budget reißt) |
+| **P10.5-68** | Stabilität: +1 Item in einem nicht-größten Space → Median-Verschiebung der Knoten **anderer** Spaces ≤ 2 px (frischer Lauf); in einer **gemerkten** Karte landet das neue Item in der Region seines Space | Probe | `querfeder` (Querfeder-Faktor/Länge zurück auf 0) — **gemessen** 14.2; der geplante („Space-Reihenfolge nach Item-Zahl") ist ein **Seed**-Gegenlauf und gehört in den Node-Harness (`slot`) |
+| **P10.5-69** | Budget und Bestand: 200 Knoten ≤ 3 s bis Ruhe · reduced motion 0 Frames (P10.5-40) · Block-8-Proben grün | Probe | `ALPHA_START_SEEDED` → 1 (Budget reißt) — **gemessen** 14.2: 15,3 s |
 | **P10.5-70** | Sichtung: drei Kartenbilder (5 Spaces, 30/32/30/30/30) — „zufällig, aber geordnet" | Nikinger | — |
 | **P10.5-71** | Beschriftungen: bei Fokus auf einen Knoten mit ≥ 5 Nachbarn überlappen sich **keine** zwei gezeichneten Beschriftungs-Rechtecke; die Fokus-Beschriftung ist immer da | Probe (Rechtecke über `measureText` nachgerechnet) | Kollisionsprüfung aus |
 
@@ -240,6 +291,19 @@ Einfluss auf die Positionen.
 > die **Unsicherheit** der Bestimmung aus (**0,65 px** — die Streuung der Pan-Kandidaten plus
 > der Zoom-Rasterfehler); sie ist um eine Größenordnung kleiner als der gemessene Versatz
 > (**43,8 px**) und trägt die Aussage nicht.
+>
+> **Datierte Korrektur der Gegenlauf-Zuordnung (2026-10-26, Schritt 14.2).** §5 nannte für
+> **P10.5-66** den Gegenlauf „`ANCHOR_GRAVITY` → Leinwandmitte". **Gemessen: keine Zelle wird
+> rot** — die Regionen-Zelle bleibt bei **100 %**, und der Gegenlauf wirkt auf die
+> **Weltgröße** (Kamera-Füllgrad **101,2 % → 68,7 %**). Der Plan hat die Wirkung der
+> **Zentrums-Gravitation** (14.1: 82,2 %) mit der Wirkung der **Anker-Gravitation** (100 %)
+> verwechselt. **Gemessene** Zuordnung: `querfeder` ⇒ `stabilitaet` rot (Median 29,2 px) ·
+> `alpha` ⇒ `budget` rot (15,3 s) **und** `stabilitaet` rot (Median 91,1 px) · `zentrum` ⇒
+> **keine** Zelle rot (⇒ **kein** Gegenlauf für 66 in der Browser-Probe; der **Seed**-Gegenlauf
+> `slot` im Node-Harness deckt die Reihenfolge ab). Ein Wächter ohne wirksamen Gegenlauf
+> beweist nichts — die Lücke bleibt **offen** und wird in **14.4** mit einem Gegenlauf geschlossen,
+> der die Regionen-Zelle **wirklich** rot macht (der Kandidat: die Regionen-Zuordnung des
+> Spaces verschieben).
 
 ## §6 Startauftrag — Block 14 · Ausführer (opencode)
 

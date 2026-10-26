@@ -24,6 +24,17 @@ Ordner zweimal gesehen hat). Jeder Gegenlauf patcht **eine** Regel in einer Kopi
 
 Kein Netz, kein Browser, kein DATA_ROOT, kein Dienst. Node muss vorhanden sein; fehlt es,
 überspringt die Laufzeitprüfung (die Testdateien laufen trotzdem).
+
+**Datierte Änderung am Eingang (2026-10-26, Schritt 14.2).** Die Probe setzt die Knoten
+**fest** (über die Ablage, `pinned`): der Wächter misst die **Zeichenregel** (Schritt 8.1),
+nicht das **Layout**. Grund: bis 14.2 hing die Furche-Messung an einem Unfall — die
+Zentrums-Gravitation zog alle Spaces in einen Klumpen, die Lappen stiessen aneinander, und
+die Furche trennte sie. Mit der neuen L4 (Anker-Gravitation, Querfedern) rücken die Spaces
+auseinander, die Furche hat **keinen Gegenstand** mehr (**gemessen**: 62 Zellen vorher, **0**
+nachher) ⇒ der Gegenlauf „`furche` aus" wäre **grün** geblieben, ohne dass der Fehler
+wiederhergestellt war. Der feste Eingang (zwei Spaces **berühren** sich) macht den
+Gegenlauf wieder scharf. Das Layout misst der Browser-Wächter
+(`p105_b14_layout_probe.py`), nicht dieser.
 """
 
 from __future__ import annotations
@@ -96,10 +107,17 @@ def test_die_lappen_werden_je_space_gezeichnet(messung: dict) -> None:
 
 @needs_node
 def test_die_furche_trennt_die_lappen(messung: dict) -> None:
-    """8.1: die Konturen zweier Spaces duerfen sich nicht beruehren."""
+    """8.1: die Konturen zweier Spaces duerfen sich nicht beruehren.
+
+    Und (datierte Ergaenzung, 2026-10-26, Schritt 14.2): die Regel muss einen **Gegenstand**
+    haben — die Zahl der Furche-Zellen muss groesser als null sein. Ohne diese Zelle waere
+    der Abstand allein gemessen — und ein Abstand, den es gar nicht gibt (die Spaces stehen
+    weit auseinander), waere auch "gemessen".
+    """
     m = messung["furche"]
     assert m["contours_compared"] >= 2, m
     assert m["separation_px"] > 0, m
+    assert m["furrow_cells"] > 0, m
 
 
 @needs_node

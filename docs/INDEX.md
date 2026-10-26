@@ -59,9 +59,9 @@ updated: 2026-10-26 (B14.1: der Seed wird zum Weltgenerator — L1–L3 in graph
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing — alle Baustellen schließen; Plan `docs/concepts/phase10_5_finishing_plan.md`)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **30.962 B** · Phase-10.5-Head: Modulstatus 0–14/Z, Deploy A–D, Abnahmestand (58 ✅ · 0 ⚠️ · 13 ⬜), offene Punkte
-- [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **31.820 B** · L3-Archiv der **geschlossenen** Abnahmezeilen (58 Zeilen), verbatim aus dem Head
-- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **124.760 B** · L3-Archiv der Session-Blöcke, verbatim
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **35.316 B** · Phase-10.5-Head: Modulstatus 0–14/Z, Deploy A–D, Abnahmestand (61 ✅ · 0 ⚠️ · 10 ⬜), offene Punkte
+- [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **32.902 B** · L3-Archiv der **geschlossenen** Abnahmezeilen (61 Zeilen), verbatim aus dem Head
+- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **127.783 B** · L3-Archiv der Session-Blöcke, verbatim
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · L3-Archiv der **Startaufträge von Block 7 und 9** (verbatim 2026-10-23/24)
 
 

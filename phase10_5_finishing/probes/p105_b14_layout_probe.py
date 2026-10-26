@@ -97,6 +97,8 @@ SERVE_LOG = WEGWERF_ROOT / ("serve-%d.log" % PID)
 TLS_KEY = WEGWERF_ROOT / ("key-%d.pem" % PID)
 TLS_CERT = WEGWERF_ROOT / ("cert-%d.pem" % PID)
 AUFTRAG_DATEI = WEGWERF_ROOT / ("auftrag-%d.json" % PID)
+#: Der Beleg-Dateiname. **Ein Gegenlauf schreibt in eine eigene Datei** — der Normalfall-Beleg
+#: (die Abnahme) darf nie von einem Gegenlauf ueberschrieben werden.
 RESULT = Path(__file__).resolve().with_name("p105_b14_layout_probe.json")
 SPACE = "alpha"
 
@@ -117,10 +119,47 @@ EXTRA_ITEMS = 200 - sum(ITEMS_PRO_SPACE.values())
 PORT = 0
 BASE = ""
 
+# -- Die Gegenläufe (Plan §5) ----------------------------------------------------------------------
+#
+# Ein Wächter ohne Gegenlauf beweist nichts: eine Messung, die die falsche Sache misst, ist
+# grün und falsch zugleich (diese Fehlerklasse hat dieser Ordner zweimal gesehen). Jeder
+# Gegenlauf **patcht genau eine Regel** in einer Kopie von `graph.js` (der Arbeitsbaum bleibt
+# unberührt) und muss **genau die** zugehörige Zelle rot machen.
+#
+# | Gegenlauf | Regel (Plan) | Zelle | der Fehler |
+# |---|---|---|---|
+# | `zentrum` | §2.4 -- die Gravitation zieht zum **eigenen Space-Anker** | `regionen` | sie zieht zur Leinwandmitte (das ist der Stand von 14.1) |
+# | `querfeder` | §2.4 -- die Querfeder ist **schwach und lang** | `stabilitaet` | sie ist so stark und kurz wie die Feder im Space |
+# | `alpha` | §2.4 -- die Startenergie ist die **gesäte** | `budget` | `ALPHA_START_SEEDED` → 1 und `ALPHA_DECAY` → 0,995 (die Simulation reisst das 3-s-Budget) |
+#
+# **Die Anker sind eindeutig** (Regel + Nachbarzeile, nicht nur ein Wert) — sonst patcht der
+# Gegenlauf den Kommentar über der Regel statt der Regel.
+GEGENLAEUFE = {
+    "zentrum": {
+        "var anker = spaceRegions && spaceRegions.spaces ? spaceRegions.spaces[node.space] : null;":
+            "var anker = {x: cssWidth / 2, y: cssHeight / 2};",
+    },
+    "querfeder": {
+        "var quer = aa.space !== bb.space;": "var quer = false;",
+    },
+    "alpha": {
+        "const ALPHA_START_SEEDED = 0.5;": "const ALPHA_START_SEEDED = 1;",
+        "const ALPHA_DECAY = 0.97;": "const ALPHA_DECAY = 0.995;",
+    },
+}
+#: Der Gegenlauf dieses Laufs (`None` = der Normalfall).
+GEGENLAUF = None
+for _arg in sys.argv[1:]:
+    if _arg.startswith("--gegenlauf="):
+        GEGENLAUF = _arg.split("=", 1)[1]
+if GEGENLAUF is not None and GEGENLAUF not in GEGENLAEUFE:
+    raise SystemExit("unbekannter Gegenlauf: %s (bekannt: %s)"
+                     % (GEGENLAUF, ", ".join(sorted(GEGENLAEUFE))))
+
 # -- Der TLS-Launcher: dieselbe App wie `phase2_mcp/scripts/serve.py`, plus TLS ----------------
 # (Muster aus `phase10_inventory/probes/p10_wegwerf.py :: SERVE_TLS_LAUNCHER`.)
 SERVE_TLS_LAUNCHER = '''"""Dieselbe App wie phase2_mcp/scripts/serve.py, plus TLS."""
-import os, sys
+import os, sys, json
 sys.path.insert(0, os.environ["REPO_ROOT"])
 from datetime import datetime, timedelta, timezone
 import uvicorn
@@ -160,10 +199,38 @@ from authserver.config import load_auth_settings, load_data_encryption_key
 from authserver.store import AuthStore
 from authserver.userdir import UserDirectory
 from storage.store import Store
+import mcpserver.app as mapp
 from mcpserver.app import OAuthConfig, create_app
 from mcpserver.config import load_settings
 from mcpserver.logging_setup import configure_logging
 from mcpserver.request_log import AccessLogASGI, OAuthLogASGI
+
+# **Der Gegenlauf (Schritt 14.2).** Die statischen Dateien werden aus einer **Kopie** serviert,
+# in der `graph.js` **gepatcht** ist -- die Arbeitskopie im Repo bleibt unberuehrt (ein
+# Gegenlauf darf den Arbeitsbaum nie veraendern). `UiSettings.static_dir` zeigt dann auf die
+# Kopie (`create_app()` baut die `UiSettings` selbst -- deshalb wird das Symbol im
+# `mcpserver.app`-Modul ersetzt, nicht in `webui.config`).
+_patched = os.environ.get("GRAPH_PATCH")
+if _patched:
+    import shutil
+    from pathlib import Path
+    _quelle = Path(os.environ["REPO_ROOT"]) / "phase5_ui" / "webui" / "static"
+    _kopie = Path(os.environ["STATIC_DIR"])
+    if _kopie.exists():
+        shutil.rmtree(_kopie)
+    shutil.copytree(_quelle, _kopie)
+    _datei = _kopie / "js" / "graph.js"
+    _text = _datei.read_text(encoding="utf-8")
+    for _alt, _neu in json.loads(_patched).items():
+        if _alt not in _text:
+            raise SystemExit("Gegenlauf-Anker nicht gefunden: " + _alt[:60])
+        _text = _text.replace(_alt, _neu)
+    _datei.write_text(_text, encoding="utf-8")
+    _orig_settings = mapp.UiSettings
+    def _settings_mit_kopie(**kwargs):
+        kwargs["static_dir"] = _kopie
+        return _orig_settings(**kwargs)
+    mapp.UiSettings = _settings_mit_kopie
 
 settings = load_settings()
 configure_logging(settings.log_level)
@@ -318,6 +385,11 @@ def _serve() -> int:
     env["REPO_ROOT"] = str(REPO_ROOT)
     env["TLS_KEY"] = str(TLS_KEY)
     env["TLS_CERT"] = str(TLS_CERT)
+    if GEGENLAUF is not None:
+        # **Der Gegenlauf:** der Server serviert eine **Kopie** der statischen Dateien, in der
+        # `graph.js` gepatcht ist (der Arbeitsbaum bleibt unberuehrt).
+        env["GRAPH_PATCH"] = json.dumps(GEGENLAEUFE[GEGENLAUF])
+        env["STATIC_DIR"] = str(WEGWERF_ROOT / ("static-%d" % PID))
 
     subprocess.run(
         ["openssl", "req", "-x509", "-newkey", "rsa:2048", "-keyout", str(TLS_KEY),
@@ -704,15 +776,31 @@ def settle(page, budget_ms=60000):
 
 
 def frischer_lauf(page, leer=True):
-    """Ein kompletter Durchlauf: (leeren) Speicher loeschen, neu laden, warten, ablesen."""
+    """Ein kompletter Durchlauf: (leeren) Speicher loeschen, neu laden, warten, ablesen.
+
+    **Die Falle, die hier aufgedeckt wird (2026-10-26, Schritt 14.2):** `localStorage.clear()`
+    loescht die Ablage — aber die **App** speichert sie **periodisch** (der Ereignis-Feed
+    pollt im Sekundentakt, jeder Graph-Neulauf speichert am Ende, gedrosselt um 1 s). Zwischen
+    dem Loeschen und dem `reload()` kann ein **wartendes** Speichern zuschlagen: die Ablage ist
+    dann wieder da, der neue Lauf laedt sie — und **pinnt** alle Knoten (`seedInitialPositions()`
+    haelt gemerkte Positionen fest). Ein solcher Lauf **misst nichts**: die Knoten stehen
+    genau da, wo sie standen, und jede Verschiebung faellt zwangslaufig aus.
+
+    Deshalb wird der Ablage-Zustand **unmittelbar nach dem Neuladen** gelesen — **bevor** die
+    Simulation rechnet. `pinned_beim_start` > 0 heisst: der Lauf war **gepinnt**, die Messung
+    taugt nichts. Der Aufrufer muss das pruefen (und der Wächter muss es pruefen)."""
     if leer:
         page.evaluate("() => { localStorage.clear(); }")
     page.reload(wait_until="domcontentloaded")
     page.wait_for_selector(".overview__graph canvas", state="visible", timeout=20000)
+    ablage_beim_start = page.evaluate(ABLAGE)
     settle(page)
     # das Speichern ist gedrosselt (1 s) — erst danach steht die Ablage bereit
     page.wait_for_timeout(1600)
-    return lesen(page)
+    ergebnis = lesen(page)
+    ergebnis["pinned_beim_start"] = len(ablage_beim_start["pos"]) if ablage_beim_start else 0
+    ergebnis["knoten_beim_start"] = len(ablage_beim_start["pos"]) if ablage_beim_start else 0
+    return ergebnis
 
 
 def lesen(page):
@@ -1066,6 +1154,17 @@ def main():
         # (b) der **frische** Lauf: die Knoten der anderen Spaces duerfen sich nicht bewegen
         frisch = frischer_lauf(page, leer=True)
         pos_f = frisch["ablage"]["pos"]
+        # **Der frische Lauf muss wirklich frisch sein** (2026-10-26, Schritt 14.2): stand die
+        # Ablage schon **vor** der Simulation da, war der Lauf **gepinnt** — die Knoten standen
+        # fest, und die Zelle waere zwangslaufig gruen (ein Fehlgruen ohne Aussage).
+        if frisch["pinned_beim_start"]:
+            messungen["stabilitaet"] = {
+                "messbar": False,
+                "grund": "der frische Lauf war gepinnt (die Ablage war schon da)",
+                "pinned_beim_start": frisch["pinned_beim_start"],
+                "ok": False,
+            }
+            raise SystemExit("der frische Lauf war gepinnt — die Stabilitaets-Zelle misst nichts")
         andere = [nid for nid in pos2 if raum_von.get(nid) and raum_von[nid] != WACHSER_SPACE]
         schritte = []
         for nid in andere:
@@ -1085,8 +1184,28 @@ def main():
             "andere_spaces": len(andere),
             "median_verschiebung_px": median,
             "max_verschiebung_px": schritte[-1] if schritte else None,
-            "ok": bool(median is not None and median <= 2.0 and in_region),
+            # **Die Pruefsummen** der beiden Laeufe: sie tragen den Beleg, dass die Karten
+            # wirklich **verschieden** sind (der Vergleich zweier Laeufe braucht zwei
+            # verschiedene Karten — sonst vergleicht die Zelle eine Karte mit sich).
+            "pruefsumme_vorher": _pruefsumme(pos2),
+            "pruefsumme_nachher": _pruefsumme(pos_f),
+            "pinned_beim_start": frisch["pinned_beim_start"],
+            "knoten_frisch": len(frisch["grafik"]["nodes"]),
+            "kasten_frisch": frisch["kasten"],
+            "position_neu_frisch": pos_f.get(neues["id"]),
+            "ok": bool(median is not None and median <= 2.0 and in_region
+                       and _pruefsumme(pos2) != _pruefsumme(pos_f)),
         }
+        # **Die Positionen der beiden Laeufe** (zum Vergleich mit dem Node-Harness; die Datei
+        # landet **nicht** im Repo — sie ist ein Arbeitsmittel, kein Beleg).
+        _dump = Path("/tmp/opencode") / ("p105_b14_stab_%d.json" % AUFTRAG["pid"])
+        try:
+            _dump.write_text(json.dumps({"vorher": pos2, "nachher": pos_f,
+                                         "reihenfolge": [n["id"] for n in frisch["grafik"]["nodes"]],
+                                         "reihenfolge_vorher": [n["id"] for n in lauf2["grafik"]["nodes"]]},
+                                        ensure_ascii=False), encoding="utf-8")
+        except OSError:
+            pass
 
         # ---- 4) Budget (P10.5-69): 200 Knoten, Zeit bis Ruhe, reduced motion ---------------
         for i in range(EXTRA_ITEMS):
@@ -1131,7 +1250,8 @@ def main():
 
     bericht = {
         "probe": "p105_b14_layout_probe",
-        "schritt": "14.0",
+        "schritt": "14.2",
+        "gegenlauf": AUFTRAG.get("gegenlauf"),
         "zeit": datetime.now(timezone.utc).isoformat(),
         "seed": AUFTRAG["seed"],
         "messungen": messungen,
@@ -1155,7 +1275,10 @@ if __name__ == "__main__":
 
 
 def main() -> int:
-    global PORT, BASE
+    global PORT, BASE, RESULT
+    if GEGENLAUF is not None:
+        RESULT = Path(__file__).resolve().with_name(
+            "p105_b14_layout_probe_gegenlauf_%s.json" % GEGENLAUF)
     PORT = _freier_port()
     BASE = f"https://127.0.0.1:{PORT}"
     creds = _setup()
@@ -1172,6 +1295,8 @@ def main() -> int:
             "result": str(RESULT),
             "wachser_space": WACHSER_SPACE,
             "extra_items": EXTRA_ITEMS,
+            "pid": PID,
+            "gegenlauf": GEGENLAUF,
             "spaces": SPACES,
             "seed": {"spaces": len(SPACES), "items": sum(ITEMS_PRO_SPACE.values()),
                      "items_pro_space": ITEMS_PRO_SPACE, "wachser_space": WACHSER_SPACE},

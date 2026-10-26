@@ -1,13 +1,23 @@
 // P10.5 Block 14, Schritt 14.1 — der Wächter-Harness für den **Seed** des Kartenlayouts.
 //
-// **Was gemessen wird:** die reine Geometrie des neuen Seeds — die Welt, die
+// **Was gemessen wird:** die reine Geometrie des Seeds — die Welt, die
 // `graph.js :: computeRegions()` erzeugt, bevor die Kraftsimulation ueberhaupt anfaengt.
 //
 // Plan: `docs/concepts/phase10_5_block14_kartenlayout_plan.md` §1–§2 (die vier Schichten) und
-// §5 (P10.5-65/66/68). **Der Seed wird gemessen, nicht die Karte:** die Simulation (Schritt
-// 14.2) zerlegt den Seed heute noch (die Zentrums-Gravitation zieht alle Spaces auf einen
-// Punkt) — die Browser-Probe `p105_b14_layout_probe.py` misst deshalb bis Schritt 14.2 nur
-// den **Seed** als das, was sie messen kann: die Determinismus-Zelle (P10.5-65).
+// §5 (P10.5-65/66/68). **Der Seed wird gemessen, nicht die Karte:** die **Entspannung**
+// (Schritt 14.2) wird **nicht** hier gemessen — sie ist **chaotisch** (siehe unten) —,
+// sondern von der Browser-Probe `p105_b14_layout_probe.py`, die die **echte** Karte misst.
+//
+// **Warum die Entspannung nicht in Node gemessen wird (gemessen, 2026-10-26, Schritt 14.2).**
+// Die Kraftsimulation ist **pfadabhaengig**: dieselben Knoten in einer **anderen
+// Reihenfolge** ergeben am Ende eine **andere** Karte — der Median der Abweichung der
+// Endpositionen liegt bei **56,5 px** (max. 190,2 px; 86 % der Knoten weichen um mehr als
+// 20 px ab). Ursache: die Repulsion sammelt die Kraefte in der Reihenfolge der Knotenliste;
+// die Rundungsfehler (1e-16) wachsen in der Relaxation zu einem **anderen Gleichgewicht**.
+// Der **Seed** ist davon **nicht** betroffen (er ist eine reine Funktion der Daten, ohne
+// Rundung) — deshalb ist er hier messbar und die Karte nicht. Ein Node-Harness fuer die
+// Entspannung wuerde eine **andere** Karte messen als der Browser: das waere ein
+// Fehlgruen ohne Aussage (diese Fehlerklasse hat dieser Ordner zweimal gesehen).
 //
 // **Muster:** `p105_b8_c2_probe.mjs` — das echte `graph.js` wird in Node geladen (mit einem
 // minimalen DOM-Shim), nicht nachgebaut. `computeRegions()` und `hashString()` sind darum

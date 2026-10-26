@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-26 (Session-Block Block 14.0 rotiert — die Basislinie des Kartenlayouts) | 2026-10-26 (Session-Block Nachzug Block 13 rotiert — v4.0.0, Space-Auswahl, Rohtext weg; Block 14.0 folgt im Head) | 2026-10-26 (Session-Block Block 13 rotiert — Nachzug v4.0.0, Space-Auswahl, Rohtext weg folgt im Head) | 2026-10-25 (Session-Block Block 12 rotiert — Doku und Altlasten; Block 13 folgt im Head) | 2026-10-25 (Session-Block Block 11.8 rotiert — der Roundtrip; Block 11.6 folgt im Head) | 2026-10-25 (Session-Block Block 11.5 rotiert — die To-do-Kästchen; Block 11.8 folgt im Head) | 2026-10-25 (Session-Block Block 11.7 rotiert — das Budget; Block 11.5 folgt im Head) | 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-26 (Session-Block Block 14.1 rotiert — L1–L3, der Seed wird zum Weltgenerator) | 2026-10-26 (Session-Block Block 14.0 rotiert — die Basislinie des Kartenlayouts) | 2026-10-26 (Session-Block Nachzug Block 13 rotiert — v4.0.0, Space-Auswahl, Rohtext weg; Block 14.0 folgt im Head) | 2026-10-26 (Session-Block Block 13 rotiert — Nachzug v4.0.0, Space-Auswahl, Rohtext weg folgt im Head) | 2026-10-25 (Session-Block Block 12 rotiert — Doku und Altlasten; Block 13 folgt im Head) | 2026-10-25 (Session-Block Block 11.8 rotiert — der Roundtrip; Block 11.6 folgt im Head) | 2026-10-25 (Session-Block Block 11.5 rotiert — die To-do-Kästchen; Block 11.8 folgt im Head) | 2026-10-25 (Session-Block Block 11.7 rotiert — das Budget; Block 11.5 folgt im Head) | 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,48 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-26 (Block 14.1: L1–L3 — der Seed wird zum Weltgenerator)
+
+**Ergebnis.** Schritt **14.1** des Plans (`docs/concepts/phase10_5_block14_kartenlayout_plan.md`):
+der **Seed** ist neu — eine Region je Space, darin Ordner-Inseln, darin Items auf einer
+Goldwinkel-Spirale. Beleg: `probes/p105_b14_layout_probe.mjs` (Node, fünf Zellen) und
+`probes/p105_b14_layout_probe.json` (die Browser-Probe).
+
+**Der Code** (`phase5_ui/webui/static/js/graph.js`, der einzige Produktcode): `hashString()`
+(FNV-1a als Zahl, aus `seedJitter()` herausgezogen — **bitidentisch**, der C2-Wächter hängt an
+genau diesem Hash), `computeRegions()` (**rein, ohne DOM**: Space-Regionen → Ordner-Inseln →
+Item-Spirale; der eigene Space in der Mitte, die anderen auf der Spirale, **Reihenfolge = Hash
+des Space-Namens**) und der neue `seedInitialPositions()` (die gemerkten Positionen bleiben
+festgehalten, gesät wird nur, wer noch nirgends war).
+
+**Der Seed wird ohne Browser gemessen** — der Node-Harness lädt das echte Modul (Muster
+`p105_b8_c2_probe.mjs`): **fünf Zellen grün** (`regionen` **152/152**, `inseln` Faktor
+**2,78–2,80**, `spiralen` **20/20**, `stabilitaet` **0** Anker verschoben, `determinismus`
+**0,0 px**) und **fünf Gegenläufe, jeder rot an genau seiner Zelle** (Wächter
+`tests/test_b14_seed_probe.py`, 9 Tests).
+
+**Die Browser-Probe** (das Plan-Instrument) bleibt im Determinismus grün (**0,0 px** über 152
+Knoten, zwei Läufe byteweise gleich), und die Zahlen der roten Zellen **wandern**:
+`regionen` **57,2 % → 82,2 %**, das neue Item liegt jetzt **in** der Region seines Space
+(vorher 118,4 px von einem fremden), Kamera **78,1 %** Füllgrad (vorher 68,5 %) und **31,4 px**
+Versatz (vorher 43,8 px). `stabilitaet` bleibt rot: die anderen Spaces verschieben sich noch
+**233 px** — das ist die Zentrums-Gravitation (14.2).
+
+**Zwei Befunde an den Messungen selbst.** (1) Die **Insel-Nachbarschaft ist mit den Startwerten
+knapp**: zwei Inselzentren liegen nur **66,3 px** auseinander (der Goldwinkel bringt die Inseln 1
+und 4 auf 52,5°) — die erste Fassung der Insel-Zelle („das nächste Inselzentrum") kippte an der
+Klinge (35,95 px gegen 36,44 px) ⇒ sie misst jetzt die **Gruppenbildung**. (2) Der
+**wachsende Space verschiebt seine eigenen Inseln** um **1,1 px** (seine Region wächst mit) —
+die gewollte Wirkung; die Abnahme zählt die Knoten **anderer** Spaces.
+
+**Abnahme.** **P10.5-65 geschlossen** (der Determinismus) → **58 ✅ · 0 ⚠️ · 13 ⬜**. Suite
+**1602** grün, `doc_health` 0, `ui_budget` 5/5 (Erstaufruf **220,8 KB**; `graph.js`
+**23,2 → 26,4 KB** gz). `graph.js` trägt jetzt `graph.js`-eigene Startwerte mit dem Vermerk
+„Startwert, gemessen in 14.4".
+
+**Nächster Schritt:** **14.2** — L4: Anker-Gravitation statt Zentrums-Gravitation, Querfedern
+schwach und lang, `ALPHA_START_SEEDED`. Danach 14.3 (`fitView()`), 14.35 (Beschriftungen).
 
 ## Session stopped — 2026-10-26 (Block 14.0: die Basislinie des Kartenlayouts)
 

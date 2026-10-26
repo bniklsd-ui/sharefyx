@@ -25,8 +25,9 @@
     "ok": true
   },
   "furche": {
+    "furrow_cells": 36,
     "contours_compared": 3,
-    "separation_px": 8,
+    "separation_px": 11.3,
     "ok": true
   },
   "bahnen": {
@@ -86,7 +87,7 @@
     "ok": true
   },
   "ausfuehrer": {
-    "ticks": 152,
+    "ticks": 129,
     "fetch_calls": 3,
     "gegenlauf": null
   }
