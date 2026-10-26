@@ -95,13 +95,12 @@ def test_there_is_no_mode_switch_any_more():
     assert "function setRawMode(on)" in text
 
 
-def test_the_switch_is_called_rohtext_and_toggles_the_raw_mode():
-    """Der Schalter heisst „Rohtext" (nicht „Vorschau") und schaltet den Rohmodus."""
+def test_the_rohtext_switch_is_gone():
+    """Nikinger 2026-10-26: der Rohtext ist fuer den Nutzer nicht mehr sichtbar -- kein Knopf."""
     html = APP_HTML.read_text(encoding="utf-8")
-    assert 'id="toggle-preview"' in html
-    assert ">Rohtext</button>" in html
-    text = _editor()
-    assert "setRawMode(state.mode !== \"raw\");" in text
+    assert 'id="toggle-preview"' not in html
+    assert "Rohtext</button>" not in html
+    assert "toggle-preview" not in _editor()
 
 
 def test_the_live_mode_is_the_default_when_opening():

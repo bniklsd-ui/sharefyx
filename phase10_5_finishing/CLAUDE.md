@@ -56,7 +56,7 @@ updated: 2026-10-25 (Block 13: die vier Aufträge des Nikingers gebaut — Edito
 | A | `v3.1.5` | `7358f22` | **9/9 OK** | nach Block 1–4 — **live seit 2026-10-23**, Release `20261023T065010.377336Z` |
 | B | `v3.1.6` | `e5c834e` | **9/9 OK** | nach Block 5–6 (+ **Block 7.0**, die Update-Log-ID) — **live seit 2026-10-23**, Release `20261023T165838.591015Z` · **Deploy beim Nikinger** (Hard Rule 9, `sudo`; `deploy.sh main` → Release-Tests **1380 grün** (340,7 s) → Symlink-Wechsel → Dienst neu gestartet) · `health_gate.sh --expected-version=v3.1.6 --require-todays-update-log --expected-sha=e5c834e` → **9/9 OK** (`.rail__version` v3.1.6, Release-SHA `e5c834e…`, Update-Log 2026-10-23) · **Block 7.1 (UI-1) ist gemergt** (`f0e76b0`, aus `p105-block7`) — **nicht** in diesem Release, sondern in `v3.1.7` |
 | C | `v3.1.7` | — | — | nach Block 7–8 — **2026-10-24 vorbereitet** (Badge, eigener `## 2026-10-24`-Block im Update-Log, Suite 1425 grün, `doc_health` 0, `ui_budget` 5/5), **`deploy.sh` beim Nikinger** |
-| D | `v3.1.8` | — | — | nach Block 9–11 **+ 13** (die UI-Änderungen aus Block 13 fahren mit) |
+| D | `v4.0.0` (vorher `v3.1.8`; Nikinger 2026-10-26) | — | — | nach Block 9–11 **+ 13** + Nachzug 2026-10-26 (**enthält RE-4 `rename_folder` und RE-3 `rename_space`**) (die UI-Änderungen aus Block 13 fahren mit) |
 
 **Stand 2026-10-24 (Abend):** Deploy A ist **live** (`v3.1.5`, Release `20261023T065010.377336Z`, SHA `7358f22`, `health_gate` **9/9 OK**); der Branch `p105-block5` (Block 5 + 6 + P10.5-26) ist **gemergt**. **Deploy B ist ebenfalls live**: `v3.1.6`, Release `20261023T165838.591015Z`, SHA `e5c834e`, `health_gate` **9/9 OK** (aus `main` mit `fastmcp 4.1.3`; der Deploy lief beim Nikinger, die Release-Tests im Release **1380 grün** in 340,7 s). **Block 7.1 (UI-1) ist gemergt** (`f0e76b0`) und damit ab `v3.1.7` dabei. **Deploy C (`v3.1.7`) ist vorbereitet** — Badge, eigener Update-Log-Block `## 2026-10-24` (9 Zeilen für Menschen), Suite **1425 grün** (332,6 s), `doc_health` 0, `ui_budget` **5/5** (Erstaufruf 204,5 KB); **`deploy.sh` liegt beim Nikinger**. **Die Generalprobe davor ist gefahren: 26/26 Zellen grün an der Wegwerf-Instanz** (Details im Session-Block unten; die Zeile stand vorher auf „25/25" — **datierte Korrektur**, der Block-7.0-Commit hat die Probe um eine Zelle erweitert). **Der Deploy-Aufruf der letzten Session ist an den Release-Tests gescheitert — nicht am Befehl:** eine verklebte `updated:`-Zeile in `SESSIONS_ARCHIVE.md` (behoben, Details im Session-Block) — es fehlt nur noch der Deploy-Aufruf durch den Nikinger. **Block 7.1 (UI-1) ist gebaut** auf dem Branch `p105-block7` — **nicht gemergt** (Nikinger-Entscheidung: Deploy A vor dem Branch-Merge); der Merge wartet auf Deploy A/B.
 
@@ -155,55 +155,29 @@ Ende); die **Belegte** stehen im Commit und im Session-Block.
 **P10.5-51** (Editor Stufe 1) und **P10.5-32** (UI-4) — drei Bilder, drei Urteile; die Deploys
 **C** (`v3.1.7`) und **D** (`v3.1.8`, jetzt **mit** den Änderungen aus Block 13) liegen beim Nikinger.
 
-## Session stopped — 2026-10-25 (Block 13: die vier Aufträge des Nikingers)
+## Session stopped — 2026-10-26 (Nachzug Block 13: v4.0.0, Space-Auswahl, Rohtext weg)
 
-**Ergebnis.** Alle vier Aufträge sind gebaut und **gemessen**: die **Größen** wirken im
-Live-Editor, die **Leiste** trägt Words Reihenfolge, die **Farben** sind das blaue,
-halbtransparente Design, und die **ganze Gehirnkarte** liegt als Bild vor
-(P10.5-62/63/64 ✅ ⇒ **54 ✅ · 0 ⚠️ · 10 ⬜** von 64). Suite **1586 grün**,
-`ui_budget` Erstaufruf **232,1 KB** (Grenze 400 KB, Plan-Korridor 250 KB), `doc_health` **0**.
+**Ergebnis.** Drei Wünsche des Nikingers umgesetzt, Suite **1586 grün**, Bilder von der
+Wegwerf-Instanz (`probes/p105_b14_screens.py`, freier Port, eigener Datenbaum, PID-Datei) unter
+`docs/screenshots/p105_b14_0{1,2,3,4}_*.png`. **Nicht committet, nicht deployt** — Deploy C/D
+und die Sichtungen P10.5-37/51/32 liegen weiter beim Nikinger.
 
-**13.1 Die Größe (UI-8).** Die Stufen wirken jetzt live: Basis 13 px, `klein` **11,05 px**,
-`normal` 13 px, `groß` **15,6 px** — bei **gleicher Zeilenhöhe 21 px**. **Die Ursache des
-Sprungs (gemessen, nicht geraten):** CM5 rechnet `defaultTextHeight` **einmal** (aus 50
-Zeilen) und setzt daraus die Höhe *jeder* Zeile; eine Prozent-`line-height` im Span macht die
-Zeile höher als die berechnete. **Die Lösung:** feste Pixelhöhe (`.CodeMirror { line-height:
-21px }`) + `line-height: 0` auf den Größen-Spans — der Span ändert die Schriftgröße, nicht die
-Zeilenhöhe; die Baseline bleibt. Der Overlay liefert Farbe **und** Größe, in **beliebiger
-Reihenfolge** im Text (`[Text]{.rot .klein}` wie `[Text]{.klein .rot}`).
+1. **Version `v4.0.0`** (`app.html` `.rail__version`) — Nikinger: „lieber auf V4, da große
+   Änderung". Die Form `v4.0.0` (drei Segmente, wie `v3.1.x`) ist **meine** Wahl; will er `v4`
+   oder `v4.0`, ist es eine Zeile. Die Entscheidung selbst ist seine (Memory
+   `project-ui-version-scheme`: Minor/Major-Sprung = Nikinger).
+2. **Einstellungen: die Auswahl bleibt in Stufe 3.** Öffnet man einen Space (Stufe 3), trägt
+   die Space-Zeile in Stufe 2 `aria-current="true"` — wie der Menüpunkt in Stufe 1. Vorher
+   wurde die Zeile nur beim Neuzeichnen der Liste markiert, nie beim Klick. `settings.js ::
+   show()` meldet den Zustand von Stufe 3 per Ereignis `sfx:settings-detail` (Import wäre ein
+   Zyklus, dieselbe Form wie `sfx:open-panel`); `spaces.js` markiert danach. Gemessen:
+   Detail offen → Menü `true`, Zeile `true`; Detail zu → Menü `true`, Zeile `false`.
+3. **Rohtext-Schalter entfernt** (`#toggle-preview`, Gruppe `toolbar-group--modus`, CSS-Regel,
+   Listener). `setRawMode()` bleibt als interner Pfad (`opts.mode === "raw"`, Notausgang), ist
+   aber für Nutzer nicht mehr erreichbar. Tests `test_knopfleiste_word`, `test_editor_live`,
+   `test_static_routes` nachgezogen (Knopf **fehlt** jetzt, ist nicht mehr Pflicht).
 
-**13.2 Die Leiste (UI-9).** Fünf Gruppen in **Words Ribbon-Reihenfolge** (Schriftart · Absatz ·
-Formatvorlagen · Einfügen · Modus-Schalter ganz rechts), Trenner dazwischen, **alle Knöpfe
-26 × 24 px**, **keine** HTML-Entity-Zeichen als Icons (`</>`, `•`, `—` raus — Verbotsliste
-§0.3 Punkt 1); **B** und **I** bleiben Buchstaben. Die fünf neuen Icons sind **vendored** aus
-dem Tarball **Lucide 1.38.0** (SHA-256 `d28944cfc6…` verifiziert).
+**Auffällig.** Der Wegwerf-Server beendet sich auf SIGTERM nicht binnen 10 s (SIGKILL über die
+PID-Datei) — gleiches Verhalten schon in B13, bisher nicht untersucht.
 
-**13.3 Die Farben (UI-10).** `--btn-std-fill` = `rgba(62,141,243,.20)` (Hover `.28`, Active
-`.10`, Linie `.40`) — die **datierte Umkehr** der P9-Entscheidung vom 2026-10-01 („Buttons
-deckend"), begründet mit der Rail-Auswahl (`--select-fill`). Weil die Fläche heller wird,
-wurde die **Vorsichtfarbe nachgerechnet**: `#F06A6E` → **`#FF8A8E`**, Minimum **4,76:1**
-(Hover über `--surface-raised`) statt **3,59:1** — der Kontrast ist **gerechnet** (`tests/test_contrast.py`: die rgba-Stops über
-alle vier Untergründe), nicht behauptet.
-
-**13.4 Die ganze Karte.** Die bisherigen Bilder zeigten den Ausschnitt am Bildschirmrand. Die
-Karte ist **frei zoombar** (`graph.js`: Rad 50 %..250 %) — die neuen Bilder nutzen 1920 × 1200
-und die **kleinste** Stufe (50 %): die Welt der Knoten liegt vollständig im Bild.
-**P10.5-37 bleibt ⬜** bis zum Urteil des Nikingers.
-
-**Drei Funde, die erst das Messen zeigte.** (A) Der **TOTP-Offset** der Probe war `digest[0]` —
-das ist der falsche Offset (RFC 4226 §5.3: das **letzte** Byte) → der Login der Probe schlug
-401 fehl und die Probe meldete **acht rote Zellen**: ein Messgerät, das die falsche Sache misst.
-(B) Ein **zurückgebliebener** Wegwerf-Server eines früheren Laufs schrieb seinen Index in die
-**neue** Instanz (fremde Item-ID → 500 in der Übersicht) und hielt den festen Port → jetzt
-**freier Port je Lauf** und **eigener Datenwurzel-Baum je Lauf**. (C) `i-chevron-left` stand im
-Sprite, die **Quelldatei war nie vendored** (`git log` leer) → der Sprite war **nicht aus dem
-Bestand reproduzierbar**; das zeigte erst das Neubauen (der Phase-9-Wächter wurde rot).
-Nachgetragen; **alle 25** vendored Dateien byteweise gegen den Tarball geprüft.
-
-**Verifiziert.** Probe `probes/p105_b13_knopfleiste_probe.py` **8/8 grün** an der Wegwerf-
-Instanz, der Gegenlauf **5 Zellen rot**; Wächter `tests/test_knopfleiste_word.py` (9) und
-`tests/test_contrast.py` (3) grün; Bilder `docs/screenshots/p105_b13_0{1..5}_*.png`.
-
-**Nächster Schritt.** Die drei **Sichtungen** (P10.5-37 Karte, P10.5-51 Editor, P10.5-32 UI-4)
-liegen beim Nikinger; danach Deploy **C** (`v3.1.7`) und **D** (`v3.1.8`, jetzt **mit** Block
-13). **Block Z** (Closeout) erst nach P10.5-27/28 live.
+**Nachtrag (Nikinger 2026-10-26):** `v4.0.0` bestätigt. **Sonderauftrag P10.6 (nur notiert, nicht begonnen):** 20–30-s-Intro-Film für `v4.0.0` (Product-Launch-Stil), Vollbild beim ersten Start, im Update-Log wieder aufrufbar; eigener Plan nötig, ggf. temporäre VM von eurofleet — Zeile in `ROADMAP.md`. **Offen für Deploy D:** ein `v4.0.0`-Block in `docs/UPDATE_LOG.md` (`health_gate --require-todays-update-log`); Deploy C (`v3.1.7`) ist mit dem Badge `v4.0.0` auf diesem Branch nicht mehr getrennt auslieferbar — Entscheidung beim Nikinger (C überspringen, D = alles).

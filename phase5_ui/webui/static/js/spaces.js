@@ -56,6 +56,21 @@ var spaceRemoveSubmitEl;
 var spaceRemoveCancelEl;
 
 var selectedSpaceName = null;
+// Stufe 3 sichtbar? Die Fensterkette (`settings.js`) meldet das per `sfx:settings-detail`;
+// die Markierung der Space-Zeile folgt dem Detail-Fenster wie der Menüpunkt seinem Panel.
+var detailOpen = false;
+
+function syncSpaceRows() {
+  if (!spaceAdminListEl) return;
+  spaceAdminListEl.querySelectorAll(".settings-space-row").forEach(function (row) {
+    row.setAttribute("aria-current", detailOpen && row.dataset.space === selectedSpaceName ? "true" : "false");
+  });
+}
+
+window.addEventListener("sfx:settings-detail", function (event) {
+  detailOpen = !!(event.detail && event.detail.open);
+  syncSpaceRows();
+});
 var pendingMemberBody = null;
 
 function spaceAdminError(message) {
@@ -71,7 +86,8 @@ function renderSpaceList() {
     // P9-AG: die Zeile traegt denselben Auswahlzustand wie eine Baumzeile, wenn ihr Panel
     // offen ist (Stufe 3). `aria-current` ist hier die Anzeige, nicht der Zustand — der
     // Zustand ist `selectedSpaceName` darunter, genau wie in der Rail.
-    if (selectedSpaceName === space.name) row.setAttribute("aria-current", "true");
+    row.dataset.space = space.name;
+    row.setAttribute("aria-current", detailOpen && selectedSpaceName === space.name ? "true" : "false");
     row.addEventListener("click", function () { selectSpace(space.name); });
     spaceAdminListEl.appendChild(row);
   });

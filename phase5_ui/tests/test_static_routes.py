@@ -2046,7 +2046,7 @@ def test_1024_editor_buttons_present():
         )
 
     # Vorschau-Toggle + Bild-Insert + Append (zusätzliche Editor-Bedienelemente)
-    for btn_id in ("toggle-preview", "insert-image-button", "append-button", "append-input"):
+    for btn_id in ("insert-image-button", "append-button", "append-input"):
         assert f'id="{btn_id}"' in html, (
             f"app.html muss id='{btn_id}' enthalten (H-R.5-L zusätzliche "
             f"Editor-Bedienelemente)."

@@ -45,7 +45,6 @@ var metaCreatedByEl;
 var fieldTagsEl;
 var fieldLinksEl;
 var editorToolbarEl;
-var togglePreviewButtonEl;
 var editorTextareaEl;
 // P10.5, Block 11, Schritt 11.3 (ED-1): **unbenutzt seit dem Live-Editor.** Die Vorschau-
 // Paneele im Editor (getrenntes HTML) gibt es nicht mehr -- der Live-Editor ist die Ansicht
@@ -706,8 +705,6 @@ function setRawMode(on) {
   // auch das `[ ]` eines To-dos. Die Kaestchen werden abgeraeumt und beim Zurueckschalten
   // neu gesetzt.
   _todoMarkenAuffrischen();
-  togglePreviewButtonEl.textContent = on ? "Live" : "Rohtext";
-  togglePreviewButtonEl.setAttribute("aria-pressed", on ? "true" : "false");
   // Die Formatierhilfen bleiben **aktiv** (sie schreiben in den Puffer, in beiden Ansichten
   // gleich) — sie sind kein Vorschau-Feature, sondern ein Schreibbefehl.
 }
@@ -1023,7 +1020,6 @@ export function init() {
   fieldTagsEl = document.getElementById("field-tags");
   fieldLinksEl = document.getElementById("field-links");
   editorToolbarEl = document.getElementById("editor-toolbar");
-  togglePreviewButtonEl = document.getElementById("toggle-preview");
   editorTextareaEl = document.getElementById("editor-textarea");
   editorPreviewEl = document.getElementById("editor-preview");
   saveButtonEl = document.getElementById("save-button");
@@ -1270,13 +1266,6 @@ export function init() {
       formatAusrichtungEl.value = "";
     });
   }
-
-  // P10.5, Block 11, Schritt 11.3 (ED-1/ED-5): der Schalter heißt "Rohtext" und schaltet
-  // **innerhalb** des Live-Editors zwischen Live-Darstellung und Rohtext (kein Moduswechsel
-  // mehr — s. `setRawMode()`).
-  togglePreviewButtonEl.addEventListener("click", function () {
-    setRawMode(state.mode !== "raw");
-  });
 
   // -- Bild einfügen (Block B Step B3, P6.5-J) — der Pflichtweg ist dieser Knopf, kein
   // Zwischenablage-/Drag&Drop-Einfügen (P6-AB gilt sinngemäß fort, dieselbe Regel wie bei

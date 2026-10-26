@@ -34,18 +34,17 @@ VENDOR_ICONS = REPO_ROOT / "phase5_ui/vendor/lucide/icons"
 
 #: Die **Word-Reihenfolge** (Start-Ribbon). Eine allgemeine Anordnung ist nicht
 #: urheberrechtlich geschützt — der Nikinger-Auftrag vom 2026-10-25.
-#: Schriftart → Absatz → Formatvorlagen → Einfügen, der Modus-Schalter ganz rechts.
+#: Schriftart → Absatz → Formatvorlagen → Einfügen (der Rohtext-Schalter ist seit 2026-10-26 entfernt).
 WORD_REIHENFOLGE = [
     "bold", "italic", "code", "format-farbe", "format-groesse",
     "ul", "ol", "format-ausrichtung",
     "h", "quote",
     "image", "hr", "link",
-    "toggle-preview",
 ]
 
 #: Die vier Word-Gruppen der Leiste + der Modus-Schalter (keine Word-Gruppe: ein
 #: Ansichts-Schalter, wie Words Ansichtsumschalter in der Statuszeile).
-WORD_GRUPPEN = ["schriftart", "absatz", "vorlagen", "einfuegen", "modus"]
+WORD_GRUPPEN = ["schriftart", "absatz", "vorlagen", "einfuegen"]
 
 #: Die fünf Icons, die mit der Werkzeugleiste nach Word dazukamen (Block 13.2). Sie
 #: ersetzen die HTML-Entity-Zeichen `</>`, `•` und `—` — die Verbotsliste der Phase 8

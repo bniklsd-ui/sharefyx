@@ -71,6 +71,9 @@ function show(visible) {
     node.hidden = name !== openStage;
   });
   syncSelection();
+  // Ereignis statt Import (Zyklus, s. `sfx:open-panel`): `spaces.js` markiert die Space-Zeile,
+  // solange Stufe 3 offen ist — wie der Menüpunkt, solange sein Panel offen ist.
+  window.dispatchEvent(new CustomEvent("sfx:settings-detail", { detail: { open: visible && openDetail } }));
 }
 
 // Der Menüpunkt, dessen data-panel zum offenen Panel gehört, trägt `aria-current="true"`,

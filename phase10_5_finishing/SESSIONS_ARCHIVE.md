@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-25 (Session-Block Block 12 rotiert — Doku und Altlasten; Block 13 folgt im Head) | 2026-10-25 (Session-Block Block 11.8 rotiert — der Roundtrip; Block 11.6 folgt im Head) | 2026-10-25 (Session-Block Block 11.5 rotiert — die To-do-Kästchen; Block 11.8 folgt im Head) | 2026-10-25 (Session-Block Block 11.7 rotiert — das Budget; Block 11.5 folgt im Head) | 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-26 (Session-Block Block 13 rotiert — Nachzug v4.0.0, Space-Auswahl, Rohtext weg folgt im Head) | 2026-10-25 (Session-Block Block 12 rotiert — Doku und Altlasten; Block 13 folgt im Head) | 2026-10-25 (Session-Block Block 11.8 rotiert — der Roundtrip; Block 11.6 folgt im Head) | 2026-10-25 (Session-Block Block 11.5 rotiert — die To-do-Kästchen; Block 11.8 folgt im Head) | 2026-10-25 (Session-Block Block 11.7 rotiert — das Budget; Block 11.5 folgt im Head) | 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,59 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-25 (Block 13: die vier Aufträge des Nikingers)
+
+**Ergebnis.** Alle vier Aufträge sind gebaut und **gemessen**: die **Größen** wirken im
+Live-Editor, die **Leiste** trägt Words Reihenfolge, die **Farben** sind das blaue,
+halbtransparente Design, und die **ganze Gehirnkarte** liegt als Bild vor
+(P10.5-62/63/64 ✅ ⇒ **54 ✅ · 0 ⚠️ · 10 ⬜** von 64). Suite **1586 grün**,
+`ui_budget` Erstaufruf **232,1 KB** (Grenze 400 KB, Plan-Korridor 250 KB), `doc_health` **0**.
+
+**13.1 Die Größe (UI-8).** Die Stufen wirken jetzt live: Basis 13 px, `klein` **11,05 px**,
+`normal` 13 px, `groß` **15,6 px** — bei **gleicher Zeilenhöhe 21 px**. **Die Ursache des
+Sprungs (gemessen, nicht geraten):** CM5 rechnet `defaultTextHeight` **einmal** (aus 50
+Zeilen) und setzt daraus die Höhe *jeder* Zeile; eine Prozent-`line-height` im Span macht die
+Zeile höher als die berechnete. **Die Lösung:** feste Pixelhöhe (`.CodeMirror { line-height:
+21px }`) + `line-height: 0` auf den Größen-Spans — der Span ändert die Schriftgröße, nicht die
+Zeilenhöhe; die Baseline bleibt. Der Overlay liefert Farbe **und** Größe, in **beliebiger
+Reihenfolge** im Text (`[Text]{.rot .klein}` wie `[Text]{.klein .rot}`).
+
+**13.2 Die Leiste (UI-9).** Fünf Gruppen in **Words Ribbon-Reihenfolge** (Schriftart · Absatz ·
+Formatvorlagen · Einfügen · Modus-Schalter ganz rechts), Trenner dazwischen, **alle Knöpfe
+26 × 24 px**, **keine** HTML-Entity-Zeichen als Icons (`</>`, `•`, `—` raus — Verbotsliste
+§0.3 Punkt 1); **B** und **I** bleiben Buchstaben. Die fünf neuen Icons sind **vendored** aus
+dem Tarball **Lucide 1.38.0** (SHA-256 `d28944cfc6…` verifiziert).
+
+**13.3 Die Farben (UI-10).** `--btn-std-fill` = `rgba(62,141,243,.20)` (Hover `.28`, Active
+`.10`, Linie `.40`) — die **datierte Umkehr** der P9-Entscheidung vom 2026-10-01 („Buttons
+deckend"), begründet mit der Rail-Auswahl (`--select-fill`). Weil die Fläche heller wird,
+wurde die **Vorsichtfarbe nachgerechnet**: `#F06A6E` → **`#FF8A8E`**, Minimum **4,76:1**
+(Hover über `--surface-raised`) statt **3,59:1** — der Kontrast ist **gerechnet** (`tests/test_contrast.py`: die rgba-Stops über
+alle vier Untergründe), nicht behauptet.
+
+**13.4 Die ganze Karte.** Die bisherigen Bilder zeigten den Ausschnitt am Bildschirmrand. Die
+Karte ist **frei zoombar** (`graph.js`: Rad 50 %..250 %) — die neuen Bilder nutzen 1920 × 1200
+und die **kleinste** Stufe (50 %): die Welt der Knoten liegt vollständig im Bild.
+**P10.5-37 bleibt ⬜** bis zum Urteil des Nikingers.
+
+**Drei Funde, die erst das Messen zeigte.** (A) Der **TOTP-Offset** der Probe war `digest[0]` —
+das ist der falsche Offset (RFC 4226 §5.3: das **letzte** Byte) → der Login der Probe schlug
+401 fehl und die Probe meldete **acht rote Zellen**: ein Messgerät, das die falsche Sache misst.
+(B) Ein **zurückgebliebener** Wegwerf-Server eines früheren Laufs schrieb seinen Index in die
+**neue** Instanz (fremde Item-ID → 500 in der Übersicht) und hielt den festen Port → jetzt
+**freier Port je Lauf** und **eigener Datenwurzel-Baum je Lauf**. (C) `i-chevron-left` stand im
+Sprite, die **Quelldatei war nie vendored** (`git log` leer) → der Sprite war **nicht aus dem
+Bestand reproduzierbar**; das zeigte erst das Neubauen (der Phase-9-Wächter wurde rot).
+Nachgetragen; **alle 25** vendored Dateien byteweise gegen den Tarball geprüft.
+
+**Verifiziert.** Probe `probes/p105_b13_knopfleiste_probe.py` **8/8 grün** an der Wegwerf-
+Instanz, der Gegenlauf **5 Zellen rot**; Wächter `tests/test_knopfleiste_word.py` (9) und
+`tests/test_contrast.py` (3) grün; Bilder `docs/screenshots/p105_b13_0{1..5}_*.png`.
+
+**Nächster Schritt.** Die drei **Sichtungen** (P10.5-37 Karte, P10.5-51 Editor, P10.5-32 UI-4)
+liegen beim Nikinger; danach Deploy **C** (`v3.1.7`) und **D** (`v3.1.8`, jetzt **mit** Block
+13). **Block Z** (Closeout) erst nach P10.5-27/28 live.
 
 ## Session stopped — 2026-10-25 (Block 12: Doku und Altlasten)
 

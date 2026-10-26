@@ -1860,12 +1860,6 @@ select.input:focus {
   padding-left: 5px;
   border-left: 1px solid var(--line);
 }
-/* Der Modus-Schalter (Rohtext) ist keine Formatierung: er steht **ganz rechts**, wie
-   Words Ansichtsumschalter in der Statuszeile. `margin-left: auto` schiebt ihn ans
- * Ende der Leiste; die Spezifitaet (0,2,0) muss die der Gruppen-Regel (0,2,0) schlagen —
-   gleiche Spezifitaet, spaeter im Stylesheet gewinnt. */
-.editor__toolbar .toolbar-group--modus { margin-left: auto; }
-
 .toolbar-btn {
   /* P9, Nikinger-Entscheidung 2026-10-01 (zweite Runde am selben Tag): die Formatierhilfen der
      Textleiste tragen jetzt dieselben Tokens wie `.btn` (siehe `--btn-std-*` in :root)
