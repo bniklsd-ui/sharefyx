@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-27 (Session-Block Block 14.35 rotiert — die Beschriftungen ohne Überlappung) | 2026-10-26 (Session-Block Block 14.2 rotiert — L4, die Anker-Gravitation; Block 14.3 folgt im Head) | 2026-10-26 (Session-Block Block 14.1 rotiert — L1–L3, der Seed wird zum Weltgenerator) | 2026-10-26 (Session-Block Block 14.0 rotiert — die Basislinie des Kartenlayouts) | 2026-10-26 (Session-Block Nachzug Block 13 rotiert — v4.0.0, Space-Auswahl, Rohtext weg; Block 14.0 folgt im Head) | 2026-10-26 (Session-Block Block 13 rotiert — Nachzug v4.0.0, Space-Auswahl, Rohtext weg folgt im Head) | 2026-10-25 (Session-Block Block 12 rotiert — Doku und Altlasten; Block 13 folgt im Head) | 2026-10-25 (Session-Block Block 11.8 rotiert — der Roundtrip; Block 11.6 folgt im Head) | 2026-10-25 (Session-Block Block 11.5 rotiert — die To-do-Kästchen; Block 11.8 folgt im Head) | 2026-10-25 (Session-Block Block 11.7 rotiert — das Budget; Block 11.5 folgt im Head) | 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-27 (Block 14.35: ein Session-Block wandert in das Archiv — die Beschriftungen ohne Überlappung) | 2026-10-27 (Session-Block Block 14.35 rotiert — die Beschriftungen ohne Überlappung) | 2026-10-26 (Session-Block Block 14.2 rotiert — L4, die Anker-Gravitation; Block 14.3 folgt im Head) | 2026-10-26 (Session-Block Block 14.1 rotiert — L1–L3, der Seed wird zum Weltgenerator) | 2026-10-26 (Session-Block Block 14.0 rotiert — die Basislinie des Kartenlayouts) | 2026-10-26 (Session-Block Nachzug Block 13 rotiert — v4.0.0, Space-Auswahl, Rohtext weg; Block 14.0 folgt im Head) | 2026-10-26 (Session-Block Block 13 rotiert — Nachzug v4.0.0, Space-Auswahl, Rohtext weg folgt im Head) | 2026-10-25 (Session-Block Block 12 rotiert — Doku und Altlasten; Block 13 folgt im Head) | 2026-10-25 (Session-Block Block 11.8 rotiert — der Roundtrip; Block 11.6 folgt im Head) | 2026-10-25 (Session-Block Block 11.5 rotiert — die To-do-Kästchen; Block 11.8 folgt im Head) | 2026-10-25 (Session-Block Block 11.7 rotiert — das Budget; Block 11.5 folgt im Head) | 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,54 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-27 (Block 14.35: die Beschriftungen ohne Überlappung)
+
+**Ergebnis.** Schritt **14.35** des Plans: die Beschriftungen überlappen sich nicht mehr.
+Beleg: `probes/p105_b14_layout_probe.json` (Browser, Wegwerf) + `…_gegenlauf_beschriftung.json`.
+
+**Der Code** (`phase5_ui/webui/static/js/graph.js`, der einzige Produktcode): `drawLabels()`
+sammelt die Beschriftungs-Rechtecke (Breite aus `ctx.measureText`, Höhe `LABEL_HEIGHT` = 12 px,
+Abstand `LABEL_OFFSET` = 6 px vom Knotenrand) und zeichnet **nur**, was kein schon gezeichnetes
+Rechteck überlappt (`labelRectOverlaps()`). Die Reihenfolge ist der **Vorrang** (Plan §2.7):
+Fokus → erster Ring → Suchtreffer → Rest nach Grad absteigend (`labelCandidates()`); der Fokus
+verliert seine Beschriftung **nie**. **Reine Zeichenlogik** — die Positionen der Knoten bleiben,
+die Kamera misst nach dem Umbau **unverändert** (Füllgrad 93,6 %, Versatz 0,42 px). Die *Menge*
+der beschrifteten Knoten ändert sich **nicht** (Plan 8.6: Fokus + erster Ring immer, sonst erst ab
+`ZOOM_LABEL_THRESHOLD`); die Suchtreffer sind eine *Stufe der Reihenfolge*, kein eigener Anlass.
+**Ein leerer Titel belegt keine Fläche** (ein Rechteck der Breite 0 würde sonst die
+Nachbarbeschriftung wegdrücken — die Prüfung sieht die Rechtecke, nicht die Buchstaben).
+
+**Die Messung** (Wegwerf-Instanz, 5 Spaces, 152 Knoten, Fokus `itm_0000003f` mit **12** Nachbarn):
+**13** Kandidaten, **10** gezeichnet, **3** weggelassen, **0** überlappende Paare — der Stand
+14.3 zählte **4** per Pixelvergleich, der Recorder zählt dieselbe Szene mit **5**; die
+Fokus-Beschriftung steht am **Pixel** nachgewiesen auf der Leinwand (69 Pixel). Der
+Gegenlauf `beschriftung` (die Kollisionsprüfung aus) macht **genau diese** Zelle rot und stellt
+den Stand von 14.2 wieder her: 13 gezeichnet, 0 weggelassen, **5** Paare.
+
+**Ein Befund an der Messung selbst — er ändert die Messung, nicht die Regel.** Die *Menge* der
+gezeichneten Beschriftungen misst der Browser jetzt an den **`fillText`-Aufrufen** des letzten
+Bildes (ein Recorder an der Leinwand-API — **kein** Haken im Produktcode), **nicht** mehr an den
+Pixeln: die neue Regel lässt überlappende Beschriftungen **weg**, und an den Pixeln ist ein
+*weggelassenes* Rechteck nicht von einem *gezeichneten* zu unterscheiden (zwei überlappende
+Rechtecke teilen sich ihre Pixel). Der Pixelbeweis bleibt für die Fokus-Beschriftung.
+**Nebenbefund:** der alte Pixelvergleich zählte **4** Paare, der Recorder zählt **5** — er zählt
+die Paare aus den Rechtecken, nicht aus den Pixeln. Die Mindestzahl gezeichneter Beschriftungen
+(„die Hälfte der Kandidaten") ist auf **zwei** gesenkt: die Hälfte wäre nach der neuen Regel der
+**falsche** Maßstab; der Wächter prüft zusätzlich, dass **mindestens eine** weggelassen wurde.
+
+**Abnahme.** **P10.5-71 geschlossen** (die Beschriftungen) → **63 ✅ · 0 ⚠️ · 8 ⬜**. Wächter
+`tests/test_b14_layout_probe.py` **15/15** (Zellen, Zahlen, Prüfsummen, fünf Gegenläufe, sieben
+Manipulations-Gegenproben), `tests/test_graph_c2.py` **21/21**. Suite **1610** grün, `doc_health`
+0, `ui_budget` **6/6** (Erstaufruf **238,9 KB**; `graph.js` **28,9 → 29,8 KB** gz).
+
+**Datierte Anmerkung:** der 14.3-Block trägt das Datum **2026-10-26**, sein Commit und sein
+Beleg dagegen **2026-10-27** (UTC) — der Block ist einen Tag zu früh datiert; hier steht das
+richtige Datum.
+
+**Nächster Schritt:** **14.4** (die Startwerte messen: `ANCHOR_GRAVITY` 0,02 · `CROSS_SPRING_FACTOR`
+0,15 · `CROSS_SPRING_LENGTH_FACTOR` 3 · `ALPHA_START_SEEDED` 0,5 — und den fehlenden Gegenlauf
+für die Regionen-Zelle schließen), dann **14.5** (die Bilder beim Nikinger).
 
 ## Session stopped — 2026-10-26 (Block 14.3: die Kamera — `fitView()`)
 

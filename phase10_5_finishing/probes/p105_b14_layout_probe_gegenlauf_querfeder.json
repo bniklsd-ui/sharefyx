@@ -1,8 +1,23 @@
 {
   "probe": "p105_b14_layout_probe",
-  "schritt": "14.35",
+  "schritt": "14.4",
   "gegenlauf": "querfeder",
-  "zeit": "2026-10-27T17:16:49.633441+00:00",
+  "konstanten_varianten": {},
+  "konstanten_gesendet": {
+    "REGION_ITEM_STEP": "22",
+    "REGION_PAD": "30",
+    "REGION_GAP": "40",
+    "ISLAND_FACTOR": "0.55",
+    "ITEM_STEP": "14",
+    "ITEM_JITTER_PX": "8",
+    "GOLDEN_ANGLE": "2.399963229728653",
+    "ANCHOR_GRAVITY": "0.02",
+    "CROSS_SPRING_FACTOR": "0.15",
+    "CROSS_SPRING_LENGTH_FACTOR": "3",
+    "ALPHA_START_SEEDED": "0.5",
+    "FIT_MARGIN": "40"
+  },
+  "zeit": "2026-10-27T19:03:41.127586+00:00",
   "seed": {
     "spaces": 5,
     "items": 152,
@@ -50,6 +65,12 @@
         ]
       },
       "beispiele_falsch": [],
+      "marge_min_px": 8.567339048513816,
+      "marge_median_px": 178.87661382691516,
+      "abstand_eigen_median_px": 66.91630759554968,
+      "abstand_fremd_min_px": 115.68916207762169,
+      "engster_abstand_px": 16.1245154965971,
+      "ueberlappende_paare": 2,
       "ok": true
     },
     "kamera": {
@@ -165,7 +186,7 @@
         "itm_0000092a"
       ],
       "graph_knoten": 201,
-      "ruhe_ms": 2147,
+      "ruhe_ms": 2146,
       "luecken_ms": [],
       "raf_calls": 130,
       "raf_calls_reduced_motion": 0,

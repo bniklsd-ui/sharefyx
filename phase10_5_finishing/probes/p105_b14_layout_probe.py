@@ -88,6 +88,7 @@ from __future__ import annotations
 import base64
 import json
 import os
+import re
 import secrets
 import signal
 import ssl
@@ -149,6 +150,13 @@ BASE = ""
 # | `alpha` | §2.4 -- die Startenergie ist die **gesäte** | `budget` | `ALPHA_START_SEEDED` → 1 und `ALPHA_DECAY` → 0,995 (die Simulation reisst das 3-s-Budget) |
 # | `fitview` | §2.5 -- die Kamera **passt sich ein** | `kamera` | `fitView()` ist aus (das ist der Stand von 14.2) |
 # | `beschriftung` | §2.7 -- die Beschriftungen **überlappen sich nicht** | `beschriftungen` | die Kollisionsprüfung ist aus (das ist der Stand von 14.2) |
+# | `region` | §2.1 L1 -- **eine Region je Space** | `regionen` | der zweite Space bekommt **keine eigene Region** (sein Abstand ist null) |
+#
+# **`zentrum` und `region` (datierte Korrektur, Schritt 14.4):** der Plan §5 nannte für
+# **P10.5-66** den Gegenlauf "`ANCHOR_GRAVITY` → Leinwandmitte". **Gemessen:** dieser
+# Gegenlauf macht **keine** Zelle rot (14.2) — er wirkt auf die **Weltgröße**, nicht auf die
+# Regionen-Zelle. Der Gegenlauf, der die Zelle **wirklich** rot macht, ist `region`: er bricht
+# die Regel, die sie misst (**eine Region je Space**).
 #
 # **Die Anker sind eindeutig** (Regel + Nachbarzeile, nicht nur ein Wert) -- sonst patcht der
 # Gegenlauf den Kommentar über der Regel statt der Regel.
@@ -184,15 +192,102 @@ GEGENLAEUFE = {
             "  return false;  // Gegenlauf 14.35: die Kollisionspruefung ist aus\n"
             "  for (var i = 0; i < belegt.length; i++) {",
     },
+    # **14.4: die Regionen-Zuordnung des Spaces verschieben.** Die Regel (Plan §2.1, L1): "eine
+    # **Region je Space**". Der Gegenlauf legt **alle** Anker auf **einen** Punkt -- es gibt
+    # dann nur noch **eine** Region statt einer je Space (derselbe Gegenlauf wie im Seed-Harness
+    # `anker`: die Regel wird in beiden Schichten gebrochen).
+    #
+    # **Warum *alle* Anker und nicht einer (gemessen, Schritt 14.4):** die Browser-Probe misst
+    # die **entspannte** Karte, und die **Anker-Gravitation repariert** eine verschobene
+    # Region: der verschobene Cluster wird von der Repulsion wieder herausgeschoben (gemessen:
+    # der zweite Space bekommt den Anker des eigenen => der Cluster liegt **205 px** daneben,
+    # die Regions-Zelle bleibt **grün** bei 100 %; verschiebt man nur die *Ordner-Inseln*,
+    # bleiben 97,4 % bzw. 98,7 % grün). **Erst wenn kein Space einen eigenen Anker hat, bleiben
+    # die Items ineinander** -- dann wird die Zelle rot (92,1 % statt 95 %).
+    #
+    # **Der Anker ist die Regelzeile** (die eine Zeile, die den **Abstand** der Region vom
+    # Anker bestimmt) -- gepatcht wird die *Platzierung der Region*, nicht ihr Radius.
+    "region": {
+        "    var abstand = k === 0 ? 0 : slot * Math.sqrt(k);":
+            "    var abstand = 0;",
+    },
 }
+
+
+
 #: Der Gegenlauf dieses Laufs (`None` = der Normalfall).
 GEGENLAUF = None
+#: **Die Startwert-Messung (Schritt 14.4).** Die vier L4-Konstanten des Plans (§2.4) sind
+#: **Startwerte** — "in 14.4 werden sie **gemessen** (nicht gesetzt)" (Plan §2.4, datiert
+#: 2026-10-26). Ein Lauf mit `--konstante=NAME=WERT` patcht die Konstante in der **Kopie**
+#: der statischen Dateien (der Arbeitsbaum bleibt unberührt, wie bei einem Gegenlauf) und
+#: schreibt seinen Beleg in eine **eigene** Datei — der Normalfall-Beleg darf nie von einer
+#: Messvariante überschrieben werden.
+#:
+#: **Warum die Option und kein neuer Gegenlauf:** ein Gegenlauf macht eine Zelle **rot** und
+#: belegt damit, dass die Zelle die Regel misst. Eine Messvariante dagegen **misst** die
+#: Wirkung eines Wertes — sie beantwortet die Frage "welcher Wert ist der richtige?".
+#: Beides ist derselbe Mechanismus (ein Patch in einer Kopie), aber mit anderem Ziel.
+KONSTANTEN: dict[str, str] = {}
+#: Der Dateiname des Belegs (ohne `--label` aus den Werten gebildet).
+LABEL = ""
 for _arg in sys.argv[1:]:
     if _arg.startswith("--gegenlauf="):
         GEGENLAUF = _arg.split("=", 1)[1]
+    elif _arg.startswith("--konstante="):
+        _name, _, _wert = _arg.split("=", 1)[1].partition("=")
+        KONSTANTEN[_name.strip()] = _wert.strip()
+    elif _arg.startswith("--label="):
+        LABEL = _arg.split("=", 1)[1].strip()
 if GEGENLAUF is not None and GEGENLAUF not in GEGENLAEUFE:
     raise SystemExit("unbekannter Gegenlauf: %s (bekannt: %s)"
                      % (GEGENLAUF, ", ".join(sorted(GEGENLAEUFE))))
+if GEGENLAUF is not None and KONSTANTEN:
+    raise SystemExit("ein Lauf ist entweder ein Gegenlauf oder eine Messvariante — nicht beides")
+if KONSTANTEN and not LABEL:
+    LABEL = "_".join("%s%s" % (n, w) for n, w in sorted(KONSTANTEN.items()))
+
+#: Die **Block-14-Konstanten** (Plan §2) — sie stehen im Beleg, damit der Leser weiss,
+#: mit welchen Werten gemessen wurde. Der Wert kommt aus der **echten** `graph.js` (nach dem
+#: Patch), nicht aus einer Dublette hier.
+BLOCK14_KONSTANTEN = [
+    "REGION_ITEM_STEP", "REGION_PAD", "REGION_GAP", "ISLAND_FACTOR", "ITEM_STEP",
+    "ITEM_JITTER_PX", "GOLDEN_ANGLE", "ANCHOR_GRAVITY", "CROSS_SPRING_FACTOR",
+    "CROSS_SPRING_LENGTH_FACTOR", "ALPHA_START_SEEDED", "FIT_MARGIN",
+]
+
+
+def _graph_text() -> str:
+    return (REPO_ROOT / "phase5_ui" / "webui" / "static" / "js" / "graph.js").read_text(
+        encoding="utf-8")
+
+
+def _konstanten_patch() -> dict:
+    """Der Patch der Messvariante: `const NAME = alt;` → `const NAME = neu;`.
+
+    Der Anker wird aus der **echten** `graph.js` gelesen (nicht hier wiederholt) — sonst
+    wäre die Dublette die stille Abweichung, die dieser Ordner zweimal getroffen hat."""
+    text = _graph_text()
+    patch = {}
+    for name, wert in KONSTANTEN.items():
+        treffer = re.search(r"^const %s = ([^;]+);" % re.escape(name), text, re.M)
+        if not treffer:
+            raise SystemExit("Konstante steht nicht in graph.js: " + name)
+        alt = "const %s = %s;" % (name, treffer.group(1))
+        if alt in patch:
+            raise SystemExit("zwei Konstanten mit demselben Anker: " + alt)
+        patch[alt] = "const %s = %s;" % (name, wert)
+    return patch
+
+
+def _konstanten_werte(text: str) -> dict:
+    """Die Werte der Block-14-Konstanten in einem (ggf. gepatchten) Quelltext."""
+    werte = {}
+    for name in BLOCK14_KONSTANTEN:
+        treffer = re.search(r"^const %s = ([^;]+);" % re.escape(name), text, re.M)
+        if treffer:
+            werte[name] = treffer.group(1)
+    return werte
 
 # -- Der TLS-Launcher: dieselbe App wie `phase2_mcp/scripts/serve.py`, plus TLS ----------------
 # (Muster aus `phase10_inventory/probes/p10_wegwerf.py :: SERVE_TLS_LAUNCHER`.)
@@ -428,6 +523,12 @@ def _serve() -> int:
         # `graph.js` gepatcht ist (der Arbeitsbaum bleibt unberuehrt).
         env["GRAPH_PATCH"] = json.dumps(GEGENLAEUFE[GEGENLAUF])
         env["STATIC_DIR"] = str(WEGWERF_ROOT / ("static-%d" % PID))
+    elif KONSTANTEN:
+        # **Die Messvariante (Schritt 14.4):** dieselbe Kopie, aber mit einem anderen
+        # Startwert. Auch hier bleibt der Arbeitsbaum unberuehrt.
+        env["GRAPH_PATCH"] = json.dumps(_konstanten_patch())
+        env["STATIC_DIR"] = str(WEGWERF_ROOT / ("static-%d" % PID))
+
 
     subprocess.run(
         ["openssl", "req", "-x509", "-newkey", "rsa:2048", "-keyout", str(TLS_KEY),
@@ -1205,6 +1306,14 @@ def main():
         zentren = schwerpunkte(pos2, raum_von)
         richtig = 0
         falsch_beispiele = []
+        # **Die Marge (Schritt 14.4):** je Knoten der Abstand zum **naechsten fremden**
+        # Schwerpunkt minus dem Abstand zum **eigenen** Schwerpunkt. Positiv = der Knoten
+        # liegt in seiner Region, und die Zahl sagt, **wie viel** Spielraum die Trennung
+        # hat (ein Wert nahe 0 waere eine Zelle, die beim naechsten Item kippt). Ohne diese
+        # Zahl waere die Konstanten-Wahl eine Augenentscheidung.
+        margen = []
+        abstaende_eigen = []
+        abstaende_fremd = []
         for nid, xy in pos2.items():
             eigen = raum_von.get(nid)
             if eigen is None:
@@ -1214,16 +1323,60 @@ def main():
                 richtig += 1
             elif len(falsch_beispiele) < 5:
                 falsch_beispiele.append({"id": nid, "space": eigen, "naechster": best[0]})
+            d_eigen = ((xy[0] - zentren[eigen][0]) ** 2 + (xy[1] - zentren[eigen][1]) ** 2) ** 0.5
+            d_fremd = None
+            for sp, z in zentren.items():
+                if sp == eigen:
+                    continue
+                d = ((xy[0] - z[0]) ** 2 + (xy[1] - z[1]) ** 2) ** 0.5
+                if d_fremd is None or d < d_fremd:
+                    d_fremd = d
+            if d_fremd is None:
+                continue
+            abstaende_eigen.append(d_eigen)
+            abstaende_fremd.append(d_fremd)
+            margen.append(d_fremd - d_eigen)
         anzahl = sum(1 for nid in pos2 if raum_von.get(nid) is not None)
         anteil = richtig / anzahl if anzahl else 0.0
+        margen.sort()
+        # **Die Dichte** (Schritt 14.4): der kleinste Abstand zwischen zwei Knoten und die
+        # Zahl der Paare, deren **Kreise sich ueberlappen** (der Radius folgt dem Produktcode:
+        # `NODE_RADIUS_BASE + NODE_RADIUS_PER_LOG * log2(1 + Grad)`, gedeckelt). Das sind die
+        # Zahlen, mit denen der **Seed** geprueft wurde (Plan §2.3: "dicht, ohne Ueberlappung"):
+        # ohne sie waere `ITEM_STEP` (14 px) eine Setzung, keine Messung.
+        grad = {nid: len(nb) for nid, nb in nachbarn.items()}
+        ids = list(pos2.keys())
+        engster = None
+        ueberlappungen = 0
+        for i in range(len(ids)):
+            a = pos2[ids[i]]
+            ra = min(4 + 2 * math.log2(1 + grad.get(ids[i], 0)), 12)
+            for j in range(i + 1, len(ids)):
+                b = pos2[ids[j]]
+                d = ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5
+                if engster is None or d < engster:
+                    engster = d
+                rb = min(4 + 2 * math.log2(1 + grad.get(ids[j], 0)), 12)
+                if d < ra + rb:
+                    ueberlappungen += 1
         messungen["regionen"] = {
             "knoten": anzahl,
             "richtig": richtig,
             "anteil": anteil,
             "schwerpunkte": zentren,
             "beispiele_falsch": falsch_beispiele,
+            # **Die Marge** (Schritt 14.4): die Trennung der Regionen hat einen **Spielraum**.
+            "marge_min_px": margen[0] if margen else None,
+            "marge_median_px": margen[len(margen) // 2] if margen else None,
+            "abstand_eigen_median_px": (sorted(abstaende_eigen)[len(abstaende_eigen) // 2]
+                                        if abstaende_eigen else None),
+            "abstand_fremd_min_px": min(abstaende_fremd) if abstaende_fremd else None,
+            # **Die Dichte** (Schritt 14.4): die Zahlen des Seeds.
+            "engster_abstand_px": engster,
+            "ueberlappende_paare": ueberlappungen,
             "ok": anteil >= 0.95,
         }
+
 
         messungen["kamera"] = kamera_messung(page, lauf2, pos2)
 
@@ -1369,8 +1522,12 @@ def main():
 
     bericht = {
         "probe": "p105_b14_layout_probe",
-        "schritt": "14.35",
+        "schritt": AUFTRAG.get("schritt", "14.4"),
         "gegenlauf": AUFTRAG.get("gegenlauf"),
+        # **Die Randbedingung der Messung (Schritt 14.4):** welche Startwerte hat der Server
+        # ausgeliefert? Ohne diese Zeile waere der Beleg eine Behauptung ohne Randbedingung.
+        "konstanten_varianten": AUFTRAG.get("konstanten_varianten") or {},
+        "konstanten_gesendet": AUFTRAG.get("konstanten_gesendet") or {},
         "zeit": datetime.now(timezone.utc).isoformat(),
         "seed": AUFTRAG["seed"],
         "messungen": messungen,
@@ -1398,12 +1555,23 @@ def main() -> int:
     if GEGENLAUF is not None:
         RESULT = Path(__file__).resolve().with_name(
             "p105_b14_layout_probe_gegenlauf_%s.json" % GEGENLAUF)
+    elif KONSTANTEN:
+        # **Die Messvariante schreibt in ihre eigene Datei** — der Normalfall-Beleg (die
+        # Abnahme) darf nie von einer Messvariante ueberschrieben werden.
+        RESULT = Path(__file__).resolve().with_name(
+            "p105_b14_layout_probe_konstante_%s.json" % LABEL)
     PORT = _freier_port()
     BASE = f"https://127.0.0.1:{PORT}"
     creds = _setup()
     _seed()
     try:
         _serve()
+        # **Die gesendeten Werte** der Block-14-Konstanten: der Beleg muss sagen, **womit**
+        # gemessen wurde (sonst ist die Datei eine Behauptung ohne Randbedingung).
+        text = _graph_text()
+        for alt, neu in (GEGENLAEUFE[GEGENLAUF].items() if GEGENLAUF is not None
+                         else _konstanten_patch().items()):
+            text = text.replace(alt, neu)
         auftrag = {
             "base": BASE,
             "space": SPACE,
@@ -1416,6 +1584,11 @@ def main() -> int:
             "extra_items": EXTRA_ITEMS,
             "pid": PID,
             "gegenlauf": GEGENLAUF,
+            # **Die Messvariante (14.4):** die variierten Startwerte und die Werte, die
+            # **tatsaechlich** serviert wurden.
+            "konstanten_varianten": KONSTANTEN,
+            "konstanten_gesendet": _konstanten_werte(text),
+            "schritt": "14.4",
             "spaces": SPACES,
             "seed": {"spaces": len(SPACES), "items": sum(ITEMS_PRO_SPACE.values()),
                      "items_pro_space": ITEMS_PRO_SPACE, "wachser_space": WACHSER_SPACE},

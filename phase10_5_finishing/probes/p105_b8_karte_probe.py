@@ -301,26 +301,40 @@ async def _warte_bereit(page) -> None:
     await page.wait_for_selector(".overview__graph canvas", state="visible", timeout=15000)
 
 
-async def _settle(page, budget_ms: int = 12000) -> None:
-    """Warten, bis der Canvas zweimal hintereinander gleich ist (die Karte zur Ruhe)."""
+async def _settle(page, budget_ms: int = 30000) -> None:
+    """Warten, bis die Simulation **keine Frames mehr anfordert**.
+
+    Der Canvas-Hash taugt dafuer **nicht** (Muster aus `p105_b14_layout_probe.py`, dort
+    ausdruecklich benannt): in den ersten Frames wird die Karte zweimal **unveraendert**
+    gezeichnet -- der Seed steht, die Simulation hat noch nicht gerechnet -- der Hash bleibt
+    also stabil, und die Probe erkannte die Karte als "zur Ruhe gekommen", **bevor**
+    ueberhaupt simuliert wurde. Das war vor 14.3 harmlos (die Kamera stand still), seit 14.3
+    ist es ein **Fehlgruen-Bewusst**: die Kamera passt sich **erst** nach der Entspannung ein
+    (`fitView()` beim `settle()`), ein zu frueh gemessenes Bild zeigt also die **ungepasste**
+    Kamera -- die Zelle `layout` war deshalb rot, obwohl die gemerkte Ablage stimmte
+    (gemessen: der Zoom stand nach dem Neuladen auf "100 %" statt des Einpass-Zooms).
+
+    Das richtige Signal ist der `requestAnimationFrame` **aus graph.js** (`RAF_PROBE` zaehlt
+    ihn nach dem Stack) -- derselbe, an dem auch die Zelle `reducedmotion` haengt.
+    """
+    last = -1
+    still = 0
     elapsed = 0
-    last = None
-    stable = None
     while elapsed <= budget_ms:
-        snap = await page.evaluate(CANVAS_HASH)
-        if snap is None:
-            raise RuntimeError("Canvas fehlt im DOM")
-        if snap["painted"] > 0 and snap["hash"] == last:
-            if stable is None:
-                stable = snap["now"]
-            elif snap["now"] - stable >= 100:
+        n = await page.evaluate("() => (window.__rafLog ? window.__rafLog.count : -1)")
+        if n == last:
+            still += 1
+            # vier Zehntel ohne neuen Frame = die Simulation ist durch. `n > 0` heisst: es
+            # gab ueberhaupt Frames -- ohne diese Bedingung waere die Karte schon bei der
+            # **ersten** Ruhepause (vor dem ersten Tick) "fertig".
+            if still >= 4 and (n > 0 or elapsed > 4000):
                 return
         else:
-            stable = None
-        last = snap["hash"]
+            still = 0
+        last = n
         await page.wait_for_timeout(100)
         elapsed += 100
-    raise RuntimeError("Canvas kam nicht zur Ruhe")
+    raise RuntimeError("die Simulation kam nicht zur Ruhe")
 
 
 def _instance_gesund() -> bool:
@@ -332,11 +346,16 @@ def _instance_gesund() -> bool:
 
 
 def _instanz_starten() -> None:
-    """Die 200-Knoten-Wegwerf-Instanz aufsetzen (das Skript aus Phase 8, unveraendert)."""
+    """Die 200-Knoten-Wegwerf-Instanz aufsetzen (das Skript aus Phase 8, unveraendert).
+
+    **Das Setup laeuft mit dem Projekt-venv, nicht mit dem e2e-venv** (Schritt 14.4): das
+    Setup-Skript braucht `keyring` und die Projekt-Module -- das e2e-venv hat nur Playwright.
+    Der **Server** startet ohnehin ueber `.venv/bin/python` (im Setup-Skript selbst)."""
+    setup_python = str(REPO_ROOT / ".venv" / "bin" / "python")
     if not CREDS_FILE.exists():
-        subprocess.run([sys.executable, str(SETUP), "setup"], cwd=str(REPO_ROOT), check=True)
-        subprocess.run([sys.executable, str(SETUP), "seed-items"], cwd=str(REPO_ROOT), check=True)
-    subprocess.run([sys.executable, str(SETUP), "start"], cwd=str(REPO_ROOT), check=True)
+        subprocess.run([setup_python, str(SETUP), "setup"], cwd=str(REPO_ROOT), check=True)
+        subprocess.run([setup_python, str(SETUP), "seed-items"], cwd=str(REPO_ROOT), check=True)
+    subprocess.run([setup_python, str(SETUP), "start"], cwd=str(REPO_ROOT), check=True)
 
 
 def _patchen(patches: list[tuple[str, str]]) -> str:
@@ -555,6 +574,32 @@ async def main(argv: list[str] | None = None) -> int:
                 )
                 await page.wait_for_timeout(1800)     # das Speichern ist gedrosselt (1 s)
                 nachher_lage = await page.evaluate(LAYOUT_LESE)
+                # **Die Kamera auf denselben Stand bringen wie nach dem Neuladen**
+                # (Schritt 14.4). Seit 14.3 passt die Kamera den Inhalt **ein** -- einmal je
+                # Kartenaufbau. Der Zug aber aendert den **Umriss**: nach dem Neuladen wird
+                # **neu** eingepasst (der Umriss ist jetzt groesser), und der Zoom damit ein
+                # anderer -- der gezogene Knoten laege nach dem Neuladen **nicht mehr** am
+                # selben *Bildpunkt*, obwohl seine **Weltposition** gemerkt ist (das ist die
+                # Zusage von KA-2). Die Zelle misst aber **Pixel**. Der Doppelklick (der in
+                # 14.3 `fitView()` aufruft) stellt die Kamera **vor** der Messung auf den
+                # Stand, den sie nach dem Neuladen haben wird -- damit vergleicht die Zelle
+                # wieder das Merken und nicht die Kamera.
+                #
+                # **Der Doppelklick wird als Ereignis geschickt, nicht als Doppelklick des
+                # Browsers**: sonst wuerde der Browser zwei Klicks daraus machen und der
+                # Klick auf den Knoten das Item oeffnen (die Ansicht waere danach eine
+                # andere).
+                await page.evaluate(
+                    """
+() => {
+  const c = document.getElementById('overview-graph-canvas');
+  const r = c.getBoundingClientRect();
+  c.dispatchEvent(new MouseEvent('dblclick', {
+    bubbles: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 }));
+}
+"""
+                )
+                await page.wait_for_timeout(300)
                 # Der Mauszeiger weg vom Canvas (sonst zeichnet die Karte den Fokus mit --
                 # der ist nach dem Neuladen nicht da, und die Bilder waeren nicht vergleichbar).
                 await page.mouse.move(box["left"] + 2, box["top"] + 2)

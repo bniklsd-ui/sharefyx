@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-10-27 (B14.35: die Beschriftungen — 0 überlappende Paare, 3 von 13 weggelassen; P10.5-71 ✅) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-10-27 (B14.4: die Startwerte gemessen; der Anhang zum Kartenlayout-Plan) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -28,7 +28,7 @@ updated: 2026-10-27 (B14.35: die Beschriftungen — 0 überlappende Paare, 3 von
 
 ## Root & governance
 
-- [docs/INDEX.md](./INDEX.md) — 🔗 **diese Karte** (L0) · **37.786 B — unter dem 40-KiB-Softcap** (V145 ✅) · die Karten-Chronik steht in `docs/INDEX_ENTRIES_ARCHIVE.md` · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [docs/INDEX.md](./INDEX.md) — 🔗 **diese Karte** (L0) · **37.952 B — unter dem 40-KiB-Softcap** (V145 ✅) · die Karten-Chronik steht in `docs/INDEX_ENTRIES_ARCHIVE.md` · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [CLAUDE.md](../CLAUDE.md) — 📗 **38.322 B** (vor der Rotation 114.771 B) · Wurzel-Regelwerk: Kernprinzip der dumme Server, **neun Hard Rules** (1 keine Secrets in Dateien · 3 kein Write ohne `version` · 4 Schreibrechte folgen der Mitgliedschaft · 6 nie ein offener Port · 8 Commit ⇒ Doc-Update · 9 nie `pkill -f`, nie den systemd-Dienst), Working style, Doku-Hygiene und **Current state** (Session-Bloecke, newest-first, **kein** Ein-Block-Limit — P9-A). **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [README.md](../README.md) — 📗 ~7KB · human overview + machine setup (venv, keyring, run, smoke test); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [ROADMAP.md](../ROADMAP.md) — 📗 **26.882 B** · Phasen 1–10.5, Scope, Status (LG-6: Phase 8.5 → `ROADMAP_ARCHIVE.md`) · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
@@ -59,16 +59,17 @@ updated: 2026-10-27 (B14.35: die Beschriftungen — 0 überlappende Paare, 3 von
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing — alle Baustellen schließen; Plan `docs/concepts/phase10_5_finishing_plan.md`)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **38.803 B** · Phase-10.5-Head: Modulstatus 0–14/Z, Deploy A–D, Abnahmestand (63 ✅ · 0 ⚠️ · 8 ⬜), offene Punkte
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **39.742 B** · Phase-10.5-Head: Modulstatus 0–14/Z, Deploy A–D, Abnahmestand (63 ✅ · 0 ⚠️ · 8 ⬜), offene Punkte
 - [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **35.281 B** · L3-Archiv der **geschlossenen** Abnahmezeilen (63 Zeilen), verbatim aus dem Head
-- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **135.136 B** · L3-Archiv der Session-Blöcke, verbatim
+- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **138.964 B** · L3-Archiv der Session-Blöcke, verbatim
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · L3-Archiv der **Startaufträge von Block 7 und 9** (verbatim 2026-10-23/24)
 
 
 
 - [phase10_5_finishing/FREIGABEN_ARCHIVE.md](../phase10_5_finishing/FREIGABEN_ARCHIVE.md) — 📦 **3.577 B** · die Freigaben der Phase, verbatim aus dem Head
 - [phase10_5_finishing/MODULSTATUS_ARCHIVE.md](../phase10_5_finishing/MODULSTATUS_ARCHIVE.md) — 📦 **8.581 B** · die **ausführlichen** Statusspalten der Blöcke 0–10, verbatim (2026-10-24)
-- [docs/concepts/phase10_5_block14_kartenlayout_plan.md](./concepts/phase10_5_block14_kartenlayout_plan.md) — 📗 **38.823 B** · Plan Block 14: Kartenlayout
+- [docs/concepts/phase10_5_block14_kartenlayout_plan.md](./concepts/phase10_5_block14_kartenlayout_plan.md) — 📗 **39.556 B** · Plan Block 14: Kartenlayout
+- [docs/concepts/phase10_5_block14_kartenlayout_plan_anhang.md](./concepts/phase10_5_block14_kartenlayout_plan_anhang.md) — 📦 **8.748 B** · Anhang zum Kartenlayout-Plan: §0, §3, §6
 - [phase10_5_finishing/UPDATES_ARCHIVE.md](../phase10_5_finishing/UPDATES_ARCHIVE.md) — 📦 **12285 B** · L3-Archiv der älteren `updated:`-Fäden des Phase-10.5-Heads, verbatim, newest-first (2026-10-23)
 
 ## Phase 8.6 — ✅ abgeschlossen 2026-09-19 (UI-Politur, live `v3.0.2`; zwei Pläne)
@@ -196,7 +197,7 @@ doppelt hier gelistet.)*
 - [docs/INDEX_ENTRIES_ARCHIVE.md](./INDEX_ENTRIES_ARCHIVE.md) — 📦 **46.456 B** · L3-Archiv der **datierten Nachträge aus den Einträgen dieser Karte**, verbatim, ein Abschnitt je Karte in der Reihenfolge der Karte (nicht newest-first). **Regel:** eine Kartenzeile bekommt **keinen** datierten Nachtrag mehr (`test_no_entry_line_carries_a_dated_addendum_any_more`) — die Karte ist **Stand**, das Archiv ist **Chronik**
 - [docs/INDEX_KURZUNG_ARCHIVE.md](./INDEX_KURZUNG_ARCHIVE.md) — 📦 **11.961 B** · L3-Archiv der aus der Karte gekürzten Texte — die acht Abschnittsköpfe und fünf Kartenzeilen-Chroniken, verbatim (die letzten zwei am 2026-10-24, DO-2-Luft); die Karte trägt wieder Stand, dieses Archiv die Chronik des Kürzens
 
-- [docs/INDEX_UPDATES_ARCHIVE.md](./INDEX_UPDATES_ARCHIVE.md) — 📦 **22.556 B** · L3-Archiv der `updated:`-Kette **dieser** Datei, verbatim, newest-first (erste Rotation 2026-09-19); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [docs/INDEX_UPDATES_ARCHIVE.md](./INDEX_UPDATES_ARCHIVE.md) — 📦 **22.711 B** · L3-Archiv der `updated:`-Kette **dieser** Datei, verbatim, newest-first (erste Rotation 2026-09-19); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/PROJECT_SESSION_LOG.md](./PROJECT_SESSION_LOG.md) — 📦 **265.140 B** (vor der 24-Block-Rotation 101.450 B) · L3-Archiv der historischen `[YYYY-MM-DD]`-Session-Bloecke aus `CLAUDE.md` §Current state, newest-first, plus §Frontmatter-Archiv (die `updated:`-Kette der Wurzel-`CLAUDE.md`, 28 Eintraege, verbatim seit 2026-09-13). Wer die Chronik einer alten Phase sucht, faengt hier an, nicht im Wurzel-Head
 
 ## Referenzmaterial (nicht Teil des Plan/Konzept/Handover-Trios)

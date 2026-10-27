@@ -204,13 +204,24 @@ const LAYOUT_SAVE_DELAY_MS = 1000;                  // Plan 8.5: gedrosselt 1 s
 //
 // **Alle Zahlen sind Startwerte**, justiert durch Messung in Schritt 14.4 (Plan §2.1) --
 // nicht geschaetzt uebernommen.
-const REGION_ITEM_STEP = 22;    // Startwert, gemessen in 14.4 -- der Radius je Item
-const REGION_PAD = 30;          // Startwert, gemessen in 14.4 -- der Grundradius je Region
-const REGION_GAP = 40;          // Startwert, gemessen in 14.4 -- der Abstand zweier Regionen
-const ISLAND_FACTOR = 0.55;     // Startwert, gemessen in 14.4 -- der Anteil der Region, den die
-                                //   Ordner-Inseln einnehmen
-const ITEM_STEP = 14;           // Startwert, gemessen in 14.4 -- der Abstand der Items in der Insel
-const ITEM_JITTER_PX = 8;       // Startwert, gemessen in 14.4 -- die Amplitude des Item-Jitters
+//
+// **P10.5 Block 14, Schritt 14.4: sie sind gemessen.** Der Treiber
+// `phase10_5_finishing/probes/p105_b14_startwerte.py` faehrt die Browser-Probe je Wert
+// (5 Spaces, 152 Items) und vergleicht die Zellen; die Rohdaten stehen in
+// `phase10_5_finishing/probes/p105_b14_startwerte_messung.json`.
+//
+// **Die Regel der Wahl (Schritt 14.4):** der Wert bleibt, wenn er die **Stabilitaet** haelt
+// (Median <= 2 px **und** Maximum <= 3 px) *und* die groesste **Trennungs-Marge** hat (der
+// kleinste Abstand "eigener Space-Schwerpunkt minus naechster fremder" ueber alle Knoten --
+// 0 hiesse: die Zelle kippt beim naechsten Item). Jeder Wert in beide Richtungen ist
+// gemessen: der Nachbarwert ist jeweils schlechter.
+const REGION_ITEM_STEP = 22;    // gemessen in 14.4 -- der Radius je Item (30 => Stabilitaet rot)
+const REGION_PAD = 30;          // gemessen in 14.4 -- der Grundradius je Region (50 => Maximum 23,8 px)
+const REGION_GAP = 40;          // gemessen in 14.4 -- der Abstand zweier Regionen (0 => Maximum 28,3 px)
+const ISLAND_FACTOR = 0.55;     // gemessen in 14.4 -- der Anteil der Region, den die
+                                //   Ordner-Inseln einnehmen (0,35 => Stabilitaet rot)
+const ITEM_STEP = 14;           // gemessen in 14.4 -- der Abstand der Items in der Insel
+const ITEM_JITTER_PX = 8;       // gemessen in 14.4 -- die Amplitude des Item-Jitters
 const GOLDEN_ANGLE = 2.399963229728653;  // 137,50776405003785 Grad in Radiant
 
 // -- P10.5 Block 14, Schritt 14.2: L4 -- die Entspannung ---------------------------------------
@@ -223,10 +234,18 @@ const GOLDEN_ANGLE = 2.399963229728653;  // 137,50776405003785 Grad in Radiant
 // **Die Startenergie ist kleiner:** der Seed liegt schon nah am Ziel, also reichen weniger
 // Ticks (`ALPHA_START_SEEDED` 0,5 statt `ALPHA_START` 1 -- die Zahl der Ticks ist
 // `ln(ALPHA_MIN / ALPHA_START) / ln(ALPHA_DECAY)`).
-const ANCHOR_GRAVITY = 0.02;           // Startwert, gemessen in 14.4 -- der Zug zum eigenen Anker
-const CROSS_SPRING_FACTOR = 0.15;      // Startwert, gemessen in 14.4 -- die Staerke der Querfeder
-const CROSS_SPRING_LENGTH_FACTOR = 3;  // Startwert, gemessen in 14.4 -- die Laenge der Querfeder
-const ALPHA_START_SEEDED = 0.5;        // Startwert, gemessen in 14.4 -- die Startenergie
+//
+// **Schritt 14.4: die vier Werte sind gemessen, nicht gesetzt** (Plan §2.4: "in 14.4 werden
+// sie **gemessen** (nicht gesetzt)"). Dieselbe Regel wie oben: die Stabilitaet muss halten
+// (Median <= 2 px **und** Maximum <= 3 px), und die Trennungs-Marge muss die groesste sein.
+const ANCHOR_GRAVITY = 0.02;           // gemessen in 14.4 -- der Zug zum eigenen Anker
+                                        //   (0,04 => Maximum 18,8 px; 0,08 => Median 3,2 px: rot)
+const CROSS_SPRING_FACTOR = 0.15;      // gemessen in 14.4 -- die Staerke der Querfeder
+                                        //   (0,3 => Median 5,0 px: rot; 0 => die Welt waechst auf 1334 px)
+const CROSS_SPRING_LENGTH_FACTOR = 3;  // gemessen in 14.4 -- die Laenge der Querfeder
+                                        //   (der einzige Wert, bei dem Median **und** Maximum halten)
+const ALPHA_START_SEEDED = 0.5;        // gemessen in 14.4 -- die Startenergie
+                                        //   (0,75 => Median 77,0 px: rot; 0,25 => 1769 ms, Welt 1214 px)
 
 // -- P10.5 Block 14, Schritt 14.35: die Beschriftungen ohne Ueberlappung -------------------------
 //

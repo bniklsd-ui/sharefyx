@@ -62,8 +62,9 @@ ZELLEN = {
     "beschriftungen": "P10.5-71",
 }
 
-#: **Stand 14.35** — die Beschriftungen. **Alle sechs Zellen sind grün**: die Kollisionspruefung
-#: (Plan §2.7) laesst ueberlappende Beschriftungen weg, der Fokus verliert seine nie.
+#: **Stand 14.4** — die **Startwerte gemessen** (Plan §2.1/§2.4: "Startwerte, durch Messung in
+#: 14.4 justiert", "in 14.4 werden sie **gemessen** (nicht gesetzt)"). **Alle sechs Zellen sind
+#: grün**, und der **fehlende Gegenlauf** für die Regions-Zelle ist geschlossen (`region`).
 ROT = set()
 GRUEN = {"determinismus", "regionen", "kamera", "stabilitaet", "budget", "beschriftungen"}
 
@@ -72,8 +73,9 @@ GRUEN = {"determinismus", "regionen", "kamera", "stabilitaet", "budget", "beschr
 #: → **100 %**) und `stabilitaet` (Median 327,9 px → 233 px → **0,0 px**) gruen gemacht;
 #: **14.3** hat `kamera` gruen gemacht (Füllgrad **93,6 %**, Versatz **32,3 px → 0,42 px**);
 #: **14.35** hat `beschriftungen` gruen gemacht (**5** ueberlappende Paare → **0**, **3** von
-#: **13** Beschriftungen weggelassen).
-STAND = "14.35"
+#: **13** Beschriftungen weggelassen); **14.4** hat die **Startwerte gemessen** (alle vier
+#: bestätigt) und den **Gegenlauf** `region` gebracht.
+STAND = "14.4"
 
 
 #: Der **Datensatz** (Plan §5, datierte Abweichung vom 5x30-Seed: `beta` hat 32 Items, damit
@@ -91,6 +93,7 @@ SEED_SUMME = 152
 #: | `zentrum` | — | die Gravitation zieht zur Leinwandmitte statt zum eigenen Anker (§2.4) |
 #: | `fitview` | `kamera` | die Kamera **passt sich ein** (§2.5) |
 #: | `beschriftung` | `beschriftungen` | die **Kollisionsprüfung** der Beschriftungen (§2.7) |
+#: | `region` | `regionen` | **eine Region je Space** (§2.1 L1) — der zweite Space bekommt keine eigene |
 #:
 #: **`zentrum` macht keine Zelle rot** — das ist ein *Befund*, kein Fehler des Beleugs: die
 #: Anker-Gravitation ist **nicht** die Regel, die die Regionen-Zelle misst (sie misst die
@@ -116,12 +119,34 @@ SEED_SUMME = 152
 #: anderen bleiben grün. Der Pixel-Vergleich des Standes 14.2 fand **4** Paare — er zählte
 #: eines nicht mit (zwei überlappende Rechtecke teilen sich ihre Pixel); der Recorder zählt
 #: die Paare **aus den Rechtecken**, nicht aus den Pixeln.
+#:
+#: **[Datierte Ergänzung 2026-10-27, Schritt 14.4] `region` (neu) — der Gegenlauf, der die
+#: Lücke schließt.** Der Plan §5 nannte für **P10.5-66** den Gegenlauf "`ANCHOR_GRAVITY` →
+#: Leinwandmitte" — **gemessen** lässt der keine Zelle rot werden (er wirkt auf die
+#: **Weltgröße**). `region` bricht die Regel, die die Zelle tatsächlich misst: **eine Region je
+#: Space** (§2.1 L1) — alle Anker liegen auf **einem** Punkt, es gibt nur noch **eine**
+#: Region (derselbe Gegenlauf wie im Seed-Harness `anker`).
+#:
+#: **Er macht *drei* Zellen rot** — und das ist **gemessen und begründet**: der Fehler ist der
+#: **Stand von 14.0** (die Spaces haben keine eigenen Regionen), und der bringt genau die drei
+#: roten Zellen der Basislinie zurück: `regionen` (92,1 % statt 95 %), `kamera` (die Welt ist
+#: ein **642 × 485 px** großer Klumpen ⇒ Füllgrad **56,6 %** < 60 %) und `stabilitaet` (Median
+#: **278 px** — ein Klumpen ist wackelig). Die **Beschriftungs**-Zelle bleibt grün: die
+#: Kollisionsprüfung (14.35) wirkt auch im Klumpen.
+#:
+#: **Warum nicht *ein* Space (gemessen, Schritt 14.4):** die Browser-Probe misst die
+#: **entspannte** Karte, und die Anker-Gravitation **repariert** eine verschobene Region — der
+#: verschobene Cluster wird von der Repulsion wieder herausgeschoben. Gemessen: der zweite
+#: Space bekommt den Anker des eigenen ⇒ die Zelle bleibt bei **100 %** grün (der Cluster liegt
+#: **205 px** daneben); verschiebt man nur die Ordner-Inseln, bleiben **97,4 %** bzw. **98,7 %**
+#: grün. **Erst wenn kein Space einen eigenen Anker hat, bleiben die Items ineinander.**
 GEGENLAEUFE = {
     "querfeder": ("stabilitaet", "kamera"),
     "alpha": ("budget", "stabilitaet"),
     "zentrum": (),
     "fitview": ("kamera",),
     "beschriftung": ("beschriftungen",),
+    "region": ("regionen", "kamera", "stabilitaet"),
 }
 
 
@@ -209,6 +234,22 @@ def test_the_measured_numbers_are_the_ones_the_cells_stand_on():
     assert reg["knoten"] == SEED_SUMME
     assert reg["richtig"] == SEED_SUMME, "jeder Knoten liegt seinem eigenen Space am naechsten"
     assert reg["anteil"] == pytest.approx(1.0, abs=1e-9)
+    # **[Neu, 2026-10-27, Schritt 14.4] Die **Marge** — der Spielraum der Trennung.** Die
+    # Zelle prüft nur, ob der eigene Schwerpunkt der *nächste* ist; die Marge sagt, **wie
+    # viel** Spielraum die Trennung hat (der kleinste Abstand „eigener Schwerpunkt minus
+    # nächster fremder" über alle Knoten). Ohne sie wäre die Zelle grün, obwohl die Regionen
+    # sich schon fast berühren — und die Wahl der Startwerte (§2.1) stünde auf keinem
+    # Boden. Der Gegenlauf `region` dreht sie ins Negative (das ist der Beweis, dass sie
+    # misst).
+    assert reg["marge_min_px"] > 100.0, (
+        "die Regionen haben zu wenig Spielraum — ein neues Item koennte sie kippen")
+    assert reg["marge_median_px"] > reg["marge_min_px"], "die Marge ist nicht monoton"
+    # **Die Dichte** (Schritt 14.4): die Items liegen **dicht, aber nicht uebereinander**
+    # (Plan §2.3) — der kleinste Abstand zwischen zwei Knoten und die Zahl der Paare, deren
+    # Kreise sich ueberlappen.
+    assert reg["engster_abstand_px"] > 8.0, "zwei Items liegen zu dicht beieinander"
+    assert reg["ueberlappende_paare"] <= 5, (
+        "zu viele Item-Kreise ueberlappen sich — der Seed ist zu eng")
 
     # Stabilitaet (P10.5-68): die Knoten **anderer** Spaces stehen still, und das neue Item
     # liegt in der Region seines Space.
@@ -364,12 +405,12 @@ def test_the_gegenlauf_fitview_makes_the_camera_red_and_nothing_else():
 
 
 def test_the_gegenlauf_beschriftung_makes_the_labels_red_and_nothing_else():
-    """**Der Gegenlauf zu P10.5-71:** die **Kollisionsprüfung** der Beschriftungen ist aus —
+    """**Der Gegenlauf zu P10.5-71:** die **Kollisionspruefung** der Beschriftungen ist aus —
     die ueberlappenden Beschriftungen werden wieder **alle** gezeichnet.
 
     Ohne diesen Gegenlauf waere die Beschriftungs-Zelle ein Wächter, der nichts prueft: die
     Zelle waere auch dann gruen, wenn die Regel gar nicht existierte (die Kandidaten der
-    Probe ueberlappen sich in dieser Karte von Natur aus). Der Gegenlauf stellt **genau** die
+    Probe ueberlappen sich in dieser Karte von Natur aus). Der Gegenlauf stellt **genau die**
     Zelle rot — die anderen fuenf bleiben gruen."""
     beleg = _gegenlauf_beleg("beschriftung")
     zellen = _zellen(beleg)
@@ -387,6 +428,48 @@ def test_the_gegenlauf_beschriftung_makes_the_labels_red_and_nothing_else():
     assert len(bes["ueberlappungen"]) >= 1, (
         "ohne die Kollisionspruefung ueberlappen sich die Rechtecke nicht — der Gegenlauf "
         "stellt den Fehler nicht wieder her")
+
+
+def test_the_gegenlauf_region_makes_the_regionen_cell_red():
+    """**Der Gegenlauf zu P10.5-66** (Schritt 14.4): alle Anker liegen auf **einem** Punkt —
+    es gibt **nur noch eine Region** statt einer je Space.
+
+    **Das ist der Gegenlauf, der die Lücke schließt.** Der Plan §5 nannte für P10.5-66 den
+    Gegenlauf "`ANCHOR_GRAVITY` → Leinwandmitte" — **gemessen** lässt der *keine* Zelle rot
+    werden (er wirkt auf die Weltgröße). Ohne einen wirksamen Gegenlauf wäre die
+    Regions-Zelle ein Wächter, der nichts prüft: sie wäre auch dann grün, wenn die Regel
+    „eine Region je Space" gar nicht existierte.
+
+    **Er macht *drei* Zellen rot — und das ist gemessen und begründet:** der Fehler ist der
+    **Stand von 14.0** (keine eigenen Regionen), und der bringt die drei roten Zellen der
+    Basislinie zurück: `regionen`, `kamera` (die Welt ist ein Klumpen ⇒ Füllgrad < 60 %) und
+    `stabilitaet` (ein Klumpen ist wackelig). Die **Beschriftungs**-Zelle bleibt grün — die
+    Kollisionsprüfung wirkt auch im Klumpen."""
+    beleg = _gegenlauf_beleg("region")
+    zellen = _zellen(beleg)
+    rot = {zelle for zelle, ok in zellen.items() if not ok}
+    neu_rot = rot - ROT
+    assert neu_rot == {"regionen", "kamera", "stabilitaet"}, (
+        f"der Gegenlauf `region` macht {sorted(neu_rot)} neu rot — erwartet "
+        "['kamera', 'regionen', 'stabilitaet']")
+    reg = beleg["messungen"]["regionen"]
+    # **Die Zahlen**: die Items liegen ineinander -- ihr Anteil am richtigen Schwerpunkt bricht
+    # ein, und die **Marge** (der Spielraum der Trennung) ist negativ: die Regionen sind nicht
+    # mehr getrennt.
+    assert reg["anteil"] < 0.95, (
+        "ohne eigene Regionen liegt ein Space nicht mehr bei seinem eigenen Schwerpunkt")
+    assert reg["richtig"] < reg["knoten"], "es muss Knoten geben, die im fremden Space liegen"
+    assert reg["marge_min_px"] < 0, (
+        "die Trennung der Regionen ist nicht mehr da — die Marge muss negativ sein")
+    assert len(reg.get("beispiele_falsch") or []) >= 1, (
+        "der Beleg muss zeigen, welche Knoten im fremden Space liegen")
+    # **Die beiden Folge-Zellen** sind Konsequenzen desselben Fehlers (der Klumpen) — sie
+    # werden hier festgehalten, damit eine Änderung an ihnen auffällt.
+    kam = beleg["messungen"]["kamera"]
+    assert kam["fuellgrad"] < 0.60, "der Klumpen fuellt die Leinwand nicht mehr"
+    stab = beleg["messungen"]["stabilitaet"]
+    assert stab["median_verschiebung_px"] > 2.0, "der Klumpen ist wackelig"
+
 
 
 def test_a_manipulated_beleg_would_be_rejected(tmp_path, monkeypatch):

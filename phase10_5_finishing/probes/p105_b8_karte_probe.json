@@ -2,42 +2,42 @@
   "gegenlauf": null,
   "messungen": {
     "lappen": {
-      "lappen_pixel": 137492,
-      "kern_pixel": 13989,
+      "lappen_pixel": 75256,
+      "kern_pixel": 1213,
       "ok": true
     },
     "filter": {
       "treffer_text": "10 Treffer",
-      "kern_ohne_suche": 13989,
-      "kern_mit_suche": 129,
-      "gedimmt_mit_suche": 11276,
+      "kern_ohne_suche": 1213,
+      "kern_mit_suche": 74,
+      "gedimmt_mit_suche": 1272,
       "filter_typ": "task",
-      "kern_mit_filter": 4364,
+      "kern_mit_filter": 383,
       "ok": true
     },
     "layout": {
       "quelle_px": [
-        325,
-        71
+        412,
+        559
       ],
       "ziel_px": [
         24,
         24
       ],
-      "kerne": 13989,
-      "abstand": 25,
+      "kerne": 1213,
+      "abstand": 13,
       "ablage_geaendert": true,
       "eintraege": 200,
-      "pixel_vorher": 116,
-      "pixel_nachher": 106,
-      "bild_vorher": 2489309704,
-      "bild_nachher": 404097232,
+      "pixel_vorher": 13,
+      "pixel_nachher": 11,
+      "bild_vorher": 3782740024,
+      "bild_nachher": 142671744,
       "bild_gleich": false,
       "ok": true
     },
     "reducedmotion": {
       "raf_calls": 0,
-      "kern_pixel": 13989,
+      "kern_pixel": 1213,
       "ok": true
     }
   },

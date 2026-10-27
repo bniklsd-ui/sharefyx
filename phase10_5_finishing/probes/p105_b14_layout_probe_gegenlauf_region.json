@@ -1,0 +1,260 @@
+{
+  "probe": "p105_b14_layout_probe",
+  "schritt": "14.4",
+  "gegenlauf": "region",
+  "konstanten_varianten": {},
+  "konstanten_gesendet": {
+    "REGION_ITEM_STEP": "22",
+    "REGION_PAD": "30",
+    "REGION_GAP": "40",
+    "ISLAND_FACTOR": "0.55",
+    "ITEM_STEP": "14",
+    "ITEM_JITTER_PX": "8",
+    "GOLDEN_ANGLE": "2.399963229728653",
+    "ANCHOR_GRAVITY": "0.02",
+    "CROSS_SPRING_FACTOR": "0.15",
+    "CROSS_SPRING_LENGTH_FACTOR": "3",
+    "ALPHA_START_SEEDED": "0.5",
+    "FIT_MARGIN": "40"
+  },
+  "zeit": "2026-10-27T19:13:30.497071+00:00",
+  "seed": {
+    "spaces": 5,
+    "items": 152,
+    "items_pro_space": {
+      "alpha": 30,
+      "beta": 32,
+      "gamma": 30,
+      "delta": 30,
+      "epsilon": 30
+    },
+    "wachser_space": "epsilon"
+  },
+  "messungen": {
+    "determinismus": {
+      "knoten": 152,
+      "knoten_lauf1": 152,
+      "gemeinsam": 152,
+      "max_abweichung_px": 0.0,
+      "ok": true
+    },
+    "regionen": {
+      "knoten": 152,
+      "richtig": 140,
+      "anteil": 0.9210526315789473,
+      "schwerpunkte": {
+        "alpha": [
+          746.0,
+          660.7333333333333
+        ],
+        "beta": [
+          547.375,
+          523.75
+        ],
+        "gamma": [
+          722.8666666666667,
+          465.8333333333333
+        ],
+        "delta": [
+          416.8,
+          646.1333333333333
+        ],
+        "epsilon": [
+          398.8,
+          353.8333333333333
+        ]
+      },
+      "beispiele_falsch": [
+        {
+          "id": "itm_0000000b",
+          "space": "alpha",
+          "naechster": "delta"
+        },
+        {
+          "id": "itm_00000015",
+          "space": "alpha",
+          "naechster": "gamma"
+        },
+        {
+          "id": "itm_00000023",
+          "space": "beta",
+          "naechster": "gamma"
+        },
+        {
+          "id": "itm_00000024",
+          "space": "beta",
+          "naechster": "gamma"
+        },
+        {
+          "id": "itm_00000027",
+          "space": "beta",
+          "naechster": "epsilon"
+        }
+      ],
+      "marge_min_px": -99.33914117206413,
+      "marge_median_px": 119.03081886941568,
+      "abstand_eigen_median_px": 74.15195359680162,
+      "abstand_fremd_min_px": 40.05401907979327,
+      "engster_abstand_px": 16.1245154965971,
+      "ueberlappende_paare": 8,
+      "ok": false
+    },
+    "kamera": {
+      "messbar": true,
+      "zoom": 1,
+      "zoom_anzeige": 1,
+      "leerwand": [
+        1134,
+        1061.375
+      ],
+      "welt": {
+        "x0": 286,
+        "x1": 928,
+        "y0": 262,
+        "y1": 747
+      },
+      "bild_mass": [
+        642,
+        485
+      ],
+      "fuellgrad": 0.5661375661375662,
+      "passt": true,
+      "pan": [
+        -40.44347826086954,
+        25.951296626912267
+      ],
+      "umriss_mitte": [
+        607.0,
+        504.5
+      ],
+      "versatz_mitte_px": 0.44347826086959685,
+      "unsicherheit_px": 0.6072135593220205,
+      "zentriert": true,
+      "ok": false
+    },
+    "beschriftungen": {
+      "messbar": true,
+      "fokus": "itm_0000003f",
+      "fokus_titel": "Gamma Plan 01",
+      "nachbarn": 12,
+      "kandidaten": 13,
+      "gezeichnet": 10,
+      "unterdrueckt": 3,
+      "texte": [
+        "Gamma Plan 01",
+        "Beta Plan 01",
+        "Delta Plan 01",
+        "Beta Plan 31",
+        "Gamma Frage 04",
+        "Gamma Idee 03",
+        "Gamma Skizze 07",
+        "Gamma Entwurf 30",
+        "Gamma Notiz 02",
+        "Gamma Protokoll 08"
+      ],
+      "ueberlappungen": [],
+      "fokus_beschriftung": true,
+      "fokus_pixel": 19,
+      "genug_gezeichnet": true,
+      "zoom": 1,
+      "pan": [
+        -40.44347826086954,
+        25.951296626912267
+      ],
+      "unsicherheit_px": 0.6072135593220205,
+      "treffer": 26,
+      "ok": true
+    },
+    "stabilitaet": {
+      "wachser_space": "epsilon",
+      "neues_item": "itm_00000901",
+      "position_neu": [
+        579,
+        727
+      ],
+      "naechster_schwerpunkt": "alpha",
+      "in_eigener_region": false,
+      "abstand_eigener_space_px": 321.2864765283469,
+      "abstand_fremder_space_px": 32.55764119219941,
+      "andere_spaces": 122,
+      "median_verschiebung_px": 278.08811553175013,
+      "max_verschiebung_px": 601.4864919513986,
+      "pruefsumme_vorher": 3322784946,
+      "pruefsumme_nachher": 1741405362,
+      "pinned_beim_start": 0,
+      "knoten_frisch": 153,
+      "kasten_frisch": {
+        "left": 753,
+        "top": 121.625,
+        "width": 1134,
+        "height": 1061.375,
+        "dw": 1134,
+        "dh": 1061,
+        "dpr": 1
+      },
+      "position_neu_frisch": [
+        532,
+        869
+      ],
+      "ok": false
+    },
+    "budget": {
+      "knoten": 201,
+      "pos_pruefsumme": 842138277,
+      "graph_reihenfolge": [
+        "itm_00000931",
+        "itm_00000930",
+        "itm_0000092f",
+        "itm_0000092e",
+        "itm_0000092d",
+        "itm_0000092c",
+        "itm_0000092b",
+        "itm_0000092a"
+      ],
+      "graph_knoten": 201,
+      "ruhe_ms": 2147,
+      "luecken_ms": [],
+      "raf_calls": 130,
+      "raf_calls_reduced_motion": 0,
+      "kern_pixel_reduced_motion": 4221,
+      "kern_pixel": 4221,
+      "grenze_ms": 3000,
+      "kamera_200_knoten": {
+        "messbar": true,
+        "zoom": 0.577333392,
+        "zoom_anzeige": 0.58,
+        "leerwand": [
+          1134,
+          1061.375
+        ],
+        "welt": {
+          "x0": -109,
+          "x1": 1007,
+          "y0": -678,
+          "y1": 1080
+        },
+        "bild_mass": [
+          644.304065472,
+          1014.952103136
+        ],
+        "fuellgrad": 0.9562615504755624,
+        "passt": true,
+        "pan": [
+          307.10205745676194,
+          414.4795459113618
+        ],
+        "umriss_mitte": [
+          449.0,
+          201.0
+        ],
+        "versatz_mitte_px": 0.675249535237981,
+        "unsicherheit_px": 0.6649467746061055,
+        "zentriert": true,
+        "ok": true
+      },
+      "ok": true
+    }
+  },
+  "alle_kriterien_erfuellt": false,
+  "seitenfehler": []
+}
