@@ -67,6 +67,13 @@ var dpr = 1;
 var zoom = 1;
 var panX = 0;
 var panY = 0;
+// P10.5 Block 14, Schritt 14.3 (Plan §2.5): die Kamera passt sich **einmal** je Kartenaufbau
+// ein (nach dem Einschwingen, nicht nach einem Drag). `viewFitted` merkt, dass das schon
+// geschehen ist; `viewTouchedByUser` merkt, dass der Nutzer **selbst** gezoomt oder verschoben
+// hat -- **seine Ansicht gewinnt** (Plan §2.5: "Hat der Nutzer in dieser Sitzung schon gezoomt
+// oder verschoben, passt die Karte nicht neu ein").
+var viewFitted = false;
+var viewTouchedByUser = false;
 
 var dragNode = null;       // Knoten, der gerade gezogen wird
 var panStart = null;        // Pan-Geste: {startX, startY, origPanX, origPanY}
@@ -220,6 +227,17 @@ const ANCHOR_GRAVITY = 0.02;           // Startwert, gemessen in 14.4 -- der Zug
 const CROSS_SPRING_FACTOR = 0.15;      // Startwert, gemessen in 14.4 -- die Staerke der Querfeder
 const CROSS_SPRING_LENGTH_FACTOR = 3;  // Startwert, gemessen in 14.4 -- die Laenge der Querfeder
 const ALPHA_START_SEEDED = 0.5;        // Startwert, gemessen in 14.4 -- die Startenergie
+
+// -- P10.5 Block 14, Schritt 14.3: die Kamera einpassen ----------------------------------------
+//
+// Plan §2.5: nach dem **ersten** Einschwingen je `loadGraph()` (nicht nach einem Drag) passt
+// die Kamera den Inhalt ein -- Umriss der sichtbaren Knoten plus `FIT_MARGIN`, Zoom so, dass
+// der Inhalt **in** die Leinwand passt, Pan auf die **Mitte** des Umrisses.
+//
+// **Nie ueber 100 %:** eine kleine Karte wird nicht aufgeblasen (Plan §2.5). Der Unterwert ist
+// `ZOOM_MIN` (E3: der Ausfuehrer senkt ihn, wenn 200 Knoten bei 0,5 nicht passen -- der
+// gemessene Wert steht im Bericht zu 14.3).
+const FIT_MARGIN = 40;   // Plan §2.5 (40 px) -- der Rand um den Inhalt; Startwert, gemessen in 14.4
 
 const COLORS = Object.freeze({
   bg: "#0B0D10",          // wird nicht gezeichnet -- Canvas ist transparent, darunter die .surface
@@ -774,6 +792,11 @@ function runSimulation() {
   // Seed liegt schon nah am Ziel, also reichen weniger Ticks (Plan §2.4).
   var alpha = ALPHA_START_SEEDED;
 
+  // P10.5 Block 14, Schritt 14.3: ein neuer Aufbau darf sich **einmal** wieder einpassen
+  // (Plan §2.5: "nach dem ersten Einschwingen je `loadGraph()`"). Das gilt auch fuer den Knopf
+  // "Layout zuruecksetzen" -- der baut die Karte neu auf.
+  viewFitted = false;
+
   // P8.6-D4 (Plan §6.4): jede Wiederholung von `loadGraphPanel()` (Klick auf
   // Uebersicht, Refresh) startete bisher eine **zusaetzliche**
   // `requestAnimationFrame`-Schleife. Solange die vorige noch ueber ALPHA_MIN
@@ -794,6 +817,13 @@ function runSimulation() {
   // das Ende der Tick-Kette und der reduced-motion-Pfad.
   function settle() {
     lobeCache = computeLobes(visibleNodes());
+    // P10.5 Block 14, Schritt 14.3 (Plan §2.5): die Kamera passt sich **einmal** ein -- nach
+    // dem Einschwingen, nicht nach einem Drag. Hat der Nutzer in dieser Sitzung schon
+    // gezoomt oder verschoben, **gewinnt seine Ansicht**: dann passst sich nichts neu ein.
+    if (!viewFitted) {
+      viewFitted = true;
+      if (!viewTouchedByUser) fitView();
+    }
     scheduleLayoutSave();
     draw();
   }
@@ -1696,6 +1726,44 @@ function updateZoomReadout() {
   readout.textContent = (zoom * 100).toFixed(0) + "%";
 }
 
+// P10.5 Block 14, Schritt 14.3 (Plan §2.5): die **Kamera einpassen**.
+//
+// Nach dem Einschwingen (nicht nach einem Drag) passt die Kamera den Inhalt ein: der Umriss
+// der **sichtbaren** Knoten plus `FIT_MARGIN` ergibt die Soll-Groesse; der Zoom ist so gewaehlt,
+// dass der Inhalt **in** die Leinwand passt (nie ueber 100 % -- eine kleine Karte wird nicht
+// aufgeblasen), und der Pan legt die **Mitte des Umrisses** in die Leinwandmitte.
+//
+// **Nicht** auf den Ursprung gezentriert: der Ursprung ist der Anker des **eigenen** Space
+// (Plan §2.1) -- die Mitte der Welt liegt woanders. Genau das war der Fehler, den die Kamera-
+// Zelle gemessen hat: der Umriss saß 32,3 px neben der Mitte (Stand 14.2).
+function fitView() {
+  if (nodes.length === 0 || cssWidth <= 0 || cssHeight <= 0) return;
+  var shown = visibleNodes();
+  var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  var anzahl = 0;
+  for (var i = 0; i < nodes.length; i++) {
+    var n = nodes[i];
+    if (!shown[n.id]) continue;
+    anzahl += 1;
+    if (n.x < x0) x0 = n.x;
+    if (n.x > x1) x1 = n.x;
+    if (n.y < y0) y0 = n.y;
+    if (n.y > y1) y1 = n.y;
+  }
+  if (!anzahl) return;
+  // Der Umriss **plus** der Rand: der Inhalt soll mit Luft in der Leinwand stehen.
+  var bw = (x1 - x0) + FIT_MARGIN * 2;
+  var bh = (y1 - y0) + FIT_MARGIN * 2;
+  // `clamp(min(w/bw, h/bh), ZOOM_MIN, 1)` -- die **beide** Grenzen: `ZOOM_MIN` unten (E3),
+  // **1** oben (nie ueber 100 %).
+  var z = Math.min(cssWidth / bw, cssHeight / bh);
+  zoom = Math.max(ZOOM_MIN, Math.min(1, z));
+  // Der Pan auf die **Mitte des Umrisses** (nicht auf den Ursprung).
+  panX = cssWidth / 2 - ((x0 + x1) / 2) * zoom;
+  panY = cssHeight / 2 - ((y0 + y1) / 2) * zoom;
+  updateZoomReadout();
+}
+
 function graphCoordsFromEvent(e) {
   var rect = canvasEl.getBoundingClientRect();
   var sx = e.clientX - rect.left;
@@ -1744,6 +1812,9 @@ function onMouseMove(e) {
   if (panStart) {
     panX = panStart.panX + (e.clientX - panStart.x);
     panY = panStart.panY + (e.clientY - panStart.y);
+    // P10.5 Block 14, Schritt 14.3 (Plan §2.5): der Nutzer hat die Ansicht **selbst**
+    // verschoben -- seine Ansicht gewinnt, die Karte passt sich nicht neu ein.
+    viewTouchedByUser = true;
     draw();
     return;
   }
@@ -1823,15 +1894,20 @@ function onWheel(e) {
   panX = sx - (sx - panX) * (newZoom / zoom);
   panY = sy - (sy - panY) * (newZoom / zoom);
   zoom = newZoom;
+  // P10.5 Block 14, Schritt 14.3 (Plan §2.5): der Nutzer hat **selbst** gezoomt -- seine
+  // Ansicht gewinnt, die Karte passt sich danach nicht mehr neu ein.
+  viewTouchedByUser = true;
   updateZoomReadout();
   draw();
 }
 
 function onDoubleClick() {
-  // Plan §5 D2: Doppelklick auf Hintergrund setzt Ansicht zurueck.
-  zoom = 1;
-  panX = 0;
-  panY = 0;
-  updateZoomReadout();
+  // P10.5 Block 14, Schritt 14.3 (Plan §2.5): der Doppelklick **passt die Kamera ein**. Vorher
+  // war er "Ansicht zurueck" (Zoom 1, Pan 0) -- das ist die Sicht **ohne** Einpassen, also
+  // genau das, was die Kamera-Zelle als rot gemessen hat (der Umriss 32,3 px neben der Mitte).
+  //
+  // Der Doppelklick zaehlt **nicht** als "der Nutzer hat die Ansicht selbst gewaehlt": er **ist**
+  // die gewaehlte Ansicht. Er setzt `viewTouchedByUser` deshalb nicht.
+  fitView();
   draw();
 }

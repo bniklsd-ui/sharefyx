@@ -1,8 +1,8 @@
 {
   "probe": "p105_b14_layout_probe",
-  "schritt": "14.2",
+  "schritt": "14.3",
   "gegenlauf": "alpha",
-  "zeit": "2026-10-26T20:12:24.658689+00:00",
+  "zeit": "2026-10-27T16:31:37.105762+00:00",
   "seed": {
     "spaces": 5,
     "items": 152,
@@ -73,17 +73,17 @@
       "fuellgrad": 0.890652557319224,
       "passt": true,
       "pan": [
-        -0.48360655737701563,
-        -0.4056064574245113
+        -27.100000000000023,
+        38.95134043987176
       ],
       "umriss_mitte": [
         594.0,
         491.5
       ],
-      "versatz_mitte_px": 39.59310645742448,
-      "unsicherheit_px": 0.6978309599380612,
-      "zentriert": false,
-      "ok": false
+      "versatz_mitte_px": 0.23615956012827155,
+      "unsicherheit_px": 0.643547337555221,
+      "zentriert": true,
+      "ok": true
     },
     "beschriftungen": {
       "messbar": true,
@@ -111,11 +111,11 @@
       "genug_gezeichnet": true,
       "zoom": 1,
       "pan": [
-        -0.48360655737701563,
-        -0.4056064574245113
+        -27.100000000000023,
+        38.95134043987176
       ],
-      "unsicherheit_px": 0.6978309599380612,
-      "treffer": 47,
+      "unsicherheit_px": 0.643547337555221,
+      "treffer": 37,
       "ok": false
     },
     "stabilitaet": {
@@ -169,9 +169,42 @@
       "luecken_ms": [],
       "raf_calls": 920,
       "raf_calls_reduced_motion": 0,
-      "kern_pixel_reduced_motion": 19132,
-      "kern_pixel": 19223,
+      "kern_pixel_reduced_motion": 6783,
+      "kern_pixel": 5416,
       "grenze_ms": 3000,
+      "kamera_200_knoten": {
+        "messbar": true,
+        "zoom": 0.623844744,
+        "zoom_anzeige": 0.62,
+        "leerwand": [
+          1134,
+          1061.375
+        ],
+        "welt": {
+          "x0": -327,
+          "x1": 1412,
+          "y0": -174,
+          "y1": 1156
+        },
+        "bild_mass": [
+          1084.866009816,
+          829.71350952
+        ],
+        "fuellgrad": 0.9566719663280424,
+        "passt": true,
+        "pan": [
+          227.997231288,
+          223.99743295568572
+        ],
+        "umriss_mitte": [
+          542.5,
+          491.0
+        ],
+        "versatz_mitte_px": 0.5669950919999565,
+        "unsicherheit_px": 0.6718700178229973,
+        "zentriert": true,
+        "ok": true
+      },
       "ok": false
     }
   },

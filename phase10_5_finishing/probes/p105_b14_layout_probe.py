@@ -60,6 +60,12 @@ Erst mit `passt` und `zentriert` ist der Gegenlauf „`fitView()` aus" (Plan §5
 erkennbar: `fitView()` setzt genau diese beiden Eigenschaften (Zoom so, dass der Inhalt passt,
 Pan auf die Mitte).
 
+**Die Kamera wird zweimal gemessen (Schritt 14.3).** Einmal in der Abnahme-Zelle (152 Knoten)
+und einmal in der **Budget-Zelle** (201 Knoten) — dort als `kamera_200_knoten`. Der Grund ist
+**E3** (Plan §2.5): reicht `ZOOM_MIN` (0,5) bei 200 Knoten, oder muss der Ausfuehrer ihn senken
+(Untergrenze 0,2)? Wuerde der Zoom auf `ZOOM_MIN` abgeklemmt, stuende die Anzeige genau auf
+50 % **und** der Inhalt passte nicht in die Leinwand — beides steht im Beleg.
+
 Aufruf:  `.venv/bin/python phase10_5_finishing/probes/p105_b14_layout_probe.py`
 Ergebnis: `phase10_5_finishing/probes/p105_b14_layout_probe.json`
 
@@ -131,8 +137,9 @@ BASE = ""
 # | `zentrum` | §2.4 -- die Gravitation zieht zum **eigenen Space-Anker** | `regionen` | sie zieht zur Leinwandmitte (das ist der Stand von 14.1) |
 # | `querfeder` | §2.4 -- die Querfeder ist **schwach und lang** | `stabilitaet` | sie ist so stark und kurz wie die Feder im Space |
 # | `alpha` | §2.4 -- die Startenergie ist die **gesäte** | `budget` | `ALPHA_START_SEEDED` → 1 und `ALPHA_DECAY` → 0,995 (die Simulation reisst das 3-s-Budget) |
+# | `fitview` | §2.5 -- die Kamera **passt sich ein** | `kamera` | `fitView()` ist aus (das ist der Stand von 14.2) |
 #
-# **Die Anker sind eindeutig** (Regel + Nachbarzeile, nicht nur ein Wert) — sonst patcht der
+# **Die Anker sind eindeutig** (Regel + Nachbarzeile, nicht nur ein Wert) -- sonst patcht der
 # Gegenlauf den Kommentar über der Regel statt der Regel.
 GEGENLAEUFE = {
     "zentrum": {
@@ -145,6 +152,15 @@ GEGENLAEUFE = {
     "alpha": {
         "const ALPHA_START_SEEDED = 0.5;": "const ALPHA_START_SEEDED = 1;",
         "const ALPHA_DECAY = 0.97;": "const ALPHA_DECAY = 0.995;",
+    },
+    # **14.3: die Kamera passt sich nicht ein.** Der Anker ist die **erste Zeile des
+    # Rumpfes** von `fitView()` -- sie wird durch ein bedingungsloses `return;` ersetzt, die
+    # Funktion ist damit ein No-op (Plan §5: der Gegenlauf zu P10.5-67 ist "fitView() aus").
+    # Nicht der Aufrufer wird gepatcht: sonst bliebe der Doppelklick (der `fitView()` ruft)
+    # wirksam, und der Gegenlauf maesste nicht die Regel, sondern nur ihren Aufrufer.
+    "fitview": {
+        "  if (nodes.length === 0 || cssWidth <= 0 || cssHeight <= 0) return;":
+            "  return;  // Gegenlauf 14.3: fitView() ist aus",
     },
 }
 #: Der Gegenlauf dieses Laufs (`None` = der Normalfall).
@@ -897,6 +913,65 @@ def _pan(page, kerne, pos, zoom):
     return treffer
 
 
+def kamera_messung(page, lauf, pos):
+    """Die **Kamera-Zelle** (P10.5-67): Fuellgrad, Passung, Zentrierung.
+
+    Der Pan der Kamera kommt aus den **Kernpositionen** und den Weltpositionen (derselbe Weg,
+    den die Beschriftungs-Zelle geht) -- er steht im Modul, nicht im DOM. Ohne ihn ist die
+    Zentrierung nicht messbar.
+
+    **Ein** Zoom fuer alle Rechnungen: der verfeinerte aus der Pan-Bestimmung (die Anzeige
+    rundet auf ganze Prozent).
+
+    **Die Zentrierung** (Plan §2.5: "Pan auf die Mitte"): der Umriss des Inhalts muss in der
+    Leinwandmitte liegen. Vor `fitView()` saß er **32,3 px** neben der Mitte -- der Umriss des
+    Inhalts liegt beim Anker des eigenen Space, nicht in der Mitte der Welt.
+
+    Dieselbe Rechnung laeuft **zweimal**: einmal fuer die 152 Knoten der Abnahme-Zelle und
+    einmal fuer die 201 Knoten der Budget-Zelle (E3: reicht `ZOOM_MIN` bei 200 Knoten?).
+    """
+    passend = _pan(page, lauf["kerne"], pos, lauf["zoom"])
+    if not passend:
+        return {"messbar": False, "grund": "die Kamera liess sich nicht bestimmen", "ok": False}
+    zoom = passend["zoom"]
+    pan_x, pan_y = passend["panX"], passend["panY"]
+    kasten = lauf["kasten"]
+    xs = [xy[0] for xy in pos.values()]
+    ys = [xy[1] for xy in pos.values()]
+    welt = {"x0": min(xs), "x1": max(xs), "y0": min(ys), "y1": max(ys)}
+    bild_w = zoom * (welt["x1"] - welt["x0"])
+    bild_h = zoom * (welt["y1"] - welt["y0"])
+    fuellgrad = max(bild_w / kasten["width"], bild_h / kasten["height"])
+    passt = (bild_w <= kasten["width"] * 1.02 and bild_h <= kasten["height"] * 1.02)
+    mitte_x = kasten["width"] / 2
+    mitte_y = kasten["height"] / 2
+    umriss_mitte = [(welt["x0"] + welt["x1"]) / 2, (welt["y0"] + welt["y1"]) / 2]
+    versatz = max(abs(umriss_mitte[0] * zoom + pan_x - mitte_x),
+                  abs(umriss_mitte[1] * zoom + pan_y - mitte_y))
+    zentriert = versatz <= 3.0
+    # die **Unsicherheit** der Kamerabestimmung: die Streuung der Pan-Kandidaten
+    # plus der Zoom-Rasterfehler (Zoom-Raster × Welt-Ausdehnung)
+    unsicherheit = (passend["pan_streuung"]
+                    + passend["zoom_schritt"] * max(welt["x1"] - welt["x0"],
+                                                    welt["y1"] - welt["y0"]))
+    return {
+        "messbar": True,
+        "zoom": zoom,
+        "zoom_anzeige": lauf["zoom"],
+        "leerwand": [kasten["width"], kasten["height"]],
+        "welt": welt,
+        "bild_mass": [bild_w, bild_h],
+        "fuellgrad": fuellgrad,
+        "passt": passt,
+        "pan": [pan_x, pan_y],
+        "umriss_mitte": umriss_mitte,
+        "versatz_mitte_px": versatz,
+        "unsicherheit_px": unsicherheit,
+        "zentriert": zentriert,
+        "ok": fuellgrad >= 0.60 and passt and zentriert,
+    }
+
+
 def nachbarn_je_knoten(grafik):
     """Die **eindeutigen** Nachbarn je Knoten — wie `graph.js :: recomputeDegrees()`: der
     Client fasst frontmatter- und body-Kante derselben Paarung zu einer zusammen."""
@@ -1063,58 +1138,7 @@ def main():
             "ok": anteil >= 0.95,
         }
 
-        kasten = lauf2["kasten"]
-        zoom_anzeige = lauf2["zoom"]
-        # der Pan der Kamera: aus den **Kernpositionen** und den Weltpositionen geschaetzt
-        # (derselbe Weg, den die Beschriftungs-Zelle geht). Ohne ihn ist die Zentrierung
-        # nicht messbar -- der Pan steht im Modul, nicht im DOM.
-        passend = _pan(page, lauf2["kerne"], pos2, zoom_anzeige)
-        if not passend:
-            messungen["kamera"] = {"messbar": False,
-                                   "grund": "die Kamera liess sich nicht bestimmen", "ok": False}
-        else:
-            # **ein** Zoom fuer alle Rechnungen: der verfeinerte aus der Pan-Bestimmung
-            zoom = passend["zoom"]
-            pan_x, pan_y = passend["panX"], passend["panY"]
-            xs = [xy[0] for xy in pos2.values()]
-            ys = [xy[1] for xy in pos2.values()]
-            welt = {"x0": min(xs), "x1": max(xs), "y0": min(ys), "y1": max(ys)}
-            bild_w = zoom * (welt["x1"] - welt["x0"])
-            bild_h = zoom * (welt["y1"] - welt["y0"])
-            fuellgrad = max(bild_w / kasten["width"], bild_h / kasten["height"])
-            passt = (bild_w <= kasten["width"] * 1.02 and bild_h <= kasten["height"] * 1.02)
-            # **Zentrierung** (Plan §2.5: „Pan auf die Mitte"): der Umriss des Inhalts muss in
-            # der Leinwandmitte liegen. Der heutige Code zieht die Knoten mit der
-            # Zentrums-Gravitation auf den **Schwerpunkt** — der **Umriss** sitzt dadurch
-            # seitlich, die Karte steht also schief im Panel. Nach `fitView()` sitzt der
-            # Umriss exakt in der Mitte (die Pan wird auf den Mittelpunkt des Umrisses gesetzt).
-            mitte_x = kasten["width"] / 2
-            mitte_y = kasten["height"] / 2
-            umriss_mitte = [(welt["x0"] + welt["x1"]) / 2, (welt["y0"] + welt["y1"]) / 2]
-            versatz = max(abs(umriss_mitte[0] * zoom + pan_x - mitte_x),
-                          abs(umriss_mitte[1] * zoom + pan_y - mitte_y))
-            zentriert = versatz <= 3.0
-            # die **Unsicherheit** der Kamerabestimmung: die Streuung der Pan-Kandidaten
-            # plus der Zoom-Rasterfehler (Zoom-Raster × Welt-Ausdehnung)
-            unsicherheit = (passend["pan_streuung"]
-                            + passend["zoom_schritt"] * max(welt["x1"] - welt["x0"],
-                                                            welt["y1"] - welt["y0"]))
-            messungen["kamera"] = {
-                "messbar": True,
-                "zoom": zoom,
-                "zoom_anzeige": zoom_anzeige,
-                "leerwand": [kasten["width"], kasten["height"]],
-                "welt": welt,
-                "bild_mass": [bild_w, bild_h],
-                "fuellgrad": fuellgrad,
-                "passt": passt,
-                "pan": [pan_x, pan_y],
-                "umriss_mitte": umriss_mitte,
-                "versatz_mitte_px": versatz,
-                "unsicherheit_px": unsicherheit,
-                "zentriert": zentriert,
-                "ok": fuellgrad >= 0.60 and passt and zentriert,
-            }
+        messungen["kamera"] = kamera_messung(page, lauf2, pos2)
 
         # ---- 2) Die Beschriftungen (P10.5-71) ----------------------------------------------
         messungen["beschriftungen"] = beschriftungen(page, lauf2, pos2, raum_von, nachbarn)
@@ -1241,6 +1265,14 @@ def main():
             "kern_pixel_reduced_motion": kern2,
             "kern_pixel": gross["kernpixel"],
             "grenze_ms": 3000,
+            # **E3 (Plan §2.5):** reicht `ZOOM_MIN` (0,5) bei **200 Knoten**? Die Kamera wird
+            # auch hier eingepasst -- die Messung steht als **eigene** Kamera-Zelle in der
+            # Budget-Zelle, nicht in der Abnahme-Zelle (dort sind es 152 Knoten).
+            #
+            # **Der Zoom ist die Anzeige** (auf ganze Prozent gerundet). Wuerde der Zoom auf
+            # `ZOOM_MIN` **abgeklemmt**, stuende er genau auf 50 % **und** der Inhalt passte
+            # **nicht** in die Leinwand (`passt` false) -- beides steht hier.
+            "kamera_200_knoten": kamera_messung(page, gross, pos_gross),
             "ok": bool(ms is not None and ms <= 3000 and len(pos_gross) >= 200
                        and raf2["count"] == 0 and kern2 > 0 and gross["kernpixel"] > 0),
         }
@@ -1250,7 +1282,7 @@ def main():
 
     bericht = {
         "probe": "p105_b14_layout_probe",
-        "schritt": "14.2",
+        "schritt": "14.3",
         "gegenlauf": AUFTRAG.get("gegenlauf"),
         "zeit": datetime.now(timezone.utc).isoformat(),
         "seed": AUFTRAG["seed"],

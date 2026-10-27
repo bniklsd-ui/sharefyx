@@ -1,0 +1,213 @@
+{
+  "probe": "p105_b14_layout_probe",
+  "schritt": "14.3",
+  "gegenlauf": "fitview",
+  "zeit": "2026-10-27T16:27:34.857869+00:00",
+  "seed": {
+    "spaces": 5,
+    "items": 152,
+    "items_pro_space": {
+      "alpha": 30,
+      "beta": 32,
+      "gamma": 30,
+      "delta": 30,
+      "epsilon": 30
+    },
+    "wachser_space": "epsilon"
+  },
+  "messungen": {
+    "determinismus": {
+      "knoten": 152,
+      "knoten_lauf1": 152,
+      "gemeinsam": 152,
+      "max_abweichung_px": 0.0,
+      "ok": true
+    },
+    "regionen": {
+      "knoten": 152,
+      "richtig": 152,
+      "anteil": 1.0,
+      "schwerpunkte": {
+        "alpha": [
+          616.7,
+          524.3333333333334
+        ],
+        "beta": [
+          820.28125,
+          843.875
+        ],
+        "gamma": [
+          76.0,
+          502.46666666666664
+        ],
+        "delta": [
+          555.2333333333333,
+          185.8
+        ],
+        "epsilon": [
+          1045.4333333333334,
+          129.56666666666666
+        ]
+      },
+      "beispiele_falsch": [],
+      "ok": true
+    },
+    "kamera": {
+      "messbar": true,
+      "zoom": 0.9997997599999999,
+      "zoom_anzeige": 1,
+      "leerwand": [
+        1134,
+        1061.375
+      ],
+      "welt": {
+        "x0": -8,
+        "x1": 1140,
+        "y0": 49,
+        "y1": 948
+      },
+      "bild_mass": [
+        1147.7701244799998,
+        898.8199842399999
+      ],
+      "fuellgrad": 1.0121429669135802,
+      "passt": true,
+      "pan": [
+        -0.441033536260079,
+        -0.03448890269834237
+      ],
+      "umriss_mitte": [
+        566.0,
+        498.5
+      ],
+      "versatz_mitte_px": 32.32180854269836,
+      "unsicherheit_px": 0.7066020199080716,
+      "zentriert": false,
+      "ok": false
+    },
+    "beschriftungen": {
+      "messbar": true,
+      "fokus": "itm_0000003f",
+      "nachbarn": 12,
+      "kandidaten": 13,
+      "erwartet_im_bild": 13,
+      "ausserhalb_bild": 0,
+      "gezeichnet": 13,
+      "ueberlappungen": [
+        [
+          "itm_0000003f",
+          "itm_00000042"
+        ],
+        [
+          "itm_00000041",
+          "itm_00000042"
+        ],
+        [
+          "itm_00000041",
+          "itm_0000005c"
+        ]
+      ],
+      "fokus_beschriftung": true,
+      "genug_gezeichnet": true,
+      "zoom": 0.9997997599999999,
+      "pan": [
+        -0.441033536260079,
+        -0.03448890269834237
+      ],
+      "unsicherheit_px": 0.7066020199080716,
+      "treffer": 25,
+      "ok": false
+    },
+    "stabilitaet": {
+      "wachser_space": "epsilon",
+      "neues_item": "itm_00000901",
+      "position_neu": [
+        1146,
+        189
+      ],
+      "naechster_schwerpunkt": "epsilon",
+      "in_eigener_region": true,
+      "abstand_eigener_space_px": 27.65863337187866,
+      "abstand_fremder_space_px": 523.0086041357255,
+      "andere_spaces": 122,
+      "median_verschiebung_px": 0.0,
+      "max_verschiebung_px": 2.23606797749979,
+      "pruefsumme_vorher": 3754218440,
+      "pruefsumme_nachher": 4006010231,
+      "pinned_beim_start": 0,
+      "knoten_frisch": 153,
+      "kasten_frisch": {
+        "left": 753,
+        "top": 121.625,
+        "width": 1134,
+        "height": 1061.375,
+        "dw": 1134,
+        "dh": 1061,
+        "dpr": 1
+      },
+      "position_neu_frisch": [
+        1138,
+        285
+      ],
+      "ok": true
+    },
+    "budget": {
+      "knoten": 201,
+      "pos_pruefsumme": 2427632413,
+      "graph_reihenfolge": [
+        "itm_00000931",
+        "itm_00000930",
+        "itm_0000092f",
+        "itm_0000092e",
+        "itm_0000092d",
+        "itm_0000092c",
+        "itm_0000092b",
+        "itm_0000092a"
+      ],
+      "graph_knoten": 201,
+      "ruhe_ms": 2146,
+      "luecken_ms": [],
+      "raf_calls": 130,
+      "raf_calls_reduced_motion": 0,
+      "kern_pixel_reduced_motion": 17932,
+      "kern_pixel": 17932,
+      "grenze_ms": 3000,
+      "kamera_200_knoten": {
+        "messbar": true,
+        "zoom": 1.0002,
+        "zoom_anzeige": 1,
+        "leerwand": [
+          1134,
+          1061.375
+        ],
+        "welt": {
+          "x0": -235,
+          "x1": 1333,
+          "y0": -135,
+          "y1": 1058
+        },
+        "bild_mass": [
+          1568.3136,
+          1193.2386
+        ],
+        "fuellgrad": 1.3829925925925926,
+        "passt": false,
+        "pan": [
+          -0.43903931623924564,
+          -0.4421609857514852
+        ],
+        "umriss_mitte": [
+          549.0,
+          461.5
+        ],
+        "versatz_mitte_px": 69.53736098575155,
+        "unsicherheit_px": 0.7977514890925796,
+        "zentriert": false,
+        "ok": false
+      },
+      "ok": true
+    }
+  },
+  "alle_kriterien_erfuellt": false,
+  "seitenfehler": []
+}

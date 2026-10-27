@@ -95,11 +95,38 @@ const MESS_PFLASTER = [
    "globalThis.__furrowCells = 0; for (var fi2 = 0; fi2 < furrow.length; fi2++) globalThis.__furrowCells += furrow[fi2]; return { key: lobeKey(shown), lobes: lobes };"],
 ];
 
+// -- Die Kamera steht still (Schritt 14.3, 2026-10-26) --------------------------------------------
+//
+// **Dieselbe Art von Eingangs-Fixierung wie die festen Positionen** (siehe `FESTE_POSITIONEN`):
+// diese Probe misst die **Zeichenregel** (Lappen, Furche, Bahnen, Zellen, Abdunklung) — nicht
+// die Kamera. Seit 14.3 passt sich die Kamera nach dem Einschwingen ein (Zoom ≠ 100 %, Pan ≠
+// 0), und der **Zeiger** der Probe (`mousemove` auf die Position eines Knotens) traegt den
+// Knoten dann nicht mehr: die Weltposition ist nicht mehr die Bildschirmposition.
+//
+// **Die Kamera wird deshalb auf 100 % / Pan 0 festgenagelt** (`fitView()` ist aus). Die
+// **Kamera selbst** misst der Browser-Waechter (`p105_b14_layout_probe.py`, Zelle `kamera`,
+// Abnahme P10.5-67) — dort ist sie die Regel, hier ist sie nur der Bildausschnitt.
+//
+// Der Anker ist dieselbe Zeile wie im Gegenlauf `fitview` der Browser-Probe: fehlt sie, bricht
+// die Probe **laut** ab (kein stilles Weiterarbeiten mit falscher Kamera).
+const KAMERA_STEHT_STILL = [
+  ["  if (nodes.length === 0 || cssWidth <= 0 || cssHeight <= 0) return;",
+   "  return;  // C2-Probe: die Kamera steht still (Schritt 14.3)"],
+];
+
 // -- Modul laden (mit Patch) --------------------------------------------------------------------
 
 let moduleCounter = 0;
 function loadGraphModule(patch, suffix) {
   let source = fs.readFileSync(GRAPH_JS, "utf8");
+  // **Die Kamera steht still** (Schritt 14.3) — immer, auch im Gegenlauf: die Kamera ist nicht
+  // der Gegenstand dieser Probe (siehe `KAMERA_STEHT_STILL`).
+  for (const [oldText, newText] of KAMERA_STEHT_STILL) {
+    if (!source.includes(oldText)) {
+      throw new Error("Kamera-Anker nicht gefunden: " + JSON.stringify(oldText.slice(0, 60)));
+    }
+    source = source.replace(oldText, newText);
+  }
   if (patch) {
     for (const [oldText, newText] of patch) {
       if (!source.includes(oldText)) {

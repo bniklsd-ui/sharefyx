@@ -1,8 +1,8 @@
 {
   "probe": "p105_b14_layout_probe",
-  "schritt": "14.2",
+  "schritt": "14.3",
   "gegenlauf": "querfeder",
-  "zeit": "2026-10-26T20:10:25.718156+00:00",
+  "zeit": "2026-10-27T16:29:37.724130+00:00",
   "seed": {
     "spaces": 5,
     "items": 152,
@@ -54,7 +54,7 @@
     },
     "kamera": {
       "messbar": true,
-      "zoom": 1.00060008,
+      "zoom": 1,
       "zoom_anzeige": 1,
       "leerwand": [
         1134,
@@ -67,22 +67,22 @@
         "y1": 781
       },
       "bild_mass": [
-        676.40565408,
-        622.3732497599999
+        676,
+        622
       ],
-      "fuellgrad": 0.596477649100529,
+      "fuellgrad": 0.5961199294532628,
       "passt": true,
       "pan": [
-        -1.0090481125924953,
-        -0.5271982654558656
+        -39.52293577981652,
+        60.520127086437014
       ],
       "umriss_mitte": [
         606.0,
         470.0
       ],
-      "versatz_mitte_px": 60.9326606654559,
-      "unsicherheit_px": 0.5612680288780354,
-      "zentriert": false,
+      "versatz_mitte_px": 0.5229357798165211,
+      "unsicherheit_px": 0.5797013619125575,
+      "zentriert": true,
       "ok": false
     },
     "beschriftungen": {
@@ -113,13 +113,13 @@
       ],
       "fokus_beschriftung": true,
       "genug_gezeichnet": true,
-      "zoom": 1.00060008,
+      "zoom": 1,
       "pan": [
-        -1.0090481125924953,
-        -0.5271982654558656
+        -39.52293577981652,
+        60.520127086437014
       ],
-      "unsicherheit_px": 0.5612680288780354,
-      "treffer": 24,
+      "unsicherheit_px": 0.5797013619125575,
+      "treffer": 22,
       "ok": false
     },
     "stabilitaet": {
@@ -169,13 +169,46 @@
         "itm_0000092a"
       ],
       "graph_knoten": 201,
-      "ruhe_ms": 2145,
+      "ruhe_ms": 2146,
       "luecken_ms": [],
       "raf_calls": 130,
       "raf_calls_reduced_motion": 0,
-      "kern_pixel_reduced_motion": 19722,
-      "kern_pixel": 19722,
+      "kern_pixel_reduced_motion": 8511,
+      "kern_pixel": 8511,
       "grenze_ms": 3000,
+      "kamera_200_knoten": {
+        "messbar": true,
+        "zoom": 0.71426,
+        "zoom_anzeige": 0.71,
+        "leerwand": [
+          1134,
+          1061.375
+        ],
+        "welt": {
+          "x0": -220,
+          "x1": 1288,
+          "y0": -115,
+          "y1": 1026
+        },
+        "bild_mass": [
+          1077.10408,
+          814.97066
+        ],
+        "fuellgrad": 0.9498272310405644,
+        "passt": true,
+        "pan": [
+          185.0128711111111,
+          204.55903587810246
+        ],
+        "umriss_mitte": [
+          534.0,
+          455.5
+        ],
+        "versatz_mitte_px": 0.7830341218975718,
+        "unsicherheit_px": 0.6722644894693932,
+        "zentriert": true,
+        "ok": true
+      },
       "ok": true
     }
   },

@@ -8,7 +8,7 @@ down:
   - ../../phase5_ui/webui/static/js/graph.js            # der einzige Produktcode, der sich ändert
   - ../../phase10_5_finishing/probes/p105_b15_screens.py # der 5×30-Seed, aus dem der Auftrag kam
   - phase10_5_finishing_plan.md                         # 📕 Hauptplan (§2.1 Vorbedingung, Block 8 = C2-Stil)
-updated: 2026-10-26 (Schritt 14.2 erledigt: die L4 ist gebaut und gemessen; **datierte Korrektur** der Gegenlauf-Zuordnung in §5; der Befund „die Entspannung ist chaotisch“ — der Node-Harness bleibt Seed-only) | 2026-10-26 (E1–E4 beantwortet: E1 entfällt — KA-2 nie live; E2 nein; E3/E4 frei + Beschriftungen in Block 14) | 2026-10-26 (Entwurf, Claude Code)
+updated: 2026-10-26 (Schritt 14.3 erledigt: die Kamera passt sich ein — `fitView()`, Füllgrad 93,6 %, Versatz 0,42 px; **E3: `ZOOM_MIN` bleibt 0,5** (68,8 % bei 201 Knoten); **datierte Korrektur** der Gegenlauf-Zuordnung: `fitview` ⇒ `kamera`, `querfeder` macht jetzt *zwei* Zellen rot; die C2-Probe nagelt die Kamera fest) | 2026-10-26 (Schritt 14.2 erledigt: die L4 ist gebaut und gemessen; **datierte Korrektur** der Gegenlauf-Zuordnung in §5; der Befund „die Entspannung ist chaotisch“ — der Node-Harness bleibt Seed-only) | 2026-10-26 (E1–E4 beantwortet: E1 entfällt — KA-2 nie live; E2 nein; E3/E4 frei + Beschriftungen in Block 14) | 2026-10-26 (Entwurf, Claude Code)
 ---
 # P10.5 Block 14 — Kartenlayout: zufällig, aber geordnet
 
@@ -135,6 +135,32 @@ Minecraft würfelt nicht frei: ein **Seed** bestimmt deterministisch zuerst die 
 - **E3 (frei):** reicht `ZOOM_MIN` 0,5 bei 200 Knoten nicht, senkt der Ausführer ihn (Untergrenze
   0,2) und nennt Wert und Messung im Bericht.
 
+> **[2026-10-26, Schritt 14.3 — erledigt]** Die Kamera ist gebaut (`phase5_ui/webui/static/js/graph.js`):
+> `fitView()` (Umriss der **sichtbaren** Knoten + `FIT_MARGIN = 40` → `zoom = clamp(min(w/bw,
+> h/bh), ZOOM_MIN, 1)`, Pan auf die **Mitte des Umrisses** — nicht auf den Ursprung, das ist der
+> Anker des eigenen Space), `FIT_MARGIN` als benannte Konstante, ein Merker `viewFitted`
+> (einmal je Kartenaufbau) und ein Merker `viewTouchedByUser` (der Nutzer hat selbst gezoomt
+> oder verschoben ⇒ **seine Ansicht gewinnt**). Der **Doppelklick** ruft jetzt `fitView()` auf
+> (vorher: „Ansicht zurück" = Zoom 1, Pan 0 — also die Sicht **ohne** Einpassen).
+>
+> **E3 — gemessen, nicht gesetzt:** `ZOOM_MIN` **bleibt 0,5**. Der Einpass-Zoom bei **201
+> Knoten** ist **68,8 %** (der Rand von 40 px je Seite ist eingerechnet), der Inhalt passt und
+> sitzt mittig (Versatz **0,43 px**). Der Klemmpunkt greift also **nicht** — bei 200 Knoten
+> ist der Wert nicht zu senken. (Der Klemmpunkt *wäre* sichtbar: stünde die Anzeige genau auf
+> 50 % und passte der Inhalt nicht mehr in die Leinwand.)
+>
+> **Gemessen an der Wegwerf-Instanz** (`probes/p105_b14_layout_probe.json`, 5 Spaces, 152
+> Knoten): Füllgrad **93,6 %** (vorher 101,2 %), **passt**, Versatz **0,42 px** (vorher
+> **32,3 px**), Unsicherheit der Bestimmung **0,68 px**. Der Gegenlauf `fitview` (die Kamera
+> ist aus) stellt den alten Stand **exakt** wieder her (Versatz 32,32 px, Zoom 100 %) und
+> macht **genau die** Kamera-Zelle rot.
+>
+> **Ein Rand-Fall für 14.5 (aus den Konstanten gerechnet, nicht gemessen):** `FIT_MARGIN` ist
+> 40 px, die Lappen-Kontur reicht aber **48 px** (`LOBE_REACH`) plus eine Rasterzelle (8 px)
+> über den äußersten Knoten — auf der **begrenzenden** Achse können bis zu **16 px** der
+> Kontur am Leinwandrand abgeschnitten werden. Sollen die Lappen **geschlossen** bleiben,
+> bräuchte der Rand ≥ 56 px (ein **neuer** Wert — der Plan sagt 40 px).
+
 ### 2.6 Die gemerkte Karte (B4) — **kein** Schlüsselwechsel
 
 **[2026-10-26, E1 beantwortet]** Das Merken (KA-2, Block 8) fährt mit Deploy C/D und war **nie
@@ -166,7 +192,7 @@ Einfluss auf die Positionen.
 | **14.0** | Vorbedingung + **Basislinie**: Probe `probes/p105_b14_layout_probe.py` (aus `p105_b15_screens.py`: Wegwerf-Instanz, freier Port, eigener Datenbaum, PID-Datei; **152 Items** statt 5×30 — siehe die datierte Abweichung in §5) mit den Zellen aus §5, **gegen den heutigen Code** | Probe läuft; die Basislinie ist **rot** in `regionen`/`kamera`/`beschriftungen`/`stabilitaet` (das ist der Beleg, dass die Zellen messen) — JSON neben der Probe |
 | **14.1** | L1–L3: `hashString()`, `computeRegions()`, neuer `seedInitialPositions()` | Determinismus-Zelle grün ✅ **2026-10-26** |
 | **14.2** | L4: Anker-Gravitation, Querfedern, `ALPHA_START_SEEDED`; `CENTER_GRAVITY` raus | Regionen-Zelle grün **und** Stabilität-Zelle grün (P10.5-68: ein neues Item verschiebt die Anker nur, wenn es den größten Space vergrößert); Budget-Zelle grün ✅ **2026-10-26** — `regionen` **152/152 = 100 %**, `stabilitaet` **Median 0,0 px**, `budget` **201 Knoten in 2147 ms**; `kamera`/`beschriftungen` bleiben rot (⇒ 14.3 / 14.35) |
-| **14.3** | `fitView()` + Doppelklick; ggf. `ZOOM_MIN` (E3) | Kamera-Zelle grün; E3-Wert im Bericht |
+| **14.3** | `fitView()` + Doppelklick; ggf. `ZOOM_MIN` (E3) | Kamera-Zelle grün ✅ **2026-10-26** — Füllgrad **93,6 %**, Versatz **0,42 px** (vorher 32,3 px), `passt` ✅; **E3: `ZOOM_MIN` bleibt 0,5** (der Einpass-Zoom bei 201 Knoten ist **68,8 %**, der Klemmpunkt greift nicht); der Gegenlauf `fitview` macht **genau** die Kamera-Zelle rot |
 | **14.35** | Beschriftungen ohne Überlappung (§2.7) | Beschriftungs-Zelle grün |
 | **14.4** | Konstanten justieren (nur §2-Konstanten), Gegenläufe, Block-8-Proben neu fahren | alle Zellen grün, jeder Gegenlauf rot an **genau** seiner Zelle; `p105_b8_karte_probe.py` + `p105_b8_c2_probe.mjs` grün |
 | **14.5** | **Claude Code:** Bilder (`p105_b15_screens.py` ohne die 16 Radschritte), Update-Log-Zeile (neues Kartenlayout), Head, Abnahmezeilen | drei Kartenbilder beim Nikinger |
@@ -251,6 +277,27 @@ Einfluss auf die Positionen.
 >    `pinned_beim_start` **direkt nach dem Reload** und bricht **ab**, wenn die Ablage schon
 >    gefüllt war; der Beleg führt die Prüfsummen **vorher/nachher** mit, und die Zelle ist
 >    nur grün, wenn sie sich **unterscheiden**.
+>
+> **[2026-10-26, Schritt 14.3 — erledigt]** Die Kamera ist gebaut und gemessen
+> (`phase5_ui/webui/static/js/graph.js`): `fitView()`, `FIT_MARGIN = 40`, der Zoom
+> `clamp(min(w/bw, h/bh), ZOOM_MIN, 1)`, der Pan auf die **Mitte des Umrisses**, einmal je
+> Kartenaufbau; hat der Nutzer selbst gezoomt oder verschoben, **gewinnt seine Ansicht**; der
+> **Doppelklick** passt die Kamera ein. **E3: `ZOOM_MIN` bleibt 0,5** (der Einpass-Zoom bei
+> 201 Knoten ist **68,8 %** — der Klemmpunkt greift nicht).
+>
+> **Gemessen an der Wegwerf-Instanz** (5 Spaces, 152 Knoten): Füllgrad **93,6 %** (vorher
+> 101,2 %), **passt**, Versatz **0,42 px** (vorher **32,3 px**), Unsicherheit **0,68 px**.
+> Der Gegenlauf `fitview` macht **genau die** Kamera-Zelle rot und stellt den Stand von 14.2
+> **exakt** wieder her.
+>
+> **Ein Fund an der *anderen* Probe (Block 8 gegen Block 14).** Die C2-Probe (`p105_b8_c2_probe.mjs`,
+> Node) misst die **Zeichenregel** — Lappen, Furche, Bahnen, Zellen, Abdunklung. Ihr **Zeiger**
+> war die Weltposition eines Knotens (der Canvas-Shim rechnet den Zoom/Pan **nicht** um) — mit
+> der eingepassten Kamera trägt er den Knoten nicht mehr, und die Zelle `aktivierung` wäre
+> **grün geblieben, ohne dass der Fehler wiederhergestellt war**. Dieselbe Art von
+> Eingangs-Fixierung wie die festen Positionen (14.2): die Kamera wird auf **100 % / Pan 0**
+> festgenagelt (`fitView()` ist aus). Die **Kamera selbst** misst der Browser-Wächter, nicht
+> dieser.
 
 ## §5 Abnahme (neue Zeilen P10.5-65–71 — **stehen seit 2026-10-26 (Block 14.0) im Head**)
 
@@ -258,7 +305,7 @@ Einfluss auf die Positionen.
 |---|---|---|---|
 | **P10.5-65** | Determinismus: zwei frische Ladevorgänge (leerer Speicher) → max. Abweichung ≤ 1 px | Probe | `seedJitter` → `Math.random` |
 | **P10.5-66** | Regionen: ≥ 95 % der Knoten liegen dem Schwerpunkt **ihres** Space am nächsten (5 Spaces, 30/32/30/30/30 — siehe die datierte Seed-Abweichung unten) | Probe | ⚠️ **kein wirksamer Gegenlauf** (14.2) — der geplante lässt die Zelle **grün**; die datierte Korrektur steht unten |
-| **P10.5-67** | Kamera: nach dem Einschwingen, **ohne** Rad, füllt der Inhalt ≥ 60 % der Leinwand auf mindestens einer Achse | Probe | `fitView()` aus |
+| **P10.5-67** | Kamera: nach dem Einschwingen, **ohne** Rad, füllt der Inhalt ≥ 60 % der Leinwand auf mindestens einer Achse | Probe | `fitView()` aus — **gemessen** 14.3: macht genau die Kamera-Zelle rot (Versatz 32,32 px statt 0,42 px) |
 | **P10.5-68** | Stabilität: +1 Item in einem nicht-größten Space → Median-Verschiebung der Knoten **anderer** Spaces ≤ 2 px (frischer Lauf); in einer **gemerkten** Karte landet das neue Item in der Region seines Space | Probe | `querfeder` (Querfeder-Faktor/Länge zurück auf 0) — **gemessen** 14.2; der geplante („Space-Reihenfolge nach Item-Zahl") ist ein **Seed**-Gegenlauf und gehört in den Node-Harness (`slot`) |
 | **P10.5-69** | Budget und Bestand: 200 Knoten ≤ 3 s bis Ruhe · reduced motion 0 Frames (P10.5-40) · Block-8-Proben grün | Probe | `ALPHA_START_SEEDED` → 1 (Budget reißt) — **gemessen** 14.2: 15,3 s |
 | **P10.5-70** | Sichtung: drei Kartenbilder (5 Spaces, 30/32/30/30/30) — „zufällig, aber geordnet" | Nikinger | — |
@@ -304,6 +351,29 @@ Einfluss auf die Positionen.
 > beweist nichts — die Lücke bleibt **offen** und wird in **14.4** mit einem Gegenlauf geschlossen,
 > der die Regionen-Zelle **wirklich** rot macht (der Kandidat: die Regionen-Zuordnung des
 > Spaces verschieben).
+>
+> **Datierte Korrektur der Gegenlauf-Zuordnung (2026-10-26, Schritt 14.3).** Zwei Änderungen,
+> beide **gemessen**:
+>
+> 1. **`fitview` (neu) ⇒ `kamera`.** Der Gegenlauf zu P10.5-67 ist „`fitView()` aus" — er
+>    patcht die **erste Zeile des Rumpfes** von `fitView()` (die Funktion wird zum No-op; der
+>    Anker ist derselbe wie in der C2-Probe, die die Kamera aus demselben Grund festnagelt).
+>    Er macht **genau die** Kamera-Zelle rot und stellt den Stand von 14.2 **exakt** wieder her
+>    (Versatz **32,32 px**, Zoom 100 %) — die anderen fünf Zellen bleiben grün.
+> 2. **`querfeder` macht jetzt *zwei* Zellen rot.** Die Querfeder auf „so stark und kurz wie
+>    die Feder im Space" zu stellen, lässt die Spaces **zusammenlaufen**: die Welt wird
+>    **676 px** breit (statt 1148 px), der Einpass-Zoom ist auf **100 % abgeklemmt**, und der
+>    Füllgrad sinkt auf **59,6 %** — unter die 60-%-Schwelle der Abnahme P10.5-67. Die
+>    Kamera-Zelle folgt damit **ihrer** Regel (sie misst, ob die Karte die Leinwand füllt);
+>    das ist eine **zweite, echte** Folge, kein Fehler des Gegenlaufs. Die Erwartung im
+>    Wächter ist die Dokumentation davon.
+>
+> **Datierte Ergänzung zur Wirkung des Gegenlaufs `zentrum` (2026-10-26, Schritt 14.3).** Seit
+> die Kamera einpasst, ist die Wirkung an **zwei** Zahlen zu sehen: die Welt ist **779 px**
+> breit statt 1148 px, **und** der Füllgrad sinkt von **93,6 %** auf **68,8 %** (die kleinere
+> Welt passt auch bei 100 % Zoom nicht ganz in die Leinwand). Vor 14.3 war nur der Füllgrad zu
+> sehen (101,2 % → 68,7 %), weil die Kamera nicht einpasste. Die Zelle bleibt grün — die
+> Anker-Gravitation ist weiterhin **nicht** die Regel, die die Regionen-Zelle misst.
 
 ## §6 Startauftrag — Block 14 · Ausführer (opencode)
 
@@ -314,9 +384,12 @@ Einfluss auf die Positionen.
 `phase10_5_finishing/tests/**`. **Nicht:** Server-Code, `app.css`, `nodeColor()`, die Lappen-/
 Bahnen-/Zellen-Zeichnung (Block 8), `docs/UPDATE_LOG.md` (14.5, Claude Code).
 
-**Anker (Stand `59ca205`):** `seedInitialPositions()` Z. 477 · `startLayout()` Z. 514 ·
-`seedJitter()` Z. 530 · `runSimulation()` Z. 540 / `settle()` Z. 561 · `applyForces()` Z. 603
-(Gravitation Z. 650) · Konstanten Z. 120–141 · `LAYOUT_KEY_PREFIX` Z. 170 · `loadStoredLayout()`/`saveLayout()` Z. 1364/1377 · `drawLabels()` Z. 923 · `onWheel()` Z. 1563.
+**Anker (Stand `59ca205`, **Zeilen nach 14.3 in Klammern**):** `seedInitialPositions()` Z. 477
+(706) · `startLayout()` Z. 514 (752) · `seedJitter()` Z. 530 (785) · `runSimulation()` Z. 540 (790) /
+`settle()` Z. 561 (813) · `applyForces()` Z. 603 (873) (Gravitation Z. 650 · 924) · Konstanten
+Z. 120–141 (131–160, die Block-14-Konstanten 200–232) · `LAYOUT_KEY_PREFIX` Z. 170 (183) ·
+`loadStoredLayout()`/`saveLayout()` Z. 1364/1377 (1646/1659) · `drawLabels()` Z. 923 (1205) ·
+`onWheel()` Z. 1563 (1886) · **neu 14.3:** `fitView()` Z. 1739 · `onDoubleClick()` Z. 1904.
 
 **Regeln:** Proben **nur** an der Wegwerf-Instanz (eigener Port, tmp-`DATA_ROOT`,
 tmp-`auth.sqlite3`, Playwright aus `~/.claude-code-tools/e2e-venv`), Stopp **nur** über die

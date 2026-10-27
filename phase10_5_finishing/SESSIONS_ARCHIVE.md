@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-26 (Session-Block Block 14.1 rotiert — L1–L3, der Seed wird zum Weltgenerator) | 2026-10-26 (Session-Block Block 14.0 rotiert — die Basislinie des Kartenlayouts) | 2026-10-26 (Session-Block Nachzug Block 13 rotiert — v4.0.0, Space-Auswahl, Rohtext weg; Block 14.0 folgt im Head) | 2026-10-26 (Session-Block Block 13 rotiert — Nachzug v4.0.0, Space-Auswahl, Rohtext weg folgt im Head) | 2026-10-25 (Session-Block Block 12 rotiert — Doku und Altlasten; Block 13 folgt im Head) | 2026-10-25 (Session-Block Block 11.8 rotiert — der Roundtrip; Block 11.6 folgt im Head) | 2026-10-25 (Session-Block Block 11.5 rotiert — die To-do-Kästchen; Block 11.8 folgt im Head) | 2026-10-25 (Session-Block Block 11.7 rotiert — das Budget; Block 11.5 folgt im Head) | 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-26 (Session-Block Block 14.2 rotiert — L4, die Anker-Gravitation; Block 14.3 folgt im Head) | 2026-10-26 (Session-Block Block 14.1 rotiert — L1–L3, der Seed wird zum Weltgenerator) | 2026-10-26 (Session-Block Block 14.0 rotiert — die Basislinie des Kartenlayouts) | 2026-10-26 (Session-Block Nachzug Block 13 rotiert — v4.0.0, Space-Auswahl, Rohtext weg; Block 14.0 folgt im Head) | 2026-10-26 (Session-Block Block 13 rotiert — Nachzug v4.0.0, Space-Auswahl, Rohtext weg folgt im Head) | 2026-10-25 (Session-Block Block 12 rotiert — Doku und Altlasten; Block 13 folgt im Head) | 2026-10-25 (Session-Block Block 11.8 rotiert — der Roundtrip; Block 11.6 folgt im Head) | 2026-10-25 (Session-Block Block 11.5 rotiert — die To-do-Kästchen; Block 11.8 folgt im Head) | 2026-10-25 (Session-Block Block 11.7 rotiert — das Budget; Block 11.5 folgt im Head) | 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,53 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-26 (Block 14.2: L4 — die Anker-Gravitation, die Querfeder, `ALPHA_START_SEEDED`)
+
+**Ergebnis.** Schritt **14.2** des Plans: die **Entspannung** zieht nicht mehr auf die
+Leinwandmitte, sondern auf den **Space-Anker**; die Spaces werden **weit auseinander** gehalten
+(schwache, lange Querfeder). Beleg: `probes/p105_b14_layout_probe.json` (Browser, Wegwerf) und
+die drei Gegenlauf-Belege `p105_b14_layout_probe_gegenlauf_{zentrum,querfeder,alpha}.json`.
+
+**Der Code** (`phase5_ui/webui/static/js/graph.js`, der einzige Produktcode): `CENTER_GRAVITY` und
+`ALPHA_START` sind **ersetzt**, nicht ergänzt — jetzt `ANCHOR_GRAVITY = 0.02` (jeder Knoten zieht
+zu seinem Space-Anker aus `computeRegions()`; der Modulstate `spaceRegions` merkt die Regionen
+beim Seed), `CROSS_SPRING_FACTOR = 0.15`, `CROSS_SPRING_LENGTH_FACTOR = 3` und
+`ALPHA_START_SEEDED = 0.5` — alle vier mit dem Vermerk „Startwert, gemessen in 14.4“.
+
+**Die Messung** (Wegwerf-Instanz, 5 Spaces, 201 Knoten): `regionen` **152/152 = 100 %**
+(Basislinie 57,2 %, 14.1: 82,2 %), `stabilitaet` **Median 0,0 px** (max. 2,24 px; Basislinie
+327,9 px), `budget` **201 Knoten in 2147 ms**, **0** Frames bei reduced motion.
+`kamera` (Füllgrad 101,2 %, Versatz 32,3 px) und `beschriftungen` bleiben **rot** ⇒ **14.3**
+und **14.35**.
+
+**Drei Befunde an der Messung selbst — sie ändern den Plan, nicht nur den Bericht.**
+(1) **Die Gegenlauf-Zuordnung im Plan §5 war falsch:** der für P10.5-66 geplante Gegenlauf
+(`ANCHOR_GRAVITY` → Leinwandmitte) macht **keine** Zelle rot — er wirkt auf die **Weltgröße**
+(Kamera-Füllgrad 101,2 % → 68,7 %). Der Plan hatte die Wirkung der **Zentrums-Gravitation**
+(14.1: 82,2 %) mit der der **Anker-Gravitation** (100 %) verwechselt. Wirksam sind
+`querfeder` (⇒ `stabilitaet` rot, Median 29,2 px) und `alpha` (⇒ `budget` rot, 15,3 s, **und**
+`stabilitaet` rot). **Datierte Korrektur** in §2.4/§5 des Plans. (2) **Die Entspannung ist
+chaotisch:** dieselben Knoten in anderer Reihenfolge ⇒ Endpositionen Median **56,5 px**, max.
+**190,2 px**, 86 % über 20 px ⇒ ein Node-Harness für die L4 wäre ein **Fehlgrün** (er misst eine
+andere Karte als der Browser); der Node-Harness misst weiterhin **nur den Seed** (rundungsfrei,
+damit messbar). (3) **Ein „frischer“ Lauf kann gepinnt sein** (die Ablage stand schon da) ⇒ die
+Stabilitäts-Zelle wäre zwangsläufig grün; die Probe liest jetzt `pinned_beim_start` **direkt
+nach dem Reload**, bricht ab, wenn die Ablage gefüllt war, und führt die Prüfsummen
+vorher/nachher mit.
+
+**Der vierte Befund kam aus dem vollen Lauf der Suite: die C2-Furche hat im neuen Layout
+keinen Gegenstand** (Block 8 gegen Block 14). Die Spaces rücken auseinander, die Lappen
+berühren sich nicht mehr — **gemessen** 62 → 0 Furche-Zellen; der Gegenlauf „Furche aus“ wäre
+**grün** geblieben, ohne dass der Fehler wiederhergestellt war. **Repariert** durch einen
+**festen Eingang** in der C2-Probe (zwei Spaces **berühren** sich dort, wo die Furche zu
+trennen hat): der Wächter prüft jetzt die **Zeichenregel**, nicht das Layout. Die **sichtbare**
+Folge — die „Gehirnkarte“ wird zu **Inseln**, die Bahnen zwischen den Spaces werden lang — ist
+ein **Befund für den Nikinger** (siehe „Offen beim Nikinger“ oben).
+
+**Abnahme.** **P10.5-66, -68 und -69 geschlossen** (die Regionen, die Stabilität, das Budget) → **61 ✅ · 0 ⚠️ · 10 ⬜**. Wächter `tests/test_b14_layout_probe.py` **10/10 grün** (Zellen, Zahlen, Prüfsummen, `pinned_beim_start`, die drei Gegenläufe, vier Manipulations-Gegenproben), `tests/test_b14_seed_probe.py` **9/9**, `tests/test_graph_c2.py` **21/21**. Suite **1605** grün, `doc_health` 0, `ui_budget` **6/6** (Erstaufruf **236,4 KB**; `graph.js` **26,4 → 27,4 KB** gz).
+
+**Nächster Schritt:** **14.3** — die Kamera: `fitView()` (P10.5-67: ≥ 60 % Füllgrad auf einer Achse, der Umriss in der Mitte). Danach 14.35 (Beschriftungen), 14.4 (die Startwerte messen) und 14.5 (die Bilder — die Inseln sind sichtbar).
 
 ## Session stopped — 2026-10-26 (Block 14.1: L1–L3 — der Seed wird zum Weltgenerator)
 
