@@ -1,32 +1,33 @@
 """Der **Beleg** der Block-14-Probe: `p105_b14_layout_probe.json` steht im Repo, und die
-Zellen tragen den **Stand des Schritts 14.3** (die Kamera).
+Zellen tragen den **Stand des Schritts 14.35** (die Beschriftungen).
 
 **Warum ein Wächter und nicht nur eine Notiz.** Die Probe fährt gegen eine Wegwerf-Instanz;
 was sie misst, landet als JSON im Repo. Eine JSON-Datei im Repo ist aber nur so viel wert wie
 die Aussage, die man über sie macht — und die Aussage („die Regionen sind getrennt, die
-Stabilität hält, das Budget reißt nicht") steht sonst nirgends im Code. Dieser Wächter bindet
-sie an den Plan: **welche Zelle ab welchem Schritt grün sein muss**, steht in
+Stabilität hält, das Budget reißt nicht, die Beschriftungen überlappen sich nicht") steht
+sonst nirgends im Code. Dieser Wächter bindet sie an den Plan: **welche Zelle ab welchem
+Schritt grün sein muss**, steht in
 `docs/concepts/phase10_5_block14_kartenlayout_plan.md` §4.
 
-**Der Wächter ist ein Schloss auf den Fortschritt, kein Urteil.** Er sagt: „Stand 14.2 =
-diese Zellen sind grün, diese sind rot." Wird eine Zelle im nächsten Schritt grün, wird
-**hier** die Menge der roten Zellen kleiner — und genau diese Änderung steht im Diff. Wäre
-der Wächter statisch, würde ein Schritt, der eine Zelle kaputtmacht, unauffällig durchrutschen.
+**Der Wächter ist ein Schloss auf den Fortschritt, kein Urteil.** Er sagt: „Stand 14.35 =
+diese Zellen sind grün." Wird eine Zelle im nächsten Schritt rot, wird **hier** die Menge der
+roten Zellen größer — und genau diese Änderung steht im Diff. Wäre der Wächter statisch,
+würde ein Schritt, der eine Zelle kaputtmacht, unauffällig durchrutschen.
 
 | Schritt (Plan §4) | was grün werden muss |
 |---|---|
 | 14.0 (Basislinie) | `determinismus`, `budget` — die anderen vier sind **rot** (Basislinie) |
 | 14.1 | `determinismus` bleibt grün (L1–L3) — die vier roten Zellen bleiben rot, **aber ihre Zahlen wandern** |
 | 14.2 | `regionen` **und** `stabilitaet` werden grün (L4: Anker-Gravitation, Querfedern, `ALPHA_START_SEEDED`) — `kamera` (14.3) und `beschriftungen` (14.35) bleiben rot |
-| **14.3 (dieser Stand)** | `kamera` wird grün (`fitView()`) — `beschriftungen` bleibt rot (14.35) |
-| 14.35 | `beschriftungen` wird grün (§2.7) |
-| 14.4 | **alle** grün + jeder Gegenlauf rot an genau seiner Zelle |
+| 14.3 | `kamera` wird grün (`fitView()`) — `beschriftungen` bleibt rot (14.35) |
+| **14.35 (dieser Stand)** | `beschriftungen` wird grün (§2.7: die Kollisionsprüfung) — **alle sechs Zellen grün** |
+| 14.4 | alle Zellen grün + jeder Gegenlauf rot an genau seiner Zelle |
 
 **Die Zahlen sind mitgeprüft, nicht nur die `ok`-Flags** (der Test
 `test_the_measured_numbers_are_the_ones_the_cells_stand_on`): ein Schritt, der eine Zelle
 kaputtmacht, muss die Zahlen mitnehmen — sonst würde der Wächter die Bewegung der Zahlen
-übersehen. Die Zahlen der Basislinie (14.0), des Stands 14.1, 14.2 und 14.3 stehen alle
-im Diff dieser Datei — **datiert**, weil sich der Code geändert hat.
+übersehen. Die Zahlen der Basislinie (14.0), des Stands 14.1, 14.2, 14.3 und 14.35 stehen
+alle im Diff dieser Datei — **datiert**, weil sich der Code geändert hat.
 
 **Die Gegenläufe sind Belege im Repo** (`p105_b14_layout_probe_gegenlauf_*.json`): die
 Browser-Probe ist zu langsam für die Testsuite (rund eine Minute je Lauf), also fährt sie
@@ -61,16 +62,18 @@ ZELLEN = {
     "beschriftungen": "P10.5-71",
 }
 
-#: **Stand 14.3** — die Kamera. Grün: `determinismus`, `regionen`, `kamera`, `stabilitaet`,
-#: `budget`. Rot: `beschriftungen` (das ist 14.35).
-ROT = {"beschriftungen"}
-GRUEN = {"determinismus", "regionen", "kamera", "stabilitaet", "budget"}
+#: **Stand 14.35** — die Beschriftungen. **Alle sechs Zellen sind grün**: die Kollisionspruefung
+#: (Plan §2.7) laesst ueberlappende Beschriftungen weg, der Fokus verliert seine nie.
+ROT = set()
+GRUEN = {"determinismus", "regionen", "kamera", "stabilitaet", "budget", "beschriftungen"}
 
 #: **Datierter Stand** — die Basislinie (14.0) war rot in `regionen`, `kamera`, `stabilitaet`
 #: und `beschriftungen`; 14.1 hat nur die Zahlen bewegt; **14.2** hat `regionen` (57,2 % → 82,2 %
 #: → **100 %**) und `stabilitaet` (Median 327,9 px → 233 px → **0,0 px**) gruen gemacht;
-#: **14.3** hat `kamera` gruen gemacht (Füllgrad **93,6 %**, Versatz **32,3 px → 0,42 px**).
-STAND = "14.3"
+#: **14.3** hat `kamera` gruen gemacht (Füllgrad **93,6 %**, Versatz **32,3 px → 0,42 px**);
+#: **14.35** hat `beschriftungen` gruen gemacht (**5** ueberlappende Paare → **0**, **3** von
+#: **13** Beschriftungen weggelassen).
+STAND = "14.35"
 
 
 #: Der **Datensatz** (Plan §5, datierte Abweichung vom 5x30-Seed: `beta` hat 32 Items, damit
@@ -87,6 +90,7 @@ SEED_SUMME = 152
 #: | `alpha` | `budget` | die Startenergie ist die **gesäte** (§2.4) |
 #: | `zentrum` | — | die Gravitation zieht zur Leinwandmitte statt zum eigenen Anker (§2.4) |
 #: | `fitview` | `kamera` | die Kamera **passt sich ein** (§2.5) |
+#: | `beschriftung` | `beschriftungen` | die **Kollisionsprüfung** der Beschriftungen (§2.7) |
 #:
 #: **`zentrum` macht keine Zelle rot** — das ist ein *Befund*, kein Fehler des Beleugs: die
 #: Anker-Gravitation ist **nicht** die Regel, die die Regionen-Zelle misst (sie misst die
@@ -104,11 +108,20 @@ SEED_SUMME = 152
 #: damit **ihrer** Regel: sie misst, ob die Karte die Leinwand füllt. Das ist **kein** Fehler
 #: des Gegenlaufs, sondern eine **zweite, echte** Folge — und die Erwartung hier ist die
 #: **Dokumentation** davon.
+#:
+#: **[Datierte Ergänzung 2026-10-27, Schritt 14.35] `beschriftung` (neu).** Der Gegenlauf
+#: patcht die **Kollisionsprüfung** (`graph.js :: labelRectOverlaps()`) — nicht ihren Aufrufer.
+#: **Gemessen:** **13** Beschriftungen gezeichnet, **0** weggelassen, **5** überlappende Paare —
+#: das ist der Stand von 14.2 (und von 14.3), die Zelle `beschriftungen` ist **rot**, alle
+#: anderen bleiben grün. Der Pixel-Vergleich des Standes 14.2 fand **4** Paare — er zählte
+#: eines nicht mit (zwei überlappende Rechtecke teilen sich ihre Pixel); der Recorder zählt
+#: die Paare **aus den Rechtecken**, nicht aus den Pixeln.
 GEGENLAEUFE = {
     "querfeder": ("stabilitaet", "kamera"),
     "alpha": ("budget", "stabilitaet"),
     "zentrum": (),
     "fitview": ("kamera",),
+    "beschriftung": ("beschriftungen",),
 }
 
 
@@ -147,8 +160,8 @@ def test_the_beleg_has_every_cell():
 
 
 def test_the_stand_is_green_in_exactly_these_cells():
-    """**Das ist die Aussage des Schritts 14.3:** `kamera` ist grün geworden, `beschriftungen`
-    bleibt rot (das ist 14.35)."""
+    """**Das ist die Aussage des Schritts 14.35:** `beschriftungen` ist grün geworden — alle
+    sechs Zellen sind grün."""
     zellen = _zellen(_beleg())
     rot = {name for name, ok in zellen.items() if not ok}
     gruen = {name for name, ok in zellen.items() if ok}
@@ -243,11 +256,25 @@ def test_the_measured_numbers_are_the_ones_the_cells_stand_on():
         "der Einpass-Zoom bei 200 Knoten liegt auf `ZOOM_MIN` — der Wert muss gesenkt werden "
         "(E3)")
 
-    # Beschriftungen (P10.5-71): es ueberlappen sich welche, der Fokus ist beschriftet (14.35)
+    # Beschriftungen (P10.5-71): **keine** zwei gezeichneten Rechtecke ueberlappen sich, die
+    # Fokus-Beschriftung ist **da** (am Pixel bewiesen) — und die Regel hat **wirklich**
+    # gewirkt: es wurde eine Beschriftung weggelassen.
+    # **[Datierte Aenderung 2026-10-26, Schritt 14.35]:** vorher stand hier `len(...) >= 1`
+    # (die Basislinie hatte Ueberlappungen). Jetzt sind es **null** — und der Beleg muss
+    # **zeigen**, dass die Regel gegriffen hat: ohne weggelassene Beschriftung waere die Zelle
+    # auch ohne die Regel gruen (der Gegenlauf `beschriftung` beweist das Gegenteil).
     bes = m["beschriftungen"]
-    assert bes["fokus_beschriftung"] is True
+    assert bes["fokus_beschriftung"] is True, "die Fokus-Beschriftung fehlt"
+    assert bes["fokus_pixel"] > 0, "die Fokus-Beschriftung steht nicht auf der Leinwand"
     assert bes["gezeichnet"] >= 2, "es sind genug Beschriftungen gezeichnet worden"
-    assert len(bes["ueberlappungen"]) >= 1, "die Basislinie hat Ueberlappungen"
+    assert len(bes["ueberlappungen"]) == 0, (
+        f"gezeichnete Beschriftungen ueberlappen sich: {bes['ueberlappungen']}")
+    assert bes["unterdrueckt"] >= 1, (
+        "es wurde **keine** Beschriftung weggelassen — die Kollisionspruefung hat nicht "
+        "gegriffen, die Zelle waere auch ohne die Regel gruen")
+    assert bes["kandidaten"] == bes["gezeichnet"] + bes["unterdrueckt"], (
+        "die Zahl der Kandidaten passt nicht zu den gezeichneten und den weggelassenen")
+    assert bes["nachbarn"] >= 5, "der Fokus-Knoten hat mindestens fuenf Nachbarn (Plan §5)"
 
     # Budget (P10.5-69): 200 Knoten, 3 s, 0 Frames, die Karte ist gemalt
     bud = m["budget"]
@@ -258,9 +285,9 @@ def test_the_measured_numbers_are_the_ones_the_cells_stand_on():
 
     # **kein** Seitenfehler: ein Fehler im Graph-Code wuerde die Zellen stumm verfaelschen
     assert beleg["seitenfehler"] == [], f"der Beleg traegt Seitenfehler: {beleg['seitenfehler']}"
-    assert beleg["alle_kriterien_erfuellt"] is False, (
-        "der Stand kann noch nicht alle Kriterien erfuellen — `beschriftungen` ist die Aufgabe "
-        "von 14.35")
+    assert beleg["alle_kriterien_erfuellt"] is True, (
+        "der Stand 14.35 erfuellt alle Kriterien — wenn hier 'false' steht, traegt der Beleg "
+        "eine rote Zelle, die die Bilanz oben nicht zeigt")
 
 
 def test_each_gegenlauf_makes_exactly_its_cell_red():
@@ -274,8 +301,8 @@ def test_each_gegenlauf_makes_exactly_its_cell_red():
         assert beleg["gegenlauf"] == name, f"der Beleg {name} nennt einen anderen Gegenlauf"
         zellen = _zellen(beleg)
         rot = {zelle for zelle, ok in zellen.items() if not ok}
-        # Die Zellen, die **ohnehin** rot sind (die Aufgaben von 14.3 und 14.35), sind kein
-        # Fehler des Gegenlaufs -- sie stehen auch im Normalfall rot.
+        # **Stand 14.35: keine Zelle ist ohnehin rot** — der Gegenlauf muss also *genau*
+        # seine Zelle treffen, ohne eine andere mitzunehmen.
         neu_rot = rot - ROT
         assert neu_rot == set(erwartet_rot), (
             f"der Gegenlauf {name!r} macht {sorted(neu_rot)} neu rot — erwartet "
@@ -334,6 +361,32 @@ def test_the_gegenlauf_fitview_makes_the_camera_red_and_nothing_else():
     assert kam["versatz_mitte_px"] > 3.0, "der Umriss sitzt nicht mehr neben der Mitte"
     assert kam["zentriert"] is False
     assert kam["zoom_anzeige"] == 1, "ohne den Einpass bleibt der Zoom bei 100 %"
+
+
+def test_the_gegenlauf_beschriftung_makes_the_labels_red_and_nothing_else():
+    """**Der Gegenlauf zu P10.5-71:** die **Kollisionsprüfung** der Beschriftungen ist aus —
+    die ueberlappenden Beschriftungen werden wieder **alle** gezeichnet.
+
+    Ohne diesen Gegenlauf waere die Beschriftungs-Zelle ein Wächter, der nichts prueft: die
+    Zelle waere auch dann gruen, wenn die Regel gar nicht existierte (die Kandidaten der
+    Probe ueberlappen sich in dieser Karte von Natur aus). Der Gegenlauf stellt **genau** die
+    Zelle rot — die anderen fuenf bleiben gruen."""
+    beleg = _gegenlauf_beleg("beschriftung")
+    zellen = _zellen(beleg)
+    rot = {zelle for zelle, ok in zellen.items() if not ok}
+    neu_rot = rot - ROT
+    assert neu_rot == {"beschriftungen"}, (
+        f"der Gegenlauf `beschriftung` macht {sorted(neu_rot)} neu rot — erwartet "
+        "['beschriftungen']")
+    bes = beleg["messungen"]["beschriftungen"]
+    # **Die Zahlen**: ohne die Regel werden **alle** Kandidaten gezeichnet (keiner weggelassen)
+    # und die Rechtecke ueberlappen sich wieder.
+    assert bes["unterdrueckt"] == 0, "ohne die Kollisionspruefung wurde nichts weggelassen"
+    assert bes["gezeichnet"] == bes["kandidaten"], (
+        "ohne die Kollisionspruefung wurde nicht jede Beschriftung gezeichnet")
+    assert len(bes["ueberlappungen"]) >= 1, (
+        "ohne die Kollisionspruefung ueberlappen sich die Rechtecke nicht — der Gegenlauf "
+        "stellt den Fehler nicht wieder her")
 
 
 def test_a_manipulated_beleg_would_be_rejected(tmp_path, monkeypatch):
@@ -400,6 +453,40 @@ def test_a_beleg_with_a_shifted_camera_would_be_rejected(tmp_path, monkeypatch):
     diesem Ordner zweimal getroffen."""
     beleg = _beleg()
     beleg["messungen"]["kamera"]["versatz_mitte_px"] = 40.0
+    gefaelscht = tmp_path / "p105_b14_layout_probe.json"
+    gefaelscht.write_text(json.dumps(beleg), encoding="utf-8")
+    monkeypatch.setattr(sys.modules[__name__], "BELEG", gefaelscht)
+    with pytest.raises(AssertionError):
+        test_the_measured_numbers_are_the_ones_the_cells_stand_on()
+
+
+def test_a_beleg_with_overlapping_labels_would_be_rejected(tmp_path, monkeypatch):
+    """Die **sechste** Gegenprobe (2026-10-26, Schritt 14.35): ein Beleg, in dem die
+    gezeichneten Beschriftungs-Rechtecke sich wieder **ueberlappen** (ohne das `ok`-Feld zu
+    beruehren), muss den Wächter rot machen.
+
+    Das ist die Fehlerklasse, die dieser Ordner schon zweimal getroffen hat: das `ok`-Flag
+    wird umgeschaltet, die **Zahl** bleibt stehen. Der Wächter prueft die Zahlen — ein Beleg
+    mit `ueberlappungen: []` und einem Paar waere ein Witz."""
+    beleg = _beleg()
+    beleg["messungen"]["beschriftungen"]["ueberlappungen"] = [["Gamma Plan 01", "Gamma Frage 04"]]
+    gefaelscht = tmp_path / "p105_b14_layout_probe.json"
+    gefaelscht.write_text(json.dumps(beleg), encoding="utf-8")
+    monkeypatch.setattr(sys.modules[__name__], "BELEG", gefaelscht)
+    with pytest.raises(AssertionError):
+        test_the_measured_numbers_are_the_ones_the_cells_stand_on()
+
+
+def test_a_beleg_without_a_suppressed_label_would_be_rejected(tmp_path, monkeypatch):
+    """Die **siebte** Gegenprobe (2026-10-26, Schritt 14.35): ein Beleg, in dem **keine**
+    Beschriftung weggelassen wurde, muss den Wächter rot machen.
+
+    Sonst waere die Zelle auch dann gruen, wenn die Kollisionspruefung gar nicht existierte —
+    die Zelle wuerde die Regel nicht messen, sondern nur behaupten. Der Gegenlauf
+    `beschriftung` beweist die Regel von der anderen Seite; diese Gegenprobe beweist, dass
+    der Waechter sie von der Belegseite her prueft."""
+    beleg = _beleg()
+    beleg["messungen"]["beschriftungen"]["unterdrueckt"] = 0
     gefaelscht = tmp_path / "p105_b14_layout_probe.json"
     gefaelscht.write_text(json.dumps(beleg), encoding="utf-8")
     monkeypatch.setattr(sys.modules[__name__], "BELEG", gefaelscht)

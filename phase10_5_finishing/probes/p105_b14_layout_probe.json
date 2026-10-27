@@ -1,8 +1,8 @@
 {
   "probe": "p105_b14_layout_probe",
-  "schritt": "14.3",
+  "schritt": "14.35",
   "gegenlauf": null,
-  "zeit": "2026-10-27T16:26:33.602743+00:00",
+  "zeit": "2026-10-27T17:12:45.557684+00:00",
   "seed": {
     "spaces": 5,
     "items": 152,
@@ -88,30 +88,26 @@
     "beschriftungen": {
       "messbar": true,
       "fokus": "itm_0000003f",
+      "fokus_titel": "Gamma Plan 01",
       "nachbarn": 12,
       "kandidaten": 13,
-      "erwartet_im_bild": 13,
-      "ausserhalb_bild": 0,
-      "gezeichnet": 13,
-      "ueberlappungen": [
-        [
-          "itm_0000003f",
-          "itm_00000041"
-        ],
-        [
-          "itm_0000003f",
-          "itm_00000042"
-        ],
-        [
-          "itm_00000041",
-          "itm_00000042"
-        ],
-        [
-          "itm_00000041",
-          "itm_0000005c"
-        ]
+      "gezeichnet": 10,
+      "unterdrueckt": 3,
+      "texte": [
+        "Gamma Plan 01",
+        "Beta Plan 01",
+        "Delta Plan 01",
+        "Gamma Tabelle 06",
+        "Beta Plan 31",
+        "Gamma Antwort 05",
+        "Gamma Skizze 07",
+        "Gamma Frage 24",
+        "Gamma Notiz 02",
+        "Gamma Protokoll 08"
       ],
+      "ueberlappungen": [],
       "fokus_beschriftung": true,
+      "fokus_pixel": 69,
       "genug_gezeichnet": true,
       "zoom": 0.9242342818944,
       "pan": [
@@ -120,7 +116,7 @@
       ],
       "unsicherheit_px": 0.6792152186749161,
       "treffer": 18,
-      "ok": false
+      "ok": true
     },
     "stabilitaet": {
       "wachser_space": "epsilon",
@@ -169,7 +165,7 @@
         "itm_0000092a"
       ],
       "graph_knoten": 201,
-      "ruhe_ms": 2146,
+      "ruhe_ms": 2147,
       "luecken_ms": [],
       "raf_calls": 130,
       "raf_calls_reduced_motion": 0,
@@ -212,6 +208,6 @@
       "ok": true
     }
   },
-  "alle_kriterien_erfuellt": false,
+  "alle_kriterien_erfuellt": true,
   "seitenfehler": []
 }

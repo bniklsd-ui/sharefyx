@@ -228,6 +228,19 @@ const CROSS_SPRING_FACTOR = 0.15;      // Startwert, gemessen in 14.4 -- die Sta
 const CROSS_SPRING_LENGTH_FACTOR = 3;  // Startwert, gemessen in 14.4 -- die Laenge der Querfeder
 const ALPHA_START_SEEDED = 0.5;        // Startwert, gemessen in 14.4 -- die Startenergie
 
+// -- P10.5 Block 14, Schritt 14.35: die Beschriftungen ohne Ueberlappung -------------------------
+//
+// Plan §2.7: die Beschriftungs-Rechtecke (Breite aus `ctx.measureText`, Hoehe = die Schrift)
+// in der Reihenfolge des **Vorrangs** sammeln; ueberlappt ein Rechteck ein schon gezeichnetes,
+// wird es **nicht** gezeichnet. Reihenfolge = Fokus → erster Ring → Suchtreffer → Rest nach Grad
+// absteigend. Der Fokus-Knoten verliert seine Beschriftung **nie**.
+//
+// **Reine Zeichenlogik:** die Positionen der Knoten aendern sich nicht.
+const LABEL_FONT_SIZE = 12;   // die Schrift der Beschriftung (px) -- Plan 8.6
+const LABEL_FONT = LABEL_FONT_SIZE + 'px "IBM Plex Sans Var", system-ui, sans-serif';
+const LABEL_HEIGHT = LABEL_FONT_SIZE;  // die Hoehe des Beschriftungs-Rechtecks (px)
+const LABEL_OFFSET = 6;       // der Abstand zwischen Knotenrand und Text (px)
+
 // -- P10.5 Block 14, Schritt 14.3: die Kamera einpassen ----------------------------------------
 //
 // Plan §2.5: nach dem **ersten** Einschwingen je `loadGraph()` (nicht nach einem Drag) passt
@@ -1207,23 +1220,70 @@ function drawLabels(rings, shown, hits) {
   var zoomedIn = zoom >= ZOOM_LABEL_THRESHOLD;
   if (!rings && !zoomedIn) return;
   ctx.fillStyle = COLORS.label;
-  ctx.font = '12px "IBM Plex Sans Var", system-ui, sans-serif';
+  ctx.font = LABEL_FONT;
   ctx.textBaseline = "middle";
+  // P10.5 Block 14, Schritt 14.35 (Plan §2.7): die Rechtecke der **gezeichneten**
+  // Beschriftungen sammeln; ein Rechteck, das ein schon gezeichnetes ueberlappt, wird
+  // **nicht** gezeichnet. Der Fokus verliert seine Beschriftung **nie**.
+  var belegt = [];
+  var kandidaten = labelCandidates(rings, shown, hits, zoomedIn);
+  for (var i = 0; i < kandidaten.length; i++) {
+    var k = kandidaten[i];
+    var text = truncate(k.node.title, 28);
+    // Position in CSS-Koordinaten (nach pan/zoom-Transform).
+    var sx = k.node.x * zoom + panX;
+    var sy = k.node.y * zoom + panY;
+    var x0 = sx + k.radius + LABEL_OFFSET;
+    var rect = {
+      x0: x0, y0: sy - LABEL_HEIGHT / 2,
+      x1: x0 + ctx.measureText(text).width, y1: sy + LABEL_HEIGHT / 2,
+    };
+    if (!k.focus && labelRectOverlaps(rect, belegt)) continue;
+    // Die Beschriftung folgt derselben Helligkeit wie der Knoten -- sonst leuchtet der Titel
+    // eines getroffenen Knotens weiter, obwohl der Knoten selbst gedimmt ist.
+    ctx.globalAlpha = nodeAlpha(k.node.id, rings, hits);
+    ctx.fillText(text, x0, sy);
+    belegt.push(rect);
+  }
+  ctx.globalAlpha = 1;
+}
+
+// Die **Reihenfolge** der Beschriftungen ist der Vorrang (Plan §2.7): Fokus → erster Ring →
+// Suchtreffer → Rest nach Grad absteigend. Innerhalb einer Stufe entscheidet der Grad
+// (der groesste zuerst) -- damit ist die Reihenfolge eindeutig und die Karte sieht bei
+// gleicher Lage immer gleich aus.
+//
+// **Die Menge der beschrifteten Knoten aendert sich nicht** (Plan 8.6): Fokus und erster Ring
+// immer, sonst erst ab `ZOOM_LABEL_THRESHOLD`. Die Suchtreffer sind eine *Stufe* der
+// Reihenfolge, kein eigener Anlass -- wer sucht, zoomt ohnehin.
+function labelCandidates(rings, shown, hits, zoomedIn) {
+  var out = [];
   for (var i = 0; i < nodes.length; i++) {
     var n = nodes[i];
     if (!shown[n.id]) continue;
-    var near = rings && (n.id === rings.focus || rings.first.has(n.id));
-    if (!near && !zoomedIn) continue;
-    var r = nodeRadius(n);
-    // Position in CSS-Koordinaten (nach pan/zoom-Transform).
-    var sx = n.x * zoom + panX;
-    var sy = n.y * zoom + panY;
-    // Die Beschriftung folgt derselben Helligkeit wie der Knoten -- sonst leuchtet der Titel
-    // eines getroffenen Knotens weiter, obwohl der Knoten selbst gedimmt ist.
-    ctx.globalAlpha = nodeAlpha(n.id, rings, hits);
-    ctx.fillText(truncate(n.title, 28), sx + r + 6, sy);
+    var focus = !!(rings && n.id === rings.focus);
+    var first = !!(rings && rings.first.has(n.id));
+    if (!focus && !first && !zoomedIn) continue;
+    var rang = 3;
+    if (focus) rang = 0;
+    else if (first) rang = 1;
+    else if (hits && hits[n.id]) rang = 2;
+    out.push({node: n, focus: focus, rang: rang, radius: nodeRadius(n)});
   }
-  ctx.globalAlpha = 1;
+  out.sort(function (a, b) {
+    if (a.rang !== b.rang) return a.rang - b.rang;
+    return b.node.deg - a.node.deg;
+  });
+  return out;
+}
+
+// Ueberlappt das Rechteck eine der schon gezeichneten Beschriftungen? (Plan §2.7)
+function labelRectOverlaps(rect, belegt) {
+  for (var i = 0; i < belegt.length; i++) {
+    var b = belegt[i];
+    if (rect.x0 < b.x1 && b.x0 < rect.x1 && rect.y0 < b.y1 && b.y0 < rect.y1) return true;
+  }
+  return false;
 }
 
 

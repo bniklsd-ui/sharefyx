@@ -1,0 +1,237 @@
+{
+  "probe": "p105_b14_layout_probe",
+  "schritt": "14.35",
+  "gegenlauf": "beschriftung",
+  "zeit": "2026-10-27T17:13:56.928693+00:00",
+  "seed": {
+    "spaces": 5,
+    "items": 152,
+    "items_pro_space": {
+      "alpha": 30,
+      "beta": 32,
+      "gamma": 30,
+      "delta": 30,
+      "epsilon": 30
+    },
+    "wachser_space": "epsilon"
+  },
+  "messungen": {
+    "determinismus": {
+      "knoten": 152,
+      "knoten_lauf1": 152,
+      "gemeinsam": 152,
+      "max_abweichung_px": 0.0,
+      "ok": true
+    },
+    "regionen": {
+      "knoten": 152,
+      "richtig": 152,
+      "anteil": 1.0,
+      "schwerpunkte": {
+        "alpha": [
+          616.7,
+          524.3333333333334
+        ],
+        "beta": [
+          820.28125,
+          843.875
+        ],
+        "gamma": [
+          76.0,
+          502.46666666666664
+        ],
+        "delta": [
+          555.2333333333333,
+          185.8
+        ],
+        "epsilon": [
+          1045.4333333333334,
+          129.56666666666666
+        ]
+      },
+      "beispiele_falsch": [],
+      "ok": true
+    },
+    "kamera": {
+      "messbar": true,
+      "zoom": 0.9242342818944,
+      "zoom_anzeige": 0.92,
+      "leerwand": [
+        1134,
+        1061.375
+      ],
+      "welt": {
+        "x0": -8,
+        "x1": 1140,
+        "y0": 49,
+        "y1": 948
+      },
+      "bild_mass": [
+        1061.0209556147713,
+        830.8866194230657
+      ],
+      "fuellgrad": 0.9356445816708742,
+      "passt": true,
+      "pan": [
+        43.465198344891746,
+        70.13802076345269
+      ],
+      "umriss_mitte": [
+        566.0,
+        498.5
+      ],
+      "versatz_mitte_px": 0.41819810287779546,
+      "unsicherheit_px": 0.6792152186749161,
+      "zentriert": true,
+      "ok": true
+    },
+    "beschriftungen": {
+      "messbar": true,
+      "fokus": "itm_0000003f",
+      "fokus_titel": "Gamma Plan 01",
+      "nachbarn": 12,
+      "kandidaten": 13,
+      "gezeichnet": 13,
+      "unterdrueckt": 0,
+      "texte": [
+        "Gamma Plan 01",
+        "Beta Plan 01",
+        "Delta Plan 01",
+        "Gamma Tabelle 06",
+        "Beta Plan 31",
+        "Gamma Frage 04",
+        "Gamma Antwort 05",
+        "Gamma Idee 03",
+        "Gamma Skizze 07",
+        "Gamma Frage 24",
+        "Gamma Entwurf 30",
+        "Gamma Notiz 02",
+        "Gamma Protokoll 08"
+      ],
+      "ueberlappungen": [
+        [
+          "Gamma Plan 01",
+          "Gamma Frage 04"
+        ],
+        [
+          "Gamma Plan 01",
+          "Gamma Idee 03"
+        ],
+        [
+          "Gamma Frage 04",
+          "Gamma Idee 03"
+        ],
+        [
+          "Gamma Idee 03",
+          "Gamma Entwurf 30"
+        ],
+        [
+          "Gamma Frage 24",
+          "Gamma Entwurf 30"
+        ]
+      ],
+      "fokus_beschriftung": true,
+      "fokus_pixel": 118,
+      "genug_gezeichnet": true,
+      "zoom": 0.9242342818944,
+      "pan": [
+        43.465198344891746,
+        70.13802076345269
+      ],
+      "unsicherheit_px": 0.6792152186749161,
+      "treffer": 18,
+      "ok": false
+    },
+    "stabilitaet": {
+      "wachser_space": "epsilon",
+      "neues_item": "itm_00000901",
+      "position_neu": [
+        1146,
+        189
+      ],
+      "naechster_schwerpunkt": "epsilon",
+      "in_eigener_region": true,
+      "abstand_eigener_space_px": 27.65863337187866,
+      "abstand_fremder_space_px": 523.0086041357255,
+      "andere_spaces": 122,
+      "median_verschiebung_px": 0.0,
+      "max_verschiebung_px": 2.23606797749979,
+      "pruefsumme_vorher": 3754218440,
+      "pruefsumme_nachher": 4006010231,
+      "pinned_beim_start": 0,
+      "knoten_frisch": 153,
+      "kasten_frisch": {
+        "left": 753,
+        "top": 121.625,
+        "width": 1134,
+        "height": 1061.375,
+        "dw": 1134,
+        "dh": 1061,
+        "dpr": 1
+      },
+      "position_neu_frisch": [
+        1138,
+        285
+      ],
+      "ok": true
+    },
+    "budget": {
+      "knoten": 201,
+      "pos_pruefsumme": 2427632413,
+      "graph_reihenfolge": [
+        "itm_00000931",
+        "itm_00000930",
+        "itm_0000092f",
+        "itm_0000092e",
+        "itm_0000092d",
+        "itm_0000092c",
+        "itm_0000092b",
+        "itm_0000092a"
+      ],
+      "graph_knoten": 201,
+      "ruhe_ms": 2147,
+      "luecken_ms": [],
+      "raf_calls": 130,
+      "raf_calls_reduced_motion": 0,
+      "kern_pixel_reduced_motion": 7661,
+      "kern_pixel": 7661,
+      "grenze_ms": 3000,
+      "kamera_200_knoten": {
+        "messbar": true,
+        "zoom": 0.6884817251039999,
+        "zoom_anzeige": 0.69,
+        "leerwand": [
+          1134,
+          1061.375
+        ],
+        "welt": {
+          "x0": -235,
+          "x1": 1333,
+          "y0": -135,
+          "y1": 1058
+        },
+        "bild_mass": [
+          1079.5393449630717,
+          821.3586980490718
+        ],
+        "fuellgrad": 0.9519747310079998,
+        "passt": true,
+        "pan": [
+          188.62654457633886,
+          212.5274723409844
+        ],
+        "umriss_mitte": [
+          549.0,
+          461.5
+        ],
+        "versatz_mitte_px": 0.42571152351968067,
+        "unsicherheit_px": 0.6901256215267022,
+        "zentriert": true,
+        "ok": true
+      },
+      "ok": true
+    }
+  },
+  "alle_kriterien_erfuellt": false,
+  "seitenfehler": []
+}

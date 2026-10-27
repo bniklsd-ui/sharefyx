@@ -219,6 +219,15 @@ function makeCtx() {
     fillText(text, x, y) {
       this.texts.push({ text: text, x: x, y: y, alpha: this.globalAlpha });
     },
+    // **Die Breite eines Textes** (P10.5 Block 14, Schritt 14.35): `drawLabels()` misst die
+    // Beschriftungs-Rechtecke mit `ctx.measureText` -- ohne diese Methode waere der Harness
+    // ein `TypeError` und die Probe wuerde gar nichts messen. Die Breite ist hier eine
+    // **Naeherung** (6 px je Zeichen): der Harness misst die **Zeichenregel** (Lappen, Furche,
+    // Bahnen, Zellen, Abdunklung), nicht die Typografie -- die *Breiten* misst der Browser-
+    // Waechter (`p105_b14_layout_probe.py`) mit der echten Schrift.
+    measureText(text) {
+      return { width: String(text == null ? "" : text).length * 6 };
+    },
     setLineDash(d) { this.dashes.push(d.slice()); },
   };
 }

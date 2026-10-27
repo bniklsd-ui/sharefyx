@@ -25,10 +25,20 @@ Items anlegen (Zelle P10.5-68). Muster: `phase10_inventory/probes/p10_wegwerf.py
 
 **Gemessen wird ueber Positionen, nicht ueber Pixel** (Plan §4): nach dem Einschwingen schreibt
 `saveLayout()` alle `x, y` in den `localStorage` — die Probe liest sie (`page.evaluate`) und
-verbindet sie mit `/api/v1/graph` (Space, Ordner). **Kein Test-Haken im Produktcode.** Pixel
+verbindet sie mit `/api/v1/graph` (Space, Ordner). **Kein** Test-Haken im Produktcode. Pixel
 werden nur an **zwei** Stellen gelesen, wo es keine Alternative gibt: die **Kernpositionen**
 (die Kamera-Transformation zu schaetzen) und die **Beschriftungs-Rechtecke** (P10.5-71 verlangt
 ausdruecklich „Rechtecke ueber `measureText` nachgerechnet").
+
+> **Datierte Aenderung der Beschriftungs-Messung (2026-10-27, Schritt 14.35).** Die
+> *Menge* der gezeichneten Beschriftungen wird jetzt an den **`fillText`-Aufrufen** des letzten
+> Bildes gemessen (ein Recorder an der Leinwand-API des Browsers — wieder **kein** Haken im
+> Produktcode), nicht mehr an den Pixeln. Grund: die neue Regel **laesst** ueberlappende
+> Beschriftungen **weg**, und an den Pixeln ist ein *weggelassenes* Rechteck nicht von einem
+> *gezeichneten* zu unterscheiden — zwei ueberlappende Rechtecke teilen sich ihre Pixel. Der
+> Pixelbeweis bleibt fuer die **Fokus-Beschriftung** (sie muss wirklich auf der Leinwand
+> stehen). Die **Rechtecke** selbst werden weiterhin ueber `ctx.measureText` nachgerechnet
+> (Plan §5).
 
 | Zelle | Abnahme | was gemessen wird | gruen, wenn |
 |---|---|---|---|
@@ -138,6 +148,7 @@ BASE = ""
 # | `querfeder` | §2.4 -- die Querfeder ist **schwach und lang** | `stabilitaet` | sie ist so stark und kurz wie die Feder im Space |
 # | `alpha` | §2.4 -- die Startenergie ist die **gesäte** | `budget` | `ALPHA_START_SEEDED` → 1 und `ALPHA_DECAY` → 0,995 (die Simulation reisst das 3-s-Budget) |
 # | `fitview` | §2.5 -- die Kamera **passt sich ein** | `kamera` | `fitView()` ist aus (das ist der Stand von 14.2) |
+# | `beschriftung` | §2.7 -- die Beschriftungen **überlappen sich nicht** | `beschriftungen` | die Kollisionsprüfung ist aus (das ist der Stand von 14.2) |
 #
 # **Die Anker sind eindeutig** (Regel + Nachbarzeile, nicht nur ein Wert) -- sonst patcht der
 # Gegenlauf den Kommentar über der Regel statt der Regel.
@@ -161,6 +172,17 @@ GEGENLAEUFE = {
     "fitview": {
         "  if (nodes.length === 0 || cssWidth <= 0 || cssHeight <= 0) return;":
             "  return;  // Gegenlauf 14.3: fitView() ist aus",
+    },
+    # **14.35: die Kollisionspruefung der Beschriftungen ist aus.** Der Anker ist die
+    # **Regel + Nachbarzeile** (die erste Zeile des Rumpfes von `labelRectOverlaps()` plus die
+    # Schleife darunter) -- gepatcht wird die *Regel*, nicht ihr Aufrufer: sonst wuerde der
+    # Aufrufer (`drawLabels()`) noch immer die Rechtecke sammeln, und der Gegenlauf wuerde
+    # nicht die Ueberlappung, sondern nur den Wegfall der *Pruefung* messen.
+    "beschriftung": {
+        "function labelRectOverlaps(rect, belegt) {\n  for (var i = 0; i < belegt.length; i++) {":
+            "function labelRectOverlaps(rect, belegt) {\n"
+            "  return false;  // Gegenlauf 14.35: die Kollisionspruefung ist aus\n"
+            "  for (var i = 0; i < belegt.length; i++) {",
     },
 }
 #: Der Gegenlauf dieses Laufs (`None` = der Normalfall).
@@ -645,10 +667,49 @@ PAN = r"""(args) => {
           pan_streuung: Math.max(streu(0), streu(1)), zoom_schritt: bestZ * 0.0002};
 }"""
 
+# Der **Recorder** der gezeichneten Beschriftungen (Schritt 14.35).
+#
+# **Kein Haken im Produktcode** (Plan §4): die Probe haengt sich an die **Leinwand-API** des
+# Browsers. `clearRect` beginnt jeden Zeichendurchgang (`graph.js :: draw()` loescht am Anfang
+# die Leinwand), `fillText` schreibt die Beschriftung. Was zwischen dem letzten `clearRect` und
+# dem Ende des Durchgangs geschrieben wurde, ist die **gezeichnete Menge des letzten Bildes**.
+#
+# **Warum nicht die Pixel?** (der Stand vor 14.35): die Pixel-Schnueffelei konnte nicht
+# unterscheiden, ob eine Beschriftung gezeichnet wurde oder nicht — zwei ueberlappende
+# Rechtecke teilen sich ihre Pixel, und ein *weggelassenes* Rechteck sah wie ein gezeichnetes
+# aus. Genau das waere nach der neuen Regel falsch: die Regel **laesst** Ueberlappendes weg.
+# Der Pixelbeweis bleibt fuer die **Fokus-Beschriftung** (sie muss wirklich auf der Leinwand
+# stehen) — dort kann nichts anderes ihre Pixel haben.
+LABEL_RECORDER = r"""
+(() => {
+  const proto = CanvasRenderingContext2D.prototype;
+  const origClear = proto.clearRect;
+  const origFill = proto.fillText;
+  window.__labels = {calls: [], frames: 0};
+  proto.clearRect = function (x, y, w, h) {
+    if (this.canvas && this.canvas.id === 'overview-graph-canvas') {
+      window.__labels.calls = [];
+      window.__labels.frames += 1;
+    }
+    return origClear.call(this, x, y, w, h);
+  };
+  proto.fillText = function (text, x, y) {
+    if (this.canvas && this.canvas.id === 'overview-graph-canvas') {
+      window.__labels.calls.push({text: String(text), x: x, y: y, alpha: this.globalAlpha});
+    }
+    return origFill.call(this, text, x, y);
+  };
+})();
+"""
+
+# Die **gezeichneten** Beschriftungen des letzten Bildes.
+GEZEICHNETE_LABELS = "() => (window.__labels ? window.__labels.calls : [])"
+
 # Die **Beschriftungs-Rechtecke**: Breite aus `ctx.measureText` (die Schrift des Graphen:
-# 12px "IBM Plex Sans Var"), Hoehe = die Schrift (12 px). Geprueft wird an den **Pixeln**, ob
-# die Beschriftung wirklich gezeichnet wurde — das trennt „gezeichnet" von „weggelassen"
-# (Schritt 14.35 laesst Ueberlappende weg), ohne die Produktlogik nachzubauen.
+# 12px "IBM Plex Sans Var"), Hoehe = die Schrift (12 px). Die Koordinaten kommen aus dem
+# Recorder — sie sind **CSS-Pixel** (die App zeichnet die Beschriftungen nach `restore()`, also
+# ohne Zoom). Zusaetzlich wird an den **Pixeln** geprueft, ob die Beschriftung wirklich
+# gemalt wurde (der Beweis fuer die Fokus-Beschriftung).
 BESCHRIFTUNGEN = r"""(args) => {
   const LABEL = [196, 205, 216];
   const c = document.getElementById('overview-graph-canvas');
@@ -661,11 +722,9 @@ BESCHRIFTUNGEN = r"""(args) => {
   const nah = (p, w, t) => Math.abs(p[0] - w[0]) <= t && Math.abs(p[1] - w[1]) <= t
                          && Math.abs(p[2] - w[2]) <= t;
   const out = [];
-  for (const k of args.kandidaten) {
-    const text = k.titel.length <= 28 ? k.titel : k.titel.slice(0, 27) + '\u2026';
-    const w = ctx.measureText(text).width;
-    const x0 = k.x * args.zoom + args.panX + k.r + 6;
-    const y0 = k.y * args.zoom + args.panY - 6;
+  for (const k of args.aufrufe) {
+    const w = ctx.measureText(k.text).width;
+    const x0 = k.x, y0 = k.y - 6;
     const px0 = Math.round(x0 * sx), px1 = Math.round((x0 + w) * sx);
     const py0 = Math.round(y0 * sy), py1 = Math.round((y0 + 12) * sy);
     const imBild = px0 >= 0 && py0 >= 0 && px1 <= c.width && py1 <= c.height;
@@ -679,8 +738,8 @@ BESCHRIFTUNGEN = r"""(args) => {
         }
       }
     }
-    out.push({id: k.id, titel: k.titel, text: text, breite: w, x0: x0, y0: y0,
-              gezeichnet: treffer > 0, pixel: treffer, imBild: imBild});
+    out.push({text: k.text, breite: w, x0: x0, y0: y0, x1: x0 + w, y1: y0 + 12,
+              pixel: treffer, hat_pixel: treffer > 0, imBild: imBild});
   }
   return out;
 }"""
@@ -982,12 +1041,27 @@ def nachbarn_je_knoten(grafik):
     return nachbarn
 
 
+def _truncate(titel, n=28):
+    """Die Beschriftung, wie der Client sie zeichnet (`graph.js :: truncate()`)."""
+    if not titel:
+        return ""
+    return titel if len(titel) <= n else titel[: n - 1] + "…"
+
+
 def beschriftungen(page, lauf, pos, raum_von, nachbarn):
     """P10.5-71 — die gezeichneten Beschriftungs-Rechtecke.
 
     Der Fokus-Knoten: der Knoten mit den meisten **Nachbarn**, der **im Bild** liegt (sonst
     kann der Browser ihn nicht ueberfahren). Die Nachbarn kommen aus `/api/v1/graph` — die App
-    zeichnet im Fokus-Zustand den Fokus und den **ersten Ring** (`drawLabels()`)."""
+    zeichnet im Fokus-Zustand den Fokus und den **ersten Ring** (`drawLabels()`).
+
+    **Datierte Aenderung der Messung (2026-10-26, Schritt 14.35):** gemessen wird nicht mehr
+    an den **Pixeln**, sondern an den **`fillText`-Aufrufen** des letzten Bildes (der Recorder
+    haengt sich an `clearRect`/`fillText` der Leinwand — **kein** Haken im Produktcode). Grund:
+    die neue Regel **laesst** ueberlappende Beschriftungen weg, und an den Pixeln ist ein
+    *weggelassenes* Rechteck von einem *gezeichneten* nicht zu unterscheiden (zwei
+    ueberlappende Rechtecke teilen sich ihre Pixel). Der Pixelbeweis bleibt fuer die
+    **Fokus-Beschriftung** — sie muss wirklich auf der Leinwand stehen."""
     kerne = lauf["kerne"]
     zoom = lauf["zoom"]
     welt = [[xy[0], xy[1]] for xy in pos.values()]
@@ -1028,6 +1102,9 @@ def beschriftungen(page, lauf, pos, raum_von, nachbarn):
     page.mouse.move(kasten["left"] + fx, kasten["top"] + fy)
     page.wait_for_timeout(600)
 
+    # **die Kandidaten**: die Knoten, die eine Beschriftung bekommen *koennten* (Fokus +
+    # erster Ring) — die Zahl geht in den Beleg, damit man sieht, wie viele weggelassen
+    # wurden.
     ring = sorted(nachbarn.get(fokus_id, ()))
     kandidaten = []
     for nid in [fokus_id] + ring:
@@ -1038,35 +1115,42 @@ def beschriftungen(page, lauf, pos, raum_von, nachbarn):
         r = min(12, 4 + 2 * math.log2(1 + deg))
         kandidaten.append({"id": nid, "titel": titel_von.get(nid, ""), "x": xy[0],
                            "y": xy[1], "r": r})
-    rects = page.evaluate(BESCHRIFTUNGEN, {"kandidaten": kandidaten,
-                                           "zoom": passend["zoom"],
-                                           "panX": passend["panX"],
-                                           "panY": passend["panY"]})
-    gezeichnet = [r for r in rects if r["gezeichnet"]]
-    erwartet = len([r for r in rects if r["imBild"]])
+    # **die gezeichneten Beschriftungen**: der Recorder meldet die `fillText`-Aufrufe des
+    # letzten Bildes.
+    aufrufe = page.evaluate(GEZEICHNETE_LABELS)
+    rects = page.evaluate(BESCHRIFTUNGEN, {"aufrufe": aufrufe})
+    # **die Fokus-Beschriftung**: sie ist die erste gezeichnete (Vorrang) und muss auf der
+    # Leinwand stehen — der Pixelbeweis.
+    fokus_text = _truncate(titel_von.get(fokus_id, ""))
+    fokus_rect = next((r for r in rects if r["text"] == fokus_text), None)
+    fokus_beschriftung = bool(fokus_rect and fokus_rect["hat_pixel"])
+    # die **Ueberlappungen**: zwei gezeichnete Rechtecke duerfen sich nicht schneiden
     ueber = []
-    for i in range(len(gezeichnet)):
-        for j in range(i + 1, len(gezeichnet)):
-            a, b = gezeichnet[i], gezeichnet[j]
-            if (b["x0"] < a["x0"] + a["breite"] and a["x0"] < b["x0"] + b["breite"]
-                    and b["y0"] < a["y0"] + 12 and a["y0"] < b["y0"] + 12):
-                ueber.append([a["id"], b["id"]])
-    fokus_gezeichnet = any(r["id"] == fokus_id and r["gezeichnet"] for r in rects)
+    for i in range(len(rects)):
+        for j in range(i + 1, len(rects)):
+            a, b = rects[i], rects[j]
+            if (b["x0"] < a["x1"] and a["x0"] < b["x1"]
+                    and b["y0"] < a["y1"] and a["y0"] < b["y1"]):
+                ueber.append([a["text"], b["text"]])
     # **Mindestzahl gezeichneter Beschriftungen**: sonst waere die Zelle gruen, wenn die App
     # nur noch die Fokus-Beschriftung zeichnet (kein Ueberlappungspaar — aber auch keine
-    # Nachbarbeschriftung, die man pruefen koennte). Mindestens die Haelfte der im Bild
-    # liegenden Kandidaten muss gezeichnet sein.
-    genug = len(gezeichnet) >= 2 and 2 * len(gezeichnet) >= max(erwartet, 1)
+    # Nachbarbeschriftung, die man pruefen koennte). **Zwei** gezeichnete sind das Minimum;
+    # die *Haelfte* der Kandidaten war vor 14.35 die Bedingung — das **waere jetzt der
+    # falsche Massstab**: die Regel laesst ueberlappende Beschriftungen bewusst weg, eine
+    # Minderheit gezeichneter Beschriftungen ist ihr **Ergebnis**, kein Fehler.
+    genug = len(rects) >= 2
     return {
         "messbar": True,
         "fokus": fokus_id,
+        "fokus_titel": fokus_text,
         "nachbarn": len(ring),
         "kandidaten": len(kandidaten),
-        "erwartet_im_bild": erwartet,
-        "ausserhalb_bild": len([r for r in rects if not r["imBild"]]),
-        "gezeichnet": len(gezeichnet),
+        "gezeichnet": len(rects),
+        "unterdrueckt": len(kandidaten) - len(rects),
+        "texte": [r["text"] for r in rects],
         "ueberlappungen": ueber,
-        "fokus_beschriftung": fokus_gezeichnet,
+        "fokus_beschriftung": fokus_beschriftung,
+        "fokus_pixel": fokus_rect["pixel"] if fokus_rect else 0,
         "genug_gezeichnet": genug,
         "zoom": passend["zoom"],
         "pan": [passend["panX"], passend["panY"]],
@@ -1075,7 +1159,7 @@ def beschriftungen(page, lauf, pos, raum_von, nachbarn):
                                 abs(max(xy[0] for xy in pos.values()) - min(xy[0] for xy in pos.values())),
                                 abs(max(xy[1] for xy in pos.values()) - min(xy[1] for xy in pos.values())))),
         "treffer": passend["treffer"],
-        "ok": len(ueber) == 0 and fokus_gezeichnet and genug,
+        "ok": len(ueber) == 0 and fokus_beschriftung and genug,
     }
 
 
@@ -1088,6 +1172,9 @@ def main():
                                   ignore_https_errors=True)
         page = ctx.new_page()
         page.add_init_script(RAF_PROBE)
+        # **Der Recorder der gezeichneten Beschriftungen** (Schritt 14.35): er haengt sich an
+        # die Leinwand-API des Browsers, nicht in den Produktcode (Plan §4).
+        page.add_init_script(LABEL_RECORDER)
         page.on("pageerror", lambda e: fehler.append(str(e)))
         login(page)
 
@@ -1282,7 +1369,7 @@ def main():
 
     bericht = {
         "probe": "p105_b14_layout_probe",
-        "schritt": "14.3",
+        "schritt": "14.35",
         "gegenlauf": AUFTRAG.get("gegenlauf"),
         "zeit": datetime.now(timezone.utc).isoformat(),
         "seed": AUFTRAG["seed"],

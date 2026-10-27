@@ -8,7 +8,7 @@ down:
   - ../../phase5_ui/webui/static/js/graph.js            # der einzige Produktcode, der sich ändert
   - ../../phase10_5_finishing/probes/p105_b15_screens.py # der 5×30-Seed, aus dem der Auftrag kam
   - phase10_5_finishing_plan.md                         # 📕 Hauptplan (§2.1 Vorbedingung, Block 8 = C2-Stil)
-updated: 2026-10-26 (Schritt 14.3 erledigt: die Kamera passt sich ein — `fitView()`, Füllgrad 93,6 %, Versatz 0,42 px; **E3: `ZOOM_MIN` bleibt 0,5** (68,8 % bei 201 Knoten); **datierte Korrektur** der Gegenlauf-Zuordnung: `fitview` ⇒ `kamera`, `querfeder` macht jetzt *zwei* Zellen rot; die C2-Probe nagelt die Kamera fest) | 2026-10-26 (Schritt 14.2 erledigt: die L4 ist gebaut und gemessen; **datierte Korrektur** der Gegenlauf-Zuordnung in §5; der Befund „die Entspannung ist chaotisch“ — der Node-Harness bleibt Seed-only) | 2026-10-26 (E1–E4 beantwortet: E1 entfällt — KA-2 nie live; E2 nein; E3/E4 frei + Beschriftungen in Block 14) | 2026-10-26 (Entwurf, Claude Code)
+updated: 2026-10-27 (Schritt 14.35 erledigt: die Beschriftungen ohne Überlappung — 0 überlappende Paare, 3 von 13 weggelassen; der Gegenlauf `beschriftung` macht genau die Beschriftungs-Zelle rot; **datierte Änderung der Messung**: die gezeichneten Beschriftungen misst der Browser jetzt an den `fillText`-Aufrufen, nicht mehr an den Pixeln) | 2026-10-26 (Schritt 14.3 erledigt: die Kamera passt sich ein — `fitView()`, Füllgrad 93,6 %, Versatz 0,42 px; **E3: `ZOOM_MIN` bleibt 0,5** (68,8 % bei 201 Knoten); **datierte Korrektur** der Gegenlauf-Zuordnung: `fitview` ⇒ `kamera`, `querfeder` macht jetzt *zwei* Zellen rot; die C2-Probe nagelt die Kamera fest) | 2026-10-26 (Schritt 14.2 erledigt: die L4 ist gebaut und gemessen; **datierte Korrektur** der Gegenlauf-Zuordnung in §5; der Befund „die Entspannung ist chaotisch“ — der Node-Harness bleibt Seed-only) | 2026-10-26 (E1–E4 beantwortet: E1 entfällt — KA-2 nie live; E2 nein; E3/E4 frei + Beschriftungen in Block 14) | 2026-10-26 (Entwurf, Claude Code)
 ---
 # P10.5 Block 14 — Kartenlayout: zufällig, aber geordnet
 
@@ -176,6 +176,39 @@ gezeichnet. Reihenfolge = **Vorrang**: Fokus → erster Ring → Suchtreffer →
 absteigend. Der Fokus-Knoten verliert seine Beschriftung **nie**. Reine Zeichenlogik, kein
 Einfluss auf die Positionen.
 
+> **[2026-10-26, Schritt 14.35 — erledigt]** Die Regel ist gebaut (`phase5_ui/webui/static/js/graph.js`):
+> `labelCandidates()` (die **Reihenfolge** nach Vorrang: Fokus → erster Ring → Suchtreffer → Rest
+> nach Grad absteigend), `labelRectOverlaps()` (die Kollisionsprüfung) und die Rechtecke in
+> `drawLabels()` (Breite aus `ctx.measureText`, Höhe = `LABEL_HEIGHT` = 12 px, Abstand
+> `LABEL_OFFSET` = 6 px vom Knotenrand — dieselben drei Werte wie in der Rechnung der Probe).
+> **Die Menge der beschrifteten Knoten ändert sich nicht** (Plan 8.6: Fokus + erster Ring immer,
+> sonst erst ab `ZOOM_LABEL_THRESHOLD`) — die Suchtreffer sind eine *Stufe der Reihenfolge*,
+> kein eigener Anlass. **Reine Zeichenlogik:** die Positionen der Knoten bleiben, die Kamera
+> misst nach dem Umbau **unverändert** (Füllgrad 93,6 %, Versatz 0,42 px).
+>
+> **Gemessen an der Wegwerf-Instanz** (`probes/p105_b14_layout_probe.json`, 5 Spaces, 152
+> Knoten, Fokus-Knoten mit **12** Nachbarn): **13** Kandidaten, **10** gezeichnet, **3**
+> weggelassen, **0** überlappende Paare (der Stand 14.3 zählte **4** per Pixelvergleich — der
+> Recorder zählt dieselbe Szene mit **5**), die Fokus-Beschriftung ist da und steht
+> **am Pixel** nachgewiesen auf der Leinwand (69 Beschriftungspixel). Der Gegenlauf
+> `beschriftung` (die Kollisionsprüfung aus) macht **genau diese** Zelle rot und stellt den
+> Stand von 14.2 wieder her: **13** gezeichnet, **0** weggelassen, **5** überlappende Paare.
+>
+> **Datierte Änderung der Messung (2026-10-27, Schritt 14.35).** Die *Menge* der gezeichneten
+> Beschriftungen misst der Browser jetzt an den **`fillText`-Aufrufen** des letzten Bildes (ein
+> Recorder an der Leinwand-API des Browsers — **kein** Haken im Produktcode), **nicht** mehr an
+> den Pixeln. Grund: die Regel lässt überlappende Beschriftungen **weg**, und an den Pixeln ist
+> ein *weggelassenes* Rechteck nicht von einem *gezeichneten* zu unterscheiden (zwei
+> überlappende Rechtecke teilen sich ihre Pixel). Der Pixelbeweis bleibt für die
+> **Fokus-Beschriftung**. **Ein Nebenbefund:** der alte Pixelvergleich fand **4** Paare, der
+> Recorder findet **5** — er zählt die Paare aus den Rechtecken, nicht aus den Pixeln.
+>
+> **Die Mindestzahl gezeichneter Beschriftungen** (vorher: „mindestens die Hälfte der im Bild
+> liegenden Kandidaten") ist auf **zwei** gesenkt: die Hälfte wäre nach der neuen Regel der
+> **falsche** Maßstab — eine Minderheit gezeichneter Beschriftungen ist ihr *Ergebnis*, kein
+> Fehler. Der Wächter prüft zusätzlich, dass **mindestens eine** Beschriftung weggelassen
+> wurde (sonst wäre die Zelle auch ohne die Regel grün).
+
 ## §3 Entscheidungen für den Nikinger (vor dem Bau)
 
 | # | Frage | Empfehlung |
@@ -193,7 +226,7 @@ Einfluss auf die Positionen.
 | **14.1** | L1–L3: `hashString()`, `computeRegions()`, neuer `seedInitialPositions()` | Determinismus-Zelle grün ✅ **2026-10-26** |
 | **14.2** | L4: Anker-Gravitation, Querfedern, `ALPHA_START_SEEDED`; `CENTER_GRAVITY` raus | Regionen-Zelle grün **und** Stabilität-Zelle grün (P10.5-68: ein neues Item verschiebt die Anker nur, wenn es den größten Space vergrößert); Budget-Zelle grün ✅ **2026-10-26** — `regionen` **152/152 = 100 %**, `stabilitaet` **Median 0,0 px**, `budget` **201 Knoten in 2147 ms**; `kamera`/`beschriftungen` bleiben rot (⇒ 14.3 / 14.35) |
 | **14.3** | `fitView()` + Doppelklick; ggf. `ZOOM_MIN` (E3) | Kamera-Zelle grün ✅ **2026-10-26** — Füllgrad **93,6 %**, Versatz **0,42 px** (vorher 32,3 px), `passt` ✅; **E3: `ZOOM_MIN` bleibt 0,5** (der Einpass-Zoom bei 201 Knoten ist **68,8 %**, der Klemmpunkt greift nicht); der Gegenlauf `fitview` macht **genau** die Kamera-Zelle rot |
-| **14.35** | Beschriftungen ohne Überlappung (§2.7) | Beschriftungs-Zelle grün |
+| **14.35** | Beschriftungen ohne Überlappung (§2.7) | Beschriftungs-Zelle grün ✅ **2026-10-26** — **0** überlappende Paare (der Stand 14.3 zählte **4** per Pixelvergleich — der Recorder zählt dieselbe Szene mit **5**), **3** von **13** Beschriftungen weggelassen, die Fokus-Beschriftung ist am Pixel nachgewiesen da; der Gegenlauf `beschriftung` macht **genau diese** Zelle rot (13 gezeichnet, 5 Paare) |
 | **14.4** | Konstanten justieren (nur §2-Konstanten), Gegenläufe, Block-8-Proben neu fahren | alle Zellen grün, jeder Gegenlauf rot an **genau** seiner Zelle; `p105_b8_karte_probe.py` + `p105_b8_c2_probe.mjs` grün |
 | **14.5** | **Claude Code:** Bilder (`p105_b15_screens.py` ohne die 16 Radschritte), Update-Log-Zeile (neues Kartenlayout), Head, Abnahmezeilen | drei Kartenbilder beim Nikinger |
 
@@ -309,7 +342,7 @@ Einfluss auf die Positionen.
 | **P10.5-68** | Stabilität: +1 Item in einem nicht-größten Space → Median-Verschiebung der Knoten **anderer** Spaces ≤ 2 px (frischer Lauf); in einer **gemerkten** Karte landet das neue Item in der Region seines Space | Probe | `querfeder` (Querfeder-Faktor/Länge zurück auf 0) — **gemessen** 14.2; der geplante („Space-Reihenfolge nach Item-Zahl") ist ein **Seed**-Gegenlauf und gehört in den Node-Harness (`slot`) |
 | **P10.5-69** | Budget und Bestand: 200 Knoten ≤ 3 s bis Ruhe · reduced motion 0 Frames (P10.5-40) · Block-8-Proben grün | Probe | `ALPHA_START_SEEDED` → 1 (Budget reißt) — **gemessen** 14.2: 15,3 s |
 | **P10.5-70** | Sichtung: drei Kartenbilder (5 Spaces, 30/32/30/30/30) — „zufällig, aber geordnet" | Nikinger | — |
-| **P10.5-71** | Beschriftungen: bei Fokus auf einen Knoten mit ≥ 5 Nachbarn überlappen sich **keine** zwei gezeichneten Beschriftungs-Rechtecke; die Fokus-Beschriftung ist immer da | Probe (Rechtecke über `measureText` nachgerechnet) | Kollisionsprüfung aus |
+| **P10.5-71** | Beschriftungen: bei Fokus auf einen Knoten mit ≥ 5 Nachbarn überlappen sich **keine** zwei gezeichneten Beschriftungs-Rechtecke; die Fokus-Beschriftung ist immer da | Probe (Rechtecke über `measureText` nachgerechnet) | Kollisionsprüfung aus — **gemessen** 14.35: macht genau die Beschriftungs-Zelle rot (13 gezeichnet, 0 weggelassen, **5** überlappende Paare) |
 
 > **Datierte Präzisierung der Kamera-Zelle (2026-10-26, Schritt 14.0).** „Füllt ≥ 60 %" allein
 > kann die Zelle nicht tragen: wäre der Inhalt **größer** als die Leinwand, wäre der Füllgrad
@@ -374,6 +407,27 @@ Einfluss auf die Positionen.
 > Welt passt auch bei 100 % Zoom nicht ganz in die Leinwand). Vor 14.3 war nur der Füllgrad zu
 > sehen (101,2 % → 68,7 %), weil die Kamera nicht einpasste. Die Zelle bleibt grün — die
 > Anker-Gravitation ist weiterhin **nicht** die Regel, die die Regionen-Zelle misst.
+>
+> **Datierte Ergänzung zur Beschriftungs-Zelle (2026-10-26, Schritt 14.35).** Zwei Dinge, die
+> die **Messung** betreffen, nicht die Regel:
+>
+> 1. **Die Menge der gezeichneten Beschriftungen misst der Browser jetzt an den
+>    `fillText`-Aufrufen** (ein Recorder an der Leinwand-API — **kein** Haken im Produktcode),
+>    **nicht** mehr an den Pixeln. Die neue Regel lässt überlappende Beschriftungen **weg**,
+>    und an den Pixeln ist ein *weggelassenes* Rechteck nicht von einem *gezeichneten* zu
+>    unterscheiden: zwei überlappende Rechtecke teilen sich ihre Pixel. Der Pixelbeweis bleibt
+>    für die **Fokus-Beschriftung** (sie muss am Pixel nachgewiesen auf der Leinwand stehen).
+>    **Nebenbefund:** der alte Pixelvergleich zählte **4** überlappende Paare, der Recorder
+>    zählt **5** — er zählt die Paare aus den Rechtecken, nicht aus den Pixeln.
+> 2. **Die Mindestzahl gezeichneter Beschriftungen** (vorher „die Hälfte der im Bild liegenden
+>    Kandidaten") ist **zwei**: die Hälfte wäre nach der neuen Regel der falsche Maßstab. Der
+>    Wächter prüft zusätzlich, dass **mindestens eine** Beschriftung **weggelassen** wurde —
+>    sonst wäre die Zelle auch ohne die Regel grün (der Gegenlauf `beschriftung` beweist die
+>    Regel von der anderen Seite).
+>
+> **Gemessene Zahlen (14.35):** Fokus `itm_0000003f` („Gamma Plan 01") mit **12** Nachbarn ·
+> **13** Kandidaten · **10** gezeichnet · **3** weggelassen · **0** überlappende Paare · die
+> Fokus-Beschriftung steht mit **69** Beschriftungspixeln auf der Leinwand.
 
 ## §6 Startauftrag — Block 14 · Ausführer (opencode)
 
