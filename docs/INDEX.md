@@ -59,7 +59,7 @@ updated: 2026-10-27 (B14.35: die Beschriftungen — 0 überlappende Paare, 3 von
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing — alle Baustellen schließen; Plan `docs/concepts/phase10_5_finishing_plan.md`)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **38.624 B** · Phase-10.5-Head: Modulstatus 0–14/Z, Deploy A–D, Abnahmestand (63 ✅ · 0 ⚠️ · 8 ⬜), offene Punkte
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **38.803 B** · Phase-10.5-Head: Modulstatus 0–14/Z, Deploy A–D, Abnahmestand (63 ✅ · 0 ⚠️ · 8 ⬜), offene Punkte
 - [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **35.281 B** · L3-Archiv der **geschlossenen** Abnahmezeilen (63 Zeilen), verbatim aus dem Head
 - [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **135.136 B** · L3-Archiv der Session-Blöcke, verbatim
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · L3-Archiv der **Startaufträge von Block 7 und 9** (verbatim 2026-10-23/24)

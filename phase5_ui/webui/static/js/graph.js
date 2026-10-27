@@ -1230,6 +1230,10 @@ function drawLabels(rings, shown, hits) {
   for (var i = 0; i < kandidaten.length; i++) {
     var k = kandidaten[i];
     var text = truncate(k.node.title, 28);
+    // **Ein leerer Titel belegt keine Flaeche:** ein Rechteck der Breite 0 wuerde sonst die
+    // Nachbarbeschriftung wegdruecken (die Kollisionspruefung sieht die Rechtecke, nicht die
+    // Buchstaben) -- ohne dass es etwas zu zeichnen gaebe.
+    if (!text) continue;
     // Position in CSS-Koordinaten (nach pan/zoom-Transform).
     var sx = k.node.x * zoom + panX;
     var sy = k.node.y * zoom + panY;

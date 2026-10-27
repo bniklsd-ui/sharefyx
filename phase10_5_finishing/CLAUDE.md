@@ -198,6 +198,8 @@ verliert seine Beschriftung **nie**. **Reine Zeichenlogik** — die Positionen d
 die Kamera misst nach dem Umbau **unverändert** (Füllgrad 93,6 %, Versatz 0,42 px). Die *Menge*
 der beschrifteten Knoten ändert sich **nicht** (Plan 8.6: Fokus + erster Ring immer, sonst erst ab
 `ZOOM_LABEL_THRESHOLD`); die Suchtreffer sind eine *Stufe der Reihenfolge*, kein eigener Anlass.
+**Ein leerer Titel belegt keine Fläche** (ein Rechteck der Breite 0 würde sonst die
+Nachbarbeschriftung wegdrücken — die Prüfung sieht die Rechtecke, nicht die Buchstaben).
 
 **Die Messung** (Wegwerf-Instanz, 5 Spaces, 152 Knoten, Fokus `itm_0000003f` mit **12** Nachbarn):
 **13** Kandidaten, **10** gezeichnet, **3** weggelassen, **0** überlappende Paare — der Stand
