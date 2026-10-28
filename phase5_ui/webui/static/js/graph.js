@@ -1585,10 +1585,15 @@ function traceContour(member, cols, rows, cell, minX, minY) {
     var y1 = y0 + cell;
     // Orientierung im Uhrzeigersinn (y nach unten): oben (x1→x0), links (y0→y1),
     // unten (x0→x1), rechts (y1→y0). So laeuft die Kontur geschlossen um die Menge.
-    if (!member[idx - cols] && gy > 0) edges.push([x1, y0, x0, y0]);
-    if (!member[idx - 1] && gx > 0) edges.push([x0, y0, x0, y1]);
-    if (!member[idx + cols] && gy < rows - 1) edges.push([x0, y1, x1, y1]);
-    if (!member[idx + 1] && gx < cols - 1) edges.push([x1, y1, x1, y0]);
+    // **Der Rasterrand ist "draussen"** (2026-10-28): vorher fiel die Kante dort *weg* -- die
+    // Kontur des aeussersten Knotens (das Raster beginnt genau bei Knoten − LOBE_REACH) blieb
+    // offen, zerfiel in Bruchstuecke, und jedes wurde mit einer Sehne geschlossen (sichtbar als
+    // schraege Linie am linken Lappen der Kartenbilder 14.5). `gx === 0` statt `idx - 1`: am
+    // linken Rand ist `idx - 1` die letzte Zelle der Zeile darueber.
+    if (gy === 0 || !member[idx - cols]) edges.push([x1, y0, x0, y0]);
+    if (gx === 0 || !member[idx - 1]) edges.push([x0, y0, x0, y1]);
+    if (gy === rows - 1 || !member[idx + cols]) edges.push([x0, y1, x1, y1]);
+    if (gx === cols - 1 || !member[idx + 1]) edges.push([x1, y1, x1, y0]);
   }
   if (!edges.length) return null;
   return chainEdges(edges);

@@ -14,7 +14,7 @@ down:
   - MODULSTATUS_ARCHIVE.md                         # 📦 die ausführlichen Statusspalten der Blöcke 0–10, verbatim
   - ABNAHME_ARCHIVE.md                             # 📦 die geschlossenen Abnahmezeilen (P10.5-1–71), verbatim
   - FREIGABEN_ARCHIVE.md                           # 📦 die Freigaben der Phase, verbatim
-updated: 2026-10-28 (Block 14.5: die drei Kartenbilder — und der **gemessene** Rand-Fall aus §2.5: die Lappen-Kontur stand 3,8 px über dem Leinwandrand ⇒ `FIT_MARGIN` 40 → 56 px, jetzt 10,7 px Luft; Füllgrad 93,6 % → 91,1 %; P10.5-70 wartet auf die Sichtung) | 2026-10-27 (Block 14.4: die Startwerte gemessen — 37 Varianten, alle zehn Werte bleiben; der Gegenlauf `region` schließt die Lücke von P10.5-66; die Block-8-Probe wartet jetzt auf das richtige Ruhe-Signal) | 2026-10-27 (Block 14.35: die Beschriftungen ohne Überlappung — 0 überlappende Paare, 3 von 13 weggelassen, der Fokus bleibt; P10.5-71 ✅) | 2026-10-26 (Block 14.3: die Kamera — `fitView()`; Füllgrad 93,6 %, Versatz 0,42 px; E3: `ZOOM_MIN` bleibt 0,5; P10.5-67 ✅) | 2026-10-26 (Block 14.2: die L4 — Anker-Gravitation, Querfedern, `ALPHA_START_SEEDED`; Regionen 152/152, Stabilität Median 0,0 px, Budget 201 Knoten/2147 ms; P10.5-66/68/69 ✅) | 2026-10-26 (Block 14.1: L1–L3 — der Seed wird zum Weltgenerator; fünf Seed-Zellen grün, fünf Gegenläufe rot an genau ihrer Zelle; P10.5-65 geschlossen) | 2026-10-26 (Block 14.0: die Basislinie des Kartenlayouts — die Probe steht, die Abnahmezeilen 65–71 sind im Head; rot in Regionen/Kamera/Beschriftungen/Stabilität, grün in Determinismus/Budget; B5 widerlegt) | 2026-10-25 (Block 13: die vier Aufträge des Nikingers gebaut — Editor-Größen live, Knopfleiste nach Word, Knopffarben transparent-blau, ganze Gehirnkarte; P10.5-62/63/64 ✅, 54 ✅ · 10 ⬜) | 2026-10-25 (Block 12: Doku und Altlasten — DO-1, LG-6, AL-1/AL-3, BG-2/BG-3, Register-Bilanz per Skript; P10.5-57/58/59 ✅, 51 ✅ · 10 ⬜) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-28 (Nachzug 14.5: die Lappen-Kontur am Rasterrand war **offen** — beim Sichten der Bilder gefunden, behoben, Bilder neu; Update-Log-Zeile geschrieben) | 2026-10-28 (Block 14.5: die drei Kartenbilder — und der **gemessene** Rand-Fall aus §2.5: die Lappen-Kontur stand 3,8 px über dem Leinwandrand ⇒ `FIT_MARGIN` 40 → 56 px, jetzt 10,7 px Luft; Füllgrad 93,6 % → 91,1 %; P10.5-70 wartet auf die Sichtung) | 2026-10-27 (Block 14.4: die Startwerte gemessen — 37 Varianten, alle zehn Werte bleiben; der Gegenlauf `region` schließt die Lücke von P10.5-66; die Block-8-Probe wartet jetzt auf das richtige Ruhe-Signal) | 2026-10-27 (Block 14.35: die Beschriftungen ohne Überlappung — 0 überlappende Paare, 3 von 13 weggelassen, der Fokus bleibt; P10.5-71 ✅) | 2026-10-26 (Block 14.3: die Kamera — `fitView()`; Füllgrad 93,6 %, Versatz 0,42 px; E3: `ZOOM_MIN` bleibt 0,5; P10.5-67 ✅) | 2026-10-26 (Block 14.2: die L4 — Anker-Gravitation, Querfedern, `ALPHA_START_SEEDED`; Regionen 152/152, Stabilität Median 0,0 px, Budget 201 Knoten/2147 ms; P10.5-66/68/69 ✅) | 2026-10-26 (Block 14.1: L1–L3 — der Seed wird zum Weltgenerator; fünf Seed-Zellen grün, fünf Gegenläufe rot an genau ihrer Zelle; P10.5-65 geschlossen) | 2026-10-26 (Block 14.0: die Basislinie des Kartenlayouts — die Probe steht, die Abnahmezeilen 65–71 sind im Head; rot in Regionen/Kamera/Beschriftungen/Stabilität, grün in Determinismus/Budget; B5 widerlegt) | 2026-10-25 (Block 13: die vier Aufträge des Nikingers gebaut — Editor-Größen live, Knopfleiste nach Word, Knopffarben transparent-blau, ganze Gehirnkarte; P10.5-62/63/64 ✅, 54 ✅ · 10 ⬜) | 2026-10-25 (Block 12: Doku und Altlasten — DO-1, LG-6, AL-1/AL-3, BG-2/BG-3, Register-Bilanz per Skript; P10.5-57/58/59 ✅, 51 ✅ · 10 ⬜) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -41,7 +41,7 @@ updated: 2026-10-28 (Block 14.5: die drei Kartenbilder — und der **gemessene**
 | 11 | Editor Stufe 1 + 2: ED-1, ED-2, ED-3 (P1-11), ED-5 | Ausführer (+ Claude Code Proben/Sichtung) | D | 🔄 2026-10-24 — **11.1 Vendor** (CodeMirror 5.65.16, **fünf** Dateien statt drei — gemessen: der UMD-Browser-Zweig der `markdown.min.js` löst `require("../xml/xml")` **nicht** auf) · **11.2 Nachlader** (`js/editor_cm.js`: CSS → Kern → Modus-Dateien, Promise gecacht, Fehler → `null` = Textarea/Rohmodus) · **11.3 Live-Editor** (`editor.js`: `getBody()`/`setBody()`, `setRawMode(on)`, Schalter „Rohtext", Probe 12/12 grün) · **11.4 Live-Darstellung** (V211 **gemessen**: `visibility: hidden` hält die Cursorposition, `display: none`/`font-size: 0` rücken sie 2 Zeichen vor; Probe 15/15 grün) · **11.5 To-do-Kästchen** (ED-2: `cm.markText(…, {replacedWith: <checkbox>, atomic: true})` — der **Text** bleibt die Quelle; Klick bei sauberem Editor speichert **sofort** mit `version`, bei geändertem nur der Puffer; Lesesicht **deaktiviert**; Probe 8/8 grün, Gegenlauf bricht genau die Schreibzelle) · **11.7 Budget** (`ui_budget.py`: `static_payload_files()` — **jede Datei genau einmal**; Erstaufruf **209,3 KB** ≤ 250 KB, Editor **69,7 KB** ≤ 80 KB; Wächter `tests/test_budget_coverage.py` mit Gegenprobe) · **11.8 Roundtrip** (V201-Rest: die **zehn** M7-Fixtures **10/10 byte-identisch**, Öffnen macht den Editor **nicht** geändert, Dateien auf der Platte byte-identisch) · **11.6 Format-Konvention** (ED-3: `markdown.js` — Vokabular **Farbe** (rot/blau/gruen/gelb) · **Größe** (klein/normal/gross) · **Ausrichtung** (links/zentriert/rechts); Inline `[Text]{.rot}`, Block `::: {.zentriert}` … `:::`; eine **unbekannte** Klasse bleibt **wörtlich**; der Sanitizer lässt `span`/`div` nur mit Klassen aus der festen Menge durch; die **Codespans** sind ausgeschnitten (darin wird **nichts** formatiert — das behebt einen Alt-Fehler); Editor: drei Felder in der Werkzeugleiste + ein **CM5-Overlay**, das `[…]{.rot}` schon beim Schreiben färbt; MCP: `_FORMAT_HINT` **wörtlich identisch** an allen fünf Body-Schreib-Werkzeugen; Probe `probes/p105_b11_markdown_probe.py`: **9/9 Zellen grün**, der Gegenlauf bricht genau die Zelle „unbekannte Klasse wörtlich“) |
 | 12 | Doku und Altlasten: DO-1, LG-6, AL-1 (Rest), AL-3, BG-2/BG-3 | Claude Code | — | ✅ 2026-10-25 — **DO-1** (die drei Heads: 8.6 109.230 → 23.614 B, 8 47.861 → 34.225 B, 6 41.032 → 34.801 B; verbatim per `move_sections.py`, die 33-KB-Kette von 8.6 per Skript in `UPDATES_ARCHIVE.md`) · **LG-6** (`ROADMAP.md` 37.197 → 26.457 B, Phase 8.5 → `docs/ROADMAP_ARCHIVE.md`) · **AL-1/AL-3** (P6-Nachzug in `phase6_shares/CLAUDE.md`) · **BG-2/BG-3** (P9-124/127 ⚠️ → ✅, Bilanz 123/10/1) · **Register-Bilanz** per `scripts/register_bilanz.py` (46 P10.5-Zeilen: 40 ✅ · 6 ⬜) |
 | 13 | Aufträge des Nikingers: UI-8 (die Größen wirken live), UI-9 (die Knopfleiste nach Word), UI-10 (die Knopffarben) | Claude Code (Sichtung Nikinger) | D | ✅ 2026-10-25 — **13.1** (die Stufen wirken im **Live-Editor**: Basis 13 px, `klein` 11,05 px, `normal` 13 px, `groß` 15,6 px; die **Zeilenhöhe bleibt 21 px** in allen drei Stufen — die Ursache war die Prozent-`line-height`: CM5 rechnet `defaultTextHeight` **einmal** (aus 50 Zeilen); der Overlay liefert Farbe **und** Größe in beliebiger Reihenfolge) · **13.2** (die Leiste: **fünf** Gruppen in Words Ribbon-Reihenfolge, alle Knöpfe 26 × 24 px, Trenner dazwischen, **keine** HTML-Entity-Zeichen als Icons; **B** und **I** bleiben Buchstaben; die fünf neuen Icons aus dem Lucide-Tarball **1.38.0**, SHA-256 **verifiziert**) · **13.3** (die Fläche: `--btn-std-fill` = `rgba(62,141,243,.20)` — die **datierte Umkehr** der P9-Entscheidung vom 2026-10-01; `--caution` `#F06A6E` → **`#FF8A8E`**, Kontrast **nachgerechnet**: 4,76:1 statt 3,59:1) · **13.4** (die **ganze** Karte: 1920 × 1200, Zoom 50 % — die Welt der Knoten vollständig im Bild) · Probe `probes/p105_b13_knopfleiste_probe.py` **8/8 grün**, der Gegenlauf **5 Zellen rot**; Wächter `tests/test_knopfleiste_word.py` (9) und `tests/test_contrast.py` (3) grün · **Fund:** `i-chevron-left` stand im Sprite, die Quelldatei war **nie** vendored — der Sprite war damit nicht aus dem Bestand reproduzierbar; nachgetragen und **alle 25** vendored Dateien byteweise gegen den Tarball geprüft |
-| 14 | Kartenlayout „zufällig, aber geordnet“ (Nikinger 2026-10-26) — Plan `docs/concepts/phase10_5_block14_kartenlayout_plan.md` | Ausführer (opencode) + Claude Code (Bilder) | D | 🔄 2026-10-28 — **14.0–14.5 gebaut und gemessen** (die Herleitung **verbatim** im L3-Anhang `docs/concepts/phase10_5_block14_kartenlayout_plan_anhang.md`, den Anmerkungen der Schritte 14.0–14.4): Determinismus **0,0 px** · Regionen **152/152 = 100 %** · Stabilität Median **0,0 px** · Budget **201** Knoten in **2147 ms**, **0** Frames · Kamera Füllgrad **91,1 %**, Versatz **0,49 px** · Beschriftungen **0** überlappende Paare (13 Kandidaten, 10 gezeichnet) · **14.5: die drei Kartenbilder** (`docs/screenshots/p105_b14_karte_0{1,2,3}_*.png`) und **der Rand-Fall aus §2.5 gemessen**: die Lappen-Kontur stand **3,8 px** über dem Leinwandrand ⇒ **`FIT_MARGIN` 40 → 56 px** (die 8 px Luft über `LOBE_REACH` = 48 px), jetzt **10,7 px** Luft, **kein** Beschnitt; Füllgrad **93,6 % → 91,1 %**, Zoom **92 % → 90 %** · Wächter `tests/test_b14_layout_probe.py` (18) + `tests/test_b14_karte_bilder.py` (7) · **P10.5-70 wartet auf die Sichtung** |
+| 14 | Kartenlayout „zufällig, aber geordnet“ (Nikinger 2026-10-26) — Plan `docs/concepts/phase10_5_block14_kartenlayout_plan.md` | Ausführer (opencode) + Claude Code (Bilder) | D | 🔄 2026-10-28 — **14.0–14.5 gebaut und gemessen** (die Herleitung **verbatim** im L3-Anhang `docs/concepts/phase10_5_block14_kartenlayout_plan_anhang.md`, den Anmerkungen der Schritte 14.0–14.4): Determinismus **0,0 px** · Regionen **152/152 = 100 %** · Stabilität Median **0,0 px** · Budget **201** Knoten in **2147 ms**, **0** Frames · Kamera Füllgrad **91,1 %**, Versatz **0,49 px** · Beschriftungen **0** überlappende Paare (13 Kandidaten, 10 gezeichnet) · **14.5: die drei Kartenbilder** (`docs/screenshots/p105_b14_karte_0{1,2,3}_*.png`) und **der Rand-Fall aus §2.5 gemessen**: die Lappen-Kontur stand **3,8 px** über dem Leinwandrand ⇒ **`FIT_MARGIN` 40 → 56 px** (die 8 px Luft über `LOBE_REACH` = 48 px), jetzt **10,7 px** Luft, **kein** Beschnitt; Füllgrad **93,6 % → 91,1 %**, Zoom **92 % → 90 %** · Wächter `tests/test_b14_layout_probe.py` (18) + `tests/test_b14_karte_bilder.py` (7) · **Nachzug 14.5 (2026-10-28): die Lappen-Kontur am Rasterrand war offen** (`traceContour()` liess die Randkante weg → Bruchstücke mit Sehnen, sichtbar am linken Lappen) — behoben, Bilder neu, Luft links **7,2 px**, Wächter `tests/test_lobe_kontur_geschlossen.py` (2); Update-Log-Zeile geschrieben · **P10.5-70 wartet auf die Sichtung** |
 | Z | Closeout P10.5 (Handover, Grafik, Rotationen) | Claude Code + Nikinger | — | ⬜ |
 
 > **Die ausführlichen Statusspalten der Blöcke 0–10 stehen verbatim in
@@ -107,7 +107,7 @@ stehen im Commit und im Session-Block.
 
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
-| P10.5-70 | Sichtung: drei Kartenbilder (5 Spaces, 30/32/30/30/30) — „zufällig, aber geordnet" | ⬜ | die drei Bilder liegen im Repo (Schritt 14.5: `docs/screenshots/p105_b14_karte_0{1,2,3}_*.png`, **derselbe Saat** wie der Abnahme-Beleg) — **das Urteil steht beim Nikinger** |
+| P10.5-70 | Sichtung: drei Kartenbilder (5 Spaces, 30/32/30/30/30) — „zufällig, aber geordnet" | ⬜ | die drei Bilder liegen im Repo (Schritt 14.5: `docs/screenshots/p105_b14_karte_0{1,2,3}_*.png`, **derselbe Saat** wie der Abnahme-Beleg; **neu aufgenommen 2026-10-28** nach der Kontur-Korrektur — die Bilder von `f419835` zeigten die offene Kontur am linken Lappen) — **das Urteil steht beim Nikinger** |
 
 **Summe:** 63 ✅ · 0 ⚠️ · 8 ⬜ (von 71). **[2026-10-27, Block 14.35]** +1 ✅ (10-71 die Beschriftungen — **0** überlappende Paare (der Stand 14.3 zählte **4** per Pixelvergleich — der Recorder zählt dieselbe Szene mit **5**), **3** von **13** Beschriftungen weggelassen, die Fokus-Beschriftung am Pixel nachgewiesen da; der Gegenlauf `beschriftung` macht **genau diese** Zelle rot) ⇒ 63 ✅ · 0 ⚠️ · 8 ⬜. **[2026-10-26, Block 14.3]** +1 ✅ (10-67 die Kamera — Füllgrad **93,6 %**, der Inhalt passt, der Umriss sitzt **0,42 px** neben der Mitte statt 32,3 px) ⇒ 62 ✅ · 0 ⚠️ · 9 ⬜. **[2026-10-26, Block 14.2]** +3 ✅ (10-66 die Regionen — **152/152 = 100 %**; 10-68 die Stabilität — Median **0,0 px**; 10-69 das Budget —
  201 Knoten in **2147 ms**, 0 Frames) ⇒ 61 ✅ · 0 ⚠️ · 10 ⬜. **[2026-10-26, Block 14.1]** +1 ✅ (10-65 der Determinismus — zwei frische Ladevorgänge, **0,0 px** über 152 Knoten, der Beleg byteweise reproduzierbar; der Gegenlauf `seedJitter` → `Math.random()` macht **genau diese** Zelle rot) ⇒ 58 ✅ · 0 ⚠️ · 13 ⬜. **[2026-10-26, Block 14.0]** +7 Zeilen (65–71 — das Kartenlayout; die **Basislinie** ist in `regionen`, `kamera`, `beschriftungen` und `stabilitaet` **rot**, das ist gewollt und gemessen) ⇒ 57 ✅ · 0 ⚠️ · 14 ⬜. **[2026-10-26, Nikinger-Sichtung]** +3 ✅ (10-32 UI-4, 10-37 C2-Stil, 10-51 Editor live) ⇒ 57 ✅ · 0 ⚠️ · 7 ⬜. **[2026-10-25, Block 13]** +3 ✅ (10-62 die Editor-Größen, 10-63 die Knopfleiste nach Word, 10-64 die Knopffarben) ⇒ 54 ✅ · 0 ⚠️ · 10 ⬜. **[2026-10-25, Block 12]** +3 ✅ (10-57 Oversize, 10-58 ROADMAP, 10-59 Register-Bilanz) ⇒ 51 ✅ · 0 ⚠️ · 10 ⬜. **[2026-10-25, Block 11.6]** +2 ✅ (10-54 ED-3 die Format-Konvention, 10-56 die P1-Ankündigung) ⇒ 48 ✅ · 0 ⚠️ · 13 ⬜. **[2026-10-25, Block 11.8]** +2 ✅ (10-52 der Roundtrip, 10-55 der Rohmodus) ⇒ 46 ✅ · 0 ⚠️ · 15 ⬜. **[2026-10-25, Block 11.5]** +1 ✅ (10-53, ED-2 die To-do-Kästchen) ⇒ 44 ✅ · 0 ⚠️ · 17 ⬜. **[2026-10-25, Block 11.7]** +1 ✅ (10-50, das Budget) ⇒ 43 ✅ · 0 ⚠️ · 18 ⬜. **[2026-10-24, Block 10.5]** +4 ✅ (10-45, 10-46, 10-47, 10-48) ⇒ 42 ✅ · 0 ⚠️ · 19 ⬜. **[2026-10-24, Block 9.3]** +2 ✅ (10-43, 10-44) ⇒ 38 ✅ · 0 ⚠️ · 23 ⬜. **[2026-10-24, Block 9.2]** +1 ✅ (10-42, RE-4 `rename_folder`) ⇒ 36 ✅ · 0 ⚠️ · 25 ⬜. **[2026-10-24, Block 9.1]** +1 ✅ (10-41, RE-7 `created_by`) ⇒ 35 ✅ · 0 ⚠️ · 26 ⬜. **[2026-10-24, Block 8]** +4 ✅ (10-36, 10-38, 10-39, 10-40) ⇒ 34 ✅ · 0 ⚠️ · 27 ⬜. **[Stand 2026-10-24, Block 7.5–7.7]** 33, 34 und 35 ✅. **[Korrektur 2026-10-22, Block 6]** Die Zeile stand vorher auf „21 ✅ · 0 ⚠️ · 40 ⬜“ — die Tabelle trug aber **20** ✅ (der Zähler war schon vor diesem Block falsch; Block 5 hat eine Zeile auf ✅ gezogen und die Summe nicht nachgezogen). Neu: **23**, weil Block 6 drei Zeilen (10-23/24/25) auf ✅ gesetzt hat. Ein Wächter prüft die Summe jetzt gegen die Tabelle (`tests/test_head_rules.py`) — **über beide Dateien**, seit die geschlossenen Zeilen im Archiv stehen. **[2026-10-23, Block 7.1]** +1 ✅ (10-29, UI-1) ⇒ 25 ✅ · 0 ⚠️ · 36 ⬜. **[2026-10-23, Block 7.2]** +1 ✅ (10-30, UI-2) ⇒ 26 ✅ · 0 ⚠️ · 35 ⬜. **[2026-10-23, Block 7.3]** +1 ✅ (10-31, UI-3) ⇒ 27 ✅ · 0 ⚠️ · 34 ⬜.
@@ -153,10 +153,9 @@ stehen im Commit und im Session-Block.
   zu trennen hat) — er prüft damit die **Zeichenregel**, nicht das Layout; ohne diese Reparatur
   wäre der Gegenlauf „Furche aus“ **grün** geblieben, ohne dass der Fehler wiederhergestellt
   war (`probes/p105_b8_c2_probe.mjs`, datierter Kommentar; `tests/test_graph_c2.py`).
-- **NEU 2026-10-28 (Block 14.5): die Update-Log-Zeile für das neue Kartenlayout steht noch aus.**
-  Der Plan §4 führt sie als Teil von 14.5, der Startauftrag (§6) weist sie **Claude Code** zu
-  („nicht: `docs/UPDATE_LOG.md`") — sie ist deshalb in dieser Session **nicht** geschrieben
-  worden. **Wichtig für den Deploy D (`v4.0.0`):** das `deploy.sh`-Gate verlangt, dass die
+- **2026-10-28 (Block 14.5): die Update-Log-Zeile für das neue Kartenlayout** ist **geschrieben**
+  (Nachzug 14.5, im Block `## 2026-10-26` — dem Block des Deploys D). **Bleibt beim Deploy:**
+  das `deploy.sh`-Gate verlangt, dass die
   **oberste** `##`-Überschrift in `docs/UPDATE_LOG.md` **das Datum des Deploy-Tages** trägt
   (jetzt `## 2026-10-26`) — der Block muss am Deploy-Tag **umdatiert** werden, sonst bricht
   das Gate ab (`SHAREFYX_ALLOW_STALE_UPDATELOG=1` überspringt es, ist aber nicht die Absicht).
@@ -186,59 +185,46 @@ stehen im Commit und im Session-Block.
 > Deploys **C** (`v3.1.7`) und **D** (`v3.1.8`, jetzt **mit** den Änderungen aus Block 13) liegen
 > beim Nikinger.
 
-## Session stopped — 2026-10-28 (Block 14.5: die drei Kartenbilder — und der beschnittene Rand)
+## Session stopped — 2026-10-28 (Nachzug 14.5: die offene Lappen-Kontur — gefunden beim Sichten der Bilder)
 
-**Ergebnis.** Schritt **14.5**: die **drei Kartenbilder** liegen im Repo, und der offene
-**Rand-Fall** (Plan §2.5) ist **gemessen** — die Kamera hat die Karte **beschnitten** (die
-Lappen-Kontur stand über dem Leinwandrand). Das ist jetzt behoben.
+**Ergebnis.** Die drei Kartenbilder aus 14.5 zeigten am **linken** Lappen (gamma) eine **schräge
+Linie** und eine **waagerechte Naht** — ein Zeichenfehler, kein Layoutfehler. Behoben, die Bilder
+sind neu aufgenommen, ein Wächter hält es fest. Die Update-Log-Zeile für das Kartenlayout steht.
 
-**Die Bilder.** `probes/p105_b14_karte_bilder.py`: eine **Wegwerf-Instanz auf TLS** (freier Port
-je Lauf, eigener Datenwurzelbaum und eigene `auth.sqlite3` je Lauf, Stopp **nur** über die
-PID-Datei), **derselbe Saat** wie die Abnahme (5 Spaces, 30/32/30/30/30 = 152 Items,
-**eingefrorene IDs und Uhr**) — die Bilder zeigen **dieselbe** Karte wie der Beleg
-`p105_b14_layout_probe.json`; **ohne** die 16 Radschritte des B15-Skripts (Fenster **1920 × 1200**).
+**Die Ursache.** `graph.js :: traceContour()` sammelt die Randkanten einer Zellmenge — aber **nicht**
+am Rasterrand (`!member[idx - 1] && gx > 0`). Das Lappen-Raster beginnt genau bei `Knoten −
+LOBE_REACH`, die Zellen des **äußersten** Knotens liegen also **am** Rasterrand: dort fehlte die
+Kante, die Kontur blieb offen, `chainEdges()` zerlegte sie in Bruchstücke, und `traceSmooth()`
+schloss jedes mit einer **Sehne**. **Gemessen** an einem einzelnen Knoten: **3** Bruchstücke statt
+**1**, rechts nur **32 px** statt 48. Seit Block 8 (`9226ab3`) im Code; sichtbar wird es, wenn das
+Bruchstück lang ist (gamma links).
 
-**Der Rand-Fall — gemessen, nicht gerechnet.** Der Plan §2.5 hatte aus den **Konstanten**
-gerechnet: die Kontur reiche „48 px plus eine Rasterzelle" über den äußersten Knoten, also
-könnten bis zu **16 px** abgeschnitten werden. **Gemessen** ist es weniger: die **gezeichnete**
-Kontur reicht **43,9 / 44,1 / 46,4 / 44,6 px** (Welt-Pixel) über den äußersten Knoten — das
-Raster beginnt genau bei `Knoten − LOBE_REACH`, und die **Ecke** einer Zelle ist nur halb so
-weit vom Rand entfernt wie ihr Mittelpunkt. Mit dem Rand von 40 px stand die Kontur auf der
-**begrenzenden** Achse **3,74 px** (links) und **3,81 px** (rechts) **über** dem Leinwandrand —
-**die Karte war beschnitten.**
+**Die Korrektur.** Der Rasterrand zählt als „draussen": `gx === 0 || !member[idx - 1]` (und die
+drei anderen Seiten) — `idx - 1` allein wäre am linken Rand die letzte Zelle der Zeile darüber.
+Vier Zeilen, keine neue Konstante.
 
-**Der Fund an der Messung selbst.** **Keine** Zelle hätte es gemerkt: die Kamera-Zelle
-(P10.5-67) misst den **Umriss der sichtbaren Knoten** — so lautet der Plan §2.5 — und **nicht**
-den **gezeichneten** Inhalt; die Lappen sind aber ein Teil dessen, was der Nutzer sieht.
-Gemessen wird jetzt am **Recorder** an der Leinwand-API des Browsers (**kein** Haken im
-Produktcode — die Methode steht im Plan §2.5).
+**Die Zahlen danach** (`probes/p105_b14_karte_bilder.json`, neu gefahren): Reach links **43,9 → 47,9
+px**, oben **46,4 → 48,4 px** (der Wert, den der Plan §2.5 aus den Konstanten gerechnet hatte — die
+14.5-Messung war **zu klein**, weil die offene Kante fehlte); rechts/unten unverändert. Luft links
+**10,7 → 7,2 px**, oben **84,7 → 82,9 px** — **kein** Beschnitt, `FIT_MARGIN` = 56 px reicht.
+Die ehrliche Schranke rechts/unten ist `LOBE_REACH + cell/2` = 52 px (das Raster liegt dort
+nicht am Knoten an) ⇒ schlechtester Fall **4** Welt-px Luft — datierte Korrektur im Plan §2.5.
+**Die anderen Belege:** die Layout-Probe misst keine Lappen ⇒ ihre sieben Belege bleiben gültig
+(nicht neu gefahren). `p105_b8_c2_probe.json` neu erzeugt ⇒ **inhaltsgleich** (das C2-Fixture
+berührt den Rasterrand nicht sichtbar); ihre acht Gegenläufe laufen in der Suite und bleiben rot an
+genau ihrer Zelle. `p105_b8_karte_probe.py` **nicht** neu gefahren: sie zählt Lappen-**Flächen**pixel
+gegen **0** (Lappen aus) — die Korrektur ändert wenige Konturpixel, nicht diese Aussage. Alle drei
+Bilder im 3×-Ausschnitt gesichtet (gamma in allen drei, die obere Kante der Insel oben rechts):
+**sauber**. **Ein Fund am Werkzeug:** `rotate_session_block.sh` hält den **untersten** Block für
+den neuesten — ein neuer Block gehört deshalb **ans Ende** des Heads, nicht über den alten (der
+erste Lauf hat den falschen Block verschoben; zurückgesetzt und neu gefahren).
 
-**Die Korrektur.** **`FIT_MARGIN` 40 → 56 px** — der Wert, den der Plan §2.5 für diesen Fall
-selbst nennt (die **8 px Luft** über der Grenze `LOBE_REACH` = 48 px). **Gemessen nachher:**
-**10,7 px** Luft (links/rechts), **84,7 / 85,6 px** (oben/unten) — **kein** Beschnitt. **Die
-Kosten:** Füllgrad **93,6 % → 91,1 %**, Zoom **92 % → 90 %**, Versatz **0,42 → 0,49 px**.
+**Tests.** Neu `tests/test_lobe_kontur_geschlossen.py` (2): die **echten** Funktionen aus
+`graph.js` in Node, ein Knoten → **eine** Kontur, symmetrisch ±48; die Gegenprobe setzt den alten
+Wächter wieder ein und wird **rot**. C2-Probe, Bilder- und Layout-Wächter grün.
 
-**Die Belege.** **Alle sieben** wurden mit dem neuen Wert **neu gefahren** (der Normalfall und
-die sechs Gegenläufe) — jede Zelle bleibt rot an **genau** ihrer Zelle. Wächter
-`tests/test_b14_karte_bilder.py` (**7 Tests**, **5 Gegenproben**): der Beleg nennt den
-**Datensatz**, die Bilder (Größe, PNG-Format, Pixelmaße gegen die gemessene Leinwand) und den
-**Reach** (sonst wäre „kein Beschnitt" eine leere Aussage) — und der Rand muss der sein, den der
-**echte** `graph.js` verspricht. **Aufgeräumt:** drei **Wegwerf-Server** aus der 14.4-Session
-liefen noch — **gestoppt über ihre PID-Dateien** (Hard Rule 9).
+**Abnahme.** Unverändert **63 ✅ · 0 ⚠️ · 8 ⬜**. **P10.5-70** bleibt ⬜ — das Urteil über die **neuen**
+Bilder ist des Nikingers.
 
-**Die Doku.** Der Plan stand nach dem Schritt bei **42.237 B** (über dem Softcap): die
-**Anmerkungen der Schritte 14.0–14.4** sind **verbatim** in den Anhang gewandert
-(`scripts/move_sections.py`, mit Byte-Gegenprobe) — der Plan trägt wieder **31.430 B**; der
-**Modulstatus** von Block 14 im Head ist auf den **Kurzstand** verdichtet (die Herleitung
-steht im Anhang). **Ein Fund am Werkzeug (nicht behoben):**
-`scripts/move_sections.py` bricht ab, wenn die Quelle **schon** Zeiger auf **dasselbe** Ziel
-trägt (die Byte-Gegenprobe hängt an der Zeiger-**Zeile**); die drei alten Zeiger bekamen deshalb
-ihr Datum.
-
-**Abnahme.** **P10.5-70** bleibt **⬜**: die Bilder liegen im Repo, das **Urteil** ist des
-Nikingers. Die Bilanz bleibt **63 ✅ · 0 ⚠️ · 8 ⬜**. **Offen:** die **Update-Log-Zeile** (Plan
-§6: Claude Code — der Deploy D `v4.0.0` braucht sie **am Deploy-Tag**), die **Sichtung** und die
-**C2-Frage** (die Bilder zeigen die Inseln — soll die C2-Optik an sie angepasst werden?).
-
-**Nächster Schritt:** der **Closeout von Block 14** (Sichtung abwarten, dann P10.5-70 schließen)
-— danach Block Z.
+**Nächster Schritt:** Sichtung (P10.5-70) und die C2-Frage beim Nikinger; danach Closeout Block 14,
+dann Block Z. Beim Deploy D: den Update-Log-Block auf den Deploy-Tag umdatieren.

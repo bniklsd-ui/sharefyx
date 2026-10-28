@@ -5,7 +5,7 @@ read-when: beim Audit, wenn der Stand eines früheren Blocks dieser Phase gebrau
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-10-27 (Block 14.35: ein Session-Block wandert in das Archiv — die Beschriftungen ohne Überlappung) | 2026-10-27 (Session-Block Block 14.35 rotiert — die Beschriftungen ohne Überlappung) | 2026-10-26 (Session-Block Block 14.2 rotiert — L4, die Anker-Gravitation; Block 14.3 folgt im Head) | 2026-10-26 (Session-Block Block 14.1 rotiert — L1–L3, der Seed wird zum Weltgenerator) | 2026-10-26 (Session-Block Block 14.0 rotiert — die Basislinie des Kartenlayouts) | 2026-10-26 (Session-Block Nachzug Block 13 rotiert — v4.0.0, Space-Auswahl, Rohtext weg; Block 14.0 folgt im Head) | 2026-10-26 (Session-Block Block 13 rotiert — Nachzug v4.0.0, Space-Auswahl, Rohtext weg folgt im Head) | 2026-10-25 (Session-Block Block 12 rotiert — Doku und Altlasten; Block 13 folgt im Head) | 2026-10-25 (Session-Block Block 11.8 rotiert — der Roundtrip; Block 11.6 folgt im Head) | 2026-10-25 (Session-Block Block 11.5 rotiert — die To-do-Kästchen; Block 11.8 folgt im Head) | 2026-10-25 (Session-Block Block 11.7 rotiert — das Budget; Block 11.5 folgt im Head) | 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
+updated: 2026-10-28 (Nachzug 14.5: der Session-Block von Block 14.5 wandert in das Archiv) | 2026-10-27 (Block 14.35: ein Session-Block wandert in das Archiv — die Beschriftungen ohne Überlappung) | 2026-10-27 (Session-Block Block 14.35 rotiert — die Beschriftungen ohne Überlappung) | 2026-10-26 (Session-Block Block 14.2 rotiert — L4, die Anker-Gravitation; Block 14.3 folgt im Head) | 2026-10-26 (Session-Block Block 14.1 rotiert — L1–L3, der Seed wird zum Weltgenerator) | 2026-10-26 (Session-Block Block 14.0 rotiert — die Basislinie des Kartenlayouts) | 2026-10-26 (Session-Block Nachzug Block 13 rotiert — v4.0.0, Space-Auswahl, Rohtext weg; Block 14.0 folgt im Head) | 2026-10-26 (Session-Block Block 13 rotiert — Nachzug v4.0.0, Space-Auswahl, Rohtext weg folgt im Head) | 2026-10-25 (Session-Block Block 12 rotiert — Doku und Altlasten; Block 13 folgt im Head) | 2026-10-25 (Session-Block Block 11.8 rotiert — der Roundtrip; Block 11.6 folgt im Head) | 2026-10-25 (Session-Block Block 11.5 rotiert — die To-do-Kästchen; Block 11.8 folgt im Head) | 2026-10-25 (Session-Block Block 11.7 rotiert — das Budget; Block 11.5 folgt im Head) | 2026-10-25 (Session-Block Block 11.4 rotiert — die Live-Darstellung; Block 11.7 folgt im Head) | 2026-10-24 (Session-Block Block 11.3 rotiert — der Live-Editor; Block 11.4 folgt im Head) | 2026-10-24 (Session-Block Block 11.2 rotiert — der Nachlader; Block 11.3 folgt im Head) | 2026-10-24 (Session-Block Block 11.1 rotiert — der vendorte Editor; Block 11.2 folgt im Head) | 2026-10-24 (Session-Block Block 10.5 rotiert — die Probe ist grün; Block 11.1 folgt im Head) | 2026-10-24 (Session-Block Block 10.3 rotiert — LG-2 Realtime-Client gebaut; Block 10.5 folgt im Head) | 2026-10-24 (Session-Block Block 10.2 rotiert — LG-2 Realtime serverseitig gebaut; Block 10.3 LG-2 Client folgt im Head) | 2026-10-24 (Session-Block Block 10.1 rotiert — LG-1 Volltext gebaut; Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (Session-Block Block 9.3 rotiert — RE-3 `rename_space` gebaut und gemessen; Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (Session-Block Block 9.2 rotiert — RE-4 `rename_folder` gebaut und gemessen) | 2026-10-24 (Session-Block Block 9.1 rotiert — RE-7 `created_by` gebaut und gemessen; Block 9.2 `rename_folder` folgt im Head) | 2026-10-24 (Session-Block Deploy C vorbereitet rotiert — Block 9.1 RE-7 `created_by` gebaut und gemessen) | 2026-10-24 (Session-Block Block 8 rotiert — Deploy C `v3.1.7` vorbereitet: Badge, eigener Update-Log-Block, Suite 1425 grün) | 2026-10-24 (Session-Block 7.4 rotiert — Block 8 gebaut: die Gehirnkarte C2; drei Fehler fand erst der Browser) | 2026-10-24 (Session-Block 7.5-7.7 rotiert — Block 7.4 umgesetzt: die vier Posten der Sichtung gebaut und an der Wegwerf-Instanz gemessen; P10.5-32 wartet auf die Bestätigung) | 2026-10-24 (Session-Block Deploy B live und Block 7.1–7.3 rotiert) | 2026-10-23 (Generalprobe-Block rotiert — Ketten-Defekt in derselben Zeile behoben: `pdated:` → ` | `) | 2026-10-23 (Deploy-B-Generalprobe-Block rotiert — 25/25 Zellen an der Wegwerf-Instanz) | 2026-10-23 (Deploy-A-live-Block rotiert — Deploy B `v3.1.6` vorbereitet) | 2026-10-23 (Deploy-A-Vorbereitungs-Block und P10.5-26-Block rotiert — Deploy A live, Merge von `p105-block5`) | 2026-10-23 (Block-6-Block rotiert — P10.5-26 geklärt: opencode führt `list_spaces` aus) | 2026-10-22 (Block-5-Block rotiert — Block 6 gebaut: Anbieter PA-1/PA-2, `/mcp` ohne Slash, PA-6) | 2026-10-22 (Block-4-Block rotiert — Block 5 begonnen: MCP-Schicht PA-5/LG-4) | 2026-10-22 (Block-3-Block rotiert — Block 4 begonnen: Performance PF-1/PF-4, Z1–Z4) | 2026-10-22 (Block-2.5-Block rotiert — Block-2-Nachzug + Block 3 begonnen) | 2026-10-22 (Block-2-Block (2.1–2.4) rotiert — Block 2.5 Proben) | 2026-10-22 (Block-1-Block rotiert — Block 2 begonnen) | 2026-10-22 (Block 1, Schritt 1.3: erster Block rotiert — der Block-0-Block vom 2026-10-22, verbatim) | 2026-10-22 (angelegt — P10.5 Block 0, Schritt 0.2; noch kein Block rotiert, der erste steht im Head)
 ---
 # Phase 10.5 — Session-Archiv
 
@@ -20,6 +20,63 @@ sucht, findet ihn hier — nicht im Head.
 `phase10_5_finishing/tests/test_head_rules.py`. Das ist die Lehre aus Phase 9: die alten Blöcke
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
+
+## Session stopped — 2026-10-28 (Block 14.5: die drei Kartenbilder — und der beschnittene Rand)
+
+**Ergebnis.** Schritt **14.5**: die **drei Kartenbilder** liegen im Repo, und der offene
+**Rand-Fall** (Plan §2.5) ist **gemessen** — die Kamera hat die Karte **beschnitten** (die
+Lappen-Kontur stand über dem Leinwandrand). Das ist jetzt behoben.
+
+**Die Bilder.** `probes/p105_b14_karte_bilder.py`: eine **Wegwerf-Instanz auf TLS** (freier Port
+je Lauf, eigener Datenwurzelbaum und eigene `auth.sqlite3` je Lauf, Stopp **nur** über die
+PID-Datei), **derselbe Saat** wie die Abnahme (5 Spaces, 30/32/30/30/30 = 152 Items,
+**eingefrorene IDs und Uhr**) — die Bilder zeigen **dieselbe** Karte wie der Beleg
+`p105_b14_layout_probe.json`; **ohne** die 16 Radschritte des B15-Skripts (Fenster **1920 × 1200**).
+
+**Der Rand-Fall — gemessen, nicht gerechnet.** Der Plan §2.5 hatte aus den **Konstanten**
+gerechnet: die Kontur reiche „48 px plus eine Rasterzelle" über den äußersten Knoten, also
+könnten bis zu **16 px** abgeschnitten werden. **Gemessen** ist es weniger: die **gezeichnete**
+Kontur reicht **43,9 / 44,1 / 46,4 / 44,6 px** (Welt-Pixel) über den äußersten Knoten — das
+Raster beginnt genau bei `Knoten − LOBE_REACH`, und die **Ecke** einer Zelle ist nur halb so
+weit vom Rand entfernt wie ihr Mittelpunkt. Mit dem Rand von 40 px stand die Kontur auf der
+**begrenzenden** Achse **3,74 px** (links) und **3,81 px** (rechts) **über** dem Leinwandrand —
+**die Karte war beschnitten.**
+
+**Der Fund an der Messung selbst.** **Keine** Zelle hätte es gemerkt: die Kamera-Zelle
+(P10.5-67) misst den **Umriss der sichtbaren Knoten** — so lautet der Plan §2.5 — und **nicht**
+den **gezeichneten** Inhalt; die Lappen sind aber ein Teil dessen, was der Nutzer sieht.
+Gemessen wird jetzt am **Recorder** an der Leinwand-API des Browsers (**kein** Haken im
+Produktcode — die Methode steht im Plan §2.5).
+
+**Die Korrektur.** **`FIT_MARGIN` 40 → 56 px** — der Wert, den der Plan §2.5 für diesen Fall
+selbst nennt (die **8 px Luft** über der Grenze `LOBE_REACH` = 48 px). **Gemessen nachher:**
+**10,7 px** Luft (links/rechts), **84,7 / 85,6 px** (oben/unten) — **kein** Beschnitt. **Die
+Kosten:** Füllgrad **93,6 % → 91,1 %**, Zoom **92 % → 90 %**, Versatz **0,42 → 0,49 px**.
+
+**Die Belege.** **Alle sieben** wurden mit dem neuen Wert **neu gefahren** (der Normalfall und
+die sechs Gegenläufe) — jede Zelle bleibt rot an **genau** ihrer Zelle. Wächter
+`tests/test_b14_karte_bilder.py` (**7 Tests**, **5 Gegenproben**): der Beleg nennt den
+**Datensatz**, die Bilder (Größe, PNG-Format, Pixelmaße gegen die gemessene Leinwand) und den
+**Reach** (sonst wäre „kein Beschnitt" eine leere Aussage) — und der Rand muss der sein, den der
+**echte** `graph.js` verspricht. **Aufgeräumt:** drei **Wegwerf-Server** aus der 14.4-Session
+liefen noch — **gestoppt über ihre PID-Dateien** (Hard Rule 9).
+
+**Die Doku.** Der Plan stand nach dem Schritt bei **42.237 B** (über dem Softcap): die
+**Anmerkungen der Schritte 14.0–14.4** sind **verbatim** in den Anhang gewandert
+(`scripts/move_sections.py`, mit Byte-Gegenprobe) — der Plan trägt wieder **31.430 B**; der
+**Modulstatus** von Block 14 im Head ist auf den **Kurzstand** verdichtet (die Herleitung
+steht im Anhang). **Ein Fund am Werkzeug (nicht behoben):**
+`scripts/move_sections.py` bricht ab, wenn die Quelle **schon** Zeiger auf **dasselbe** Ziel
+trägt (die Byte-Gegenprobe hängt an der Zeiger-**Zeile**); die drei alten Zeiger bekamen deshalb
+ihr Datum.
+
+**Abnahme.** **P10.5-70** bleibt **⬜**: die Bilder liegen im Repo, das **Urteil** ist des
+Nikingers. Die Bilanz bleibt **63 ✅ · 0 ⚠️ · 8 ⬜**. **Offen:** die **Update-Log-Zeile** (Plan
+§6: Claude Code — der Deploy D `v4.0.0` braucht sie **am Deploy-Tag**), die **Sichtung** und die
+**C2-Frage** (die Bilder zeigen die Inseln — soll die C2-Optik an sie angepasst werden?).
+
+**Nächster Schritt:** der **Closeout von Block 14** (Sichtung abwarten, dann P10.5-70 schließen)
+— danach Block Z.
 
 ## Session stopped — 2026-10-27 (Block 14.4: die Startwerte gemessen)
 

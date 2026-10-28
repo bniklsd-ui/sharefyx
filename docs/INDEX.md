@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-10-28 (B14.5: drei Kartenbilder; der Anhang trägt 14.0–14.4) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-10-28 (Nachzug B14.5: offene Lappen-Kontur behoben, Bilder neu) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -59,16 +59,16 @@ updated: 2026-10-28 (B14.5: drei Kartenbilder; der Anhang trägt 14.0–14.4) | 
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing — alle Baustellen schließen; Plan `docs/concepts/phase10_5_finishing_plan.md`)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **32371 B** · Phase-10.5-Head: Modulstatus 0–14/Z, Deploy A–D, Abnahmestand (63 ✅ · 0 ⚠️ · 8 ⬜), offene Punkte
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **32105 B** · Phase-10.5-Head: Modulstatus 0–14/Z, Deploy A–D, Abnahmestand (63 ✅ · 0 ⚠️ · 8 ⬜), offene Punkte
 - [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **35.281 B** · L3-Archiv der **geschlossenen** Abnahmezeilen (63 Zeilen), verbatim aus dem Head
-- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **142932 B** · L3-Archiv der Session-Blöcke, verbatim
+- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **147092 B** · L3-Archiv der Session-Blöcke, verbatim
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · L3-Archiv der **Startaufträge von Block 7 und 9** (verbatim 2026-10-23/24)
 
 
 
 - [phase10_5_finishing/FREIGABEN_ARCHIVE.md](../phase10_5_finishing/FREIGABEN_ARCHIVE.md) — 📦 **3.577 B** · die Freigaben der Phase, verbatim aus dem Head
 - [phase10_5_finishing/MODULSTATUS_ARCHIVE.md](../phase10_5_finishing/MODULSTATUS_ARCHIVE.md) — 📦 **8.581 B** · die **ausführlichen** Statusspalten der Blöcke 0–10, verbatim (2026-10-24)
-- [docs/concepts/phase10_5_block14_kartenlayout_plan.md](./concepts/phase10_5_block14_kartenlayout_plan.md) — 📗 **31430 B** · Plan Block 14: Kartenlayout
+- [docs/concepts/phase10_5_block14_kartenlayout_plan.md](./concepts/phase10_5_block14_kartenlayout_plan.md) — 📗 **32973 B** · Plan Block 14: Kartenlayout
 - [docs/concepts/phase10_5_block14_kartenlayout_plan_anhang.md](./concepts/phase10_5_block14_kartenlayout_plan_anhang.md) — 📦 **20525 B** · Anhang: §0, §3, §6, Anmerkungen 14.0–14.4
 - [phase10_5_finishing/UPDATES_ARCHIVE.md](../phase10_5_finishing/UPDATES_ARCHIVE.md) — 📦 **12285 B** · L3-Archiv der älteren `updated:`-Fäden des Phase-10.5-Heads, verbatim, newest-first (2026-10-23)
 
@@ -197,7 +197,7 @@ doppelt hier gelistet.)*
 - [docs/INDEX_ENTRIES_ARCHIVE.md](./INDEX_ENTRIES_ARCHIVE.md) — 📦 **46.456 B** · L3-Archiv der **datierten Nachträge aus den Einträgen dieser Karte**, verbatim, ein Abschnitt je Karte in der Reihenfolge der Karte (nicht newest-first). **Regel:** eine Kartenzeile bekommt **keinen** datierten Nachtrag mehr (`test_no_entry_line_carries_a_dated_addendum_any_more`) — die Karte ist **Stand**, das Archiv ist **Chronik**
 - [docs/INDEX_KURZUNG_ARCHIVE.md](./INDEX_KURZUNG_ARCHIVE.md) — 📦 **11.961 B** · L3-Archiv der aus der Karte gekürzten Texte — die acht Abschnittsköpfe und fünf Kartenzeilen-Chroniken, verbatim (die letzten zwei am 2026-10-24, DO-2-Luft); die Karte trägt wieder Stand, dieses Archiv die Chronik des Kürzens
 
-- [docs/INDEX_UPDATES_ARCHIVE.md](./INDEX_UPDATES_ARCHIVE.md) — 📦 **22.711 B** · L3-Archiv der `updated:`-Kette **dieser** Datei, verbatim, newest-first (erste Rotation 2026-09-19); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [docs/INDEX_UPDATES_ARCHIVE.md](./INDEX_UPDATES_ARCHIVE.md) — 📦 **23.048 B** · L3-Archiv der `updated:`-Kette **dieser** Datei, verbatim, newest-first (erste Rotation 2026-09-19); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/PROJECT_SESSION_LOG.md](./PROJECT_SESSION_LOG.md) — 📦 **265.140 B** (vor der 24-Block-Rotation 101.450 B) · L3-Archiv der historischen `[YYYY-MM-DD]`-Session-Bloecke aus `CLAUDE.md` §Current state, newest-first, plus §Frontmatter-Archiv (die `updated:`-Kette der Wurzel-`CLAUDE.md`, 28 Eintraege, verbatim seit 2026-09-13). Wer die Chronik einer alten Phase sucht, faengt hier an, nicht im Wurzel-Head
 
 ## Referenzmaterial (nicht Teil des Plan/Konzept/Handover-Trios)

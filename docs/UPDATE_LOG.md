@@ -16,6 +16,7 @@
 - Team-Spaces lassen sich umbenennen; der eigene Home-Space bleibt wie er ist.
 - In den Einstellungen bleibt der geöffnete Space in der Liste markiert, solange sein Fenster offen ist.
 - Die Verknüpfungskarte zeigt auf Wunsch die ganze Karte auf einmal (Zoom bis 50 %).
+- Die Verknüpfungskarte ordnet jeden Space als eigene Insel an und passt sich beim Öffnen selbst ins Fenster ein. Beim ersten Öffnen ergeben dieselben Notizen immer dasselbe Bild, und Beschriftungen überdecken sich nicht mehr.
 
 ## 2026-10-24
 - Die Verknüpfungskarte hat einen neuen Look: Die Verbindungen laufen als Bahnen zwischen runden Zellen, und jeder Space bekommt einen eigenen Bereich.
