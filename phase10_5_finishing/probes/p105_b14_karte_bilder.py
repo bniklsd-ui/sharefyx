@@ -42,6 +42,27 @@ Aufruf:  `.venv/bin/python phase10_5_finishing/probes/p105_b14_karte_bilder.py`
 Ergebnis: `phase10_5_finishing/probes/p105_b14_karte_bilder.json`
 Bilder:  `docs/screenshots/p105_b14_karte_0{1,2,3}_*.png`
 
+**Die Zelle `koerper` (Schritt 14.6.0, 2026-10-28).** Die Bilder zeigen **fuenf Inseln**
+(Plan `docs/concepts/phase10_5_block14_6_plan.md` §0): die Koerpermaske ist nur `LOBE_REACH`
+= 48 px um jeden Knoten, und das Layout aus Block 14 stellt die Spaces weit auseinander — die
+Lappen beruehren sich nie, es gibt **0** Furche-Zellen, und der Plan 14.6 will aus den Inseln
+**einen Koerper** machen.
+
+Die Zelle misst das **an der Raster-Menge**, nicht an den Bildern: die **Komponenten** des
+Koerpers (4-zusammenhaengend, **mit** den Furche-Zellen), die **Lappen je Space** (ueber die
+Zellen **ohne** Furche), die **Furche-Zellen** und die **Paare**, zwischen denen eine Furche
+liegt. Gemessen wird ueber ein **Messpflaster in einer Kopie** von `graph.js` (Muster:
+`p105_b8_c2_probe.mjs`, `globalThis.__furrowCells`) — **kein Haken im Produktcode**.
+
+**Zwei Durchgaenge je Lauf.** (a) Die **Bilder** und der Rand (Reach/Luft) aus den
+**ungepatchten** Dateien — die Bilder im Repo zeigen **Produktcode** (`test_b14_karte_bilder.py`
+prueft das). (b) Die **`koerper`-Zahlen** und die **Zeit** von `computeLobes()` aus einem
+**eigenen**, gepatchten Durchgang: das Pflaster misst nur, es veraendert nichts — aber die
+Bilder sollen den Produktcode zeigen, und das ist mit einem Pflaster in der ausgelieferten
+Datei nicht mehr der Fall. Die Zeit wird **um den Aufruf** in `settle()` gemessen
+(`performance.now()`, im Pflaster, nicht im Produktcode) — einmal nach dem Einschwingen, bei
+**152** und bei **201** Knoten (Plan 14.6 §2.5: die Zeitgrenze gilt bei 201 Knoten).
+
 **Optionen** (beide sind *Messvarianten*, keine Gegenlaeufe — sie aendern den Arbeitsbaum nie):
 
 | Option | Wirkung |
@@ -110,6 +131,179 @@ if L.KONSTANTEN:
 
 
 # ============================================================================================
+# Das Messpflaster (Schritt 14.6.0) — es macht sichtbar, was die Karte im Inneren rechnet
+# ============================================================================================
+#
+# **Kein Haken im Produktcode** (Plan 14.6 §4): das Pflaster patcht eine **Kopie** der
+# statischen Dateien (derselbe Weg wie die Messvariante `--konstante=`; der Arbeitsbaum bleibt
+# unberuehrt). Es baut **keinen Fehler** ein — es legt nur die Zahlen offen, die
+# `computeLobes()` im Inneren berechnet.
+#
+# (1) `globalThis.__koerper` -- das Raster und die Mengen:
+#       `cols`, `rows`, `cell`, `minX`, `minY` -- die Geometrie des Rasters
+#       `koerper` -- **1** fuer jede Koerperzelle (0 sonst)
+#       `space`  -- der Space je Zelle (null ausserhalb des Koerpers)
+#       `furrow` -- **1** fuer jede Furche-Zelle
+#       `knoten` -- die Knoten (x, y, Space) -- fuer den kleinsten Abstand zweier Spaces
+# (2) `globalThis.__koerperZeit` -- die Zeit von `computeLobes()` in `settle()`.
+#
+# **Die Anker sind eindeutig** (Regel + Nachbarzeile, nicht nur ein Wert) -- sonst patcht das
+# Pflaster den Kommentar ueber der Regel statt der Regel (diese Fehlerklasse hat dieser
+# Ordner zweimal gesehen).
+MESS_PFLASTER = {
+    "  return { key: lobeKey(shown), lobes: lobes };": (
+        "  var __koerper = new Uint8Array(cols * rows);\n"
+        "  for (var __ki = 0; __ki < cols * rows; __ki++) {\n"
+        "    __koerper[__ki] = assign[__ki] >= 0 ? 1 : 0;\n"
+        "  }\n"
+        "  var __knoten = [];\n"
+        "  for (var __kk = 0; __kk < list.length; __kk++) {\n"
+        "    __knoten.push([list[__kk].x, list[__kk].y, list[__kk].space]);\n"
+        "  }\n"
+        "  globalThis.__koerper = { cols: cols, rows: rows, cell: cell,\n"
+        "    minX: minX, minY: minY, koerper: Array.prototype.slice.call(__koerper),\n"
+        "    space: spaceOf, furrow: Array.prototype.slice.call(furrow),\n"
+        "    knoten: __knoten };\n"
+        "  return { key: lobeKey(shown), lobes: lobes };"
+    ),
+    "  function settle() {\n    lobeCache = computeLobes(visibleNodes());": (
+        "  function settle() {\n"
+        "    var __t0 = performance.now();\n"
+        "    lobeCache = computeLobes(visibleNodes());\n"
+        "    globalThis.__koerperZeit = performance.now() - __t0;"
+    ),
+}
+
+#: Die **Knoten**, bei denen die Zeitgrenze gilt (Plan 14.6 §2.5: „bei **201** Knoten").
+KNOTEN_FUER_DIE_ZEIT = 201
+
+
+def _nachbarn(idx: int, cols: int, rows: int) -> list:
+    """Die vier Nachbarn einer Zelle (ohne die Randzellen, die keinen haben)."""
+    gx = idx % cols
+    gy = idx // cols
+    out = []
+    if gx > 0:
+        out.append(idx - 1)
+    if gx < cols - 1:
+        out.append(idx + 1)
+    if gy > 0:
+        out.append(idx - cols)
+    if gy < rows - 1:
+        out.append(idx + cols)
+    return out
+
+
+def _analyse_raster(raster: dict) -> dict:
+    """Die Zahlen der Zelle `koerper` aus dem Raster (Plan 14.6 §5).
+
+    **Der Koerper** = alle Zellen mit `koerper == 1` — **mit** den Furche-Zellen (die
+    gehoeren zum Koerper, nur zu keinem Lappen; ohne sie zerfiele der Koerper bei *jedem*
+    Wert in fuenf Teile und die Zelle waere nie gruen).
+    **Der Lappen** eines Spaces = seine Zellen **ohne** Furche, je Space gezaehlt.
+    """
+    cols = raster["cols"]
+    rows = raster["rows"]
+    koerper = raster["koerper"]
+    space = raster["space"]
+    furrow = raster["furrow"]
+    raeume = raster["raeume"]
+    n = cols * rows
+
+    # -- 1) die Komponenten des Koerpers (4-zusammenhaengend) ---------------------------------
+    besucht = bytearray(n)
+    komponenten = 0
+    groessen = []
+    for start in range(n):
+        if not koerper[start] or besucht[start]:
+            continue
+        komponenten += 1
+        groesse = 0
+        besucht[start] = 1
+        stapel = [start]
+        while stapel:
+            i = stapel.pop()
+            groesse += 1
+            for j in _nachbarn(i, cols, rows):
+                if koerper[j] and not besucht[j]:
+                    besucht[j] = 1
+                    stapel.append(j)
+        groessen.append(groesse)
+
+    # -- 2) die Lappen je Space (die Zellen ohne Furche) --------------------------------------
+    lobe_besucht = bytearray(n)
+    lappen = {}
+    zellen_je_space = {}
+    for start in range(n):
+        if not koerper[start]:
+            continue
+        sp = space[start]
+        name = raeume[sp] if 0 <= sp < len(raeume) else "?"
+        zellen_je_space[name] = zellen_je_space.get(name, 0) + 1
+        if furrow[start] or lobe_besucht[start]:
+            continue
+        lappen[name] = lappen.get(name, 0) + 1
+        lobe_besucht[start] = 1
+        stapel = [start]
+        while stapel:
+            i = stapel.pop()
+            for j in _nachbarn(i, cols, rows):
+                if koerper[j] and not furrow[j] and not lobe_besucht[j]:
+                    lobe_besucht[j] = 1
+                    stapel.append(j)
+
+    # -- 3) die Furche: die Paare, zwischen denen sie liegt -----------------------------------
+    paare = {}
+    furche_zellen = 0
+    for i in range(n):
+        if not koerper[i]:
+            continue
+        if furrow[i]:
+            furche_zellen += 1
+            eigene = space[i]
+            fremde = set()
+            for j in _nachbarn(i, cols, rows):
+                if koerper[j] and space[j] != eigene:
+                    fremde.add(space[j])
+            for f in fremde:
+                a = raeume[eigene] if 0 <= eigene < len(raeume) else "?"
+                b = raeume[f] if 0 <= f < len(raeume) else "?"
+                key = "|".join(sorted((a, b)))
+                paare[key] = paare.get(key, 0) + 1
+
+    # -- 4) der kleinste Abstand zweier Knoten verschiedener Spaces --------------------------
+    # (die Zahl, aus der sich der noetige Schliess-Radius rechnet: die gewachsenen Masken
+    # ueberlappen erst, wenn `2 · (LOBE_REACH + D) >= d`)
+    knoten = raster.get("knoten") or []
+    min_abstand = None
+    for a in range(len(knoten)):
+        for b in range(a + 1, len(knoten)):
+            if knoten[a][2] == knoten[b][2]:
+                continue
+            d = ((knoten[a][0] - knoten[b][0]) ** 2 + (knoten[a][1] - knoten[b][1]) ** 2) ** 0.5
+            if min_abstand is None or d < min_abstand:
+                min_abstand = d
+
+    return {
+        "komponenten": komponenten,
+        "komponenten_groessen": sorted(groessen, reverse=True)[:10],
+        "lappen_je_space": lappen,
+        "zellen_je_space": zellen_je_space,
+        "koerper_zellen": sum(1 for v in koerper if v),
+        "furche_zellen": furche_zellen,
+        "paare": paare,
+        "paare_zahl": len(paare),
+        "zellgroesse_px": raster["cell"],
+        "raster": {"cols": cols, "rows": rows, "cell": raster["cell"],
+                   "minX": raster["minX"], "minY": raster["minY"]},
+        "zeit_ms": raster.get("zeit_ms"),
+        "knoten": len(knoten),
+        "min_abstand_zwei_spaces_px": (round(min_abstand, 2)
+                                       if min_abstand is not None else None),
+    }
+
+
+# ============================================================================================
 # Der Browser-Teil. Playwright liegt im e2e-venv, nicht im Projekt-venv — deshalb ein **eigenes**
 # Skript, das seinen Auftrag ueber eine Datei bekommt (kein `.format()` auf einem Quelltext, in
 # dem JavaScript steht).
@@ -129,6 +323,12 @@ REPO_ROOT = AUFTRAG["repo_root"]
 AUTH_DB = AUFTRAG["auth_db"]
 BILDER = Path(AUFTRAG["bilder"])
 PREFIX = AUFTRAG["prefix"]
+#: **Der Durchgang** dieses Laufs: "bilder" (die Bilder und der Rand) oder "koerper" (die
+#: Rasterzahlen und die Zeit). Die beiden Durchgaenge laufen **nacheinander** in **zwei**
+#: Wegwerf-Instanzen (Plan 14.6 §4) — die Bilder zeigen den Produktcode, die Zahlen kommen
+#: aus dem gepatchten Durchgang.
+DURCHGAENG = AUFTRAG["durchgang"]
+SPACES = AUFTRAG["spaces"]
 
 
 def totp_now(secret_b32):
@@ -296,6 +496,44 @@ ABLAGE = r"""() => {
 
 GRAFIK = r"""async () => (await fetch('/api/v1/graph')).json()"""
 
+# Das **Raster** aus dem Messpflaster (Schritt 14.6.0). Die **Spaces** kommen als **Indizes**
+# (die Namen stehen einmal im Bericht, nicht je Zelle) — sonst waeren es 20 000 Strings
+# durch die Leitung.
+KOERPER = r"""() => {
+  const k = window.__koerper;
+  if (!k) return null;
+  const index = {};
+  const raeume = [];
+  const space = [];
+  for (let i = 0; i < k.space.length; i++) {
+    const s = k.space[i];
+    if (s === null || s === undefined) { space.push(-1); continue; }
+    if (!(s in index)) { index[s] = raeume.length; raeume.push(s); }
+    space.push(index[s]);
+  }
+  return {
+    cols: k.cols, rows: k.rows, cell: k.cell, minX: k.minX, minY: k.minY,
+    koerper: k.koerper, space: space, furrow: k.furrow, knoten: k.knoten,
+    raeume: raeume,
+    zeit_ms: (typeof window.__koerperZeit === 'number') ? window.__koerperZeit : null,
+  };
+}"""
+
+# Ein Item anlegen (fuer den zweiten Messpunkt: die Zeitgrenze gilt bei **201** Knoten).
+# Muster: `p105_b14_layout_probe.py :: NEUES_ITEM`.
+NEUES_ITEM = r"""async (args) => {
+  const tok = (document.getElementById('bootstrap-csrf') || {}).value
+           || sessionStorage.getItem('sfx:csrf');
+  const r = await fetch('/api/v1/items', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'x-csrf-token': tok},
+    body: JSON.stringify(args.body),
+  });
+  const text = await r.text();
+  if (!r.ok) throw new Error('POST /api/v1/items -> ' + r.status + ' ' + text);
+  return JSON.parse(text);
+}"""
+
 ZOOM = r"""() => {
   const el = document.getElementById('overview-graph-zoom');
   if (!el) return null;
@@ -370,6 +608,41 @@ def nachbarn_je_knoten(grafik):
     return nachbarn
 
 
+def koerper_durchgang(page):
+    """Der Durchgang **"koerper"** (Schritt 14.6.0): die Rasterzahlen und die Zeit von
+    `computeLobes()`.
+
+    **Zwei Messpunkte:** der **Abnahme-Seed** (5 Spaces, 152 Items) und die **201 Knoten**, bei
+    denen die Zeitgrenze gilt (Plan §2.5). Fuer den zweiten Messpunkt kommen Items dazu — der
+    Feed muss einpendeln, sonst laeuft die App mit der alten Karte weiter (derselbe Grund wie
+    in der Layout-Probe).
+    """
+    messungen = []
+    start = AUFTRAG["seed"]["items"]
+    for ziel in (start, AUFTRAG["knoten_fuer_die_zeit"]):
+        if ziel > start:
+            for i in range(ziel - start):
+                sp = SPACES[i % len(SPACES)]
+                page.evaluate(NEUES_ITEM, {"body": {
+                    "type": "note", "status": "active",
+                    "title": "Probe Koerper %02d" % (i + 1), "space": sp, "folder": "ordner-2"}})
+            # **Der Feed einpendeln lassen:** das Ereignis kommt bis zu ~1 s spaeter, die App
+            # legt dann neu (und merkt die Karte) — sonst misst der folgende Lauf die alte.
+            page.wait_for_timeout(2500)
+        page.evaluate("() => { localStorage.clear(); }")
+        page.reload(wait_until="domcontentloaded")
+        page.wait_for_selector(".overview__graph canvas", state="visible", timeout=20000)
+        settle(page)
+        page.wait_for_timeout(1600)          # das Merken ist gedrosselt (1 s)
+        raster = page.evaluate(KOERPER)
+        if not raster:
+            raise RuntimeError(
+                "das Messpflaster hat keine Zahlen geliefert (globalThis.__koerper fehlt) — "
+                "der Anker griff nicht")
+        messungen.append(raster)
+    return messungen
+
+
 def main():
     fehler = []
     with sync_playwright() as p:
@@ -381,6 +654,22 @@ def main():
         page.add_init_script(REZORDER)
         page.on("pageerror", lambda e: fehler.append(str(e)))
         login(page)
+
+        # ---- der Durchgang "koerper" (Schritt 14.6.0) ----------------------------------------
+        if DURCHGAENG == "koerper":
+            messungen = koerper_durchgang(page)
+            ctx.close()
+            browser.close()
+            bericht = {"durchgang": "koerper", "messungen": messungen, "seitenfehler": fehler}
+            RESULT.write_text(json.dumps(bericht, ensure_ascii=False, indent=2) + "\n",
+                              encoding="utf-8")
+            print(json.dumps({"durchgang": "koerper",
+                              "messungen": [{"cols": m["cols"], "rows": m["rows"],
+                                              "zeit_ms": m["zeit_ms"],
+                                              "knoten": len(m["knoten"] or [])}
+                                             for m in messungen]},
+                             ensure_ascii=False, indent=2))
+            return 0
 
         # ---- der frische Lauf (leerer Speicher) -------------------------------------------
         page.evaluate("() => { localStorage.clear(); }")
@@ -552,47 +841,153 @@ def main() -> int:
         BILDER = Path(BILDER_VERZEICHNIS)
         if not BILDER.is_absolute():
             BILDER = REPO_ROOT / BILDER
-    L.PORT = L._freier_port()
-    L.BASE = f"https://127.0.0.1:{L.PORT}"
     creds = L._setup()
     L._seed()
+    berichte = {}
     try:
-        L._serve()
-        auftrag = {
-            "base": L.BASE,
-            "space": L.SPACE,
-            "password": creds["password"],
-            "secret": creds["secret"],
-            "repo_root": str(REPO_ROOT),
-            "auth_db": str(L.AUTH_DB),
-            "result": str(RESULT),
-            "bilder": str(BILDER),
-            "prefix": "p105_b14_karte",
-            "konstanten_varianten": L.KONSTANTEN,
-            "konstanten_gesendet": L._konstanten_werte(
-                L._graph_text() if not L.KONSTANTEN else
-                _mit_varianten(L._graph_text(), L._konstanten_patch())),
-            "seed": {"spaces": len(L.SPACES), "items": sum(L.ITEMS_PRO_SPACE.values()),
-                     "items_pro_space": L.ITEMS_PRO_SPACE},
-        }
-        AUFTRAG_DATEI.parent.mkdir(parents=True, exist_ok=True)
-        AUFTRAG_DATEI.write_text(json.dumps(auftrag), encoding="utf-8")
-        skript = WEGWERF_ROOT / ("browser_bilder_%d.py" % PID)
-        skript.parent.mkdir(parents=True, exist_ok=True)
-        skript.write_text(BROWSER_SKILL, encoding="utf-8")
-        e2e = Path.home() / ".claude-code-tools/e2e-venv/bin/python"
-        proc = subprocess.run(
-            [str(e2e), str(skript), str(AUFTRAG_DATEI)],
-            cwd=str(REPO_ROOT), capture_output=True, text=True, timeout=900,
-        )
-        print(proc.stdout.strip()[-8000:])
-        if proc.returncode != 0:
-            print(proc.stderr.strip()[-8000:], file=sys.stderr)
-            return 1
+        # **Zwei Durchgaenge** (Plan 14.6 §4): die Bilder und der Rand aus dem **ungepatchten**
+        # Produktcode, die `koerper`-Zahlen und die Zeit aus dem **gepatchten**. Beide laufen
+        # **nacheinander** — jeder mit einem **eigenen Port** und einer **eigenen** Instanz.
+        for durchgang in ("bilder", "koerper"):
+            L.PORT = L._freier_port()
+            L.BASE = f"https://127.0.0.1:{L.PORT}"
+            # **Das Messpflaster nur im zweiten Durchgang:** die Bilder im Repo zeigen den
+            # **Produktcode** — mit dem Pflaster in der ausgelieferten Datei waere das nicht
+            # mehr der Fall (und der Beleg muesste es sagen).
+            L.GRAPH_PATCH_EXTRA = MESS_PFLASTER if durchgang == "koerper" else {}
+            L._serve()
+            try:
+                berichte[durchgang] = _durchgang(durchgang, creds)
+            finally:
+                # **jeder** Ausgang stoppt den Wegwerf-Server — ueber die PID-Datei (Hard Rule 9)
+                L._stop()
     finally:
-        # **jeder** Ausgang stoppt den Wegwerf-Server — ueber die PID-Datei (Hard Rule 9)
         L._stop()
+    bericht = _merge(berichte)
+    RESULT.write_text(json.dumps(bericht, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps(bericht, ensure_ascii=False, indent=2))
     return 0
+
+
+def _durchgang(durchgang: str, creds: dict) -> dict:
+    """Ein Durchgang: die Wegwerf-Instanz steht, der Browser laeuft, der Bericht kommt
+    zurueck (in eine **eigene** Datei — der Beleg entsteht erst aus beiden Durchgaengen)."""
+    ziel = WEGWERF_ROOT / ("bericht-%s-%d.json" % (durchgang, PID))
+    auftrag = {
+        "base": L.BASE,
+        "space": L.SPACE,
+        "password": creds["password"],
+        "secret": creds["secret"],
+        "repo_root": str(REPO_ROOT),
+        "auth_db": str(L.AUTH_DB),
+        "result": str(ziel),
+        "bilder": str(BILDER),
+        "prefix": "p105_b14_karte",
+        "durchgang": durchgang,
+        "knoten_fuer_die_zeit": KNOTEN_FUER_DIE_ZEIT,
+        "spaces": list(L.SPACES),
+        "konstanten_varianten": L.KONSTANTEN,
+        "konstanten_gesendet": L._konstanten_werte(
+            L._graph_text() if not L.KONSTANTEN else
+            _mit_varianten(L._graph_text(), L._konstanten_patch())),
+        "seed": {"spaces": len(L.SPACES), "items": sum(L.ITEMS_PRO_SPACE.values()),
+                 "items_pro_space": L.ITEMS_PRO_SPACE},
+    }
+    AUFTRAG_DATEI.parent.mkdir(parents=True, exist_ok=True)
+    AUFTRAG_DATEI.write_text(json.dumps(auftrag), encoding="utf-8")
+    skript = WEGWERF_ROOT / ("browser_bilder_%d.py" % PID)
+    skript.parent.mkdir(parents=True, exist_ok=True)
+    skript.write_text(BROWSER_SKILL, encoding="utf-8")
+    e2e = Path.home() / ".claude-code-tools/e2e-venv/bin/python"
+    proc = subprocess.run(
+        [str(e2e), str(skript), str(AUFTRAG_DATEI)],
+        cwd=str(REPO_ROOT), capture_output=True, text=True, timeout=900,
+    )
+    print(proc.stdout.strip()[-8000:])
+    if proc.returncode != 0:
+        print(proc.stderr.strip()[-8000:], file=sys.stderr)
+        raise RuntimeError("der Durchgang %r ist gescheitert" % durchgang)
+    return json.loads(ziel.read_text(encoding="utf-8"))
+
+
+def _merge(berichte: dict) -> dict:
+    """Die beiden Durchgaenge zu **einem** Beleg.
+
+    Der Beleg traegt **beide** Durchgaenge: die Bilder und der Rand (ungepatcht) **und** die
+    `koerper`-Zahlen und die Zeit (gepatcht). Die Zelle `koerper` ist **rot** an der
+    Basislinie (Schritt 14.6.0) — das ist der gemessene Befund (Plan 14.6 §0), kein Fehler.
+    """
+    bilder = berichte["bilder"]
+    bericht = dict(bilder)
+    bericht["schritt"] = "14.6.0"
+    # Die **Pruefsumme** der Positionen (die Rechnung sitzt **einmal** in der Layout-Probe):
+    # sie vergleicht diese Karte mit der der Layout-Probe — dieselbe Karte, derselbe Saat.
+    bericht["koerper"] = _koerper_zelle(bilder, berichte["koerper"])
+    bilder_ok = bool(
+        not bilder["seitenfehler"]
+        and bilder["lappen"]["filter_eindeutig"]
+        and len(bilder["bilder"]) == 3
+        and all(b["bytes"] > 10000 for b in bilder["bilder"])
+        and bilder["knoten"]["anzahl"] == bilder["seed"]["items"])
+    bericht["zellen"] = {"bilder": bilder_ok, "koerper": bericht["koerper"]["ok"]}
+    bericht["alle_kriterien_erfuellt"] = bool(bilder_ok and bericht["koerper"]["ok"])
+    return bericht
+
+
+def _koerper_zelle(bilder: dict, koerper_roh: dict) -> dict:
+    """Die Zelle `koerper` (Plan 14.6 §5) — gemessen an der **Rastermenge**, nicht am Bild.
+
+    **Die Kriterien (wortgleich aus dem Plan §5):**
+    - die Koerperzellen aller Spaces bilden **eine** 4-zusammenhaengende Komponente — gezaehlt
+      **mit** den Furche-Zellen (sie gehoeren zum Koerper, nur zu keinem Lappen);
+    - jeder Space hat **genau einen** Lappen — gezaehlt ueber seine Zellen **ohne** Furche;
+    - zwischen je zwei Spaces, deren Lappen sich beruehren, liegt eine Furche (> 0 Zellen), und
+      mindestens **4** solcher Paare existieren;
+    - die Kontur reicht <= 52 px ueber den aeussersten Knoten, mit Luft > 0 px zur Leinwand;
+    - die Knotenpositionen sind gleich zum Stand 14.5 — **das prueft die Layout-Probe**
+      (Plan 14.6 §4, Schritt 14.6.3: "die Knotenpositionen sind gleich zu
+      `p105_b14_layout_probe.json`"), nicht diese Probe: sie zeichnet kein Layout, sie
+      misst den Koerper;
+    - `computeLobes()` braucht <= 50 ms bei 201 Knoten.
+    """
+    messungen = koerper_roh["messungen"]
+    abnahme = _analyse_raster(messungen[0])
+    zeit = _analyse_raster(messungen[1]) if len(messungen) > 1 else {}
+    reach = bilder["lappen"]["reach_welt_px"]
+    luft = {k: bilder["raender"]["lappen_" + k] for k in ("links", "rechts", "oben", "unten")}
+
+    ein_koerper = abnahme["komponenten"] == 1
+    ein_lappen = bool(abnahme["lappen_je_space"]) and all(
+        v == 1 for v in abnahme["lappen_je_space"].values()) and (
+        len(abnahme["lappen_je_space"]) == len(abnahme["zellen_je_space"]))
+    furche = abnahme["furche_zellen"] > 0 and abnahme["paare_zahl"] >= 4 and all(
+        v > 0 for v in abnahme["paare"].values())
+    rand_ok = bool(reach) and max(reach.values()) <= 52.0 and min(luft.values()) > 0.0
+    zeit_ok = (zeit.get("zeit_ms") is not None and zeit["zeit_ms"] <= 50.0)
+
+    grund = []
+    if not ein_koerper:
+        grund.append("%d Komponenten (statt 1)" % abnahme["komponenten"])
+    if not ein_lappen:
+        grund.append("Lappen je Space: %s" % abnahme["lappen_je_space"])
+    if not furche:
+        grund.append("%d Furche-Zellen, %d Paare" % (abnahme["furche_zellen"],
+                                                      abnahme["paare_zahl"]))
+    if not rand_ok:
+        grund.append("Reach %s / Luft %s" % (reach, luft))
+    if not zeit_ok:
+        grund.append("computeLobes(): %s ms bei %s Knoten" % (
+            zeit.get("zeit_ms"), zeit.get("knoten")))
+
+    return {
+        "ok": bool(ein_koerper and ein_lappen and furche and rand_ok and zeit_ok),
+        "grund": "; ".join(grund) if grund else "alle Kriterien erfuellt",
+        "abnahme": abnahme,
+        "zeit": zeit,
+        "reach_welt_px": reach,
+        "luft_px": luft,
+        "zeitgrenze_ms": 50,
+    }
 
 
 def _mit_varianten(text: str, patch: dict) -> str:

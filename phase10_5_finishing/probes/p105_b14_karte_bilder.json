@@ -1,7 +1,7 @@
 {
   "probe": "p105_b14_karte_bilder",
-  "schritt": "14.5",
-  "zeit": "2026-10-28T17:24:29.209751+00:00",
+  "schritt": "14.6.0",
+  "zeit": "2026-10-28T19:44:57.426076+00:00",
   "seed": {
     "spaces": 5,
     "items": 152,
@@ -159,5 +159,104 @@
     }
   ],
   "seitenfehler": [],
-  "alle_kriterien_erfuellt": true
+  "alle_kriterien_erfuellt": false,
+  "koerper": {
+    "ok": false,
+    "grund": "5 Komponenten (statt 1); 0 Furche-Zellen, 0 Paare",
+    "abnahme": {
+      "komponenten": 5,
+      "komponenten_groessen": [
+        989,
+        872,
+        848,
+        836,
+        815
+      ],
+      "lappen_je_space": {
+        "epsilon": 1,
+        "delta": 1,
+        "gamma": 1,
+        "alpha": 1,
+        "beta": 1
+      },
+      "zellen_je_space": {
+        "epsilon": 848,
+        "delta": 836,
+        "gamma": 815,
+        "alpha": 872,
+        "beta": 989
+      },
+      "koerper_zellen": 4360,
+      "furche_zellen": 0,
+      "paare": {},
+      "paare_zahl": 0,
+      "zellgroesse_px": 8,
+      "raster": {
+        "cols": 156,
+        "rows": 125,
+        "cell": 8,
+        "minX": -55.8990840643914,
+        "minY": 0.6206379524597168
+      },
+      "zeit_ms": 20.099999964237213,
+      "knoten": 152,
+      "min_abstand_zwei_spaces_px": 183.04
+    },
+    "zeit": {
+      "komponenten": 5,
+      "komponenten_groessen": [
+        1815,
+        1670,
+        1656,
+        1651,
+        1538
+      ],
+      "lappen_je_space": {
+        "epsilon": 1,
+        "delta": 1,
+        "gamma": 1,
+        "alpha": 1,
+        "beta": 1
+      },
+      "zellen_je_space": {
+        "epsilon": 1538,
+        "delta": 1651,
+        "gamma": 1656,
+        "alpha": 1670,
+        "beta": 1815
+      },
+      "koerper_zellen": 8330,
+      "furche_zellen": 0,
+      "paare": {},
+      "paare_zahl": 0,
+      "zellgroesse_px": 8.227207193916012,
+      "raster": {
+        "cols": 201,
+        "rows": 157,
+        "cell": 8.227207193916012,
+        "minX": -290.8626408938188,
+        "minY": -196.45339051174798
+      },
+      "zeit_ms": 35,
+      "knoten": 201,
+      "min_abstand_zwei_spaces_px": 150.7
+    },
+    "reach_welt_px": {
+      "links": 47.8990840643914,
+      "rechts": 44.10091593560878,
+      "oben": 48.37936204754028,
+      "unten": 44.620637952459674
+    },
+    "luft_px": {
+      "links": 7.20071816731722,
+      "rechts": 10.687633749949555,
+      "oben": 82.90286831994557,
+      "unten": 85.5828132138679
+    },
+    "zeitgrenze_ms": 50
+  },
+  "zellen": {
+    "bilder": true,
+    "koerper": false
+  }
 }

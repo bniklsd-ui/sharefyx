@@ -9,7 +9,7 @@ down:
   - ../../phase5_ui/webui/static/js/graph.js            # der einzige Produktcode, der sich ändert: `computeLobes()`
   - ../../phase10_5_finishing/probes/p105_b14_karte_bilder.py  # die Bilder-Probe (Recorder, `--konstante`, `--bilder`)
   - ../../phase10_5_finishing/probes/p105_b8_c2_probe.mjs      # der C2-Wächter (feste Positionen, Messpflaster)
-updated: 2026-10-28 (Entwurf, Claude Code — nach der Sichtung der 14.5-Bilder)
+updated: 2026-10-28 (Schritt 14.6.0 gebaut: die Basislinie gemessen — 5 Komponenten, 0 Furche-Zellen, 35,0 ms bei 201 Knoten) | 2026-10-28 (Entwurf, Claude Code — nach der Sichtung der 14.5-Bilder)
 ---
 # P10.5 Block 14.6 — Der Körper: aus Inseln wird eine Gehirnkarte
 
@@ -119,11 +119,62 @@ solchen Wert: STOPP, berichten.
 
 | Schritt | Inhalt | Fertig, wenn |
 |---|---|---|
-| **14.6.0** | **Messung zuerst:** die Bilder-Probe `p105_b14_karte_bilder.py` bekommt die Zelle `koerper` (§5) — gemessen über ein **Messpflaster in einer Kopie** von `graph.js` (Muster `p105_b8_c2_probe.mjs` Z. ~95, `globalThis.__furrowCells`; **kein** Haken im Produktcode). **Zwei Durchgänge je Lauf:** die **Bilder** und der Rand (Reach/Luft) aus den **ungepatchten** Dateien (die Bilder im Repo zeigen Produktcode — `test_b14_karte_bilder.py`), die `koerper`-Zahlen und die `computeLobes()`-Zeit aus einem **eigenen**, gepatchten Durchgang. Dazu `LOBE_CLOSE_PX` in `BLOCK14_KONSTANTEN` (`p105_b14_layout_probe.py` Z. 253), damit `--konstante=` es meldet. **Gegen den heutigen Code.** | `koerper` ist **rot** an der Basislinie: **5** Komponenten, **0** Furche-Zellen (das ist der gemessene Befund aus §0). Alle übrigen Zellen der Probe unverändert. |
+| **14.6.0** ✅ 2026-10-28 | **Messung zuerst:** die Bilder-Probe `p105_b14_karte_bilder.py` bekommt die Zelle `koerper` (§5) — gemessen über ein **Messpflaster in einer Kopie** von `graph.js` (Muster `p105_b8_c2_probe.mjs` Z. ~95, `globalThis.__furrowCells`; **kein** Haken im Produktcode). **Zwei Durchgänge je Lauf:** die **Bilder** und der Rand (Reach/Luft) aus den **ungepatchten** Dateien (die Bilder im Repo zeigen Produktcode — `test_b14_karte_bilder.py`), die `koerper`-Zahlen und die `computeLobes()`-Zeit aus einem **eigenen**, gepatchten Durchgang. Dazu `LOBE_CLOSE_PX` in `BLOCK14_KONSTANTEN` (`p105_b14_layout_probe.py` Z. 253), damit `--konstante=` es meldet. **Gegen den heutigen Code.** | `koerper` ist **rot** an der Basislinie: **5** Komponenten, **0** Furche-Zellen (das ist der gemessene Befund aus §0). Alle übrigen Zellen der Probe unverändert. **✅ erfüllt** — die Anmerkungen unten. |
 | **14.6.1** | Der Algorithmus (§2.1) mit `LOBE_CLOSE_PX = 0` (= heute, §2.2) — dann die **Varianten** `--konstante=LOBE_CLOSE_PX=` **0 · 80 · 120 · 160 · 200 · 240**, je mit `--bilder=~/p105_b14_6_varianten/<D>/` (**außerhalb** des Repos). | Mit `0` ist das Bild gleich dem von heute (§2.2). Tabelle je Variante: Komponenten, Lappen je Space, Furche-Zellen, Reach je Seite, Luft, Zellgröße, `computeLobes()`-Zeit (152/201 Knoten). **STOPP — Bericht an den Nikinger (E1).** Commit mit `LOBE_CLOSE_PX = 0`. |
 | **14.6.2** | Den gewählten Wert setzen (Kommentar „gewählt vom Nikinger am <Datum>, gemessen in 14.6.1"). C2-Wächter: neue Messung `koerper` in `p105_b8_c2_probe.mjs` an einem **festen** Eingang (3 Gruppen, Abstand so, dass sie sich bei `LOBE_CLOSE_PX = 0` **nicht** berühren — Muster `FESTE_POSITIONEN`, Z. ~407) + Gegenlauf `koerper` (`LOBE_CLOSE_PX` → 0) in `tests/test_graph_c2.py`. Die alte Furche-Messung bleibt. | `koerper` grün; der Gegenlauf `koerper` macht **genau diese** Messung rot, die acht alten Gegenläufe bleiben rot an genau ihrer Messung. |
 | **14.6.3** | Belege: `p105_b14_layout_probe.py` neu (Normalfall) · `p105_b14_karte_bilder.py` neu (Bilder ersetzen `docs/screenshots/p105_b14_karte_0{1,2,3}_*.png`, dieselben Namen) · `p105_b8_karte_probe.py` neu · volle Suite, `scripts/doc_health.py`, `phase5_ui/scripts/ui_budget.py`. Doku: §4-Zeile hier, Head (Modulstatus, Abnahmezeile **P10.5-72**, Summe, Session-Block), INDEX. | Die Knotenpositionen der Layout-Probe sind **gleich** zu `p105_b14_layout_probe.json` (alle Zellen gleich bis auf `zeit`) ⇒ das Layout ist unberührt, die sechs Gegenläufe müssen **nicht** neu. `koerper` grün mit dem gewählten Wert. Suite grün, `doc_health` 0, `ui_budget` grün. |
 | 14.6.4 | **Claude Code:** Update-Log-Zeile anpassen (sie sagt heute „eigene Insel"), Sichtung **P10.5-70** neu beim Nikinger | — |
+
+### Die Schritte 14.6.0 bis 14.6.4 — die Anmerkungen
+
+#### 14.6.0 ✅ 2026-10-28 — die Basislinie, gemessen
+
+**Der Befund aus §0 ist bestätigt — und er ist genau der erwartete.** Der Körper besteht aus
+**5** 4-zusammenhängenden Komponenten (die fünf Inseln), es gibt **0** Furche-Zellen, und **kein**
+Paar von Spaces liegt an einer Furche. Die Zelle `koerper` ist damit **rot** — wie der Plan sie
+für die Basislinie verlangt. **Kein Produktcode angefasst.**
+
+| Zahl | Wert |
+|---|---|
+| Komponenten (152 Knoten) | **5** (Größen 1815 / 1670 / 1656 / 1651 / 1538 Zellen) |
+| Lappen je Space | **1** (jeder Space genau einer) |
+| Furche-Zellen | **0** |
+| Paare mit Furche | **0** |
+| Körperzellen | 4360 (Raster 156 × 125, Zellgröße **8 px**) |
+| kleinster Abstand zweier Spaces | **183,0 px** |
+| `computeLobes()` | **20,1 ms** (152 Knoten) · **35,0 ms** (201 Knoten) — Grenze 50 ms |
+
+**Drei Zahlen, die die Wahl des `LOBE_CLOSE_PX` (E1) entscheiden.**
+1. **Der kleinste Abstand zweier Knoten verschiedener Spaces ist 183,0 px.** Die gewachsenen
+   Masken (Radius `LOBE_REACH + D`) überlappen erst, wenn `2 · (48 + D) ≥ 183` — also ab
+   **D = 43,5 px**. Der kleinste Wert, der die Inseln überhaupt verbinden kann, liegt damit
+   **oberhalb** von 40 px; die Variantenliste (80 … 240) deckt das ab.
+2. **Die Zeitgrenze ist kein Selbstgeschätzt.** Der **heutige** Code braucht bei **201** Knoten
+   **35,0 ms** von den erlaubten 50 ms. Das Schließen kommt **obendrauf** (die
+   Distanztransformation kostet zwei Durchgänge über das Raster) — die Reserve ist echt, aber
+   **nicht groß**.
+3. **Die Rasterzelle wächst mit `D`** (der Deckel `LOBE_MAX_CELLS` = 200 gilt für die
+   **gepolsterte** Spanne): bei 201 Knoten sind es heute **8,23 px** — die Spanne ist dort
+   **schon gedeckelt**. Jede Variante muss deshalb die **Zellgröße** mitprotokollieren (die
+   Kontur wird mit größerer Zelle **stufiger**).
+
+**Zwei Befunde am Werkzeug, die sonst stillschweigend falsch gemessen hätten.**
+- **Der Wegwerf-Server „beendete sich nicht".** Die PID bleibt als **Zombie** stehen, wenn der
+  Elternprozess sein Kind nicht abräumt — `os.kill(pid, 0)` sagt trotzdem „lebt". Der Stopp
+  wartete **zehn Sekunden** auf einen Prozess, den es nicht mehr gab, und meldete dann
+  fälschlich „SIGKILL". Der Stopp prüft jetzt den **Zustand** in `/proc/<pid>/stat`
+  (`p105_b14_layout_probe.py :: _lebt()`).
+- **Die Bilder sind byteweise identisch geblieben.** Der Lauf hat die drei Bilder neu erzeugt —
+  **unverändert** (`git` sagt nichts). Das ist der Beweis, dass der Messpflaster-Durchgang das
+  Bild **nicht** verändert: die Bilder im Repo zeigen den **Produktcode**.
+
+**Datierte Korrektur zum Plan (§4, Schritt 14.6.0).** Der Plan verlangt, `LOBE_CLOSE_PX` in
+`BLOCK14_KONSTANTEN` zu tragen, „damit `--konstante=` es meldet". Die Konstante steht aber
+erst ab **14.6.1** in `graph.js` — dort kommt der Algorithmus. `_konstanten_werte()` liest die
+Werte aus dem **echten** Quelltext (fehlende Konstanten fehlen im Beleg, ohne dass ein Lauf
+still scheitert), und `_konstanten_patch()` sagt **laut** Bescheid, wenn jemand einen Wert
+setzen will, den es noch nicht gibt. Der Widerspruch ist damit **ohne Nebenwirkung** — und
+verschwindet von selbst in 14.6.1.
 
 ## §5 Abnahme — neue Zeile P10.5-72 (und P10.5-70 neu)
 

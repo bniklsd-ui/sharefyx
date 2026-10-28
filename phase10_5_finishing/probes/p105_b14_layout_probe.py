@@ -250,11 +250,25 @@ if KONSTANTEN and not LABEL:
 #: Die **Block-14-Konstanten** (Plan §2) — sie stehen im Beleg, damit der Leser weiss,
 #: mit welchen Werten gemessen wurde. Der Wert kommt aus der **echten** `graph.js` (nach dem
 #: Patch), nicht aus einer Dublette hier.
+#:
+#: **`LOBE_CLOSE_PX` (Plan 14.6 §2.2)** — der Schliess-Radius der Koerpermaske. Die Zeile
+#: steht hier **ab Schritt 14.6.0**, damit `--konstante=LOBE_CLOSE_PX=…` die Messvariante
+#: meldet. `_konstanten_werte()` liest die Werte aus dem **echten** Quelltext: die Konstante
+#: steht erst ab 14.6.1 in `graph.js` (dort kommt der Algorithmus) — bis dahin fehlt sie im
+#: Beleg, ohne dass ein Lauf still scheitert (`_konstanten_patch()` sagt **laut** Bescheid,
+#: wenn jemand einen Wert setzen will, den es noch nicht gibt).
 BLOCK14_KONSTANTEN = [
     "REGION_ITEM_STEP", "REGION_PAD", "REGION_GAP", "ISLAND_FACTOR", "ITEM_STEP",
     "ITEM_JITTER_PX", "GOLDEN_ANGLE", "ANCHOR_GRAVITY", "CROSS_SPRING_FACTOR",
-    "CROSS_SPRING_LENGTH_FACTOR", "ALPHA_START_SEEDED", "FIT_MARGIN",
+    "CROSS_SPRING_LENGTH_FACTOR", "ALPHA_START_SEEDED", "FIT_MARGIN", "LOBE_CLOSE_PX",
 ]
+
+#: **Das Messpflaster** (Schritt 14.6.0): ein Patch, der **keinen Fehler** einbaut, sondern
+#: sichtbar macht, was die Regel tut (Muster: `p105_b8_c2_probe.mjs`, `globalThis.__furrowCells`).
+#: Die Bilder-Probe traegt ihr Pflaster hier ein (`GRAPH_PATCH_EXTRA`) — der Weg ist derselbe
+#: wie bei einem Gegenlauf: der **Arbeitsbaum bleibt unberuehrt**, der Server serviert eine
+#: **Kopie** der statischen Dateien.
+GRAPH_PATCH_EXTRA: dict = {}
 
 
 def _graph_text() -> str:
@@ -528,6 +542,15 @@ def _serve() -> int:
         # Startwert. Auch hier bleibt der Arbeitsbaum unberuehrt.
         env["GRAPH_PATCH"] = json.dumps(_konstanten_patch())
         env["STATIC_DIR"] = str(WEGWERF_ROOT / ("static-%d" % PID))
+    if GRAPH_PATCH_EXTRA:
+        # **Das Messpflaster (Schritt 14.6.0):** es baut **keinen Fehler** ein, es legt nur
+        # die Zahlen offen, die die Karte im Inneren berechnet. Es wird **zusaetzlich** auf
+        # dieselbe Kopie gepatcht (die Anker stehen in verschiedenen Zeilen — der
+        # Gegenlauf-/Varianten-Patch fasst die Konstanten an, das Pflaster den Rumpf).
+        patch = json.loads(env.get("GRAPH_PATCH", "{}"))
+        patch.update(GRAPH_PATCH_EXTRA)
+        env["GRAPH_PATCH"] = json.dumps(patch)
+        env["STATIC_DIR"] = str(WEGWERF_ROOT / ("static-%d" % PID))
 
 
     subprocess.run(
@@ -566,6 +589,29 @@ def _serve() -> int:
     return proc.pid
 
 
+def _lebt(pid: int) -> bool:
+    """Lebt der Prozess **noch**?
+
+    **Ein Zombie zaehlt nicht als lebend.** Der Probe-Prozess raeumt sein Kind nicht ab
+    (`Popen` wird nicht geholt) — nach dem `SIGTERM` bleibt die PID als Zombie stehen, und
+    `os.kill(pid, 0)` sagt weiterhin „lebt". Der Stopp wartete deshalb **zehn Sekunden** auf
+    einen Prozess, den es nicht mehr gab (gemessen 2026-10-28, Schritt 14.6.0) und meldete
+    dann faelschlich „beendete sich nicht — SIGKILL".
+    """
+    try:
+        with open("/proc/%d/stat" % pid, "r", encoding="utf-8") as fh:
+            zustand = fh.read().rsplit(")", 1)[1].split()[0]
+    except FileNotFoundError:
+        return False
+    except OSError:
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return False
+        return True
+    return zustand != "Z"
+
+
 def _stop() -> None:
     """Stopp **nur** ueber die PID-Datei (Hard Rule 9)."""
     if not SERVE_PID.exists():
@@ -575,9 +621,7 @@ def _stop() -> None:
         os.kill(pid, signal.SIGTERM)
         for _ in range(40):
             time.sleep(0.25)
-            try:
-                os.kill(pid, 0)
-            except ProcessLookupError:
+            if not _lebt(pid):
                 return
         print(f"WARNUNG: Wegwerf-Server {pid} beendete sich nicht — SIGKILL.", file=sys.stderr)
         os.kill(pid, signal.SIGKILL)

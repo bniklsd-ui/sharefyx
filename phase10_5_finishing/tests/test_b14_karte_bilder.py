@@ -1,5 +1,20 @@
-"""Der **Beleg** der Kartenbilder-Probe (Schritt 14.5): `p105_b14_karte_bilder.json` steht im
-Repo, die drei Bilder stehen in `docs/screenshots/`.
+"""Der **Beleg** der Kartenbilder-Probe (Schritt 14.5/14.6.0): `p105_b14_karte_bilder.json`
+steht im Repo, die drei Bilder stehen in `docs/screenshots/`.
+
+**Die Zelle `koerper` (Schritt 14.6.0, 2026-10-28).** Der Plan
+`docs/concepts/phase10_5_block14_6_plan.md` will aus den **fünf Inseln** **einen Körper**
+machen. Die Inseln sind **gemessen**: die Körpermaske reicht `LOBE_REACH` = 48 px um jeden
+Knoten, das Layout aus Block 14 stellt die Spaces weit auseinander — die Lappen berühren sich
+nie, es gibt **0** Furche-Zellen, und der Körper besteht aus **5** Komponenten. Das ist der
+**Befund**, an dem die Zelle hängt: **an der Basislinie ist sie rot** (Plan 14.6 §4,
+Schritt 14.6.0: „`koerper` ist **rot** an der Basislinie: **5** Komponenten, **0**
+Furche-Zellen").
+
+**Die Zwei-Durchgänge-Regel.** Die Bilder und der Rand kommen aus dem **ungepatchten**
+Durchgang, die `koerper`-Zahlen und die Zeit aus dem **gepatchten** (ein Messpflaster in einer
+**Kopie** von `graph.js` — kein Haken im Produktcode). Die Bilder im Repo zeigen deshalb
+**Produktcode** — und das ist hier **gemessen**: der Lauf vom 2026-10-28 hat die drei Bilder
+**byteweise identisch** wieder erzeugt (der Messpflaster-Durchgang ändert das Bild nicht).
 
 **Was der Schritt beweist.** Die drei Bilder zeigen **die** Karte, die in
 `p105_b14_layout_probe.json` gemessen wurde (derselbe Saat, dieselbe Wegwerf-Instanz, dieselbe
@@ -40,7 +55,7 @@ BILDER = REPO_ROOT / "docs" / "screenshots"
 GRAPH_JS = REPO_ROOT / "phase5_ui" / "webui" / "static" / "js" / "graph.js"
 
 #: Der **Stand**, den der Beleg traegt.
-STAND = "14.5"
+STAND = "14.6.0"
 
 #: Der **Datensatz** (Plan §5, datierte Abweichung vom 5x30-Seed: `beta` hat 32 Items, damit
 #: „der nicht-größte Space" eindeutig ist) — derselbe wie in der Layout-Probe.
@@ -53,6 +68,17 @@ BILDNAMEN = ("p105_b14_karte_01_ganz.png", "p105_b14_karte_02_fokus.png",
 
 #: Das **Fenster**, in dem die Bilder aufgenommen wurden (das Fenster des Nikingers, 1920 × 1200).
 FENSTER = (1920, 1200)
+
+#: Die **Zahl der Inseln an der Basislinie** (Plan 14.6 §0 und §4, Schritt 14.6.0: „**5**
+#: Komponenten, **0** Furche-Zellen — das ist der gemessene Befund").
+INSELN_BASISLINIE = 5
+FURCHE_BASISLINIE = 0
+
+#: Die **Zeitgrenze** fuer `computeLobes()` (Plan 14.6 §2.5: ≤ 50 ms bei 201 Knoten).
+ZEITGRENZE_MS = 50.0
+
+#: Die **Knoten**, bei denen die Zeitgrenze gilt.
+KNOTEN_FUER_DIE_ZEIT = 201
 
 
 def _fit_margin() -> float:
@@ -76,13 +102,22 @@ def _png_groesse(datei: Path) -> tuple[int, int]:
     return struct.unpack(">II", kopf[16:24])
 
 
-def test_the_beleg_is_the_stand_14_5():
+def test_the_beleg_is_the_stand_14_6_0():
     """**Der Beleg** muss den Schritt, den **Datensatz** und die **Messung** nennen — ohne sie
-    ist „grün" eine Behauptung."""
+    ist „grün" eine Behauptung.
+
+    **[Datierte Änderung 2026-10-28, Schritt 14.6.0]** der Beleg traegt jetzt **zwei** Zellen:
+    `bilder` (die Bilder und der Rand — grün) und `koerper` (der Koerper — **rot an der
+    Basislinie**, Plan 14.6 §4). `alle_kriterien_erfuellt` ist deshalb **false** — und das ist
+    die **Aussage**, nicht ein Fehler: der Koerper ist noch nicht gebaut."""
     beleg = _beleg()
     assert beleg["schritt"] == STAND, f"der Beleg ist Schritt {beleg['schritt']}"
     assert beleg["seitenfehler"] == [], f"der Beleg traegt Seitenfehler: {beleg['seitenfehler']}"
-    assert beleg["alle_kriterien_erfuellt"] is True
+    assert beleg["zellen"]["bilder"] is True, "die Bilder-Zelle ist rot — das darf nicht sein"
+    assert beleg["zellen"]["koerper"] is False, (
+        "die koerper-Zelle ist gruen — die Basislinie ist fuenf Inseln (Plan 14.6 §0)")
+    assert beleg["alle_kriterien_erfuellt"] is False, (
+        "die Gesamtsumme muss false sein, solange die koerper-Zelle rot ist")
     assert beleg["seed"]["spaces"] == 5, "fuenf Spaces (der 5x30-Seed des Plans)"
     assert beleg["seed"]["items"] == SEED_SUMME, "152 Items (30/32/30/30/30 — siehe Plan §5)"
     assert beleg["seed"]["items_pro_space"] == SEED_ITEMS, "die Aufteilung je Space"
@@ -241,4 +276,105 @@ def test_a_beleg_with_a_page_error_would_be_rejected(tmp_path, monkeypatch):
     gefaelscht.write_text(json.dumps(beleg), encoding="utf-8")
     monkeypatch.setattr(sys.modules[__name__], "BELEG", gefaelscht)
     with pytest.raises(AssertionError):
-        test_the_beleg_is_the_stand_14_5()
+        test_the_beleg_is_the_stand_14_6_0()
+
+
+# ============================================================================================
+# Die Zelle `koerper` (Schritt 14.6.0) — die Basislinie: **fuenf Inseln**
+# ============================================================================================
+
+
+def test_the_body_is_five_islands_at_the_baseline():
+    """**Der gemessene Befund** (Plan 14.6 §0): die Karte ist **fuenf Inseln**, keine Furche.
+
+    Der Koerper besteht aus **5** 4-zusammenhaengenden Komponenten (die Spaces beruehren
+    sich nicht), es gibt **0** Furche-Zellen (die Regel hat keinen Gegenstand), und **kein**
+    Paar von Spaces liegt an einer Furche. Genau das ist der Befund, an dem die Zelle haengt —
+    und genau das macht sie **rot**."""
+    koerper = _beleg()["koerper"]
+    abnahme = koerper["abnahme"]
+    assert abnahme["komponenten"] == INSELN_BASISLINIE, (
+        f"der Koerper hat {abnahme['komponenten']} Komponenten — an der Basislinie sind es "
+        f"{INSELN_BASISLINIE} (Plan 14.6 §0)")
+    assert abnahme["furche_zellen"] == FURCHE_BASISLINIE, (
+        f"es gibt {abnahme['furche_zellen']} Furche-Zellen — an der Basislinie gibt es keine")
+    assert abnahme["paare_zahl"] == 0, "an der Basislinie beruehren sich keine zwei Spaces"
+    assert koerper["ok"] is False, "die koerper-Zelle muss an der Basislinie rot sein"
+
+
+def test_every_space_has_one_lobe_at_the_baseline():
+    """Jeder Space hat **genau einen** Lappen (seine Zellen **ohne** Furche) — auch an der
+    Basislinie. Das ist die *andere* Haelfte des Befunds: die Inseln sind **je Space eine**
+    (die Zuordnung stimmt), nur der **Koerper** zerfaellt in fuenf Teile."""
+    abnahme = _beleg()["koerper"]["abnahme"]
+    assert len(abnahme["lappen_je_space"]) == 5, abnahme["lappen_je_space"]
+    assert all(v == 1 for v in abnahme["lappen_je_space"].values()), abnahme["lappen_je_space"]
+
+
+def test_the_compute_lobes_time_is_within_the_limit():
+    """**Die Zeitgrenze** (Plan 14.6 §2.5): `computeLobes()` braucht ≤ 50 ms bei 201 Knoten.
+
+    **Gemessen an der Basislinie:** 20,1 ms bei 152 Knoten und **35,0 ms** bei 201 — die
+    Grenze ist also kein Selbstgeschaetz: der **heutige** Stand liegt bei zwei Dritteln, und
+    das Schliessen kommt **obendrauf** (die Distanztransformation kostet zwei Durchgaenge
+    ueber das Raster)."""
+    koerper = _beleg()["koerper"]
+    zeit = koerper["zeit"]
+    assert zeit["knoten"] == KNOTEN_FUER_DIE_ZEIT, (
+        "die Zeit wurde bei der falschen Knotenzahl gemessen")
+    assert zeit["zeit_ms"] is not None and zeit["zeit_ms"] <= ZEITGRENZE_MS, (
+        f"computeLobes() braucht {zeit['zeit_ms']} ms bei {zeit['knoten']} Knoten — die Grenze "
+        f"ist {ZEITGRENZE_MS} ms")
+    assert koerper["abnahme"]["zeit_ms"] is not None, "die Zeit bei 152 Knoten fehlt"
+
+
+def test_the_grid_and_the_min_distance_are_measured():
+    """Die Zahlen, aus denen sich der **Schliess-Radius** rechnet (Plan 14.6 §3, E1).
+
+    Der kleinste Abstand zweier Knoten verschiedener Spaces ist **gemessen** (183,0 px bei 152
+    Knoten): die gewachsenen Masken ueberlappen erst, wenn `2 · (LOBE_REACH + D) >= d` — bei
+    diesem Abstand also ab `D` = 43,5 px. Ohne diese Zahl waere die Wahl des
+    `LOBE_CLOSE_PX` eine Augenentscheidung."""
+    abnahme = _beleg()["koerper"]["abnahme"]
+    assert abnahme["min_abstand_zwei_spaces_px"] is not None, (
+        "der kleinste Abstand zweier Spaces ist nicht gemessen")
+    assert abnahme["min_abstand_zwei_spaces_px"] > 0
+    assert abnahme["zellgroesse_px"] == 8, "die Rasterzelle ist 8 px (LOBE_CELL_PX)"
+    assert abnahme["raster"]["cols"] > 0 and abnahme["raster"]["rows"] > 0
+
+
+def test_a_beleg_with_a_green_koerper_cell_would_be_rejected(tmp_path, monkeypatch):
+    """Die erste Gegenprobe der koerper-Zelle: ein Beleg, in dem die koerper-Zelle **gruen**
+    ist, muss den Wächter rot machen — an der Basislinie ist sie rot (fuenf Inseln)."""
+    beleg = _beleg()
+    beleg["zellen"]["koerper"] = True
+    beleg["koerper"]["ok"] = True
+    gefaelscht = tmp_path / "p105_b14_karte_bilder.json"
+    gefaelscht.write_text(json.dumps(beleg), encoding="utf-8")
+    monkeypatch.setattr(sys.modules[__name__], "BELEG", gefaelscht)
+    with pytest.raises(AssertionError):
+        test_the_beleg_is_the_stand_14_6_0()
+
+
+def test_a_beleg_with_one_island_would_be_rejected(tmp_path, monkeypatch):
+    """Die zweite Gegenprobe: ein Beleg mit **einer** Komponente (statt fuenf) muss rot
+    machen — sonst waere die Basislinie eine Behauptung."""
+    beleg = _beleg()
+    beleg["koerper"]["abnahme"]["komponenten"] = 1
+    gefaelscht = tmp_path / "p105_b14_karte_bilder.json"
+    gefaelscht.write_text(json.dumps(beleg), encoding="utf-8")
+    monkeypatch.setattr(sys.modules[__name__], "BELEG", gefaelscht)
+    with pytest.raises(AssertionError):
+        test_the_body_is_five_islands_at_the_baseline()
+
+
+def test_a_beleg_with_a_slow_compute_lobes_would_be_rejected(tmp_path, monkeypatch):
+    """Die dritte Gegenprobe: eine `computeLobes()`-Zeit **ueber** der Grenze muss rot
+    machen — der Wächter prueft die **Zahl**, nicht das `ok`-Feld."""
+    beleg = _beleg()
+    beleg["koerper"]["zeit"]["zeit_ms"] = 80.0
+    gefaelscht = tmp_path / "p105_b14_karte_bilder.json"
+    gefaelscht.write_text(json.dumps(beleg), encoding="utf-8")
+    monkeypatch.setattr(sys.modules[__name__], "BELEG", gefaelscht)
+    with pytest.raises(AssertionError):
+        test_the_compute_lobes_time_is_within_the_limit()
