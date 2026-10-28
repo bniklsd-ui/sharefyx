@@ -21,6 +21,58 @@ sucht, findet ihn hier — nicht im Head.
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
 
+## Session stopped — 2026-10-27 (Block 14.4: die Startwerte gemessen)
+
+**Ergebnis.** Schritt **14.4** des Plans: die Startwerte des Kartenlayouts sind **gemessen**, nicht
+gesetzt; der **fehlende Gegenlauf** der Regionen-Zelle ist geschlossen; die Block-8-Proben sind
+grün.
+
+**Die Messung** (`probes/p105_b14_startwerte.py`): der Treiber fährt die Browser-Probe **37 Mal** —
+je Konstante der Startwert und zwei Nachbarn; die Konstante wird in einer **Kopie** der statischen
+Dateien gepatcht (der Arbeitsbaum bleibt unberührt), der Server serviert die Kopie. **Die Regel der
+Wahl:** der Wert bleibt, wenn er die **Stabilität** hält (Median ≤ 2 px **und** Maximum ≤ 3 px)
+**und** die größte **Trennungs-Marge** hat (der kleinste Abstand „eigener Space-Schwerpunkt minus
+nächster fremder" über alle Knoten). **Ergebnis: alle zehn Werte bleiben** — jeder Nachbarwert ist
+schlechter: `ANCHOR_GRAVITY` 0,04 ⇒ Maximum **18,8 px**, 0,08 ⇒ Median **3,2 px** ·
+`CROSS_SPRING_FACTOR` 0,3 ⇒ Median **5,0 px** (0 ⇒ die Welt wächst auf 1334 px) ·
+`CROSS_SPRING_LENGTH_FACTOR` 1 ⇒ Median **16,0 px** · `ALPHA_START_SEEDED` 0,75 ⇒ Median
+**77,0 px** (0,25 ⇒ 1769 ms) · die sechs **Seed**-Konstanten ebenso (`REGION_ITEM_STEP` 30 ⇒
+**26,4 px** · `REGION_PAD` 50 ⇒ **23,8 px** · `REGION_GAP` 0 ⇒ **28,3 px** · `ISLAND_FACTOR` 0,35 ⇒
+**29,2 px** · `ITEM_STEP` 10 ⇒ **34,1 px** · `ITEM_JITTER_PX` 4 ⇒ **47,9 px**). **Der Code ändert
+sich nur im Kommentar** — die Werte tragen jetzt ihre Herleitung (Plan §2.4). Tabelle:
+`probes/p105_b14_startwerte_messung.json`.
+
+**Der Gegenlauf, der P10.5-66 gefehlt hat.** `region` legt **alle Space-Anker auf einen Punkt** ⇒
+`regionen` **92,1 %** (140 von 152; die Trennungs-Marge −99,3 px), `kamera` **56,6 %**,
+`stabilitaet` Median **278,1 px**. Drei Zellen sind eine **echte zweite Folge** (wie `querfeder`,
+14.3): bricht die Zuordnung der Anker, kippt die Karte insgesamt. **Vier Kandidaten sind
+verworfen**, weil sie nur die Stabilität rot machten (ein Space verschoben 100 % · eine Insel
+gespalten 97,4 % · zwei Inseln 98,7 % · zwei Anker 99,3 %): die **Anker-Gravitation je Space**
+repariert eine verschobene Region — der Gegenlauf muss die **Zuordnung** der Anker brechen, nicht
+ihre Lage.
+
+**Ein Fund an der Block-8-Probe — die Zelle `layout` war rot, ohne dass das Merken kaputt war.**
+`p105_b8_karte_probe.py` wartete mit dem **Canvas-Hash** auf die Ruhe; der Hash ist aber **vor dem
+ersten Tick** stabil (die Karte wird zuerst zweimal unverändert gezeichnet — der Befund, den die
+Block-14-Probe schon benannt hat). Die Probe maß damit die **ungepasste Kamera** (Zoom 100 %
+statt des Einpass-Zooms 50 %) und nicht die gemerkte Ablage. Sie wartet jetzt auf dasselbe Signal
+wie die Block-14-Probe — der `requestAnimationFrame` **aus graph.js** hört auf ⇒ Zelle grün
+(13 Kernpixel am Zielpunkt vorher, **11** nachher). **Am Produktcode änderte sich nichts** — die
+Kamera passt sich auch nach dem Neuladen ein (gemessen). **Randnotiz (kein Fehler, gemessen):** der
+normale Aufbaupfad startet die Simulation auch bei einer 0×0-Leinwand (der reduced-motion-Pfad
+wartet seit 8.7 auf die Box) — dann ginge der Einpass verloren; hier tritt der Fall nicht auf.
+
+**Der Code.** `phase5_ui/webui/static/js/graph.js`: **nur Kommentare** (die Herleitung der zehn
+Werte) — **kein** Wert wurde geändert, **kein** Verhalten.
+
+**Abnahme.** **P10.5-66** behält ihr ✅ (der Kriteriumstext ändert sich nicht) — die **Lücke** (ein
+Wächter ohne wirksamen Gegenlauf beweist nichts) ist geschlossen ⇒ **63 ✅ · 0 ⚠️ · 8 ⬜**
+(unverändert). Wächter `tests/test_b14_layout_probe.py` und `tests/test_b14_startwerte.py` grün;
+`p105_b8_karte_probe.py` **alle Zellen grün**, `p105_b8_c2_probe.mjs` grün.
+
+**Nächster Schritt:** **14.5** (die drei Kartenbilder beim Nikinger — `p105_b15_screens.py` ohne die
+16 Radschritte), dann der Closeout von Block 14.
+
 ## Session stopped — 2026-10-27 (Block 14.35: die Beschriftungen ohne Überlappung)
 
 **Ergebnis.** Schritt **14.35** des Plans: die Beschriftungen überlappen sich nicht mehr.

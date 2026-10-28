@@ -269,7 +269,18 @@ const LABEL_OFFSET = 6;       // der Abstand zwischen Knotenrand und Text (px)
 // **Nie ueber 100 %:** eine kleine Karte wird nicht aufgeblasen (Plan §2.5). Der Unterwert ist
 // `ZOOM_MIN` (E3: der Ausfuehrer senkt ihn, wenn 200 Knoten bei 0,5 nicht passen -- der
 // gemessene Wert steht im Bericht zu 14.3).
-const FIT_MARGIN = 40;   // Plan §2.5 (40 px) -- der Rand um den Inhalt; Startwert, gemessen in 14.4
+// Der Rand um den Inhalt -- **56 px, gemessen in 14.5** (Plan §2.5; der Wert 40 px war der
+// Startwert des Plans).
+//
+// **Warum nicht 40 px (gemessen, Schritt 14.5, `probes/p105_b14_karte_bilder.json`):** die
+// Kamera passt den **Umriss der sichtbaren Knoten** ein -- die **Lappen-Kontur** reicht aber
+// bis zu `LOBE_REACH` (48 px) ueber den aeussersten Knoten (das Raster beginnt genau dort).
+// Mit 40 px Rand stand die Kontur auf der **begrenzenden** Achse **3,8 px ueber dem
+// Leinwandrand** (links und rechts; die senkrechte Achse hatte 115 px Luft). 56 px sind die
+// **8 px Luft ueber der theoretischen Grenze** (48 px) und der Wert, den der Plan §2.5 dafuer
+// nennt. **Die Kosten (gemessen):** der Fuellgrad faellt von 93,6 % auf 91,1 %, der Zoom von
+// 92 % auf 90 % -- beides weit ueber der 60-%-Schwelle der Abnahme P10.5-67.
+const FIT_MARGIN = 56;
 
 const COLORS = Object.freeze({
   bg: "#0B0D10",          // wird nicht gezeichnet -- Canvas ist transparent, darunter die .surface

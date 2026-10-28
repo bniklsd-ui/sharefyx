@@ -71,7 +71,10 @@ GRUEN = {"determinismus", "regionen", "kamera", "stabilitaet", "budget", "beschr
 #: **Datierter Stand** — die Basislinie (14.0) war rot in `regionen`, `kamera`, `stabilitaet`
 #: und `beschriftungen`; 14.1 hat nur die Zahlen bewegt; **14.2** hat `regionen` (57,2 % → 82,2 %
 #: → **100 %**) und `stabilitaet` (Median 327,9 px → 233 px → **0,0 px**) gruen gemacht;
-#: **14.3** hat `kamera` gruen gemacht (Füllgrad **93,6 %**, Versatz **32,3 px → 0,42 px**);
+#: **14.3** hat `kamera` gruen gemacht (Füllgrad **93,6 %**, Versatz **32,3 px → 0,42 px** —
+#: **[datierte Änderung 2026-10-28, Schritt 14.5: der Rand ist von 40 auf 56 px gewachsen**
+#: (die Lappen-Kontur stand sonst **3,8 px** über dem Leinwandrand), damit sind es jetzt
+#: **91,1 %** und **0,49 px**);
 #: **14.35** hat `beschriftungen` gruen gemacht (**5** ueberlappende Paare → **0**, **3** von
 #: **13** Beschriftungen weggelassen); **14.4** hat die **Startwerte gemessen** (alle vier
 #: bestätigt) und den **Gegenlauf** `region` gebracht.
@@ -99,7 +102,8 @@ SEED_SUMME = 152
 #: Anker-Gravitation ist **nicht** die Regel, die die Regionen-Zelle misst (sie misst die
 #: **Trennung** der Regionen; die trennen schon die Querfedern). Ihre messbare Wirkung ist die
 #: **Weltgröße**: die Welt ist **779 px** breit statt 1148 px, und der Füllgrad der Kamera
-#: fällt von **93,6 %** auf **68,8 %**. Die Zuordnung im Plan §5 ("`ANCHOR_GRAVITY` →
+#: fällt von **91,1 %** auf **68,8 %** (der Wert 93,6 % galt mit dem Rand von 40 px —
+#: **[datiert 2026-10-28, Schritt 14.5]**). Die Zuordnung im Plan §5 ("`ANCHOR_GRAVITY` →
 #: Leinwandmitte" als Gegenlauf der Abnahme P10.5-66) ist damit **datiert berichtigt**
 #: (Plan §5, 2026-10-26).
 #:
@@ -273,7 +277,10 @@ def test_the_measured_numbers_are_the_ones_the_cells_stand_on():
 
     # Kamera (P10.5-67): der Inhalt fuellt die Leinwand, passt **in** sie und sitzt in der
     # Mitte. **[Datierte Ergänzung 2026-10-26, Schritt 14.3]:** vor `fitView()` sass der
-    # Umriss **32,3 px** neben der Mitte (Zoom 100 %) — jetzt sind es **0,42 px** (Zoom 92 %).
+    # Umriss **32,3 px** neben der Mitte (Zoom 100 %) — jetzt sind es **0,49 px** (Zoom 90 %).
+    # **[Datierte Änderung 2026-10-28, Schritt 14.5]:** mit dem Rand von 56 px (vorher 40 px)
+    # sind es **0,49 px** bei **90 %** Zoom statt **0,42 px** bei **92 %** — der Rand ist
+    # gewachsen, weil die **Lappen-Kontur** mit eingepasst werden muss (Plan §2.5).
     kam = m["kamera"]
     assert kam["passt"] is True, "der Inhalt passt nicht in die Leinwand"
     assert kam["fuellgrad"] >= 0.60, "der Inhalt fuellt die Leinwand nicht"
@@ -362,7 +369,7 @@ def test_the_gegenlauf_zentrum_shows_the_effect_of_the_anchor_gravity():
 
     **[Datierte Ergänzung 2026-10-26, Schritt 14.3]:** seit dem Einpassen der Kamera ist die
     Wirkung an **zwei** Zahlen zu sehen, nicht an einer: die Welt wird **779 px** breit statt
-    1148 px, **und** der Füllgrad sinkt von **93,6 %** auf **68,8 %** (die kleinere Welt passt
+    1148 px, **und** der Füllgrad sinkt von **91,1 %** auf **68,8 %** (die kleinere Welt passt
     auch bei 100 % Zoom nicht mehr ganz in die Leinwand). Vor 14.3 war nur der Füllgrad zu
     sehen (101,2 % → 68,7 %), weil die Kamera nicht einpasste.
 
@@ -370,8 +377,9 @@ def test_the_gegenlauf_zentrum_shows_the_effect_of_the_anchor_gravity():
     P10.5-66) ist damit **datiert berichtigt** (2026-10-26)."""
     normal = _beleg()["messungen"]["kamera"]
     gegen = _gegenlauf_beleg("zentrum")["messungen"]["kamera"]
-    # **Die eingepasste Kamera** fuellt die Leinwand bis auf den Rand von 40 px (Plan §2.5):
-    # `bw / (bw + 2 · FIT_MARGIN)` = 1148 / 1228 = **93,6 %**.
+    # **Die eingepasste Kamera** fuellt die Leinwand bis auf den Rand von **56 px** (Plan §2.5;
+    # **[datiert 2026-10-28, Schritt 14.5]** — vorher 40 px): `bw / (bw + 2 · FIT_MARGIN)` =
+    # 1148 / 1260 = **91,1 %**.
     assert normal["fuellgrad"] > 0.90, "mit der Anker-Gravitation fuellt die Karte die Leinwand"
     assert gegen["fuellgrad"] < normal["fuellgrad"] - 0.2, (
         "mit der Zentrums-Gravitation ist die Welt kleiner (das ist die Wirkung der Regel)")

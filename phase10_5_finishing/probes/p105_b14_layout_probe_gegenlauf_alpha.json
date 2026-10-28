@@ -15,9 +15,9 @@
     "CROSS_SPRING_FACTOR": "0.15",
     "CROSS_SPRING_LENGTH_FACTOR": "3",
     "ALPHA_START_SEEDED": "1",
-    "FIT_MARGIN": "40"
+    "FIT_MARGIN": "56"
   },
-  "zeit": "2026-10-27T19:04:45.775047+00:00",
+  "zeit": "2026-10-28T16:44:30.541028+00:00",
   "seed": {
     "spaces": 5,
     "items": 152,
@@ -186,17 +186,17 @@
         "itm_0000092a"
       ],
       "graph_knoten": 201,
-      "ruhe_ms": 15313,
+      "ruhe_ms": 15329,
       "luecken_ms": [],
       "raf_calls": 920,
       "raf_calls_reduced_motion": 0,
-      "kern_pixel_reduced_motion": 6783,
-      "kern_pixel": 5416,
+      "kern_pixel_reduced_motion": 6390,
+      "kern_pixel": 5095,
       "grenze_ms": 3000,
       "kamera_200_knoten": {
         "messbar": true,
-        "zoom": 0.623844744,
-        "zoom_anzeige": 0.62,
+        "zoom": 0.611950048,
+        "zoom_anzeige": 0.61,
         "leerwand": [
           1134,
           1061.375
@@ -208,21 +208,21 @@
           "y1": 1156
         },
         "bild_mass": [
-          1084.866009816,
-          829.71350952
+          1064.181133472,
+          813.89356384
         ],
-        "fuellgrad": 0.9566719663280424,
+        "fuellgrad": 0.9384313346313934,
         "passt": true,
         "pan": [
-          227.997231288,
-          223.99743295568572
+          234.58720463999998,
+          230.04159664578032
         ],
         "umriss_mitte": [
           542.5,
           491.0
         ],
-        "versatz_mitte_px": 0.5669950919999565,
-        "unsicherheit_px": 0.6718700178229973,
+        "versatz_mitte_px": 0.4298943200000167,
+        "unsicherheit_px": 0.659971718203018,
         "zentriert": true,
         "ok": true
       },

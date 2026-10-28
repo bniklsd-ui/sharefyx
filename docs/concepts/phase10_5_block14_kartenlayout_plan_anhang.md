@@ -1,15 +1,15 @@
 ---
 status: archive
-purpose: L3-Anhang zum Plan des Kartenlayouts (Block 14) — die Abschnitte §0 (der Befund), §3 (die Entscheidungen des Nikingers) und §6 (der Startauftrag), verbatim aus dem Plan verschoben, weil der Plan über dem Softcap stand.
-read-when: wenn zu Block 14 der Befund, die Entscheidungen E1–E4 oder der Startauftrag gebraucht wird — der Plan trägt §1/§2/§4/§5
+purpose: L3-Anhang zum Plan des Kartenlayouts (Block 14) — die Abschnitte §0 (der Befund), §3 (die Entscheidungen des Nikingers), §6 (der Startauftrag) und die **Anmerkungen der Schritte 14.0–14.4**, verbatim aus dem Plan verschoben, weil der Plan über dem Softcap stand.
+read-when: wenn zu Block 14 der Befund, die Entscheidungen E1–E4, der Startauftrag oder die Messnotizen der Schritte 14.0–14.4 gebraucht wird — der Plan trägt §1/§2/§4/§5
 detail: L3
 up: ../../ROADMAP.md
 down:
   - phase10_5_block14_kartenlayout_plan.md   # 📗 der Plan (die Abschnitte, die hier stehen)
   - ../../phase10_5_finishing/CLAUDE.md       # der Phase-Head (Modulstatus Block 14)
-updated: 2026-10-27 (Block 14.4: §0, §3 und §6 aus dem Plan hierher verschoben — der Plan stand bei 40.054 B und damit am Softcap)
+updated: 2026-10-28 (Block 14.5: die **Anmerkungen der Schritte 14.0–14.4** hierher verschoben — der Plan stand bei 42.237 B; der Rand-Fall aus §2.5 ist gemessen: die Lappen-Kontur stand 3,8 px über dem Leinwandrand, `FIT_MARGIN` 40 → 56 px) | 2026-10-27 (Block 14.4: §0, §3 und §6 aus dem Plan hierher verschoben — der Plan stand bei 40.054 B und damit am Softcap)
 ---
-# Anhang zum Kartenlayout-Plan (Block 14) — §0, §3, §6
+# Anhang zum Kartenlayout-Plan (Block 14) — §0, §3, §6 und die Anmerkungen 14.0–14.4
 
 > **Warum dieses Archiv existiert (2026-10-27, Schritt 14.4).** Der Plan
 > `docs/concepts/phase10_5_block14_kartenlayout_plan.md` stand beim Bau von Schritt 14.4 bei
@@ -101,3 +101,144 @@ im selben Commit (Hard Rule 8) · volle Suite grün vor dem Commit.
 
 **Bericht je Schritt:** die Zellen der Probe (JSON), bei 14.4 die Gegenläufe, bei 14.3 die
 E3-Zahl. Rohdaten, keine Bewertung (Memory: Ausführer-Auswertung macht Fleet).
+
+### Die Schritte 14.0 bis 14.4 — die Anmerkungen (abgeschlossen)
+
+> **[2026-10-26, Schritt 14.0 — erledigt]** Die Basislinie steht: `probes/p105_b14_layout_probe.py`
+> und `p105_b14_layout_probe.json` (Wegwerf-Instanz auf TLS, freier Port je Lauf, eigener
+> Datenwurzelbaum und eigene `auth.sqlite3` je Lauf, Stopp nur über die PID-Datei). **Rot** in
+> `regionen` (**57,2 %** statt 95 %), `kamera` (der Umriss sitzt **43,8 px** neben der Mitte),
+> `beschriftungen` (**5** überlappende Paare, die Fokus-Beschriftung ist da) und `stabilitaet`
+> (Median **327,9 px**; das neue Item liegt **164,2 px** von seinem Space entfernt, aber nur
+> **118,4 px** von einem fremden). **Grün** in `determinismus` (**0,0 px** über 152 Knoten) und
+> `budget` (**201** Knoten, **2,53 s** bis Ruhe, **0** Frames bei reduced motion, die Karte ist
+> gemalt). Die Abweichungen vom Plan-Seed und die Mess-Befunde stehen in §0 und §5.
+> **Der Beleg ist byteweise reproduzierbar** (zwei Läufe, dieselbe Datei bis auf den
+> Zeitstempel) — das war erst nach dem Einfrieren von **Server-IDs und Server-Uhr** der Fall
+> (§0, datierte Ergänzung).
+>
+> **[2026-10-26, Schritt 14.1 — erledigt]** L1–L3 sind gebaut: `hashString()` (FNV-1a als Zahl,
+> herausgezogen aus `seedJitter()` — **bitidentisch**: der C2-Wächter misst die Fortsätze der
+> Zellen an genau diesem Hash), `computeRegions()` (**rein, ohne DOM**: eine Region je Space,
+> Ordner-Inseln, Item-Spirale) und der neue `seedInitialPositions()`.
+> **Der Seed wird jetzt ohne Browser gemessen:** der Node-Harness `probes/p105_b14_layout_probe.mjs`
+> lädt das echte Modul (Muster `p105_b8_c2_probe.mjs`) und misst die reine Geometrie —
+> **fünf Zellen grün** (`regionen` **152/152**, `inseln` Faktor **2,78–2,80**, `spiralen`
+> **20/20**, `stabilitaet` **0** Anker verschoben, `determinismus` **0,0 px**) und **fünf
+> Gegenläufe, jeder rot an genau seiner Zelle** (Wächter `tests/test_b14_seed_probe.py`).
+> Die Browser-Probe (das Plan-Instrument) bleibt im Determinismus grün (**0,0 px** über 152
+> Knoten, zwei Läufe byteweise gleich) — und die Zahlen der **roten** Zellen **wandern**:
+> `regionen` von **57,2 %** auf **82,2 %**, das neue Item liegt jetzt **in** der Region seines
+> Space (vorher 118,4 px von einem fremden), die Kamera füllt **78,1 %** (vorher 68,5 %) und der
+> Umriss sitzt **31,4 px** neben der Mitte (vorher 43,8 px). `stabilitaet` bleibt **rot**: die
+> anderen Spaces verschieben sich noch **233 px** — das ist die Zentrums-Gravitation
+> (Schritt 14.2). **Zwei Befunde an den Messungen selbst:** (a) die **Insel-Nachbarschaft ist
+> mit den Startwerten knapp** — zwei Inselzentren liegen nur **66,3 px** auseinander (der
+> Goldwinkel bringt die Inseln 1 und 4 auf 52,5° auseinander) ⇒ die Insel-Zelle misst jetzt die
+> **Gruppenbildung** (Abstand *zwischen* Inseln gegen *innerhalb* einer Insel) statt „das
+> nächste Inselzentrum", das an der Klinge kippte (35,95 px gegen 36,44 px); (b) der
+> **wachsende Space verschiebt seine eigenen Inseln** um **1,1 px** (seine Region wächst mit) —
+> die gewollte Wirkung; die Abnahme zählt ausdrücklich die Knoten **anderer** Spaces.
+>
+> **[2026-10-26, Schritt 14.2 — erledigt]** Die L4 ist gebaut (`phase5_ui/webui/static/js/graph.js`):
+> `CENTER_GRAVITY` und `ALPHA_START` sind **ersetzt** (nicht ergänzt) — jetzt `ANCHOR_GRAVITY =
+> 0.02` (Startwert, in **14.4** gemessen), `CROSS_SPRING_FACTOR = 0.15`,
+> `CROSS_SPRING_LENGTH_FACTOR = 3`, `ALPHA_START_SEEDED = 0.5`; die Anker kommen aus
+> `computeRegions()` (der neue Modulstate `spaceRegions` merkt sie sich beim Seed).
+> **Gemessen an der Wegwerf-Instanz** (Browser-Probe, 5 Spaces, 201 Knoten): `regionen`
+> **152/152 = 100 %** (Basislinie 57,2 %, 14.1: 82,2 %), `stabilitaet` **Median 0,0 px**
+> (max. 2,24 px; Basislinie 327,9 px, 14.1: 233 px), `budget` **201 Knoten in 2147 ms**,
+> **0** Frames bei reduced motion. `kamera` (Füllgrad 101,2 %, Versatz 32,3 px) und
+> `beschriftungen` bleiben **rot** ⇒ **14.3** und **14.35**.
+>
+> **Drei Befunde an der Messung selbst — sie ändern den Plan, nicht nur den Bericht:**
+>
+> 1. **Die Zuordnung der Gegenläufe im Plan §5 war falsch (datierte Korrektur).** Der Plan
+>    nennt für **P10.5-66** den Gegenlauf „`ANCHOR_GRAVITY` → Leinwandmitte". Gemessen:
+>    **keine** Zelle wird rot — die Regionen-Zelle bleibt bei **100 %**. Der Gegenlauf wirkt
+>    auf die **Weltgröße**: der Kamera-Füllgrad fällt von **101,2 %** auf **68,7 %** (und der
+>    Versatz sinkt von 32,3 px auf 11,0 px). Die Anker-Gravitation ist damit **an der
+>    Regionen-Zelle nicht nachweisbar** — der Plan hat die Wirkung der **Zentrums-Gravitation**
+>    (14.1: 82,2 %) mit der Wirkung der **Anker-Gravitation** (100 %) verwechselt. Die
+>    wirksamen Gegenläufe sind: **`querfeder`** ⇒ `stabilitaet` rot (Median 29,2 px) und
+>    **`alpha`** ⇒ `budget` rot (15,3 s) **und** `stabilitaet` rot (Median 91,1 px). Alle drei
+>    Gegenläufe fahren über eine **Kopie** von `phase5_ui/webui/static` — der Arbeitsbaum bleibt
+>    unberührt.
+> 2. **Die Entspannung ist chaotisch — der Node-Harness bleibt Seed-only.** Dieselben Knoten
+>    in einer **anderen Reihenfolge** ergeben am Ende eine **andere** Karte: Median der
+>    Endpositions-Abweichung **56,5 px**, max. **190,2 px**, **86 %** der Knoten weichen um mehr
+>    als 20 px ab. Ursache: die Repulsion sammelt die Kräfte in der Reihenfolge der
+>    Knotenliste; die Rundungsfehler (1e-16) wachsen in der Relaxation zu einem **anderen
+>    Gleichgewicht**. Der **Seed** ist davon **nicht** betroffen (reine Funktion der Daten, ohne
+>    Rundung) — deshalb misst der Node-Harness weiterhin **nur den Seed**. Ein
+>    Node-Harness für die L4 würde eine **andere** Karte messen als der Browser: ein
+>    **Fehlgrün ohne Aussage**.
+> 3. **Ein „frischer" Lauf kann gepinnt sein — die Stabilitäts-Zelle wäre zwangsläufig grün.**
+>    Die Karte merkt ihre Positionen im `localStorage`; lädt die Probe in ein **gefülltes**
+>    `localStorage`, startet die Simulation **gepinnt** und die Stabilitäts-Zelle misst
+>    „nichts bewegt sich" — **grün, ohne dass etwas geprüft wurde**. Die Probe liest jetzt
+>    `pinned_beim_start` **direkt nach dem Reload** und bricht **ab**, wenn die Ablage schon
+>    gefüllt war; der Beleg führt die Prüfsummen **vorher/nachher** mit, und die Zelle ist
+>    nur grün, wenn sie sich **unterscheiden**.
+>
+> **[2026-10-26, Schritt 14.3 — erledigt]** Die Kamera ist gebaut und gemessen
+> (`phase5_ui/webui/static/js/graph.js`): `fitView()`, `FIT_MARGIN = 40`, der Zoom
+> `clamp(min(w/bw, h/bh), ZOOM_MIN, 1)`, der Pan auf die **Mitte des Umrisses**, einmal je
+> Kartenaufbau; hat der Nutzer selbst gezoomt oder verschoben, **gewinnt seine Ansicht**; der
+> **Doppelklick** passt die Kamera ein. **E3: `ZOOM_MIN` bleibt 0,5** (der Einpass-Zoom bei
+> 201 Knoten ist **68,8 %** — der Klemmpunkt greift nicht).
+>
+> **Gemessen an der Wegwerf-Instanz** (5 Spaces, 152 Knoten): Füllgrad **93,6 %** (vorher
+> 101,2 %), **passt**, Versatz **0,42 px** (vorher **32,3 px**), Unsicherheit **0,68 px**.
+> Der Gegenlauf `fitview` macht **genau die** Kamera-Zelle rot und stellt den Stand von 14.2
+> **exakt** wieder her.
+>
+> **Ein Fund an der *anderen* Probe (Block 8 gegen Block 14).** Die C2-Probe (`p105_b8_c2_probe.mjs`,
+> Node) misst die **Zeichenregel** — Lappen, Furche, Bahnen, Zellen, Abdunklung. Ihr **Zeiger**
+> war die Weltposition eines Knotens (der Canvas-Shim rechnet den Zoom/Pan **nicht** um) — mit
+> der eingepassten Kamera trägt er den Knoten nicht mehr, und die Zelle `aktivierung` wäre
+> **grün geblieben, ohne dass der Fehler wiederhergestellt war**. Dieselbe Art von
+> Eingangs-Fixierung wie die festen Positionen (14.2): die Kamera wird auf **100 % / Pan 0**
+> festgenagelt (`fitView()` ist aus). Die **Kamera selbst** misst der Browser-Wächter, nicht
+> dieser.
+
+> **[2026-10-27, Schritt 14.4 — erledigt]** Die Startwerte sind **gemessen**, nicht gesetzt: der
+> Treiber `probes/p105_b14_startwerte.py` fährt die Browser-Probe **37 Mal** (jede der zehn
+> §2-Konstanten: der Startwert und je zwei Nachbarn), patched die Konstante in einer **Kopie**
+> der statischen Dateien (der Arbeitsbaum bleibt unberührt) und legt die Tabelle
+> `probes/p105_b14_startwerte_messung.json` ab. **Die Regel der Wahl:** der Wert bleibt, wenn
+> er die **Stabilität** hält (Median ≤ 2 px **und** Maximum ≤ 3 px) **und** die größte
+> **Trennungs-Marge** hat (der kleinste Abstand „eigener Space-Schwerpunkt minus nächster
+> fremder" über alle Knoten). **Ergebnis: alle zehn Werte bleiben** — jeder Nachbarwert ist
+> schlechter (die Tabelle im Messbericht): `ANCHOR_GRAVITY` 0,04 ⇒ Maximum **18,8 px**, 0,08 ⇒
+> Median **3,2 px** · `CROSS_SPRING_FACTOR` 0,3 ⇒ Median **5,0 px** (0 ⇒ die Welt wächst auf
+> 1334 px) · `CROSS_SPRING_LENGTH_FACTOR` 1 ⇒ Median **16,0 px** · `ALPHA_START_SEEDED` 0,75 ⇒
+> Median **77,0 px** (0,25 ⇒ 1769 ms) · dieselbe Regel bei den sechs **Seed**-Konstanten
+> (`REGION_ITEM_STEP` 30 ⇒ **26,4 px** · `REGION_PAD` 50 ⇒ **23,8 px** · `REGION_GAP` 0 ⇒
+> **28,3 px** · `ISLAND_FACTOR` 0,35 ⇒ **29,2 px** · `ITEM_STEP` 10 ⇒ **34,1 px** ·
+> `ITEM_JITTER_PX` 4 ⇒ **47,9 px**). Der Code ändert sich **nur im Kommentar** — die Werte
+> tragen jetzt ihre Herleitung.
+>
+> **Der fehlende Gegenlauf für die Regionen-Zelle (P10.5-66) ist geschlossen.** `region` legt
+> **alle Space-Anker auf einen Punkt** ⇒ die Regionen-Zelle fällt auf **92,1 %** (140 von 152
+> Knoten; die Trennungs-Marge wird **−99,3 px**), die Kamera-Zelle auf **56,6 %** und die
+> Stabilitäts-Zelle auf **Median 278,1 px**. Er macht damit **drei** Zellen rot — die beiden
+> anderen sind eine **echte, zweite Folge** (wie beim Gegenlauf `querfeder`, 14.3): bricht die
+> Zuordnung der Anker, kippt die Karte insgesamt. **Vier Kandidaten sind verworfen**, weil sie
+> nur die **Stabilität** rot machten (ein Space verschoben: 100 % · eine Insel gespalten: 97,4 % ·
+> zwei Inseln: 98,7 % · zwei Anker: 99,3 %): die **Anker-Gravitation je Space** repariert eine
+> verschobene Region — der Gegenlauf muss die **Zuordnung** der Anker brechen, nicht ihre Lage.
+>
+> **Ein Fund an der *anderen* Probe (Block 8) — die Zelle `layout` war rot, ohne dass das Merken
+> kaputt war.** `p105_b8_karte_probe.py` wartete mit dem **Canvas-Hash** auf die Ruhe; der Hash
+> ist aber **vor dem ersten Tick** stabil (die Karte wird zuerst zweimal unverändert gezeichnet —
+> genau der Befund, den die Block-14-Probe schon benannt hat). Die Probe maß damit die
+> **ungepasste Kamera** (Zoom 100 % statt des Einpass-Zooms 50 %) und nicht die gemerkte Ablage.
+> Sie wartet jetzt auf dasselbe Signal wie die Block-14-Probe — der `requestAnimationFrame` **aus
+> graph.js** hört auf ⇒ Zelle grün (13 Kernpixel am Zielpunkt vorher, **11** nachher).
+> **Am Produktcode änderte sich nichts** — die Kamera passt sich auch nach dem Neuladen ein
+> (gemessen: der Zoom nach dem Neuladen ist der Einpass-Zoom).
+> **Randnotiz (kein Fehler, gemessen):** der normale Aufbaupfad startet die Simulation auch bei
+> einer 0×0-Leinwand (der reduced-motion-Pfad wartet seit 8.7 auf die Box) — dann ginge der
+> Einpass verloren. **Hier tritt der Fall nicht auf** (die Box steht, gemessen), deshalb bleibt
+> der Produktcode unverändert.
