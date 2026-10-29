@@ -241,6 +241,31 @@ const ITEM_STEP = 14;           // gemessen in 14.4 -- der Abstand der Items in 
 const ITEM_JITTER_PX = 8;       // gemessen in 14.4 -- die Amplitude des Item-Jitters
 const GOLDEN_ANGLE = 2.399963229728653;  // 137,50776405003785 Grad in Radiant
 
+// -- P10.5 Block 14.7: kompakt, verteilt, glatt (Plan `docs/concepts/phase10_5_block14_7_plan.md`)
+//
+// Drei Hebel, jeder mit einem **Nullwert, der das Bild von Block 14 byteweise ergibt** (Plan §1):
+//
+// `ANCHOR_LAYOUT` (§2.1) -- die Anker der fremden Spaces: `"spirale"` (Block 14: Goldwinkel,
+//   Abstand `slot·√k` -- der aeusserste Space sitzt doppelt so weit weg wie der innerste, daher
+//   die Buchten) oder `"hex"` (Hexagonalgitter, Ring fuer Ring, Nachbarn genau `slot` auseinander).
+//   Die Plaetze haengen **nur** von ihrem Index ab -- ein neuer Space verschiebt keinen alten.
+// `ANCHOR_HEX_ORDER` -- die Reihenfolge der Plaetze im Ring: `"fortlaufend"` (der Reihe nach)
+//   oder `"gegenueber"` (0, 3, 1, 4, 2, 5 -- abwechselnd gegenueberliegend).
+// `LOBE_SCALE` (§2.2) -- das Gleichgewicht **im** Lappen ×s: Abstossung zwischen Knoten desselben
+//   Space ×s³, Federlaenge im Space ×s, Seed im Lappen (Inseln, Item-Spirale) ×s. Dann ist die
+//   Bahn jedes Knotens die heutige, gestreckt um seinen Anker (selbstaehnlich). Anker und
+//   Querkraefte bleiben -- die Lappen werden groesser im Verhaeltnis zu den Luecken.
+//   **Nicht** gestreckt: der Jitter (`ITEM_JITTER_PX`, 8 px) -- die kleine, benannte Abweichung
+//   von der Selbstaehnlichkeit.
+// `LOBE_SMOOTH_PASSES` (§2.3) -- Durchlaeufe des Binomialfilters (1-2-1) auf der Lappen-Kontur
+//   vor dem Vereinfachen; gegen die 8-px-Treppe.
+const ANCHOR_LAYOUT = "spirale";
+const ANCHOR_HEX_ORDER = "fortlaufend";
+const LOBE_SCALE = 1;
+const LOBE_SMOOTH_PASSES = 0;
+// abgeleitet: die Abstossung im eigenen Space (×s³ -- bei s = 1 exakt REPULSION_STRENGTH)
+const REPULSION_SAME_SPACE = REPULSION_STRENGTH * LOBE_SCALE * LOBE_SCALE * LOBE_SCALE;
+
 // -- P10.5 Block 14, Schritt 14.2: L4 -- die Entspannung ---------------------------------------
 //
 // Die vierte Schicht (Plan §2.4): nach dem Seed zieht jeder Knoten zu **seinem** Space-Anker
@@ -679,6 +704,12 @@ export function computeRegions(nodeList, cx, cy, ownSpace) {
     var spaceName = reihenfolge[k];
     var winkel = k === 0 ? theta0 : theta0 + k * GOLDEN_ANGLE;
     var abstand = k === 0 ? 0 : slot * Math.sqrt(k);
+    if (ANCHOR_LAYOUT === "hex" && k > 0) {
+      // Plan 14.7 §2.1: der k-te Platz des Hexagonalgitters (in Slots), gedreht um `theta0`.
+      var platz = hexPlatz(k, ANCHOR_HEX_ORDER);
+      winkel = theta0 + Math.atan2(platz[1], platz[0]);
+      abstand = slot * Math.sqrt(platz[0] * platz[0] + platz[1] * platz[1]);
+    }
     var ax = cx + Math.cos(winkel) * abstand;
     var ay = cy + Math.sin(winkel) * abstand;
     var space = {
@@ -710,6 +741,7 @@ export function computeRegions(nodeList, cx, cy, ownSpace) {
     for (var j = 0; j < F; j++) {
       var jwinkel = winkel + (j + 1) * GOLDEN_ANGLE;
       var jabstand = space.radius * ISLAND_FACTOR * Math.sqrt((j + 1) / F);
+      jabstand *= LOBE_SCALE;                    // Plan 14.7 §2.2: der Seed im Lappen ×s
       inseln.push({
         name: ordnerNamen[j],
         x: ax + Math.cos(jwinkel) * jabstand,
@@ -727,6 +759,7 @@ export function computeRegions(nodeList, cx, cy, ownSpace) {
         var item = liste[t];
         var iwinkel = insel.angle + t * GOLDEN_ANGLE;
         var irad = ITEM_STEP * Math.sqrt(t);
+        irad *= LOBE_SCALE;                      // Plan 14.7 §2.2
         pos[item.id] = [
           insel.x + Math.cos(iwinkel) * irad + seedJitter(item.id, 1) * ITEM_JITTER_PX,
           insel.y + Math.sin(iwinkel) * irad + seedJitter(item.id, 2) * ITEM_JITTER_PX,
@@ -743,6 +776,29 @@ export function computeRegions(nodeList, cx, cy, ownSpace) {
     }
   }
   return { order: reihenfolge, spaces: spaces, pos: pos };
+}
+
+// Der k-te Platz (k >= 1) des Hexagonalgitters um den Ursprung, in Slots (Plan 14.7 §2.1).
+// Ring r hat 6·r Plaetze; die Ecken liegen bei r·(cos 60°·i, sin 60°·i), dazwischen r − 1
+// Gitterpunkte -- zwei Nachbarn liegen **genau** einen Slot auseinander. Der Platz haengt nur
+// von k ab (nie von der Zahl der Spaces): ein neuer Space verschiebt keinen vorhandenen Anker.
+// **Exportiert** fuer den Node-Waechter (Plan §2.1, H1–H5) -- dieselbe Rolle wie `computeRegions()`.
+export function hexPlatz(k, ordnung) {
+  var r = 1;
+  var vorher = 0;                       // Plaetze in den Ringen innerhalb von r
+  while (k > vorher + 6 * r) { vorher += 6 * r; r += 1; }
+  var i = k - vorher - 1;              // 0 .. 6r − 1 im Ring r
+  if (ordnung === "gegenueber") {
+    // 0, 3r, 1, 3r + 1, ... -- abwechselnd ein Platz und sein Gegenueber
+    i = (i % 2 === 0) ? i / 2 : 3 * r + (i - 1) / 2;
+  }
+  var seite = Math.floor(i / r);
+  var schritt = i - seite * r;
+  var a0 = seite * Math.PI / 3;
+  var a1 = (seite + 1) * Math.PI / 3;
+  var x0 = r * Math.cos(a0), y0 = r * Math.sin(a0);
+  var x1 = r * Math.cos(a1), y1 = r * Math.sin(a1);
+  return [x0 + (x1 - x0) * schritt / r, y0 + (y1 - y0) * schritt / r];
 }
 
 // Die Sortierung **nach Hash**: aufsteigend; bei einem Gleichstand entscheidet der Name --
@@ -942,7 +998,8 @@ function applyForces(alpha) {
       var dy = a.y - b.y;
       var dist2 = dx * dx + dy * dy + 0.01;
       var dist = Math.sqrt(dist2);
-      var force = REPULSION_STRENGTH / dist2;
+      // Plan 14.7 §2.2: im **eigenen** Space ×s³ (bei s = 1 ist das exakt REPULSION_STRENGTH)
+      var force = (a.space === b.space ? REPULSION_SAME_SPACE : REPULSION_STRENGTH) / dist2;
       var fx = (dx / dist) * force;
       var fy = (dy / dist) * force;
       // P10.5 Block 8, Schritt 8.5: ein **festgehaltener** Knoten bewegt sich nicht, aber er
@@ -970,7 +1027,7 @@ function applyForces(alpha) {
     var bb = nodeById[e.dst];
     if (!aa || !bb) continue;
     var quer = aa.space !== bb.space;
-    var laenge = quer ? SPRING_LENGTH * CROSS_SPRING_LENGTH_FACTOR : SPRING_LENGTH;
+    var laenge = quer ? SPRING_LENGTH * CROSS_SPRING_LENGTH_FACTOR : SPRING_LENGTH * LOBE_SCALE;
     var staerke = quer ? SPRING_STRENGTH * CROSS_SPRING_FACTOR : SPRING_STRENGTH;
     var ddx = bb.x - aa.x;
     var ddy = bb.y - aa.y;
@@ -1760,7 +1817,26 @@ function chainEdges(edges) {
   if (!loops.length) return null;
   // Die Konturen sind alle gleich orientiert (die Randkanten sind gleich gerichtet), also
   // fuellt die Non-Zero-Regel ihre Vereinigung -- und jede einzelne wird fuer sich gestrichen.
-  return loops.map(function (l) { return simplifyLoop(l); }).filter(function (l) { return l.length >= 3; });
+  return loops.map(function (l) { return simplifyLoop(smoothLoop(l, LOBE_SMOOTH_PASSES)); })
+    .filter(function (l) { return l.length >= 3; });
+}
+
+// Plan 14.7 §2.3: die Schleife glaetten -- `passes` Durchlaeufe des Binomialfilters
+// p'_i = (p_{i-1} + 2·p_i + p_{i+1}) / 4, geschlossen. Auf der **unvereinfachten** Schleife (jeder
+// Punkt eine Zellecke, gleichmaessiger Abstand) -- sonst wiegen lange gerade Kanten weniger als
+// kurze Stufen. `passes = 0` gibt die Schleife unveraendert zurueck (Block 14).
+function smoothLoop(pts, passes) {
+  var cur = pts;
+  for (var p = 0; p < passes; p++) {
+    var n = cur.length;
+    var next = new Array(n);
+    for (var i = 0; i < n; i++) {
+      var a = cur[(i - 1 + n) % n], b = cur[i], c = cur[(i + 1) % n];
+      next[i] = [(a[0] + 2 * b[0] + c[0]) / 4, (a[1] + 2 * b[1] + c[1]) / 4];
+    }
+    cur = next;
+  }
+  return cur;
 }
 
 // Gerade Kanten zusammenfassen: ein Punkt, der auf der Linie der beiden Nachbarn liegt,

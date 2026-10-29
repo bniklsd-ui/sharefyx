@@ -42,8 +42,13 @@ function grab(name) {
 }
 const reach = Number(/const LOBE_REACH = (\d+)/.exec(src)[1]);
 const cell = Number(/const LOBE_CELL_PX = (\d+)/.exec(src)[1]);
+// [2026-10-29, Plan 14.7.1] `chainEdges()` glaettet vor dem Vereinfachen (`smoothLoop()` mit
+// `LOBE_SMOOTH_PASSES`) — beides kommt **mit** aus dem echten Quelltext, gemessen wird also
+// mit dem eingestellten Glaettungswert.
+const passes = Number(/const LOBE_SMOOTH_PASSES = (\d+)/.exec(src)[1]);
 const trace = new Function(
-  ["traceContour", "chainEdges", "simplifyLoop"].map(grab).join("\n") + "; return traceContour;")();
+  "const LOBE_SMOOTH_PASSES = " + passes + ";\n" +
+  ["traceContour", "chainEdges", "smoothLoop", "simplifyLoop"].map(grab).join("\n") + "; return traceContour;")();
 const min = -reach, cols = Math.ceil(2 * reach / cell), rows = cols, member = {};
 for (let gy = 0; gy < rows; gy++) for (let gx = 0; gx < cols; gx++) {
   const cx = min + gx * cell + cell / 2, cy = min + gy * cell + cell / 2;

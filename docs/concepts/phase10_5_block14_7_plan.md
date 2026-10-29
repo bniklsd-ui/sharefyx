@@ -10,7 +10,7 @@ down:
   - ../../phase5_ui/webui/static/js/graph.js             # `computeRegions()`, `computeLobes()`, `chainEdges()`
   - ../../phase10_5_finishing/probes/p105_b14_karte_bilder.py  # Bilder-Probe (`--konstante`, `--bilder`, Messpflaster)
   - ../../phase10_5_finishing/probes/p105_b14_startwerte.py    # Varianten-Treiber (Muster für das Raster 14.7.2)
-updated: 2026-10-29 (Schritt 14.7.0 (a)+(c): Basislinie der Form gemessen; §2.2 neu gefasst — `LOBE_SCALE`, Nikinger: A) | 2026-10-29 (Schritt 14.7.0 (b): Ursache von B4 gemessen — **Kandidat (ii), Chaos**; STOPP) | 2026-10-29 (Entwurf, Claude Code — nach der Sichtung der 14.6-Bilder; freigegeben im Chat „schreibe den Plan, und setze ihn danach selber um")
+updated: 2026-10-29 (Schritt 14.7.1: die vier Konstanten gebaut, Nullwerte = Block 14 — Layout gleich, Bilder byteweise gleich; H1–H5 grün, H1 korrigiert) | 2026-10-29 (Schritt 14.7.0 (a)+(c): Basislinie der Form gemessen; §2.2 neu gefasst — `LOBE_SCALE`, Nikinger: A) | 2026-10-29 (Schritt 14.7.0 (b): Ursache von B4 gemessen — **Kandidat (ii), Chaos**; STOPP) | 2026-10-29 (Entwurf, Claude Code — nach der Sichtung der 14.6-Bilder; freigegeben im Chat „schreibe den Plan, und setze ihn danach selber um")
 ---
 # P10.5 Block 14.7 — Kompakt und verteilt: aus dem Seestern wird ein Gehirn
 
@@ -79,7 +79,7 @@ Nikinger 2026-10-26) und der größte Umbau.
 
 | # | Eigenschaft | Warum |
 |---|---|---|
-| H1 | Ein **neuer Space** verschiebt **keinen** vorhandenen Anker (sofern `maxR` gleich bleibt) | ein gleichmäßiger Ring (2π/*m*) fiele hier durch |
+| H1 | ~~Ein **neuer Space** verschiebt **keinen** vorhandenen Anker~~ **[2026-10-29, 14.7.1]** Der *k*-te **Platz** hängt nur von *k* ab, nie von der Zahl der Spaces (sofern `maxR` gleich bleibt) — die alte Fassung gilt schon in Block 14 nicht: die Spaces sind nach dem Hash ihres Namens sortiert, ein neuer schiebt sich in die Reihe | ein gleichmäßiger Ring (2π/*m*) fiele hier durch |
 | H2 | Kein Ankerpaar liegt näher als `slot` | Goldwinkel-Schritte auf **einem** Ring fielen durch (zwei Nachbarn 52,5° auseinander) |
 | H3 | Die Anker hängen von den Item-Zahlen **nur über `maxR`** ab | P10.5-68: ein Item im kleineren Space bewegt keinen Anker |
 | H4 | `ANCHOR_LAYOUT = "spirale"` ⇒ die Positionen sind **bitgleich** zu heute | Regressionsprobe |
@@ -164,7 +164,7 @@ Entscheidung und steht hier bewusst **nicht** als Option.
 | Schritt | Inhalt | Fertig, wenn |
 |---|---|---|
 | **14.7.0** ✅ 2026-10-29 (b: STOPP → A) | **Messung zuerst.** (a) Bilder-Probe: neue Zellen `fuelle`, `verteilung`, `kontur_welligkeit`, `kontur_abstand`, `kanten_aussen` (§5) — über das Messpflaster, **kein** Haken im Produktcode. (b) **Ursache von B4:** an `step20` und `insel0.75` (14.4) messen, **welche** Knoten sich bei der Stabilitätsprobe bewegen, wie weit sie **nach der Entspannung** von ihrem Anker liegen (relativ zu `radius`) und ob sie nahe am Nachbar-Space sitzen — Kandidat (i) — oder mitten im eigenen Lappen umspringen — Kandidat (ii). (c) Abnahmezeilen **P10.5-73/74** in den Head (⬜). | Basislinie steht als Zahl im Beleg; (i) oder (ii) aus §0 ist **mit Zahlen** gestützt. Nur (ii) ⇒ **STOPP**, Bericht — `SPREAD` allein löst es dann nicht. |
-| **14.7.1** | Die Hebel `ANCHOR_LAYOUT`/`ANCHOR_HEX_ORDER` (§2.1), `LOBE_SCALE` (§2.2) und `LOBE_SMOOTH_PASSES` (§2.3) bauen, **Defaults = heute**. Node-Tests H1–H5. | Layout-Probe mit Defaults: **alle** Knotenpositionen gleich zu `p105_b14_layout_probe.json`; Bilder **byteweise** gleich zu denen im Repo. H1–H5 grün. |
+| **14.7.1** ✅ 2026-10-29 | Die Hebel `ANCHOR_LAYOUT`/`ANCHOR_HEX_ORDER` (§2.1), `LOBE_SCALE` (§2.2) und `LOBE_SMOOTH_PASSES` (§2.3) bauen, **Defaults = heute**. Node-Tests H1–H5. | Layout-Probe mit Defaults: **alle** Knotenpositionen gleich zu `p105_b14_layout_probe.json`; Bilder **byteweise** gleich zu denen im Repo. H1–H5 grün. |
 | **14.7.2** | **Das Raster:** `ANCHOR_LAYOUT` {`spirale`, `hex`/`fortlaufend`, `hex`/`gegenueber`} × `LOBE_SCALE` {1 · 1,25 · 1,5} = 9 Läufe (dazu die Glättung {0 · 2 · 4 · 6} am Bild des besten Laufs, §3 E2) (Treiber nach dem Muster `p105_b14_startwerte.py`), je Lauf **alle** Layout-Zellen + `koerper` + die neuen Zellen + Reach/Luft + `computeLobes()`-Zeit; Bilder nach `~/p105_b14_7_varianten/<label>/` (**außerhalb** des Repos). | Tabelle; Stabilität zuerst gefiltert. **STOPP — E1.** |
 | **14.7.3** | Den gewählten Wert setzen (Kommentar „gewählt vom Nikinger am <Datum>, gemessen in 14.7.2"). Wächter: Gegenläufe `anker` (`ANCHOR_LAYOUT` → `spirale`) und `spreizung` (`LOBE_SCALE` → 1) machen **genau** `fuelle` bzw. `verteilung` rot. **Die sechs Layout-Gegenläufe neu** (die Knoten haben sich bewegt — anders als in 14.6). | Alle Zellen 65–69, 71, 72 grün mit neuen Zahlen; jeder Gegenlauf rot an genau seiner Zelle. |
 | **14.7.4** | **Glätten** (§2.3, eigenes Tor): `LOBE_SMOOTH_PASSES` {0 · 2 · 4 · 6}, Default 0 = heute. Varianten-Bilder außerhalb des Repos. **STOPP — E2.** Danach Wert setzen + Gegenlauf `glatt` (→ 0 macht `kontur_welligkeit` rot). | `kontur_abstand` > 0, Reach ≤ 52, Zeit ≤ 50 ms; `test_lobe_kontur_geschlossen.py` grün. |
@@ -269,3 +269,21 @@ Bahnen), Beleg `probes/p105_b14_karte_bilder.json` → `form`. Die drei Bilder s
 | `kanten_aussen` | **29,5 %** der Querbahn-Stützpunkte | nur berichtet | — |
 
 **(c)** Die Abnahmezeilen **P10.5-73/74** stehen im Head (⬜).
+
+## Anmerkungen 14.7.1 — die Hebel (2026-10-29, Claude Code)
+
+- **`graph.js`:** `ANCHOR_LAYOUT = "spirale"`, `ANCHOR_HEX_ORDER = "fortlaufend"`, `LOBE_SCALE = 1`,
+  `LOBE_SMOOTH_PASSES = 0`; neu `hexPlatz(k, ordnung)` (exportiert) und `smoothLoop()`. Die Zeilen,
+  an denen die Gegenläufe der Layout-Probe hängen (`var abstand = …`, `var jabstand = …`,
+  `var irad = …`, der Jitter), stehen **wörtlich** wie vorher — skaliert wird in eigenen Folgezeilen.
+- **Der Jitter wird nicht gestreckt** (8 px): er steht in einer Anker-Zeile; die Abweichung von der
+  Selbstähnlichkeit ist klein und benannt.
+- **Regression (Wegwerf-Instanz):** Layout-Probe mit den Nullwerten — alle Messungen **gleich** zum
+  Beleg, Unterschied nur der Zeitstempel; Bilder-Probe — die drei Bilder **byteweise gleich**,
+  `koerper` grün, `computeLobes()` Median 35,3 ms bei 201 Knoten.
+- **H1–H5:** `probes/p105_b14_7_hex_probe.mjs` am echten `computeRegions()`, beide Ordnungen grün;
+  Gegenlauf `ring` macht **H1 und H2** rot (Platzversatz 410 px), H3/H5 bleiben grün. Wächter
+  `tests/test_b14_7_hex.py`.
+- **Datierte Korrektur H1** (oben in §2.1): „ein neuer Space verschiebt keinen Anker" gilt wegen der
+  Hash-Reihenfolge schon bei der Spirale nicht; geprüft wird jetzt, was die Regel verspricht —
+  der Platz *k* ist unabhängig von der Zahl der Spaces.
