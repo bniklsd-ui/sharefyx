@@ -10,7 +10,7 @@ down:
   - ../../phase5_ui/webui/static/js/graph.js             # `computeRegions()`, `computeLobes()`, `chainEdges()`
   - ../../phase10_5_finishing/probes/p105_b14_karte_bilder.py  # Bilder-Probe (`--konstante`, `--bilder`, Messpflaster)
   - ../../phase10_5_finishing/probes/p105_b14_startwerte.py    # Varianten-Treiber (Muster für das Raster 14.7.2)
-updated: 2026-10-29 (Entwurf, Claude Code — nach der Sichtung der 14.6-Bilder; freigegeben im Chat „schreibe den Plan, und setze ihn danach selber um")
+updated: 2026-10-29 (Schritt 14.7.0 (b): Ursache von B4 gemessen — **Kandidat (ii), Chaos**; STOPP) | 2026-10-29 (Entwurf, Claude Code — nach der Sichtung der 14.6-Bilder; freigegeben im Chat „schreibe den Plan, und setze ihn danach selber um")
 ---
 # P10.5 Block 14.7 — Kompakt und verteilt: aus dem Seestern wird ein Gehirn
 
@@ -138,7 +138,7 @@ Entscheidung und steht hier bewusst **nicht** als Option.
 
 | Schritt | Inhalt | Fertig, wenn |
 |---|---|---|
-| **14.7.0** | **Messung zuerst.** (a) Bilder-Probe: neue Zellen `fuelle`, `verteilung`, `kontur_welligkeit`, `kontur_abstand`, `kanten_aussen` (§5) — über das Messpflaster, **kein** Haken im Produktcode. (b) **Ursache von B4:** an `step20` und `insel0.75` (14.4) messen, **welche** Knoten sich bei der Stabilitätsprobe bewegen, wie weit sie **nach der Entspannung** von ihrem Anker liegen (relativ zu `radius`) und ob sie nahe am Nachbar-Space sitzen — Kandidat (i) — oder mitten im eigenen Lappen umspringen — Kandidat (ii). (c) Abnahmezeilen **P10.5-73/74** in den Head (⬜). | Basislinie steht als Zahl im Beleg; (i) oder (ii) aus §0 ist **mit Zahlen** gestützt. Nur (ii) ⇒ **STOPP**, Bericht — `SPREAD` allein löst es dann nicht. |
+| **14.7.0** 🔄 **STOPP (b) 2026-10-29** | **Messung zuerst.** (a) Bilder-Probe: neue Zellen `fuelle`, `verteilung`, `kontur_welligkeit`, `kontur_abstand`, `kanten_aussen` (§5) — über das Messpflaster, **kein** Haken im Produktcode. (b) **Ursache von B4:** an `step20` und `insel0.75` (14.4) messen, **welche** Knoten sich bei der Stabilitätsprobe bewegen, wie weit sie **nach der Entspannung** von ihrem Anker liegen (relativ zu `radius`) und ob sie nahe am Nachbar-Space sitzen — Kandidat (i) — oder mitten im eigenen Lappen umspringen — Kandidat (ii). (c) Abnahmezeilen **P10.5-73/74** in den Head (⬜). | Basislinie steht als Zahl im Beleg; (i) oder (ii) aus §0 ist **mit Zahlen** gestützt. Nur (ii) ⇒ **STOPP**, Bericht — `SPREAD` allein löst es dann nicht. |
 | **14.7.1** | Die Hebel `ANCHOR_LAYOUT`/`ANCHOR_HEX_ORDER` (§2.1) und `SPREAD` (§2.2) bauen, **Defaults = heute**. Node-Tests H1–H5. | Layout-Probe mit Defaults: **alle** Knotenpositionen gleich zu `p105_b14_layout_probe.json`; Bilder **byteweise** gleich zu denen im Repo. H1–H5 grün. |
 | **14.7.2** | **Das Raster:** `ANCHOR_LAYOUT` {`spirale`, `hex`/`fortlaufend`, `hex`/`gegenueber`} × `SPREAD` {1 · 1,25 · 1,5} = 9 Läufe (Treiber nach dem Muster `p105_b14_startwerte.py`), je Lauf **alle** Layout-Zellen + `koerper` + die neuen Zellen + Reach/Luft + `computeLobes()`-Zeit; Bilder nach `~/p105_b14_7_varianten/<label>/` (**außerhalb** des Repos). | Tabelle; Stabilität zuerst gefiltert. **STOPP — E1.** |
 | **14.7.3** | Den gewählten Wert setzen (Kommentar „gewählt vom Nikinger am <Datum>, gemessen in 14.7.2"). Wächter: Gegenläufe `anker` (`ANCHOR_LAYOUT` → `spirale`) und `spreizung` (`SPREAD` → 1) machen **genau** `fuelle` bzw. `verteilung` rot. **Die sechs Layout-Gegenläufe neu** (die Knoten haben sich bewegt — anders als in 14.6). | Alle Zellen 65–69, 71, 72 grün mit neuen Zahlen; jeder Gegenlauf rot an genau seiner Zelle. |
@@ -198,3 +198,31 @@ INDEX-Reserve 3.000 B (`test_register_archive.py`).
 **STOPP-Punkte:** nur Kandidat (ii) gestützt (14.7.0) · E1 (14.7.2) · E2 (14.7.4) · keine Variante hält
 die Stabilität · Reach > 52 px oder Luft ≤ 0 · `computeLobes()` > 50 ms bei 201 Knoten ·
 `kontur_abstand` ≤ 0 bei jedem Glättungswert.
+
+## Anmerkungen 14.7.0 — (b) die Ursache von B4 (2026-10-29, Claude Code)
+
+**Ergebnis: Kandidat (ii).** Die Lappen **wandern nicht** — sie sortieren sich **innen** um.
+Beleg `phase10_5_finishing/probes/p105_b14_7_ursache_b4.json` (Skript daneben), aus drei Läufen
+der Layout-Probe an Wegwerf-Instanzen (einzeln — parallel kollidieren die Läufe im gemeinsamen
+Wegwerf-Ordner `/tmp/opencode/sharefyx-wegwerf-b14/`, alle drei scheiterten mit Timeout).
+
+| Lauf | Median / Max (px) | Knoten > 3 px | Schwerpunkt-Verschiebung je Space (px) | Rest-Median je Space (px) | Radius je Space (px) |
+|---|---|---|---|---|---|
+| Basislinie | 0,0 / 2,2 | 0 von 122 | 0,1–0,2 (epsilon 4,7) | 0,1–0,9 | 100–119 |
+| `ITEM_STEP` 20 | 16,2 / 205,9 | 110 | 1,0–6,2 | 6,6–**67,2** (gamma) | 100–123 |
+| `ISLAND_FACTOR` 0,75 | 72,7 / 287,2 | 120 | 2,6–3,7 | 9,9–**121,4** (gamma) | 109–138 |
+
+- Die größten Springer sitzen **20–105 px** vom eigenen Schwerpunkt und **330–550 px** vom
+  nächsten fremden Knoten — keine Berührung zweier Spaces. ⇒ **(i) ist widerlegt.**
+- Ein Knoten springt bis **2×** den Lappenradius: der Lappen spiegelt/dreht sich **in sich**, ausgelöst
+  von einem Item im **400 px entfernten** Space `epsilon` — das ist Chaos (ii).
+- **Zweiter Befund:** der Radius der Lappen nach der Entspannung ist **fast gleich**, ob `ITEM_STEP`
+  14 oder 20 (100–119 gegen 100–123 px). **Die Dichte bestimmt das Gleichgewicht der Kräfte**
+  (Abstoßung gegen Anker-Gravitation und Federn), **nicht** der Seed. Ein größerer Seed verteilt
+  die Punkte also gar nicht — er legt sie nur **weiter vom Gleichgewicht** weg, die Entspannung
+  hat mehr zu tun und landet in einem anderen Minimum.
+
+**Folge für den Plan:** `SPREAD` in der Form von §2.2 (nur Seed-Abstände) ist **wirkungslos und
+instabil** — gebaut wird er nicht (§4, STOPP). Der Hebel für „mehr verteilt" ist das
+**Gleichgewicht**; ein Vorschlag liegt beim Nikinger (Session-Block im Head). `ANCHOR_LAYOUT` und
+die Glättung sind von diesem Befund **nicht** berührt.

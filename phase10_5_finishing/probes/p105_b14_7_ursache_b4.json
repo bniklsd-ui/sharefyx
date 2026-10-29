@@ -1,0 +1,201 @@
+{
+  "probe": "p105_b14_7_ursache_b4",
+  "schritt": "14.7.0 (b)",
+  "laeufe": {
+    "basis": {
+      "median_verschiebung_px": 0.0,
+      "max_verschiebung_px": 2.2,
+      "knoten_ueber_3px": 0,
+      "knoten_andere_spaces": 122,
+      "je_space": {
+        "alpha": {
+          "schwerpunkt_verschiebung_px": 0.1,
+          "rest_median_px": 0.9,
+          "radius_px": 100.1
+        },
+        "beta": {
+          "schwerpunkt_verschiebung_px": 0.2,
+          "rest_median_px": 0.2,
+          "radius_px": 118.7
+        },
+        "gamma": {
+          "schwerpunkt_verschiebung_px": 0.1,
+          "rest_median_px": 0.1,
+          "radius_px": 106.9
+        },
+        "delta": {
+          "schwerpunkt_verschiebung_px": 0.2,
+          "rest_median_px": 0.9,
+          "radius_px": 105.4
+        },
+        "epsilon": {
+          "schwerpunkt_verschiebung_px": 4.7,
+          "rest_median_px": 9.5,
+          "radius_px": 105.0
+        }
+      },
+      "groesste_springer": [
+        {
+          "verschiebung_px": 2.2,
+          "space": "alpha",
+          "abstand_eigener_schwerpunkt_px": 91.6,
+          "abstand_naechster_fremder_px": 264.3
+        },
+        {
+          "verschiebung_px": 2.2,
+          "space": "delta",
+          "abstand_eigener_schwerpunkt_px": 79.8,
+          "abstand_naechster_fremder_px": 189.9
+        },
+        {
+          "verschiebung_px": 2.2,
+          "space": "delta",
+          "abstand_eigener_schwerpunkt_px": 40.1,
+          "abstand_naechster_fremder_px": 257.3
+        },
+        {
+          "verschiebung_px": 2.0,
+          "space": "alpha",
+          "abstand_eigener_schwerpunkt_px": 31.1,
+          "abstand_naechster_fremder_px": 254.0
+        },
+        {
+          "verschiebung_px": 2.0,
+          "space": "alpha",
+          "abstand_eigener_schwerpunkt_px": 71.0,
+          "abstand_naechster_fremder_px": 277.2
+        }
+      ]
+    },
+    "ITEM_STEP=20": {
+      "median_verschiebung_px": 16.2,
+      "max_verschiebung_px": 205.9,
+      "knoten_ueber_3px": 110,
+      "knoten_andere_spaces": 122,
+      "je_space": {
+        "alpha": {
+          "schwerpunkt_verschiebung_px": 1.0,
+          "rest_median_px": 12.0,
+          "radius_px": 100.0
+        },
+        "beta": {
+          "schwerpunkt_verschiebung_px": 1.2,
+          "rest_median_px": 6.6,
+          "radius_px": 120.4
+        },
+        "gamma": {
+          "schwerpunkt_verschiebung_px": 2.9,
+          "rest_median_px": 67.2,
+          "radius_px": 106.4
+        },
+        "delta": {
+          "schwerpunkt_verschiebung_px": 6.2,
+          "rest_median_px": 19.9,
+          "radius_px": 122.5
+        },
+        "epsilon": {
+          "schwerpunkt_verschiebung_px": 7.0,
+          "rest_median_px": 86.6,
+          "radius_px": 112.3
+        }
+      },
+      "groesste_springer": [
+        {
+          "verschiebung_px": 205.9,
+          "space": "gamma",
+          "abstand_eigener_schwerpunkt_px": 49.8,
+          "abstand_naechster_fremder_px": 469.5
+        },
+        {
+          "verschiebung_px": 204.4,
+          "space": "gamma",
+          "abstand_eigener_schwerpunkt_px": 43.5,
+          "abstand_naechster_fremder_px": 415.0
+        },
+        {
+          "verschiebung_px": 183.8,
+          "space": "gamma",
+          "abstand_eigener_schwerpunkt_px": 19.6,
+          "abstand_naechster_fremder_px": 460.6
+        },
+        {
+          "verschiebung_px": 182.8,
+          "space": "gamma",
+          "abstand_eigener_schwerpunkt_px": 74.1,
+          "abstand_naechster_fremder_px": 410.1
+        },
+        {
+          "verschiebung_px": 129.6,
+          "space": "gamma",
+          "abstand_eigener_schwerpunkt_px": 64.4,
+          "abstand_naechster_fremder_px": 395.7
+        }
+      ]
+    },
+    "ISLAND_FACTOR=0.75": {
+      "median_verschiebung_px": 72.7,
+      "max_verschiebung_px": 287.2,
+      "knoten_ueber_3px": 120,
+      "knoten_andere_spaces": 122,
+      "je_space": {
+        "alpha": {
+          "schwerpunkt_verschiebung_px": 3.1,
+          "rest_median_px": 9.9,
+          "radius_px": 114.1
+        },
+        "beta": {
+          "schwerpunkt_verschiebung_px": 3.6,
+          "rest_median_px": 66.7,
+          "radius_px": 137.8
+        },
+        "gamma": {
+          "schwerpunkt_verschiebung_px": 2.6,
+          "rest_median_px": 121.4,
+          "radius_px": 119.4
+        },
+        "delta": {
+          "schwerpunkt_verschiebung_px": 3.7,
+          "rest_median_px": 80.0,
+          "radius_px": 123.6
+        },
+        "epsilon": {
+          "schwerpunkt_verschiebung_px": 4.7,
+          "rest_median_px": 30.6,
+          "radius_px": 108.9
+        }
+      },
+      "groesste_springer": [
+        {
+          "verschiebung_px": 287.2,
+          "space": "gamma",
+          "abstand_eigener_schwerpunkt_px": 103.8,
+          "abstand_naechster_fremder_px": 493.8
+        },
+        {
+          "verschiebung_px": 276.7,
+          "space": "gamma",
+          "abstand_eigener_schwerpunkt_px": 92.2,
+          "abstand_naechster_fremder_px": 455.3
+        },
+        {
+          "verschiebung_px": 275.1,
+          "space": "gamma",
+          "abstand_eigener_schwerpunkt_px": 94.2,
+          "abstand_naechster_fremder_px": 332.0
+        },
+        {
+          "verschiebung_px": 272.5,
+          "space": "gamma",
+          "abstand_eigener_schwerpunkt_px": 73.7,
+          "abstand_naechster_fremder_px": 474.2
+        },
+        {
+          "verschiebung_px": 262.7,
+          "space": "gamma",
+          "abstand_eigener_schwerpunkt_px": 104.9,
+          "abstand_naechster_fremder_px": 434.0
+        }
+      ]
+    }
+  }
+}
