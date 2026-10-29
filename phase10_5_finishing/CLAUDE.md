@@ -153,6 +153,12 @@ stehen im Commit und im Session-Block.
   zu trennen hat) — er prüft damit die **Zeichenregel**, nicht das Layout; ohne diese Reparatur
   wäre der Gegenlauf „Furche aus“ **grün** geblieben, ohne dass der Fehler wiederhergestellt
   war (`probes/p105_b8_c2_probe.mjs`, datierter Kommentar; `tests/test_graph_c2.py`).
+  **Stand 2026-10-28 (Block 14.6): die Frage ist beantwortet — Option B ist umgesetzt.** Der
+  Körper ist geschlossen (`LOBE_CLOSE_PX = 160`; die sechs Varianten in 14.6.1, der Wert vom
+  Nikinger nach der Standardregel des Plans §3 entschieden), die Karte ist **ein Körper** mit
+  Lappen und Furchen, **kein Knoten** hat seinen Platz gewechselt. **P10.5-72** ist ✅ (der
+  Beleg: `probes/p105_b14_karte_bilder.json`). **Offen bleibt die Sichtung P10.5-70** — die
+  drei Bilder im Repo sind die **neuen** (Schritt 14.6.3).
 - **2026-10-28 (Block 14.5): die Update-Log-Zeile für das neue Kartenlayout** ist **geschrieben**
   (Nachzug 14.5, im Block `## 2026-10-26` — dem Block des Deploys D). **Bleibt beim Deploy:**
   das `deploy.sh`-Gate verlangt, dass die
@@ -185,46 +191,45 @@ stehen im Commit und im Session-Block.
 > Deploys **C** (`v3.1.7`) und **D** (`v3.1.8`, jetzt **mit** den Änderungen aus Block 13) liegen
 > beim Nikinger.
 
-## Session stopped — 2026-10-28 (Block 14.6.3: die Belege neu — P10.5-72 ist geschlossen)
+## Session stopped — 2026-10-28 (Block 14.6.4 — mein Teil: die Übergabe)
 
-**Ergebnis.** Die Belege sind neu gefahren, die drei Bilder im Repo sind ersetzt, und
-**P10.5-72** („die Karte ist ein Körper") ist geschlossen. **Summe: 64 ✅ · 0 ⚠️ · 8 ⬜
-(von 72)** — P10.5-70 (die Sichtung der Bilder) bleibt ⬜.
+**Ergebnis.** Block 14.6 ist **fertig** gebaut und gemessen: die Karte ist **ein Körper**. Was
+noch fehlt, ist **nicht** Arbeit, sondern das Urteil des Nikingers (die Sichtung) und **eine
+Zeile** von Claude Code (der Update-Log).
 
-**Das Layout ist unberührt — gemessen, nicht behauptet.** Die Layout-Probe ist neu gefahren:
-**alle sechs Messungen sind identisch** mit dem Stand vor dem Schließen (Determinismus,
-Regionen, Kamera, Beschriftungen, Stabilität) — **bis auf** die *Tintenpixel* des Budgets:
-**7250 → 7253** (drei Pixel mehr, weil der geschlossene Körper eine winzige Fläche mehr
-malt). Die **Knotenpositionen** sind also **gleich** ⇒ der Schließ-Radius hat **keinen**
-Knoten bewegt ✓ (das ist die Abnahme des Plans §4).
+**Was in Block 14.6 gebaut wurde** (vier Commits, einer je Schritt):
 
-**Die Belege.** `p105_b14_karte_bilder.json` (neu): die `koerper`-Zelle ist **grün** — **1**
-Komponente (6274 Zellen), **1** Lappen je Space, **146** Furche-Zellen, **4** Paare, Reach
-**47,9 / 44,1 / 48,4 / 44,6 px** (Grenze 52), Luft **7,2 / 10,7 / 82,9 / 85,6 px**,
-`computeLobes()` **30,8 ms** (152 Knoten) · **34,6 ms** (201 Knoten, Median aus fünf
-Aufrufen). Die **drei Bilder im Repo** (`docs/screenshots/p105_b14_karte_0{1,2,3}_*.png`) sind
-ersetzt — und **byteweise identisch** mit den Variantenbildern unter
-`~/p105_b14_6_varianten/160/` ✓ (`cmp` sagt: identisch). Die Karten-Probe
-(`p105_b8_karte_probe.py`, Browser): **alle Messungen grün**.
+| Schritt | Commit | Das Ergebnis |
+|---|---|---|
+| 14.6.0 | `beba598` | die **Basislinie**: 5 Komponenten, 0 Furche-Zellen, 35,0 ms bei 201 Knoten — die Zelle `koerper` ist **rot** |
+| 14.6.1 | `dbcd6c9` | der **Algorithmus** (Polster · Wachsen · exakte Distanztransformation · Körper) und **sechs Varianten** (0/80/120/160/200/240) — der kleinste Wert mit **einer** Komponente ist **160** |
+| 14.6.2 | `d836a43` | der **Wert** steht (160, vom Nikinger nach der Standardregel des Plans §3) und der **Wächter** `koerper` beißt (Gegenlauf → 3 Komponenten, nur diese Zelle rot) |
+| 14.6.3 | `b6d067e` | die **Belege** neu, die **Bilder** im Repo ersetzt, **P10.5-72 ✅** (Summe 64 ✅ · 0 ⚠️ · 8 ⬜ von 72) |
 
-**Der Wächter folgt dem Zustand.** `tests/test_b14_karte_bilder.py` prüft jetzt die
-**Kriterien des Plans §5** statt der Zahlen der Basislinie: **ein** Körper, **ein** Lappen je
-Space, Furche-Zellen, mindestens **vier** Paare. Die Gegenproben sind **umgedreht** — an der
-Basislinie (14.6.0) musste ein *grüner* Beleg abgelehnt werden, jetzt muss ein *roter*
-abgelehnt werden — und **zwei neue** kamen dazu: **drei** Komponenten und **null**
-Furche-Zellen müssen rot machen. **19** Tests.
+**Der Kern in einem Satz:** `computeLobes()` verschließt die Körpermaske (`LOBE_CLOSE_PX =
+160`), die **Lücken zwischen den fünf Inseln füllen sich**, die Furchen entstehen von selbst
+(die Zellen zwischen zwei Lappen verschiedener Spaces), und **kein einziger Knoten** rückt
+seinen Platz — die Knotenpositionen der Layout-Probe sind **byteweise gleich** geblieben.
 
-**Der Plan §5 der Phase** (nicht dieses Plans) trug „**64 Zeilen**" — er steht jetzt auf
-„**72 Zeilen**" (Block 13: +3, Block 14.0: +7, Block 14.6.3: +1), und der Wächter
-`tests/test_head_rules.py` prüft die Zahl gegen Head **und** Archiv ✓.
+**Was jetzt beim Nikinger liegt:**
+1. **Die Sichtung P10.5-70** — die drei Bilder im Repo (`docs/screenshots/p105_b14_karte_0{1,2,3}_*.png`)
+   sind **neu** (Schritt 14.6.3; byteweise identisch mit den Variantenbildern unter
+   `~/p105_b14_6_varianten/160/`). Das Urteil: „zufällig, aber geordnet" — und jetzt **ein
+   Körper** statt fünf Inseln.
+2. **Deploy D** (`v4.0.0`) — die Kartenänderung fährt mit.
 
-**Ein Rechenfehler, den der Wächter sofort gefangen hat:** die Summe stand nach dem
-Hinzufügen der Zeile auf „64 ✅ · 0 ⚠️ · **7** ⬜" — richtig sind **8** (P10.5-70 bleibt
-offen). Der Wächter `test_the_acceptance_sum_matches_the_table` wurde rot ✓.
+**Was Claude Code macht:** die **Update-Log-Zeile** (`docs/UPDATE_LOG.md`, Z. 19) sagt heute
+„Die Verknüpfungskarte ordnet jeden Space als **eigene Insel** an" — das stimmt nicht mehr. Der
+Block-14-Eintrag (Zeile 19, im Abschnitt `## 2026-10-26`) braucht **eine** Zeile, und der
+Deploy-Gate verlangt, dass die **oberste** `##`-Überschrift das **Deploy-Datum** trägt (sie
+trägt heute `## 2026-10-26`).
+
+**Eine Grenze, die ich nicht überschritten habe:** `docs/UPDATE_LOG.md` ist **nicht** meins
+(Plan §6: „Nicht: `docs/UPDATE_LOG.md` (14.6.4, Claude Code)") — deshalb steht hier nur, was
+dort geändert werden muss, statt dass ich es geändert hätte.
 
 **Tests.** Suite **1644** grün (Phase 231), `doc_health` 0, `ui_budget` 6/6.
 
-**Abnahme.** **64 ✅ · 0 ⚠️ · 8 ⬜** (von 72).
+**Abnahme.** **64 ✅ · 0 ⚠️ · 8 ⬜** (von 72). P10.5-72 ✅.
 
-**Nächster Schritt:** 14.6.4 — **Claude Code**: die Update-Log-Zeile anpassen (sie sagt heute
-„eigene Insel") und die Sichtung **P10.5-70** beim Nikinger (die drei neuen Bilder).
+**Nächster Schritt:** die Sichtung P10.5-70 beim Nikinger; danach Deploy D.
