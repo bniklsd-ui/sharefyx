@@ -1,13 +1,13 @@
 ---
 status: live
-purpose: Die drei wiederverwendeten Workflow-Prompts (Claude Code Session-Start, Phasen-Kickoff im Browser, Phasen-Abschluss) — angepasst an dieses Projekt
+purpose: Die vier wiederverwendeten Workflow-Prompts (Claude Code Session-Start, Phasen-Kickoff im Browser, Phasen-Abschluss, Ultra-Review) — angepasst an dieses Projekt
 read-when: Start einer Claude-Code-Session, Start eines neuen Phasen-Chats, Abschluss einer Phase
 detail: L2
 up: ../CLAUDE.md
 down:
   - DOC_LAYERS_CONVENTION.md   # Navigationsregeln, auf die Prompt 1 verweist
   - ../ROADMAP.md              # Phasenübersicht
-updated: 2026-10-20 (Notiz unter Prompt 2: P9-Transkript bereinigt, P10-Kickoff lief als Prompt 1 — der Block ist die einzige Vorlage) | 2026-10-16 (Korrektur unter Prompt 2: der Phasen-Kickoff läuft seit spätestens P9 in Claude Code; Beleg und die drei Abweichungen des P9-Wortlauts) | 2026-08-09
+updated: 2026-10-29 (Prompt 4 neu: Ultra-Review vor v4.0.0) | 2026-10-20 (Notiz unter Prompt 2: P9-Transkript bereinigt, P10-Kickoff lief als Prompt 1 — der Block ist die einzige Vorlage) | 2026-10-16 (Korrektur unter Prompt 2: der Phasen-Kickoff läuft seit spätestens P9 in Claude Code; Beleg und die drei Abweichungen des P9-Wortlauts) | 2026-08-09
 ---
 # Workflow-Prompts
 
@@ -244,6 +244,93 @@ Nenne offene [VERIFY]-Marker der abgeschlossenen Phase explizit — aufgelöste 
 
 Besondere Notiz:
 xxx
+```
+
+---
+
+## Prompt 4 — Ultra-Review (vollständiges Software-Review, vor einem Major-Release)
+
+> **[2026-10-29, Nikinger-Auftrag]** Vorlage für einen Review-Agenten (z. B. `/code-review ultra`
+> — das startet der Nikinger selbst, ein Agent kann es nicht auslösen). Geschrieben vor dem
+> Launch von v4.0.0. Der Prompt fragt ab, woran erfahrene Entwickler bei einem **vollständigen**
+> Review denken — nicht nur an den letzten Diff.
+
+```
+Du reviewst das Repository „Sharefyx" vollständig — einen geteilten Kontext-Space-Server
+(Markdown + YAML-Frontmatter auf einer Heim-VM, Remote-MCP-Server, Web-UI, OAuth, Tailscale-
+Tunnel). Release-Kandidat: v4.0.0. Ziel: Fehler finden, bevor Nutzer sie finden.
+
+Lies zuerst CLAUDE.md (Kernprinzip „der Server ist dumm", neun Hard Rules) und docs/INDEX.md.
+Code ist die Quelle der Wahrheit; widerspricht ein Dokument dem Code, ist das ein Befund.
+
+Prüfe in dieser Reihenfolge — jede Kategorie ausdrücklich, auch wenn du nichts findest:
+
+1. KORREKTHEIT
+   - Logikfehler, Grenzfälle (leer, eins, sehr viele, Unicode, sehr lange Titel, Zeitzonen,
+     Mitternacht/UTC), Off-by-one, Gleitkomma-Vergleiche, falsche Annahmen über Sortierung.
+   - Fehlerpfade: wird jeder Fehler behandelt, geloggt (stderr) und richtig gemeldet?
+     Werden Ausnahmen verschluckt? Bleibt nach einem Fehler ein halber Zustand zurück?
+
+2. DATENINTEGRITÄT UND NEBENLÄUFIGKEIT (Hard Rules 2, 3, 5)
+   - Trägt jeder Schreibpfad die gelesene `version`? Gibt es irgendwo Last-Write-Wins?
+   - Atomare Writes (tmp + os.replace + fsync auf das Verzeichnis), Git-Commit je Write.
+   - Zwei Clients gleichzeitig im selben Space: Rennen zwischen Lesen, Prüfen, Schreiben?
+   - Lässt sich der SQLite-Index jederzeit aus den Dateien neu bauen? Driftet er?
+   - Umbenennen von Ordnern/Spaces, Verschieben zwischen Spaces: bleibt alles konsistent,
+     auch bei Abbruch mittendrin?
+
+3. SICHERHEIT
+   - AuthN/AuthZ: Token → Space, Mitgliedschaft, `.share.yml`, `share_write` (Hard Rule 4).
+     Kann ein Principal fremde Spaces schreiben oder lesen, die er nicht darf? IDOR?
+   - OAuth/DCR, PKCE, Redirect-URIs, TOTP (Offset, Wiederverwendung), Recovery-Codes,
+     Sitzungen, CSRF, Cookie-Flags, Rate-Limits, Brute Force.
+   - Eingaben: Pfad-Traversal in Space-/Ordner-/Dateinamen, YAML-Injection im Frontmatter,
+     Markdown/HTML-Sanitizer (XSS), CSP, Upload (Typ, Größe, EXIF).
+   - Prompt-Injection: wird jeder fremde Body in `<untrusted_content>` gewrappt — überall?
+   - Secrets: irgendwo Tokens/Keys in Dateien, Logs, Fehlermeldungen, Tests (Hard Rule 1)?
+   - Abhängigkeiten: bekannte CVEs, ungepinnte Versionen, vendored Dateien mit Prüfsumme?
+
+4. API- UND PROTOKOLLVERTRÄGE
+   - MCP: Werkzeug-Schemas, Fehlerformate, Protokollversionen (alte und neue Clients),
+     Paginierung, Grenzwerte. REST: Statuscodes, Idempotenz, Fehlerkörper.
+   - Rückwärtskompatibilität zu v3.x: Datenformat, gespeicherte Layouts, Update-Log-IDs.
+
+5. PERFORMANCE UND RESSOURCEN
+   - O(n²)-Stellen (z. B. Kraftsimulation, Lappenraster), N+1-Abfragen, ungebremstes
+     Wachstum (Logs, Index, Git-Repo, localStorage), Speicherlecks im Browser (Listener,
+     requestAnimationFrame-Schleifen), Zeitgrenzen nah am Limit.
+
+6. FRONTEND
+   - Zustände: Laden, leer, Fehler, Konflikt, Sitzung abgelaufen, offline.
+   - Barrierefreiheit (Tastatur, Fokus, Kontrast, Screenreader-Beschriftungen),
+     reduced motion, verschiedene Fenstergrößen.
+
+7. BETRIEB
+   - Deploy, Rollback, Health-Gate, systemd-Units, Backups und deren Wiederherstellung,
+     Verhalten nach Neustart/Reboot, Tunnel-Ausfall, volle Platte, gesperrter Keyring.
+   - Logging: brauchbar zur Fehlersuche, ohne Secrets oder fremde Inhalte zu leaken.
+
+8. TESTS
+   - Prüfen die Tests das, was sie behaupten? Gibt es zu jedem Wächter einen Gegenlauf,
+     der ihn rot macht? Was ist ungetestet? Laufen Tests ohne Netz und ohne echte Daten?
+
+9. ARCHITEKTUR UND WARTBARKEIT
+   - Verletzt irgendetwas das Kernprinzip (LLM-Calls, „Verstehen" von Inhalten im Server)?
+   - Toter Code, Dubletten, Konstanten mehrfach definiert, Kopplungen über Modulgrenzen.
+
+10. DOKUMENTATION
+   - Stimmen README, Setup-Anleitung, Update-Log und Phasen-Doku mit dem Code überein?
+
+Regeln:
+- Nur lesen und an einer Wegwerf-Instanz prüfen (eigener Port, tmp-DATA_ROOT, tmp-
+  auth.sqlite3). Niemals den laufenden Dienst, den echten DATA_ROOT, den Keyring oder den
+  Tunnel anfassen. Niemals `pkill -f`. Nichts committen.
+- Jeder Befund braucht: Datei:Zeile, Schweregrad (kritisch / hoch / mittel / niedrig),
+  ein konkretes Fehlerszenario (Eingabe → falsches Ergebnis) und den Grad der Gewissheit
+  (reproduziert / am Code belegt / vermutet). Vermutungen als solche kennzeichnen.
+- Keine Stilfragen ohne Folgen. Lieber zehn belegte Befunde als fünfzig vage.
+- Am Ende: eine Tabelle aller Befunde nach Schweregrad, dann die Kategorien, in denen
+  du nichts gefunden hast, mit einem Satz, was du geprüft hast.
 ```
 
 ---
