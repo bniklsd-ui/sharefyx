@@ -259,10 +259,15 @@ const GOLDEN_ANGLE = 2.399963229728653;  // 137,50776405003785 Grad in Radiant
 //   von der Selbstaehnlichkeit.
 // `LOBE_SMOOTH_PASSES` (§2.3) -- Durchlaeufe des Binomialfilters (1-2-1) auf der Lappen-Kontur
 //   vor dem Vereinfachen; gegen die 8-px-Treppe.
-const ANCHOR_LAYOUT = "spirale";
-const ANCHOR_HEX_ORDER = "fortlaufend";
-const LOBE_SCALE = 1;
-const LOBE_SMOOTH_PASSES = 0;
+// **Gewaehlt vom Nikinger am 2026-10-29 (E1 + E2), gemessen in 14.7.2** (`probes/p105_b14_7_raster.json`,
+// Variante `hexg_s1.5_glatt2`): Soliditaet 0,830 (vorher 0,497), Punktabstand 36,0 px (25,1),
+// Zusatzkruemmung 1,86 rad/100 px (11,10). Die Stabilitaet haelt die Abnahmezeile P10.5-68
+// (Median 1,0 px); das strenge Maximum aus Plan §3 (<= 3 px) nicht (9,1 px) -- vom Nikinger mit
+// dem Bild abgenommen. Die Nullwerte (Block 14) waren "spirale" / 1 / 0.
+const ANCHOR_LAYOUT = "hex";
+const ANCHOR_HEX_ORDER = "gegenueber";
+const LOBE_SCALE = 1.5;
+const LOBE_SMOOTH_PASSES = 2;
 // abgeleitet: die Abstossung im eigenen Space (×s³ -- bei s = 1 exakt REPULSION_STRENGTH)
 const REPULSION_SAME_SPACE = REPULSION_STRENGTH * LOBE_SCALE * LOBE_SCALE * LOBE_SCALE;
 

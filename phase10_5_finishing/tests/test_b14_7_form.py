@@ -101,3 +101,30 @@ def test_a_beleg_without_form_would_be_rejected():
     with pytest.raises(AssertionError):
         pruefe_form(beleg)
 
+
+
+#: **Die Gegenläufe der Form** (Plan 14.7 §5, Schritt 14.7.3, 2026-10-29) — je ein Hebel auf
+#: seinen Nullwert, gemessen mit der Bilder-Probe (`--konstante=`). **Gemessen:** `anker` und
+#: `glatt` machen **genau** ihre Zelle rot; `spreizung` macht `verteilung` **und** `fuelle` rot
+#: (ohne Streckung füllen die Lappen ihr Gitter nicht — Solidität 0,731); festgehalten wie
+#: gemessen, nicht geschönt.
+FORM_GEGENLAEUFE = {
+    "anker": {"fuelle"},
+    "spreizung": {"verteilung", "fuelle"},
+    "glatt": {"kontur_welligkeit"},
+}
+
+
+@pytest.mark.parametrize("name,rot", sorted(FORM_GEGENLAEUFE.items()))
+def test_each_form_gegenlauf_turns_exactly_its_cells_red(name, rot):
+    datei = BELEG.with_name("p105_b14_karte_bilder_konstante_gegenlauf_%s.json" % name)
+    beleg = json.loads(datei.read_text(encoding="utf-8"))
+    pruefe_form(beleg)
+    gemessen = {k for k, v in beleg["form"]["zellen"].items() if not v}
+    assert gemessen == rot, f"Gegenlauf {name}: rot {sorted(gemessen)}, erwartet {sorted(rot)}"
+
+
+def test_the_chosen_state_turns_the_form_green():
+    """Seit 14.7.3 (gewählt vom Nikinger am 2026-10-29) sind P10.5-73 und P10.5-74 grün."""
+    form = _beleg()["form"]
+    assert form["p10_5_73"] is True and form["p10_5_74"] is True, form["zellen"]

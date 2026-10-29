@@ -2,42 +2,42 @@
   "gegenlauf": null,
   "messungen": {
     "lappen": {
-      "lappen_pixel": 284,
-      "kern_pixel": 1207,
+      "lappen_pixel": 153364,
+      "kern_pixel": 1347,
       "ok": true
     },
     "filter": {
       "treffer_text": "10 Treffer",
-      "kern_ohne_suche": 1207,
-      "kern_mit_suche": 73,
-      "gedimmt_mit_suche": 1053,
+      "kern_ohne_suche": 1347,
+      "kern_mit_suche": 56,
+      "gedimmt_mit_suche": 1430,
       "filter_typ": "task",
-      "kern_mit_filter": 383,
+      "kern_mit_filter": 396,
       "ok": true
     },
     "layout": {
       "quelle_px": [
-        412,
-        559
+        335,
+        311
       ],
       "ziel_px": [
         24,
         24
       ],
-      "kerne": 1207,
+      "kerne": 1347,
       "abstand": 13,
       "ablage_geaendert": true,
       "eintraege": 200,
-      "pixel_vorher": 13,
-      "pixel_nachher": 11,
-      "bild_vorher": 3945794100,
-      "bild_nachher": 747972528,
+      "pixel_vorher": 8,
+      "pixel_nachher": 8,
+      "bild_vorher": 721736896,
+      "bild_nachher": 4243368940,
       "bild_gleich": false,
       "ok": true
     },
     "reducedmotion": {
       "raf_calls": 0,
-      "kern_pixel": 1207,
+      "kern_pixel": 1347,
       "ok": true
     }
   },

@@ -205,9 +205,18 @@ def test_the_camera_gives_the_margin_it_promises():
     knoten_raender = [raender["knoten_links"], raender["knoten_rechts"],
                       raender["knoten_oben"], raender["knoten_unten"]]
     engster = min(knoten_raender)
-    assert abs(engster - margin * zoom) < 1.5, (
-        f"der kleinste Knoten-Rand ist {engster:.2f} px, erwartet {margin * zoom:.2f} px "
-        f"({margin} px Rand bei Zoom {zoom:.4f})")
+    # **[Datierte Änderung 2026-10-29, Plan 14.7.3]** die kompakte Karte ist **kleiner** als
+    # die Leinwand — `fitView()` deckelt den Zoom bei **100 %** (Plan Block 14 §2.5: „nie über
+    # 100 %"), der Rand ist dann **größer** als `FIT_MARGIN` (gemessen 123,5 px). Gleich muss er
+    # nur sein, wenn der Zoom **unter** 100 % liegt (der Inhalt begrenzt die Kamera).
+    if zoom < 0.999:
+        assert abs(engster - margin * zoom) < 1.5, (
+            f"der kleinste Knoten-Rand ist {engster:.2f} px, erwartet {margin * zoom:.2f} px "
+            f"({margin} px Rand bei Zoom {zoom:.4f})")
+    else:
+        assert engster >= margin - 1.5, (
+            f"der kleinste Knoten-Rand ist {engster:.2f} px — bei Zoom 100 % muss er "
+            f"mindestens {margin} px sein")
     # **Der Lappen-Rand** muss **kleiner** sein als der Knoten-Rand (die Kontur reicht ueber
     # die Knoten hinaus) — **und positiv** (sie liegt innen).
     lappen_raender = [raender["lappen_links"], raender["lappen_rechts"],

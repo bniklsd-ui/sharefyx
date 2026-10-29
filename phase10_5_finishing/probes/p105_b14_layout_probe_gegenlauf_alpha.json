@@ -15,9 +15,14 @@
     "CROSS_SPRING_FACTOR": "0.15",
     "CROSS_SPRING_LENGTH_FACTOR": "3",
     "ALPHA_START_SEEDED": "1",
-    "FIT_MARGIN": "56"
+    "FIT_MARGIN": "56",
+    "LOBE_CLOSE_PX": "160",
+    "ANCHOR_LAYOUT": "\"hex\"",
+    "ANCHOR_HEX_ORDER": "\"gegenueber\"",
+    "LOBE_SCALE": "1.5",
+    "LOBE_SMOOTH_PASSES": "2"
   },
-  "zeit": "2026-10-28T16:44:30.541028+00:00",
+  "zeit": "2026-10-29T19:20:28.767378+00:00",
   "seed": {
     "spaces": 5,
     "items": 152,
@@ -40,69 +45,85 @@
     },
     "regionen": {
       "knoten": 152,
-      "richtig": 152,
-      "anteil": 1.0,
+      "richtig": 149,
+      "anteil": 0.9802631578947368,
       "schwerpunkte": {
         "alpha": [
-          671.1333333333333,
-          507.3666666666667
+          607.1,
+          538.5666666666667
         ],
         "beta": [
-          738.25,
-          826.3125
+          708.03125,
+          220.90625
         ],
         "gamma": [
-          199.1,
-          518.7666666666667
+          260.2,
+          410.46666666666664
         ],
         "delta": [
-          536.1,
-          175.5
+          378.6666666666667,
+          805.2
         ],
         "epsilon": [
-          978.8333333333334,
-          162.66666666666666
+          887.1333333333333,
+          681.8
         ]
       },
-      "beispiele_falsch": [],
-      "marge_min_px": 117.82709245330516,
-      "marge_median_px": 297.86107559829657,
-      "abstand_eigen_median_px": 79.41959595856822,
-      "abstand_fremd_min_px": 232.95232378375195,
-      "engster_abstand_px": 22.20360331117452,
+      "beispiele_falsch": [
+        {
+          "id": "itm_00000085",
+          "space": "epsilon",
+          "naechster": "alpha"
+        },
+        {
+          "id": "itm_00000011",
+          "space": "alpha",
+          "naechster": "epsilon"
+        },
+        {
+          "id": "itm_0000001c",
+          "space": "alpha",
+          "naechster": "gamma"
+        }
+      ],
+      "marge_min_px": -40.6592469911383,
+      "marge_median_px": 214.17956799720923,
+      "abstand_eigen_median_px": 130.16995727808236,
+      "abstand_fremd_min_px": 136.9547289354324,
+      "engster_abstand_px": 27.85677655436824,
       "ueberlappende_paare": 0,
       "ok": true
     },
     "kamera": {
       "messbar": true,
-      "zoom": 1,
+      "zoom": 1.00059984,
       "zoom_anzeige": 1,
       "leerwand": [
         1134,
         1061.375
       ],
       "welt": {
-        "x0": 89,
-        "x1": 1099,
-        "y0": 48,
-        "y1": 935
+        "x0": 78,
+        "x1": 1010,
+        "y0": 44,
+        "y1": 975
       },
       "bild_mass": [
-        1010,
-        887
+        932.55905088,
+        931.55845104
       ],
-      "fuellgrad": 0.890652557319224,
+      "fuellgrad": 0.8776902141467436,
       "passt": true,
       "pan": [
-        -27.100000000000023,
-        38.95134043987176
+        22.043895838558456,
+        20.497554083746763
       ],
       "umriss_mitte": [
-        594.0,
-        491.5
+        544.0,
+        509.5
       ],
-      "versatz_mitte_px": 0.23615956012827155,
-      "unsicherheit_px": 0.643547337555221,
+      "versatz_mitte_px": 0.6297912014415488,
+      "unsicherheit_px": 0.6592020021272443,
       "zentriert": true,
       "ok": true
     },
@@ -112,49 +133,59 @@
       "fokus_titel": "Gamma Plan 01",
       "nachbarn": 12,
       "kandidaten": 13,
-      "gezeichnet": 10,
-      "unterdrueckt": 3,
+      "gezeichnet": 12,
+      "unterdrueckt": 1,
       "texte": [
         "Gamma Plan 01",
         "Beta Plan 01",
         "Delta Plan 01",
+        "Gamma Tabelle 06",
         "Beta Plan 31",
         "Gamma Frage 04",
         "Gamma Antwort 05",
         "Gamma Idee 03",
         "Gamma Skizze 07",
         "Gamma Frage 24",
-        "Gamma Notiz 02"
+        "Gamma Notiz 02",
+        "Gamma Protokoll 08"
       ],
       "ueberlappungen": [],
       "fokus_beschriftung": true,
-      "fokus_pixel": 61,
+      "fokus_pixel": 27,
       "genug_gezeichnet": true,
-      "zoom": 1,
+      "zoom": 1.00059984,
       "pan": [
-        -27.100000000000023,
-        38.95134043987176
+        22.043895838558456,
+        20.497554083746763
       ],
-      "unsicherheit_px": 0.643547337555221,
-      "treffer": 37,
+      "unsicherheit_px": 0.6592020021272443,
+      "treffer": 55,
+      "zoomszene": {
+        "zoom_anzeige": "121%",
+        "zoom": 1.21,
+        "gezeichnet": 128,
+        "ueberlappungen": [],
+        "ueberlappende_paare": 0,
+        "ok": true
+      },
       "ok": true
     },
     "stabilitaet": {
       "wachser_space": "epsilon",
       "neues_item": "itm_00000901",
       "position_neu": [
-        1257,
-        22
+        659,
+        935
       ],
-      "naechster_schwerpunkt": "epsilon",
-      "in_eigener_region": true,
-      "abstand_eigener_space_px": 200.8606482116395,
-      "abstand_fremder_space_px": 611.6804721421144,
+      "naechster_schwerpunkt": "delta",
+      "in_eigener_region": false,
+      "abstand_eigener_space_px": 165.12419568312816,
+      "abstand_fremder_space_px": 140.03570973148243,
       "andere_spaces": 122,
-      "median_verschiebung_px": 91.0823802938856,
-      "max_verschiebung_px": 273.2068813189009,
-      "pruefsumme_vorher": 3746329127,
-      "pruefsumme_nachher": 2166166178,
+      "median_verschiebung_px": 162.68988905276197,
+      "max_verschiebung_px": 363.79252328765637,
+      "pruefsumme_vorher": 843792255,
+      "pruefsumme_nachher": 3591849148,
       "pinned_beim_start": 0,
       "knoten_frisch": 153,
       "kasten_frisch": {
@@ -167,14 +198,14 @@
         "dpr": 1
       },
       "position_neu_frisch": [
-        1267,
-        13
+        1182,
+        400
       ],
       "ok": false
     },
     "budget": {
       "knoten": 201,
-      "pos_pruefsumme": 825026058,
+      "pos_pruefsumme": 3214978258,
       "graph_reihenfolge": [
         "itm_00000931",
         "itm_00000930",
@@ -186,43 +217,43 @@
         "itm_0000092a"
       ],
       "graph_knoten": 201,
-      "ruhe_ms": 15329,
+      "ruhe_ms": 15313,
       "luecken_ms": [],
       "raf_calls": 920,
       "raf_calls_reduced_motion": 0,
-      "kern_pixel_reduced_motion": 6390,
-      "kern_pixel": 5095,
+      "kern_pixel_reduced_motion": 11573,
+      "kern_pixel": 7119,
       "grenze_ms": 3000,
       "kamera_200_knoten": {
         "messbar": true,
-        "zoom": 0.611950048,
-        "zoom_anzeige": 0.61,
+        "zoom": 0.6748382846688,
+        "zoom_anzeige": 0.68,
         "leerwand": [
           1134,
           1061.375
         ],
         "welt": {
-          "x0": -327,
-          "x1": 1412,
-          "y0": -174,
-          "y1": 1156
+          "x0": -225,
+          "x1": 1339,
+          "y0": -216,
+          "y1": 1244
         },
         "bild_mass": [
-          1064.181133472,
-          813.89356384
+          1055.4470772220031,
+          985.263895616448
         ],
-        "fuellgrad": 0.9384313346313934,
+        "fuellgrad": 0.9307293449929481,
         "passt": true,
         "pan": [
-          234.58720463999998,
-          230.04159664578032
+          190.49510131339264,
+          183.51051982346993
         ],
         "umriss_mitte": [
-          542.5,
-          491.0
+          557.0,
+          514.0
         ],
-        "versatz_mitte_px": 0.4298943200000167,
-        "unsicherheit_px": 0.659971718203018,
+        "versatz_mitte_px": 0.6199741260857081,
+        "unsicherheit_px": 0.7097511654965795,
         "zentriert": true,
         "ok": true
       },

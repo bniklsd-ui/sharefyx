@@ -1,7 +1,7 @@
 {
   "probe": "p105_b14_karte_bilder",
   "schritt": "14.6.0",
-  "zeit": "2026-10-29T12:52:53.004573+00:00",
+  "zeit": "2026-10-29T19:23:13.788984+00:00",
   "seed": {
     "spaces": 5,
     "items": 152,
@@ -27,94 +27,98 @@
     "CROSS_SPRING_LENGTH_FACTOR": "3",
     "ALPHA_START_SEEDED": "0.5",
     "FIT_MARGIN": "56",
-    "LOBE_CLOSE_PX": "160"
+    "LOBE_CLOSE_PX": "160",
+    "ANCHOR_LAYOUT": "\"hex\"",
+    "ANCHOR_HEX_ORDER": "\"gegenueber\"",
+    "LOBE_SCALE": "1.5",
+    "LOBE_SMOOTH_PASSES": "2"
   },
   "leinwand": {
     "breite": 1134,
     "hoehe": 1061.375,
     "dpr": 1,
-    "zoom": 0.9000900387763977,
+    "zoom": 1.0,
     "pan": [
-      57.51492691040039,
-      82.34423828125
+      -12.50882625579834,
+      -15.893980979919434
     ],
-    "zoom_anzeige": 0.9
+    "zoom_anzeige": 1
   },
   "knoten": {
     "anzahl": 152,
     "welt": {
-      "x0": -8,
-      "y0": 49,
-      "x1": 1140,
-      "y1": 948
+      "x0": 136,
+      "y0": 147,
+      "x1": 1023,
+      "y1": 946
     },
     "bild": {
-      "x0": 50.31420660018921,
-      "y0": 126.44865018129349,
-      "x1": 1083.6175711154938,
-      "y1": 935.629595041275
+      "x0": 123.49117374420166,
+      "y0": 131.10601902008057,
+      "x1": 1010.4911737442017,
+      "y1": 930.1060190200806
     }
   },
   "lappen": {
     "anzahl": 5,
     "bild": {
-      "x0": 7.200718167317206,
-      "y0": 82.90286831994558,
-      "x1": 1123.3123662500504,
-      "y1": 975.7921867861321
+      "x0": 75.96744239038091,
+      "y0": 83.08672599815813,
+      "x1": 1059.8424423903807,
+      "y1": 978.961725998158
     },
     "welt": {
-      "x0": -55.89908406439142,
-      "y0": 0.6206379524597303,
-      "x1": 1184.1009159356088,
-      "y1": 992.6206379524597
+      "x0": 88.47626864617925,
+      "y0": 98.98070697807756,
+      "x1": 1072.351268646179,
+      "y1": 994.8557069780775
     },
     "reach_welt_px": {
-      "links": 47.89908406439142,
-      "rechts": 44.10091593560878,
-      "oben": 48.37936204754027,
-      "unten": 44.620637952459674
+      "links": 47.52373135382075,
+      "rechts": 49.35126864617905,
+      "oben": 48.01929302192244,
+      "unten": 48.85570697807748
     },
     "je_lappe": [
       {
-        "x0": 374.43745398808744,
-        "y0": 385.3331213488152,
-        "x1": 763.2763507394912,
-        "y1": 730.9676962389519,
+        "x0": 379.96744239038094,
+        "y0": 284.51610099815815,
+        "x1": 762.5924423903808,
+        "y1": 729.711725998158,
         "stil": "#4a93f0",
-        "punkte": 2479
+        "punkte": 3487
       },
       {
-        "x0": 640.8641054659012,
-        "y0": 666.1612134470513,
-        "x1": 928.8929178743484,
-        "y1": 975.7921867861321,
+        "x0": 469.396817390381,
+        "y0": 83.08672599815813,
+        "x1": 955.9674423903809,
+        "y1": 419.08672599815816,
         "stil": "#2eb8a6",
-        "punkte": 2311
+        "punkte": 2983
       },
       {
-        "x0": 7.200718167317206,
-        "y0": 421.3367228998711,
-        "x1": 374.43745398808744,
-        "y1": 651.7597728266289,
+        "x0": 75.96744239038091,
+        "y0": 267.08672599815816,
+        "x1": 456.753067390381,
+        "y1": 625.6573509981581,
         "stil": "#2eb8a6",
-        "punkte": 2185
+        "punkte": 3004
       },
       {
-        "x0": 424.8424961595657,
-        "y0": 118.90646987100149,
-        "x1": 777.6777913599136,
-        "y1": 421.3367228998711,
+        "x0": 139.9674423903809,
+        "y0": 550.0867259981582,
+        "x1": 576.9674423903809,
+        "y1": 978.961725998158,
         "stil": "#2eb8a6",
-        "punkte": 2227
+        "punkte": 3256
       },
       {
-        "x0": 763.2763507394912,
-        "y0": 82.90286831994558,
-        "x1": 1123.3123662500504,
-        "y1": 320.5266385569146,
+        "x0": 661.396817390381,
+        "y0": 395.08672599815816,
+        "x1": 1059.8424423903807,
+        "y1": 811.0867259981582,
         "stil": "#2eb8a6",
-        "punkte": 1975
+        "punkte": 3214
       }
     ],
     "filter_eindeutig": true,
@@ -123,14 +127,14 @@
     "mit_breite": 5
   },
   "raender": {
-    "knoten_links": 50.31420660018921,
-    "knoten_rechts": 50.382428884506226,
-    "knoten_oben": 126.44865018129349,
-    "knoten_unten": 125.74540495872498,
-    "lappen_links": 7.200718167317206,
-    "lappen_rechts": 10.687633749949555,
-    "lappen_oben": 82.90286831994558,
-    "lappen_unten": 85.5828132138679
+    "knoten_links": 123.49117374420166,
+    "knoten_rechts": 123.50882625579834,
+    "knoten_oben": 131.10601902008057,
+    "knoten_unten": 131.26898097991943,
+    "lappen_links": 75.96744239038091,
+    "lappen_rechts": 74.15755760961929,
+    "lappen_oben": 83.08672599815813,
+    "lappen_unten": 82.41327400184196
   },
   "beschnitt": {
     "links": 0.0,
@@ -142,21 +146,21 @@
   "fokus": {
     "id": "itm_0000003f",
     "nachbarn": 12,
-    "x": 169.1260917186737,
-    "y": 548.590878367424
+    "x": 259.49117374420166,
+    "y": 420.10601902008057
   },
   "bilder": [
     {
       "datei": "p105_b14_karte_01_ganz.png",
-      "bytes": 395739
+      "bytes": 530973
     },
     {
       "datei": "p105_b14_karte_02_fokus.png",
-      "bytes": 405692
+      "bytes": 545668
     },
     {
       "datei": "p105_b14_karte_03_seite.png",
-      "bytes": 500507
+      "bytes": 636819
     }
   ],
   "seitenfehler": [],
@@ -165,113 +169,118 @@
     "ok": true,
     "grund": "alle Kriterien erfuellt",
     "abnahme": {
-      "zeit_ms": 27.099999964237213,
-      "zeit_ms_erster": 40.5,
+      "zeit_ms": 26.30000001192093,
+      "zeit_ms_erster": 37.30000001192093,
       "zeit_messungen": [
-        40.5,
-        173.39999997615814,
-        22.100000023841858,
-        27.099999964237213,
-        17.100000023841858
+        37.30000001192093,
+        135.19999998807907,
+        21.80000001192093,
+        26.30000001192093,
+        23.399999976158142
       ],
       "komponenten": 1,
       "komponenten_groessen": [
-        6274
+        8677
       ],
       "lappen_je_space": {
-        "epsilon": 1,
-        "delta": 1,
-        "alpha": 1,
+        "beta": 1,
         "gamma": 1,
-        "beta": 1
+        "alpha": 1,
+        "epsilon": 1,
+        "delta": 1
       },
       "zellen_je_space": {
-        "epsilon": 1105,
-        "delta": 1456,
-        "alpha": 1540,
-        "gamma": 961,
-        "beta": 1212
+        "beta": 1715,
+        "gamma": 1523,
+        "alpha": 1863,
+        "epsilon": 1742,
+        "delta": 1834
       },
-      "koerper_zellen": 6274,
-      "furche_zellen": 146,
+      "koerper_zellen": 8677,
+      "furche_zellen": 387,
       "paare": {
-        "delta|epsilon": 24,
-        "alpha|delta": 76,
-        "alpha|gamma": 10,
-        "alpha|beta": 36
+        "beta|gamma": 4,
+        "alpha|gamma": 71,
+        "alpha|beta": 81,
+        "beta|epsilon": 46,
+        "alpha|epsilon": 76,
+        "delta|gamma": 52,
+        "alpha|delta": 63
       },
-      "paare_zahl": 4,
+      "paare_zahl": 7,
       "zellgroesse_px": 8,
       "raster": {
-        "cols": 198,
-        "rows": 167,
+        "cols": 165,
+        "rows": 154,
         "cell": 8,
-        "minX": -223.89908406439142,
-        "minY": -167.37936204754027
+        "minX": -79.52373135382075,
+        "minY": -69.01929302192244
       },
       "knoten": 152,
-      "min_abstand_zwei_spaces_px": 183.04
+      "min_abstand_zwei_spaces_px": 69.95
     },
     "zeit": {
-      "zeit_ms": 32.39999997615814,
-      "zeit_ms_erster": 40.5,
+      "zeit_ms": 39.90000003576279,
+      "zeit_ms_erster": 49,
       "zeit_messungen": [
-        40.5,
-        38.40000003576279,
-        32.39999997615814,
-        22.19999998807907,
-        31
+        49,
+        260.0999999642372,
+        39.90000003576279,
+        38.09999996423721,
+        23
       ],
       "komponenten": 1,
       "komponenten_groessen": [
-        8456
+        14279
       ],
       "lappen_je_space": {
+        "beta": 1,
+        "gamma": 2,
         "epsilon": 1,
-        "delta": 1,
-        "alpha": 1,
-        "gamma": 1,
-        "beta": 1
+        "alpha": 2,
+        "delta": 1
       },
       "zellen_je_space": {
-        "epsilon": 1505,
-        "delta": 1788,
-        "alpha": 1816,
-        "gamma": 1646,
-        "beta": 1701
+        "beta": 3181,
+        "gamma": 2584,
+        "epsilon": 2940,
+        "alpha": 2383,
+        "delta": 3191
       },
-      "koerper_zellen": 8456,
-      "furche_zellen": 199,
+      "koerper_zellen": 14279,
+      "furche_zellen": 699,
       "paare": {
-        "delta|epsilon": 22,
-        "alpha|delta": 78,
-        "delta|gamma": 21,
-        "alpha|gamma": 26,
-        "alpha|beta": 54
+        "beta|gamma": 16,
+        "beta|epsilon": 70,
+        "alpha|beta": 91,
+        "alpha|gamma": 117,
+        "alpha|epsilon": 144,
+        "delta|gamma": 140,
+        "alpha|delta": 131
       },
-      "paare_zahl": 5,
-      "zellgroesse_px": 9.926471913046479,
+      "paare_zahl": 7,
+      "zellgroesse_px": 8.75480745654731,
       "raster": {
         "cols": 200,
-        "rows": 165,
-        "cell": 9.926471913046479,
-        "minX": -460.7891128068653,
-        "minY": -366.3798624247945
+        "rows": 188,
+        "cell": 8.75480745654731,
+        "minX": -310.14014182703403,
+        "minY": -283.4072971577874
       },
       "knoten": 201,
-      "min_abstand_zwei_spaces_px": 150.7
+      "min_abstand_zwei_spaces_px": 30.34
     },
     "reach_welt_px": {
-      "links": 47.89908406439142,
-      "rechts": 44.10091593560878,
-      "oben": 48.37936204754027,
-      "unten": 44.620637952459674
+      "links": 47.52373135382075,
+      "rechts": 49.35126864617905,
+      "oben": 48.01929302192244,
+      "unten": 48.85570697807748
     },
     "luft_px": {
-      "links": 7.200718167317206,
-      "rechts": 10.687633749949555,
-      "oben": 82.90286831994558,
-      "unten": 85.5828132138679
+      "links": 75.96744239038091,
+      "rechts": 74.15755760961929,
+      "oben": 83.08672599815813,
+      "unten": 82.41327400184196
     },
     "zeitgrenze_ms": 50
   },
@@ -281,35 +290,35 @@
   },
   "form": {
     "fuelle": {
-      "koerper_zellen": 6274,
-      "huelle_zellen": 12624,
-      "soliditaet": 0.497
+      "koerper_zellen": 8677,
+      "huelle_zellen": 10451,
+      "soliditaet": 0.8303
     },
     "verteilung": {
-      "nn_median_px": 25.1,
+      "nn_median_px": 35.95,
       "nn_median_je_space_px": {
-        "alpha": 25.18,
-        "beta": 24.72,
-        "delta": 25.1,
-        "epsilon": 26.49,
-        "gamma": 24.02
+        "alpha": 37.54,
+        "beta": 33.51,
+        "delta": 41.55,
+        "epsilon": 36.5,
+        "gamma": 35.18
       }
     },
     "welligkeit": {
-      "zusatzkruemmung_rad_je_100px": 11.096,
+      "zusatzkruemmung_rad_je_100px": 1.858,
       "schleifen": 5,
-      "umfang_px": 7248.0
+      "umfang_px": 6590.7
     },
     "kontur_abstand": {
-      "min_px": 8.0,
+      "min_px": 11.31,
       "paar": [
         "alpha",
-        "delta"
+        "gamma"
       ],
       "hinweis": null
     },
     "kanten_aussen": {
-      "anteil": 0.2949,
+      "anteil": 0.0492,
       "stuetzpunkte": 651
     },
     "schwellen": {
@@ -320,12 +329,12 @@
       "welligkeit_basis": 11.096
     },
     "zellen": {
-      "fuelle": false,
-      "verteilung": false,
-      "kontur_welligkeit": false,
+      "fuelle": true,
+      "verteilung": true,
+      "kontur_welligkeit": true,
       "kontur_abstand": true
     },
-    "p10_5_73": false,
-    "p10_5_74": false
+    "p10_5_73": true,
+    "p10_5_74": true
   }
 }

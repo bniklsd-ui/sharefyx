@@ -68,6 +68,10 @@ const GEGENLAEUFE = {
   anker: [
     ["    var abstand = k === 0 ? 0 : slot * Math.sqrt(k);",
      "    var abstand = 0;"],
+    // [2026-10-29, Plan 14.7.3] seit `ANCHOR_LAYOUT = "hex"` setzt der Hex-Zweig den Abstand
+    // neu -- der Gegenlauf muss ihn **auch dort** auf 0 legen, sonst prueft er nichts.
+    ["      abstand = slot * Math.sqrt(platz[0] * platz[0] + platz[1] * platz[1]);",
+     "      abstand = 0;"],
   ],
   // Alle Ordner-Inseln liegen auf dem Anker: die Ordner fallen uebereinander.
   inselabstand: [

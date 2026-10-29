@@ -144,13 +144,26 @@ SEED_SUMME = 152
 #: Space bekommt den Anker des eigenen ⇒ die Zelle bleibt bei **100 %** grün (der Cluster liegt
 #: **205 px** daneben); verschiebt man nur die Ordner-Inseln, bleiben **97,4 %** bzw. **98,7 %**
 #: grün. **Erst wenn kein Space einen eigenen Anker hat, bleiben die Items ineinander.**
+#:
+#: **[Datierte Änderung 2026-10-29, Plan 14.7.3 — die Karte ist kompakt (Hexgitter, `LOBE_SCALE`
+#: 1,5, vom Nikinger abgenommen)]** Die Spaces liegen jetzt **dicht**; jede Störung, die sie
+#: zusammenschiebt, kippt die Regionen-Zelle, und die Stabilität ist empfindlicher (Max 9,1 px).
+#: Gemessen: `querfeder` → `regionen` + `stabilitaet` (die Kamera bleibt grün, 63,9 %);
+#: `zentrum` → `regionen` (93,4 %) + `stabilitaet` — der Gegenlauf, der vorher **keine** Zelle
+#: umdrehte, trifft jetzt die Zelle, die der Plan §5 ihm ursprünglich zugedacht hatte.
+#: **`region` und `beschriftung` sind neu gebaut** (Nikinger: Befund B (b), „der ehrlichere
+#: Test"): der alte `region` sprengte die Karte (±7000 px — Regionen trivial getrennt, Zelle
+#: grün), der alte `beschriftung` fand im verteilten Bild keine Überlappung (13 von 13
+#: gezeichnet). Der neue `region` vergibt die Regionen per Index-Permutation statt nach Space
+#: (57,9 %); `beschriftung` wird in der **Zoomszene** gemessen (Zoom 1,21 — 57 Paare
+#: überlappen ohne die Regel, 0 mit ihr; 40 von 152 weggelassen).
 GEGENLAEUFE = {
-    "querfeder": ("stabilitaet", "kamera"),
+    "querfeder": ("regionen", "stabilitaet"),
     "alpha": ("budget", "stabilitaet"),
-    "zentrum": (),
+    "zentrum": ("regionen", "stabilitaet"),
     "fitview": ("kamera",),
     "beschriftung": ("beschriftungen",),
-    "region": ("regionen", "kamera", "stabilitaet"),
+    "region": ("regionen", "stabilitaet"),
 }
 
 
@@ -245,8 +258,12 @@ def test_the_measured_numbers_are_the_ones_the_cells_stand_on():
     # sich schon fast berühren — und die Wahl der Startwerte (§2.1) stünde auf keinem
     # Boden. Der Gegenlauf `region` dreht sie ins Negative (das ist der Beweis, dass sie
     # misst).
-    assert reg["marge_min_px"] > 100.0, (
-        "die Regionen haben zu wenig Spielraum — ein neues Item koennte sie kippen")
+    # **[Datierte Änderung 2026-10-29, Plan 14.7.3 — Befund A, vom Nikinger akzeptiert]**
+    # vorher `> 100 px` (Block 14: 171,8 px). Die kompakte Karte legt die Lappen aneinander,
+    # die Marge ist **21,8 px** — der Tausch Marge gegen Kompaktheit ist abgenommen; der
+    # Wächter verlangt jetzt nur noch eine **positive** Marge (die Regionen sind getrennt).
+    assert reg["marge_min_px"] > 0.0, (
+        "die Regionen sind nicht mehr getrennt — ein Knoten liegt naeher am fremden Space")
     assert reg["marge_median_px"] > reg["marge_min_px"], "die Marge ist nicht monoton"
     # **Die Dichte** (Schritt 14.4): die Items liegen **dicht, aber nicht uebereinander**
     # (Plan §2.3) — der kleinste Abstand zwischen zwei Knoten und die Zahl der Paare, deren
@@ -261,7 +278,11 @@ def test_the_measured_numbers_are_the_ones_the_cells_stand_on():
     # Median von **327,9 px**, der Stand 14.1 noch **233 px** — jetzt **0,0 px** (max. 2,24 px).
     stab = m["stabilitaet"]
     assert stab["median_verschiebung_px"] <= 2.0
-    assert stab["max_verschiebung_px"] <= 3.0
+    # **[Datierte Änderung 2026-10-29, Plan 14.7.3 — E1, vom Nikinger mit dem Bild
+    # abgenommen]** vorher `<= 3,0` (Block 14: 2,2 px); die kompakte Karte misst **9,1 px**.
+    # Die Abnahmezeile P10.5-68 verlangt nur den Median; die Obergrenze hier hält den
+    # abgenommenen Stand fest, damit eine weitere Verschlechterung auffällt.
+    assert stab["max_verschiebung_px"] <= 10.0
     assert stab["in_eigener_region"] is True, "das neue Item gehoert in die Region seines Space"
     assert stab["andere_spaces"] == 122, "122 Knoten der vier anderen Spaces wurden verglichen"
     # **Die beiden Karten muessen verschieden sein** — sonst vergleicht die Zelle eine Karte
@@ -317,7 +338,16 @@ def test_the_measured_numbers_are_the_ones_the_cells_stand_on():
     assert bes["gezeichnet"] >= 2, "es sind genug Beschriftungen gezeichnet worden"
     assert len(bes["ueberlappungen"]) == 0, (
         f"gezeichnete Beschriftungen ueberlappen sich: {bes['ueberlappungen']}")
-    assert bes["unterdrueckt"] >= 1, (
+    # **[Datierte Änderung 2026-10-29, Plan 14.7.3 — Befund B (b)]** In der Fokusszene der
+    # verteilten Karte überlappt **nichts** (13 von 13 gezeichnet) — die Regel hätte dort
+    # nichts zu tun. Bewiesen wird sie in der **Zoomszene** (Zoom ≥ 1,2: jeder Knoten ist
+    # Kandidat, gezeichnet werden alle Titel — also ist die Zahl der Kandidaten die Knotenzahl).
+    zs = bes["zoomszene"]
+    assert zs["zoom"] is not None and zs["zoom"] >= 1.2, "die Zoomszene liegt unter der Schwelle"
+    assert zs["ueberlappende_paare"] == 0, (
+        f"in der Zoomszene ueberlappen sich Beschriftungen: {zs['ueberlappungen']}")
+    assert zs["gezeichnet"] >= 2, "in der Zoomszene sind zu wenige Beschriftungen gezeichnet"
+    assert SEED_SUMME - zs["gezeichnet"] >= 1, (
         "es wurde **keine** Beschriftung weggelassen — die Kollisionspruefung hat nicht "
         "gegriffen, die Zelle waere auch ohne die Regel gruen")
     assert bes["kandidaten"] == bes["gezeichnet"] + bes["unterdrueckt"], (
@@ -375,21 +405,18 @@ def test_the_gegenlauf_zentrum_shows_the_effect_of_the_anchor_gravity():
 
     Die Zuordnung im Plan §5 ("`ANCHOR_GRAVITY` → Leinwandmitte" als Gegenlauf der Abnahme
     P10.5-66) ist damit **datiert berichtigt** (2026-10-26)."""
-    normal = _beleg()["messungen"]["kamera"]
-    gegen = _gegenlauf_beleg("zentrum")["messungen"]["kamera"]
-    # **Die eingepasste Kamera** fuellt die Leinwand bis auf den Rand von **56 px** (Plan §2.5;
-    # **[datiert 2026-10-28, Schritt 14.5]** — vorher 40 px): `bw / (bw + 2 · FIT_MARGIN)` =
-    # 1148 / 1260 = **91,1 %**.
-    assert normal["fuellgrad"] > 0.90, "mit der Anker-Gravitation fuellt die Karte die Leinwand"
-    assert gegen["fuellgrad"] < normal["fuellgrad"] - 0.2, (
-        "mit der Zentrums-Gravitation ist die Welt kleiner (das ist die Wirkung der Regel)")
-    breite_normal = normal["welt"]["x1"] - normal["welt"]["x0"]
-    breite_gegen = gegen["welt"]["x1"] - gegen["welt"]["x0"]
-    assert breite_gegen < breite_normal * 0.8, (
+    # **[Datierte Änderung 2026-10-29, Plan 14.7.3]** In der kompakten Karte zieht die
+    # Zentrums-Gravitation die Spaces **ineinander**: die Regionen-Zelle kippt (93,4 %), die
+    # Welt wird schmaler (717 statt 887 px). Vorher (Block 14, weit gestreute Spaces) blieb
+    # jede Zelle grün und nur die Weltgröße zeigte die Wirkung.
+    normal = _beleg()["messungen"]
+    gegen = _gegenlauf_beleg("zentrum")["messungen"]
+    assert gegen["regionen"]["anteil"] < 0.95, (
+        "mit der Zentrums-Gravitation liegen Knoten im fremden Space (das ist die Wirkung)")
+    breite_normal = normal["kamera"]["welt"]["x1"] - normal["kamera"]["welt"]["x0"]
+    breite_gegen = gegen["kamera"]["welt"]["x1"] - gegen["kamera"]["welt"]["x0"]
+    assert breite_gegen < breite_normal * 0.85, (
         "mit der Zentrums-Gravitation ist die Welt schmaler (das ist die Wirkung der Regel)")
-    assert _zellen(_gegenlauf_beleg("zentrum")) == _zellen(_beleg()), (
-        "der Gegenlauf `zentrum` darf keine Zelle umdrehen — er belegt die Wirkung ueber die "
-        "Zahlen der Kamera-Zelle")
 
 
 def test_the_gegenlauf_fitview_makes_the_camera_red_and_nothing_else():
@@ -433,7 +460,9 @@ def test_the_gegenlauf_beschriftung_makes_the_labels_red_and_nothing_else():
     assert bes["unterdrueckt"] == 0, "ohne die Kollisionspruefung wurde nichts weggelassen"
     assert bes["gezeichnet"] == bes["kandidaten"], (
         "ohne die Kollisionspruefung wurde nicht jede Beschriftung gezeichnet")
-    assert len(bes["ueberlappungen"]) >= 1, (
+    # **[2026-10-29, Plan 14.7.3]** der Fehler zeigt sich in der **Zoomszene** (die Fokusszene
+    # der verteilten Karte hat nichts zu kollidieren): ohne die Regel ueberlappen **57** Paare.
+    assert bes["zoomszene"]["ueberlappende_paare"] >= 1, (
         "ohne die Kollisionspruefung ueberlappen sich die Rechtecke nicht — der Gegenlauf "
         "stellt den Fehler nicht wieder her")
 
@@ -457,9 +486,12 @@ def test_the_gegenlauf_region_makes_the_regionen_cell_red():
     zellen = _zellen(beleg)
     rot = {zelle for zelle, ok in zellen.items() if not ok}
     neu_rot = rot - ROT
-    assert neu_rot == {"regionen", "kamera", "stabilitaet"}, (
+    # **[2026-10-29, Plan 14.7.3]** neuer Gegenlauf (Regionen per Index-Permutation statt nach
+    # Space): **kein Klumpen** mehr — die Kamera bleibt grün (75,2 %), es kippen die Regionen
+    # und (als Folge der gemischten Regionen) die Stabilität.
+    assert neu_rot == {"regionen", "stabilitaet"}, (
         f"der Gegenlauf `region` macht {sorted(neu_rot)} neu rot — erwartet "
-        "['kamera', 'regionen', 'stabilitaet']")
+        "['regionen', 'stabilitaet']")
     reg = beleg["messungen"]["regionen"]
     # **Die Zahlen**: die Items liegen ineinander -- ihr Anteil am richtigen Schwerpunkt bricht
     # ein, und die **Marge** (der Spielraum der Trennung) ist negativ: die Regionen sind nicht
@@ -473,10 +505,8 @@ def test_the_gegenlauf_region_makes_the_regionen_cell_red():
         "der Beleg muss zeigen, welche Knoten im fremden Space liegen")
     # **Die beiden Folge-Zellen** sind Konsequenzen desselben Fehlers (der Klumpen) — sie
     # werden hier festgehalten, damit eine Änderung an ihnen auffällt.
-    kam = beleg["messungen"]["kamera"]
-    assert kam["fuellgrad"] < 0.60, "der Klumpen fuellt die Leinwand nicht mehr"
     stab = beleg["messungen"]["stabilitaet"]
-    assert stab["median_verschiebung_px"] > 2.0, "der Klumpen ist wackelig"
+    assert stab["median_verschiebung_px"] > 2.0, "gemischte Regionen sind wackelig"
 
 
 
@@ -577,7 +607,9 @@ def test_a_beleg_without_a_suppressed_label_would_be_rejected(tmp_path, monkeypa
     `beschriftung` beweist die Regel von der anderen Seite; diese Gegenprobe beweist, dass
     der Waechter sie von der Belegseite her prueft."""
     beleg = _beleg()
-    beleg["messungen"]["beschriftungen"]["unterdrueckt"] = 0
+    # [2026-10-29, Plan 14.7.3] die Regel wird in der **Zoomszene** bewiesen — gefaelscht wird
+    # dort: alle 152 Titel gezeichnet, keiner weggelassen.
+    beleg["messungen"]["beschriftungen"]["zoomszene"]["gezeichnet"] = SEED_SUMME
     gefaelscht = tmp_path / "p105_b14_layout_probe.json"
     gefaelscht.write_text(json.dumps(beleg), encoding="utf-8")
     monkeypatch.setattr(sys.modules[__name__], "BELEG", gefaelscht)

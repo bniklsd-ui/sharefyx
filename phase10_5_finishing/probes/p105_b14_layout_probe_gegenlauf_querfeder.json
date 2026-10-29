@@ -15,9 +15,14 @@
     "CROSS_SPRING_FACTOR": "0.15",
     "CROSS_SPRING_LENGTH_FACTOR": "3",
     "ALPHA_START_SEEDED": "0.5",
-    "FIT_MARGIN": "56"
+    "FIT_MARGIN": "56",
+    "LOBE_CLOSE_PX": "160",
+    "ANCHOR_LAYOUT": "\"hex\"",
+    "ANCHOR_HEX_ORDER": "\"gegenueber\"",
+    "LOBE_SCALE": "1.5",
+    "LOBE_SMOOTH_PASSES": "2"
   },
-  "zeit": "2026-10-28T16:40:34.953627+00:00",
+  "zeit": "2026-10-29T19:22:04.362745+00:00",
   "seed": {
     "spaces": 5,
     "items": 152,
@@ -40,71 +45,97 @@
     },
     "regionen": {
       "knoten": 152,
-      "richtig": 152,
-      "anteil": 1.0,
+      "richtig": 139,
+      "anteil": 0.9144736842105263,
       "schwerpunkte": {
         "alpha": [
-          667.0666666666667,
-          487.6666666666667
+          591.7666666666667,
+          518.8666666666667
         ],
         "beta": [
-          678.625,
-          686.78125
+          675.71875,
+          313.09375
         ],
         "gamma": [
-          364.26666666666665,
-          501.23333333333335
+          352.6333333333333,
+          449.3666666666667
         ],
         "delta": [
-          564.4,
-          261.73333333333335
+          438.9,
+          721.3
         ],
         "epsilon": [
-          848.6333333333333,
-          258.93333333333334
+          786.9,
+          632.3
         ]
       },
-      "beispiele_falsch": [],
-      "marge_min_px": 8.567339048513816,
-      "marge_median_px": 178.87661382691516,
-      "abstand_eigen_median_px": 66.91630759554968,
-      "abstand_fremd_min_px": 115.68916207762169,
-      "engster_abstand_px": 16.1245154965971,
-      "ueberlappende_paare": 2,
-      "ok": true
+      "beispiele_falsch": [
+        {
+          "id": "itm_0000000a",
+          "space": "alpha",
+          "naechster": "beta"
+        },
+        {
+          "id": "itm_0000000e",
+          "space": "alpha",
+          "naechster": "delta"
+        },
+        {
+          "id": "itm_00000013",
+          "space": "alpha",
+          "naechster": "beta"
+        },
+        {
+          "id": "itm_00000024",
+          "space": "beta",
+          "naechster": "alpha"
+        },
+        {
+          "id": "itm_00000032",
+          "space": "beta",
+          "naechster": "alpha"
+        }
+      ],
+      "marge_min_px": -68.92510807209827,
+      "marge_median_px": 143.96361556081976,
+      "abstand_eigen_median_px": 99.32944120765505,
+      "abstand_fremd_min_px": 88.81279688549955,
+      "engster_abstand_px": 18.24828759089466,
+      "ueberlappende_paare": 1,
+      "ok": false
     },
     "kamera": {
       "messbar": true,
-      "zoom": 1,
+      "zoom": 1.0006,
       "zoom_anzeige": 1,
       "leerwand": [
         1134,
         1061.375
       ],
       "welt": {
-        "x0": 268,
-        "x1": 944,
-        "y0": 159,
-        "y1": 781
+        "x0": 218,
+        "x1": 898,
+        "y0": 192,
+        "y1": 870
       },
       "bild_mass": [
-        676,
-        622
+        680.4079999999999,
+        678.4068
       ],
-      "fuellgrad": 0.5961199294532628,
+      "fuellgrad": 0.6391772936049935,
       "passt": true,
       "pan": [
-        -39.52293577981652,
-        60.520127086437014
+        8.074407339449635,
+        -0.955093250326513
       ],
       "umriss_mitte": [
-        606.0,
-        470.0
+        558.0,
+        531.0
       ],
-      "versatz_mitte_px": 0.5229357798165211,
-      "unsicherheit_px": 0.5797013619125575,
+      "versatz_mitte_px": 0.5907926605503917,
+      "unsicherheit_px": 0.6299335812878326,
       "zentriert": true,
-      "ok": false
+      "ok": true
     },
     "beschriftungen": {
       "messbar": true,
@@ -112,8 +143,8 @@
       "fokus_titel": "Gamma Plan 01",
       "nachbarn": 12,
       "kandidaten": 13,
-      "gezeichnet": 10,
-      "unterdrueckt": 3,
+      "gezeichnet": 13,
+      "unterdrueckt": 0,
       "texte": [
         "Gamma Plan 01",
         "Beta Plan 01",
@@ -123,38 +154,49 @@
         "Gamma Frage 04",
         "Gamma Antwort 05",
         "Gamma Idee 03",
+        "Gamma Skizze 07",
         "Gamma Frage 24",
-        "Gamma Entwurf 30"
+        "Gamma Entwurf 30",
+        "Gamma Notiz 02",
+        "Gamma Protokoll 08"
       ],
       "ueberlappungen": [],
       "fokus_beschriftung": true,
-      "fokus_pixel": 58,
+      "fokus_pixel": 39,
       "genug_gezeichnet": true,
-      "zoom": 1,
+      "zoom": 1.0006,
       "pan": [
-        -39.52293577981652,
-        60.520127086437014
+        8.074407339449635,
+        -0.955093250326513
       ],
-      "unsicherheit_px": 0.5797013619125575,
-      "treffer": 22,
+      "unsicherheit_px": 0.6299335812878326,
+      "treffer": 36,
+      "zoomszene": {
+        "zoom_anzeige": "121%",
+        "zoom": 1.21,
+        "gezeichnet": 110,
+        "ueberlappungen": [],
+        "ueberlappende_paare": 0,
+        "ok": true
+      },
       "ok": true
     },
     "stabilitaet": {
       "wachser_space": "epsilon",
       "neues_item": "itm_00000901",
       "position_neu": [
-        1139,
-        124
+        805,
+        628
       ],
       "naechster_schwerpunkt": "epsilon",
       "in_eigener_region": true,
-      "abstand_eigener_space_px": 235.58013498595335,
-      "abstand_fremder_space_px": 505.1989707036229,
+      "abstand_eigener_space_px": 37.589892258425,
+      "abstand_fremder_space_px": 138.3979768638256,
       "andere_spaces": 122,
-      "median_verschiebung_px": 29.154759474226502,
-      "max_verschiebung_px": 172.15400082484288,
-      "pruefsumme_vorher": 2166009805,
-      "pruefsumme_nachher": 579150055,
+      "median_verschiebung_px": 46.0,
+      "max_verschiebung_px": 190.55970193091719,
+      "pruefsumme_vorher": 517517590,
+      "pruefsumme_nachher": 3768278437,
       "pinned_beim_start": 0,
       "knoten_frisch": 153,
       "kasten_frisch": {
@@ -167,14 +209,14 @@
         "dpr": 1
       },
       "position_neu_frisch": [
-        1150,
-        229
+        766,
+        892
       ],
       "ok": false
     },
     "budget": {
       "knoten": 201,
-      "pos_pruefsumme": 3801970400,
+      "pos_pruefsumme": 3675356302,
       "graph_reihenfolge": [
         "itm_00000931",
         "itm_00000930",
@@ -190,41 +232,13 @@
       "luecken_ms": [],
       "raf_calls": 130,
       "raf_calls_reduced_motion": 0,
-      "kern_pixel_reduced_motion": 8002,
-      "kern_pixel": 8002,
+      "kern_pixel_reduced_motion": 16,
+      "kern_pixel": 16,
       "grenze_ms": 3000,
       "kamera_200_knoten": {
-        "messbar": true,
-        "zoom": 0.7004200559999999,
-        "zoom_anzeige": 0.7,
-        "leerwand": [
-          1134,
-          1061.375
-        ],
-        "welt": {
-          "x0": -220,
-          "x1": 1288,
-          "y0": -115,
-          "y1": 1026
-        },
-        "bild_mass": [
-          1056.2334444479998,
-          799.1792838959999
-        ],
-        "fuellgrad": 0.9314227905185183,
-        "passt": true,
-        "pan": [
-          192.4685682169303,
-          211.07908878811946
-        ],
-        "umriss_mitte": [
-          534.0,
-          455.5
-        ],
-        "versatz_mitte_px": 0.5670757038806187,
-        "unsicherheit_px": 0.6746065597466332,
-        "zentriert": true,
-        "ok": true
+        "messbar": false,
+        "grund": "die Kamera liess sich nicht bestimmen",
+        "ok": false
       },
       "ok": true
     }

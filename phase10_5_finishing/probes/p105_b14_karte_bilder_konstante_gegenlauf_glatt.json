@@ -1,0 +1,342 @@
+{
+  "probe": "p105_b14_karte_bilder",
+  "schritt": "14.6.0",
+  "zeit": "2026-10-29T18:46:42.832163+00:00",
+  "seed": {
+    "spaces": 5,
+    "items": 152,
+    "items_pro_space": {
+      "alpha": 30,
+      "beta": 32,
+      "gamma": 30,
+      "delta": 30,
+      "epsilon": 30
+    }
+  },
+  "konstanten_varianten": {
+    "LOBE_SMOOTH_PASSES": "0"
+  },
+  "konstanten_gesendet": {
+    "REGION_ITEM_STEP": "22",
+    "REGION_PAD": "30",
+    "REGION_GAP": "40",
+    "ISLAND_FACTOR": "0.55",
+    "ITEM_STEP": "14",
+    "ITEM_JITTER_PX": "8",
+    "GOLDEN_ANGLE": "2.399963229728653",
+    "ANCHOR_GRAVITY": "0.02",
+    "CROSS_SPRING_FACTOR": "0.15",
+    "CROSS_SPRING_LENGTH_FACTOR": "3",
+    "ALPHA_START_SEEDED": "0.5",
+    "FIT_MARGIN": "56",
+    "LOBE_CLOSE_PX": "160",
+    "ANCHOR_LAYOUT": "\"hex\"",
+    "ANCHOR_HEX_ORDER": "\"gegenueber\"",
+    "LOBE_SCALE": "1.5",
+    "LOBE_SMOOTH_PASSES": "0"
+  },
+  "leinwand": {
+    "breite": 1134,
+    "hoehe": 1061.375,
+    "dpr": 1,
+    "zoom": 1.0,
+    "pan": [
+      -12.50882625579834,
+      -15.893980979919434
+    ],
+    "zoom_anzeige": 1
+  },
+  "knoten": {
+    "anzahl": 152,
+    "welt": {
+      "x0": 136,
+      "y0": 147,
+      "x1": 1023,
+      "y1": 946
+    },
+    "bild": {
+      "x0": 123.49117374420166,
+      "y0": 131.10601902008057,
+      "x1": 1010.4911737442017,
+      "y1": 930.1060190200806
+    }
+  },
+  "lappen": {
+    "anzahl": 5,
+    "bild": {
+      "x0": 75.96744239038091,
+      "y0": 83.08672599815813,
+      "x1": 1059.967442390381,
+      "y1": 979.0867259981582
+    },
+    "welt": {
+      "x0": 88.47626864617925,
+      "y0": 98.98070697807756,
+      "x1": 1072.4762686461793,
+      "y1": 994.9807069780776
+    },
+    "reach_welt_px": {
+      "links": 47.52373135382075,
+      "rechts": 49.47626864617928,
+      "oben": 48.01929302192244,
+      "unten": 48.98070697807759
+    },
+    "je_lappe": [
+      {
+        "x0": 379.96744239038094,
+        "y0": 283.08672599815816,
+        "x1": 763.9674423903809,
+        "y1": 731.0867259981582,
+        "stil": "#4a93f0",
+        "punkte": 2899
+      },
+      {
+        "x0": 467.96744239038094,
+        "y0": 83.08672599815813,
+        "x1": 955.9674423903809,
+        "y1": 419.08672599815816,
+        "stil": "#2eb8a6",
+        "punkte": 2479
+      },
+      {
+        "x0": 75.96744239038091,
+        "y0": 267.08672599815816,
+        "x1": 459.96744239038094,
+        "y1": 627.0867259981582,
+        "stil": "#2eb8a6",
+        "punkte": 2059
+      },
+      {
+        "x0": 139.9674423903809,
+        "y0": 547.0867259981582,
+        "x1": 579.9674423903809,
+        "y1": 979.0867259981582,
+        "stil": "#2eb8a6",
+        "punkte": 3235
+      },
+      {
+        "x0": 659.9674423903809,
+        "y0": 395.08672599815816,
+        "x1": 1059.967442390381,
+        "y1": 811.0867259981582,
+        "stil": "#2eb8a6",
+        "punkte": 2605
+      }
+    ],
+    "filter_eindeutig": true,
+    "strokes_gesamt": 705,
+    "mit_alpha": 5,
+    "mit_breite": 5
+  },
+  "raender": {
+    "knoten_links": 123.49117374420166,
+    "knoten_rechts": 123.50882625579834,
+    "knoten_oben": 131.10601902008057,
+    "knoten_unten": 131.26898097991943,
+    "lappen_links": 75.96744239038091,
+    "lappen_rechts": 74.03255760961906,
+    "lappen_oben": 83.08672599815813,
+    "lappen_unten": 82.28827400184184
+  },
+  "beschnitt": {
+    "links": 0.0,
+    "rechts": 0.0,
+    "oben": 0.0,
+    "unten": 0.0,
+    "ja": false
+  },
+  "fokus": {
+    "id": "itm_0000003f",
+    "nachbarn": 12,
+    "x": 259.49117374420166,
+    "y": 420.10601902008057
+  },
+  "bilder": [
+    {
+      "datei": "p105_b14_karte_01_ganz.png",
+      "bytes": 527285
+    },
+    {
+      "datei": "p105_b14_karte_02_fokus.png",
+      "bytes": 540136
+    },
+    {
+      "datei": "p105_b14_karte_03_seite.png",
+      "bytes": 639547
+    }
+  ],
+  "seitenfehler": [],
+  "alle_kriterien_erfuellt": true,
+  "koerper": {
+    "ok": true,
+    "grund": "alle Kriterien erfuellt",
+    "abnahme": {
+      "zeit_ms": 40.299999952316284,
+      "zeit_ms_erster": 40.299999952316284,
+      "zeit_messungen": [
+        40.299999952316284,
+        137,
+        25.700000047683716,
+        32.59999996423721,
+        138.10000002384186
+      ],
+      "komponenten": 1,
+      "komponenten_groessen": [
+        8677
+      ],
+      "lappen_je_space": {
+        "beta": 1,
+        "gamma": 1,
+        "alpha": 1,
+        "epsilon": 1,
+        "delta": 1
+      },
+      "zellen_je_space": {
+        "beta": 1715,
+        "gamma": 1523,
+        "alpha": 1863,
+        "epsilon": 1742,
+        "delta": 1834
+      },
+      "koerper_zellen": 8677,
+      "furche_zellen": 387,
+      "paare": {
+        "beta|gamma": 4,
+        "alpha|gamma": 71,
+        "alpha|beta": 81,
+        "beta|epsilon": 46,
+        "alpha|epsilon": 76,
+        "delta|gamma": 52,
+        "alpha|delta": 63
+      },
+      "paare_zahl": 7,
+      "zellgroesse_px": 8,
+      "raster": {
+        "cols": 165,
+        "rows": 154,
+        "cell": 8,
+        "minX": -79.52373135382075,
+        "minY": -69.01929302192244
+      },
+      "knoten": 152,
+      "min_abstand_zwei_spaces_px": 69.95
+    },
+    "zeit": {
+      "zeit_ms": 42.39999997615814,
+      "zeit_ms_erster": 53.19999998807907,
+      "zeit_messungen": [
+        53.19999998807907,
+        260,
+        42.39999997615814,
+        38.40000003576279,
+        27.899999976158142
+      ],
+      "komponenten": 1,
+      "komponenten_groessen": [
+        14279
+      ],
+      "lappen_je_space": {
+        "beta": 1,
+        "gamma": 2,
+        "epsilon": 1,
+        "alpha": 2,
+        "delta": 1
+      },
+      "zellen_je_space": {
+        "beta": 3181,
+        "gamma": 2584,
+        "epsilon": 2940,
+        "alpha": 2383,
+        "delta": 3191
+      },
+      "koerper_zellen": 14279,
+      "furche_zellen": 699,
+      "paare": {
+        "beta|gamma": 16,
+        "beta|epsilon": 70,
+        "alpha|beta": 91,
+        "alpha|gamma": 117,
+        "alpha|epsilon": 144,
+        "delta|gamma": 140,
+        "alpha|delta": 131
+      },
+      "paare_zahl": 7,
+      "zellgroesse_px": 8.75480745654731,
+      "raster": {
+        "cols": 200,
+        "rows": 188,
+        "cell": 8.75480745654731,
+        "minX": -310.14014182703403,
+        "minY": -283.4072971577874
+      },
+      "knoten": 201,
+      "min_abstand_zwei_spaces_px": 30.34
+    },
+    "reach_welt_px": {
+      "links": 47.52373135382075,
+      "rechts": 49.47626864617928,
+      "oben": 48.01929302192244,
+      "unten": 48.98070697807759
+    },
+    "luft_px": {
+      "links": 75.96744239038091,
+      "rechts": 74.03255760961906,
+      "oben": 83.08672599815813,
+      "unten": 82.28827400184184
+    },
+    "zeitgrenze_ms": 50
+  },
+  "zellen": {
+    "bilder": true,
+    "koerper": true
+  },
+  "form": {
+    "fuelle": {
+      "koerper_zellen": 8677,
+      "huelle_zellen": 10451,
+      "soliditaet": 0.8303
+    },
+    "verteilung": {
+      "nn_median_px": 35.95,
+      "nn_median_je_space_px": {
+        "alpha": 37.54,
+        "beta": 33.51,
+        "delta": 41.55,
+        "epsilon": 36.5,
+        "gamma": 35.18
+      }
+    },
+    "welligkeit": {
+      "zusatzkruemmung_rad_je_100px": 11.423,
+      "schleifen": 5,
+      "umfang_px": 8416.0
+    },
+    "kontur_abstand": {
+      "min_px": 8.0,
+      "paar": [
+        "alpha",
+        "gamma"
+      ],
+      "hinweis": null
+    },
+    "kanten_aussen": {
+      "anteil": 0.0492,
+      "stuetzpunkte": 651
+    },
+    "schwellen": {
+      "fuelle_min": 0.75,
+      "verteilung_faktor": 1.25,
+      "verteilung_basis_px": 25.1,
+      "welligkeit_anteil": 0.5,
+      "welligkeit_basis": 11.096
+    },
+    "zellen": {
+      "fuelle": true,
+      "verteilung": true,
+      "kontur_welligkeit": false,
+      "kontur_abstand": true
+    },
+    "p10_5_73": true,
+    "p10_5_74": false
+  }
+}

@@ -10,7 +10,7 @@ down:
   - ../../phase5_ui/webui/static/js/graph.js             # `computeRegions()`, `computeLobes()`, `chainEdges()`
   - ../../phase10_5_finishing/probes/p105_b14_karte_bilder.py  # Bilder-Probe (`--konstante`, `--bilder`, Messpflaster)
   - ../../phase10_5_finishing/probes/p105_b14_startwerte.py    # Varianten-Treiber (Muster für das Raster 14.7.2)
-updated: 2026-10-29 (Schritt 14.7.2: das Raster gemessen — keine gestreckte Variante hält Max ≤ 3 px; Kandidat hexg_s1.5 + Glättung 2; Fund: Kontur zerfällt bei krummer Zellgröße, behoben; STOPP E1 + E2) | 2026-10-29 (Schritt 14.7.1: die vier Konstanten gebaut, Nullwerte = Block 14 — Layout gleich, Bilder byteweise gleich; H1–H5 grün, H1 korrigiert) | 2026-10-29 (Schritt 14.7.0 (a)+(c): Basislinie der Form gemessen; §2.2 neu gefasst — `LOBE_SCALE`, Nikinger: A) | 2026-10-29 (Schritt 14.7.0 (b): Ursache von B4 gemessen — **Kandidat (ii), Chaos**; STOPP) | 2026-10-29 (Entwurf, Claude Code — nach der Sichtung der 14.6-Bilder; freigegeben im Chat „schreibe den Plan, und setze ihn danach selber um")
+updated: 2026-10-29 (Schritt 14.7.3 + 14.7.4: Werte gesetzt — hex/gegenueber, 1,5, Glättung 2; Bilder = abgenommenes Bild; Gegenläufe `region`/`beschriftung` neu gebaut) | 2026-10-29 (Schritt 14.7.2: das Raster gemessen — keine gestreckte Variante hält Max ≤ 3 px; Kandidat hexg_s1.5 + Glättung 2; Fund: Kontur zerfällt bei krummer Zellgröße, behoben; STOPP E1 + E2) | 2026-10-29 (Schritt 14.7.1: die vier Konstanten gebaut, Nullwerte = Block 14 — Layout gleich, Bilder byteweise gleich; H1–H5 grün, H1 korrigiert) | 2026-10-29 (Schritt 14.7.0 (a)+(c): Basislinie der Form gemessen; §2.2 neu gefasst — `LOBE_SCALE`, Nikinger: A) | 2026-10-29 (Schritt 14.7.0 (b): Ursache von B4 gemessen — **Kandidat (ii), Chaos**; STOPP) | 2026-10-29 (Entwurf, Claude Code — nach der Sichtung der 14.6-Bilder; freigegeben im Chat „schreibe den Plan, und setze ihn danach selber um")
 ---
 # P10.5 Block 14.7 — Kompakt und verteilt: aus dem Seestern wird ein Gehirn
 
@@ -165,9 +165,9 @@ Entscheidung und steht hier bewusst **nicht** als Option.
 |---|---|---|
 | **14.7.0** ✅ 2026-10-29 (b: STOPP → A) | **Messung zuerst.** (a) Bilder-Probe: neue Zellen `fuelle`, `verteilung`, `kontur_welligkeit`, `kontur_abstand`, `kanten_aussen` (§5) — über das Messpflaster, **kein** Haken im Produktcode. (b) **Ursache von B4:** an `step20` und `insel0.75` (14.4) messen, **welche** Knoten sich bei der Stabilitätsprobe bewegen, wie weit sie **nach der Entspannung** von ihrem Anker liegen (relativ zu `radius`) und ob sie nahe am Nachbar-Space sitzen — Kandidat (i) — oder mitten im eigenen Lappen umspringen — Kandidat (ii). (c) Abnahmezeilen **P10.5-73/74** in den Head (⬜). | Basislinie steht als Zahl im Beleg; (i) oder (ii) aus §0 ist **mit Zahlen** gestützt. Nur (ii) ⇒ **STOPP**, Bericht — `SPREAD` allein löst es dann nicht. |
 | **14.7.1** ✅ 2026-10-29 | Die Hebel `ANCHOR_LAYOUT`/`ANCHOR_HEX_ORDER` (§2.1), `LOBE_SCALE` (§2.2) und `LOBE_SMOOTH_PASSES` (§2.3) bauen, **Defaults = heute**. Node-Tests H1–H5. | Layout-Probe mit Defaults: **alle** Knotenpositionen gleich zu `p105_b14_layout_probe.json`; Bilder **byteweise** gleich zu denen im Repo. H1–H5 grün. |
-| **14.7.2** 🔄 **STOPP E1 + E2 2026-10-29** | **Das Raster:** `ANCHOR_LAYOUT` {`spirale`, `hex`/`fortlaufend`, `hex`/`gegenueber`} × `LOBE_SCALE` {1 · 1,25 · 1,5} = 9 Läufe (dazu die Glättung {0 · 2 · 4 · 6} am Bild des besten Laufs, §3 E2) (Treiber nach dem Muster `p105_b14_startwerte.py`), je Lauf **alle** Layout-Zellen + `koerper` + die neuen Zellen + Reach/Luft + `computeLobes()`-Zeit; Bilder nach `~/p105_b14_7_varianten/<label>/` (**außerhalb** des Repos). | Tabelle; Stabilität zuerst gefiltert. **STOPP — E1.** |
-| **14.7.3** | Den gewählten Wert setzen (Kommentar „gewählt vom Nikinger am <Datum>, gemessen in 14.7.2"). Wächter: Gegenläufe `anker` (`ANCHOR_LAYOUT` → `spirale`) und `spreizung` (`LOBE_SCALE` → 1) machen **genau** `fuelle` bzw. `verteilung` rot. **Die sechs Layout-Gegenläufe neu** (die Knoten haben sich bewegt — anders als in 14.6). | Alle Zellen 65–69, 71, 72 grün mit neuen Zahlen; jeder Gegenlauf rot an genau seiner Zelle. |
-| **14.7.4** | **Glätten** (§2.3, eigenes Tor): `LOBE_SMOOTH_PASSES` {0 · 2 · 4 · 6}, Default 0 = heute. Varianten-Bilder außerhalb des Repos. **STOPP — E2.** Danach Wert setzen + Gegenlauf `glatt` (→ 0 macht `kontur_welligkeit` rot). | `kontur_abstand` > 0, Reach ≤ 52, Zeit ≤ 50 ms; `test_lobe_kontur_geschlossen.py` grün. |
+| **14.7.2** ✅ 2026-10-29 (E1 + E2: Nikinger, „das nehme ich ab“) | **Das Raster:** `ANCHOR_LAYOUT` {`spirale`, `hex`/`fortlaufend`, `hex`/`gegenueber`} × `LOBE_SCALE` {1 · 1,25 · 1,5} = 9 Läufe (dazu die Glättung {0 · 2 · 4 · 6} am Bild des besten Laufs, §3 E2) (Treiber nach dem Muster `p105_b14_startwerte.py`), je Lauf **alle** Layout-Zellen + `koerper` + die neuen Zellen + Reach/Luft + `computeLobes()`-Zeit; Bilder nach `~/p105_b14_7_varianten/<label>/` (**außerhalb** des Repos). | Tabelle; Stabilität zuerst gefiltert. **STOPP — E1.** |
+| **14.7.3** ✅ 2026-10-29 | Den gewählten Wert setzen (Kommentar „gewählt vom Nikinger am <Datum>, gemessen in 14.7.2"). Wächter: Gegenläufe `anker` (`ANCHOR_LAYOUT` → `spirale`) und `spreizung` (`LOBE_SCALE` → 1) machen **genau** `fuelle` bzw. `verteilung` rot. **Die sechs Layout-Gegenläufe neu** (die Knoten haben sich bewegt — anders als in 14.6). | Alle Zellen 65–69, 71, 72 grün mit neuen Zahlen; jeder Gegenlauf rot an genau seiner Zelle. |
+| **14.7.4** ✅ 2026-10-29 (mit 14.7.2/14.7.3 — E2 fiel am selben STOPP) | **Glätten** (§2.3, eigenes Tor): `LOBE_SMOOTH_PASSES` {0 · 2 · 4 · 6}, Default 0 = heute. Varianten-Bilder außerhalb des Repos. **STOPP — E2.** Danach Wert setzen + Gegenlauf `glatt` (→ 0 macht `kontur_welligkeit` rot). | `kontur_abstand` > 0, Reach ≤ 52, Zeit ≤ 50 ms; `test_lobe_kontur_geschlossen.py` grün. |
 | **14.7.5** | Belege neu: Layout-Probe, Bilder-Probe (Bilder ersetzen `docs/screenshots/p105_b14_karte_0{1,2,3}_*.png`), Karten-Probe `p105_b8_karte_probe.py`, C2-Probe, volle Suite, `doc_health`, `ui_budget`. Abnahme P10.5-73/74. Update-Log-Zeile (Z. 19) nachziehen, wenn sich die Aussage ändert. Deploy-Tabelle: D enthält 14.7. | Alles grün; **P10.5-70 neu beim Nikinger** (Sichtung der neuen Bilder). |
 
 ## §5 Abnahme — neue Zeilen P10.5-73 und P10.5-74
@@ -330,3 +330,43 @@ Schließ-Polster breiter als 198 Zellen wird. Behoben: `traceContour()` verkette
 Gitterkoordinaten, rechnet danach um. Bilder im Repo **byteweise gleich**. Wächter
 `tests/test_b14_7_kontur_zellgroesse.py` (Gegenprobe: alte Rechnung ⇒ 4 Schleifen). Das Raster ist
 danach **komplett neu** gefahren (die Tabelle oben).
+
+## Anmerkungen 14.7.3 + 14.7.4 — Werte, Wächter, Gegenläufe (2026-10-29, Claude Code)
+
+**Entscheidung des Nikingers (2026-10-29):** „ja, das ergebnis aus dem bild passt so, das nehme
+ich ab“ — für das Bild `hexg_s1.5_glatt2` ⇒ **E1** `ANCHOR_LAYOUT = "hex"`,
+`ANCHOR_HEX_ORDER = "gegenueber"`, `LOBE_SCALE = 1.5` (Stabilität: Median 1,0 px, Max **9,1 px** —
+die strenge Regel aus §3 ist damit **vom Nikinger** gelockert, nicht von Claude Code) und **E2**
+`LOBE_SMOOTH_PASSES = 2`.
+
+**Die Bilder im Repo** sind **byteweise identisch** mit den abgenommenen Variantenbildern (`cmp`,
+alle drei).
+
+**Befund A (Nikinger: akzeptiert):** die Regionen-Marge fällt von 171,8 auf **21,8 px** — der
+Wächter verlangt jetzt `> 0` statt `> 100 px`.
+
+**Befund B (Nikinger: (b), „der ehrlichere Test“ — Mehraufwand akzeptiert):** zwei Gegenläufe der
+Layout-Probe waren in der neuen Szene **zahnlos** und sind neu gebaut:
+
+| Gegenlauf | alt | warum zahnlos | neu | gemessen |
+|---|---|---|---|---|
+| `region` | alle Anker auf einen Punkt | Knoten übereinander ⇒ die Abstoßung sprengt die Karte (±7000 px) ⇒ Regionen trivial getrennt | Seed-Region **und** Anker-Gravitation per Index-Permutation (×7 mod n) statt nach Space | Regionen **57,9 %**, Marge −217 px; rot: `regionen` + `stabilitaet` |
+| `beschriftung` | Kollisionsprüfung aus | Fokusszene: 13 von 13 Titeln überlappen nie | Messung um eine **Zoomszene** erweitert (Zoom 1,21 — jeder Knoten Kandidat) | normal 112 von 152 gezeichnet, **0** Paare; ohne Regel 152, **57** Paare; rot: nur `beschriftungen` |
+
+**Die übrigen Gegenläufe** treffen jetzt mehr Zellen, weil die Karte dichter ist: `querfeder` und
+`zentrum` → `regionen` + `stabilitaet`, `alpha` → `budget` + `stabilitaet`, `fitview` → `kamera`.
+Der Wächter hält die **gemessenen** Mengen fest (datiert).
+
+**Die Form-Gegenläufe** (Bilder-Probe): `anker` → `fuelle`; `glatt` → `kontur_welligkeit`;
+`spreizung` → `verteilung` **und** `fuelle` (Solidität 0,731 — ohne Streckung füllen die Lappen
+ihr Gitter nicht; festgehalten wie gemessen).
+
+**Kamera:** die kompakte Karte ist kleiner als die Leinwand — Zoom bei **100 %** gedeckelt,
+Füllgrad **78,3 %** (Abnahme 67: ≥ 60 % ✅), Knotenrand 123,5 px statt 56 px.
+
+**`computeLobes()`:** ein Lauf maß 63 ms (Median aus 5 Aufrufen; einer davon 324 ms); drei weitere
+41,9 / 42,9 / **39,9 ms**. Der Beleg ist der letzte Lauf. **Die Zeitmessung rauscht nah an der
+50-ms-Grenze** — benannt, nicht behoben.
+
+**Am Rand:** `p105_b8_karte_probe.py` läuft nur mit dem Playwright-venv
+(`~/.claude-code-tools/e2e-venv/bin/python`), so steht es in ihrem Docstring.

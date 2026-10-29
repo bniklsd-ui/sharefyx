@@ -117,9 +117,16 @@ for (const ordnung of ["fortlaufend", "gegenueber"]) {
   ergebnis.ordnungen[ordnung] = r;
 }
 
-// H4 — `"spirale"` ist bitgleich zu Block 14: die Konstanten **explizit** auf die Nullwerte
-// gesetzt gegen den unveraenderten Arbeitsbaum, **und** der alte Ausdruck `slot·√k` nachgerechnet
-const heute = await lade({}, null);
+// H4 — die Nullwerte (`"spirale"`, `LOBE_SCALE = 1`) ergeben **bitgleich** Block 14. Die Referenz
+// ist Block 14 selbst: dieselbe `graph.js` **ohne** die 14.7-Zeilen (Hex-Zweig und die beiden
+// `*= LOBE_SCALE`). [2026-10-29, 14.7.3: vorher war die Referenz der Arbeitsbaum — der traegt
+// seit 14.7.3 die gewaehlten Werte, nicht mehr die Nullwerte.]
+const BLOCK14 = [
+  ['    if (ANCHOR_LAYOUT === "hex" && k > 0) {', '    if (false) {'],
+  ["      jabstand *= LOBE_SCALE;", ""],
+  ["        irad *= LOBE_SCALE;", ""],
+];
+const heute = await lade({}, BLOCK14);
 const null_ = await lade({ ANCHOR_LAYOUT: '"spirale"', LOBE_SCALE: "1" }, null);
 const a = heute.computeRegions(fixture(5), CX, CY, OWN);
 const b = null_.computeRegions(fixture(5), CX, CY, OWN);

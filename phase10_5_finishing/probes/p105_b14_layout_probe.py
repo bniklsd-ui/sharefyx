@@ -207,9 +207,20 @@ GEGENLAEUFE = {
     #
     # **Der Anker ist die Regelzeile** (die eine Zeile, die den **Abstand** der Region vom
     # Anker bestimmt) -- gepatcht wird die *Platzierung der Region*, nicht ihr Radius.
+    # **[2026-10-29, Plan 14.7.3, Nikinger: Befund B (b) — der ehrlichere Test]** Der alte
+    # Gegenlauf (alle Anker auf **einen** Punkt) ist in der Szene von 14.7 **zahnlos**: die
+    # Knoten aller Spaces liegen dann uebereinander, die Abstossung sprengt die Karte
+    # (Schwerpunkte bei ±7000 px) — die Spaces sind danach trivial getrennt, die Zelle bleibt
+    # gruen. Der neue Gegenlauf bricht **genau** die Regel "eine Region je Space": Seed-Region
+    # und Anker-Gravitation werden ueber eine **Index-Permutation** (×7 mod n — 7 ist teilerfremd
+    # zu 152) vergeben statt nach dem Space. Jede Region behaelt ihre Item-Zahl (keine
+    # Explosion), aber in jeder Region liegen Items **aller** Spaces gemischt.
     "region": {
-        "    var abstand = k === 0 ? 0 : slot * Math.sqrt(k);":
-            "    var abstand = 0;",
+        '    var name = node.space || "";':
+            '    var name = nodeList[(i * 7) % nodeList.length].space || "";',
+        "    var anker = spaceRegions && spaceRegions.spaces ? spaceRegions.spaces[node.space] : null;":
+            "    var anker = spaceRegions && spaceRegions.spaces ? "
+            "spaceRegions.spaces[nodes[(n * 7) % nodes.length].space] : null;",
     },
 }
 
@@ -638,7 +649,7 @@ def _stop() -> None:
 # ============================================================================================
 
 BROWSER_SKILL = r'''"""Der Browser-Teil der Block-14-Probe (Playwright, e2e-venv)."""
-import base64, hashlib, hmac, json, math, struct, subprocess, sys, time
+import base64, hashlib, hmac, json, math, re, struct, subprocess, sys, time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -1286,6 +1297,42 @@ def beschriftungen(page, lauf, pos, raum_von, nachbarn):
     # falsche Massstab**: die Regel laesst ueberlappende Beschriftungen bewusst weg, eine
     # Minderheit gezeichneter Beschriftungen ist ihr **Ergebnis**, kein Fehler.
     genug = len(rects) >= 2
+
+    # **Die zweite Szene: hineingezoomt** ([2026-10-29, Plan 14.7.3, Nikinger: Befund B (b)]).
+    # Unter `ZOOM_LABEL_THRESHOLD` (1,2) beschriftet die App nur Fokus + ersten Ring — in der
+    # verteilten Karte von 14.7 ueberlappen die sich **nie** (13 von 13 gezeichnet), die Regel
+    # haette nichts zu tun und der Gegenlauf `beschriftung` waere zahnlos. Ab Zoom 1,2 ist
+    # **jeder** sichtbare Knoten Kandidat — die Szene, in der ein Nutzer die Regel braucht. Zwei
+    # Radschritte (1,1² = 1,21) um die Bildmitte, dann der Zeiger in die leere Ecke (kein Fokus).
+    page.mouse.move(kasten["left"] + kasten["width"] / 2, kasten["top"] + kasten["height"] / 2)
+    for _ in range(2):
+        page.mouse.wheel(0, -100)
+        page.wait_for_timeout(200)
+    page.mouse.move(kasten["left"] + 3, kasten["top"] + kasten["height"] - 3)
+    page.wait_for_timeout(600)
+    z_rects = page.evaluate(BESCHRIFTUNGEN, {"aufrufe": page.evaluate(GEZEICHNETE_LABELS)})
+    z_ueber = []
+    for i in range(len(z_rects)):
+        for j in range(i + 1, len(z_rects)):
+            a, b = z_rects[i], z_rects[j]
+            if (b["x0"] < a["x1"] and a["x0"] < b["x1"]
+                    and b["y0"] < a["y1"] and a["y0"] < b["y1"]):
+                z_ueber.append([a["text"], b["text"]])
+    z_anzeige = page.evaluate(
+        "() => (document.getElementById('overview-graph-zoom') || {}).textContent || ''")
+    z_zoom = None
+    try:
+        z_zoom = int(re.sub(r"[^0-9]", "", z_anzeige)) / 100
+    except ValueError:
+        pass
+    zoomszene = {
+        "zoom_anzeige": z_anzeige,
+        "zoom": z_zoom,
+        "gezeichnet": len(z_rects),
+        "ueberlappungen": z_ueber[:20],
+        "ueberlappende_paare": len(z_ueber),
+        "ok": bool(z_zoom is not None and z_zoom >= 1.2 and len(z_rects) >= 2 and not z_ueber),
+    }
     return {
         "messbar": True,
         "fokus": fokus_id,
@@ -1306,7 +1353,8 @@ def beschriftungen(page, lauf, pos, raum_von, nachbarn):
                                 abs(max(xy[0] for xy in pos.values()) - min(xy[0] for xy in pos.values())),
                                 abs(max(xy[1] for xy in pos.values()) - min(xy[1] for xy in pos.values())))),
         "treffer": passend["treffer"],
-        "ok": len(ueber) == 0 and fokus_beschriftung and genug,
+        "zoomszene": zoomszene,
+        "ok": len(ueber) == 0 and fokus_beschriftung and genug and zoomszene["ok"],
     }
 
 
