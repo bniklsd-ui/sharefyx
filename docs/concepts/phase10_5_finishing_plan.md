@@ -1106,4 +1106,4 @@ V120 (Block 7). **Bleibt draußen:** V203 (eurofyx-fleet), V150 (Termin).
 
 Statusregel wie P9/P10: ✅ erfüllt mit Beleg am Ort · ⚠️ erfüllt in anderer Form, Abweichung benannt · ⬜ offen. Seit P8.5 zählt vom
 Nikinger geprüfte Wegwerf-Automation als live (Memory). Kriterien, die an einer Identität hängen (Fabian, zweites Konto), zählen so
-nicht. **64 Zeilen** (P10.5-1–64), gezählt im Phase-Head **und** im Abnahme-Archiv (**[2026-10-25]** +3 Zeilen aus Block 13 — 62/63/64; die älteren Zeilen bleiben unverändert). Die Phase ist ✅, wenn alle Zeilen ✅/⚠️ sind und P10.5-27/28 ✅.
+nicht. **72 Zeilen** (P10.5-1–72), gezählt im Phase-Head **und** im Abnahme-Archiv (**[2026-10-25]** +3 Zeilen aus Block 13 — 62/63/64; **[2026-10-26]** +7 Zeilen aus Block 14.0 — 65–71, das Kartenlayout, Plan `docs/concepts/phase10_5_block14_kartenlayout_plan.md` §5; **[2026-10-28]** +1 Zeile aus Block 14.6.3 — **72** die Gehirnkarte als **ein Körper**, Plan `docs/concepts/phase10_5_block14_6_plan.md` §5; die älteren Zeilen bleiben unverändert). Die Phase ist ✅, wenn alle Zeilen ✅/⚠️ sind und P10.5-27/28 ✅.

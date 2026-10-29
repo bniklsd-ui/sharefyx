@@ -9,7 +9,7 @@ down:
   - ../../phase5_ui/webui/static/js/graph.js            # der einzige Produktcode, der sich ändert: `computeLobes()`
   - ../../phase10_5_finishing/probes/p105_b14_karte_bilder.py  # die Bilder-Probe (Recorder, `--konstante`, `--bilder`)
   - ../../phase10_5_finishing/probes/p105_b8_c2_probe.mjs      # der C2-Wächter (feste Positionen, Messpflaster)
-updated: 2026-10-28 (Schritt 14.6.2: der Wert steht — 160; der Wächter `koerper` beißt) | 2026-10-28 (Schritt 14.6.1: der Algorithmus steht, die sechs Varianten sind gemessen — der kleinste Wert mit EINER Komponente ist 160; STOPP E1) | 2026-10-28 (Schritt 14.6.0 gebaut: die Basislinie gemessen — 5 Komponenten, 0 Furche-Zellen) | 2026-10-28 (Entwurf, Claude Code — nach der Sichtung der 14.5-Bilder)
+updated: 2026-10-28 (Schritt 14.6.3: die Belege neu, **P10.5-72** geschlossen — 64 ✅ · 0 ⚠️ · 8 ⬜) | 2026-10-28 (Schritt 14.6.2: der Wert steht — 160; der Wächter `koerper` beißt) | 2026-10-28 (Schritt 14.6.1: der Algorithmus steht, die sechs Varianten sind gemessen — der kleinste Wert mit EINER Komponente ist 160; STOPP E1) | 2026-10-28 (Schritt 14.6.0 gebaut: die Basislinie gemessen — 5 Komponenten, 0 Furche-Zellen) | 2026-10-28 (Entwurf, Claude Code — nach der Sichtung der 14.5-Bilder)
 ---
 # P10.5 Block 14.6 — Der Körper: aus Inseln wird eine Gehirnkarte
 
@@ -122,7 +122,7 @@ solchen Wert: STOPP, berichten.
 | **14.6.0** ✅ 2026-10-28 | **Messung zuerst:** die Bilder-Probe `p105_b14_karte_bilder.py` bekommt die Zelle `koerper` (§5) — gemessen über ein **Messpflaster in einer Kopie** von `graph.js` (Muster `p105_b8_c2_probe.mjs` Z. ~95, `globalThis.__furrowCells`; **kein** Haken im Produktcode). **Zwei Durchgänge je Lauf:** die **Bilder** und der Rand (Reach/Luft) aus den **ungepatchten** Dateien (die Bilder im Repo zeigen Produktcode — `test_b14_karte_bilder.py`), die `koerper`-Zahlen und die `computeLobes()`-Zeit aus einem **eigenen**, gepatchten Durchgang. Dazu `LOBE_CLOSE_PX` in `BLOCK14_KONSTANTEN` (`p105_b14_layout_probe.py` Z. 253), damit `--konstante=` es meldet. **Gegen den heutigen Code.** | `koerper` ist **rot** an der Basislinie: **5** Komponenten, **0** Furche-Zellen (das ist der gemessene Befund aus §0). Alle übrigen Zellen der Probe unverändert. **✅ erfüllt** — die Anmerkungen unten. |
 | **14.6.1** ✅ 2026-10-28 | Der Algorithmus (§2.1) mit `LOBE_CLOSE_PX = 0` (= heute, §2.2) — dann die **Varianten** `--konstante=LOBE_CLOSE_PX=` **0 · 80 · 120 · 160 · 200 · 240**, je mit `--bilder=~/p105_b14_6_varianten/<D>/` (**außerhalb** des Repos). | Mit `0` ist das Bild gleich dem von heute (§2.2). Tabelle je Variante: Komponenten, Lappen je Space, Furche-Zellen, Reach je Seite, Luft, Zellgröße, `computeLobes()`-Zeit (152/201 Knoten). **STOPP — Bericht an den Nikinger (E1).** Commit mit `LOBE_CLOSE_PX = 0`. **✅ erfüllt** — die Bilder bei `0` sind **byteweise identisch** mit den drei im Repo; die Tabelle und der Befund stehen unten. |
 | **14.6.2** ✅ 2026-10-28 | Den gewählten Wert setzen (Kommentar „gewählt vom Nikinger am <Datum>, gemessen in 14.6.1"). C2-Wächter: neue Messung `koerper` in `p105_b8_c2_probe.mjs` an einem **festen** Eingang (3 Gruppen, Abstand so, dass sie sich bei `LOBE_CLOSE_PX = 0` **nicht** berühren — Muster `FESTE_POSITIONEN`, Z. ~407) + Gegenlauf `koerper` (`LOBE_CLOSE_PX` → 0) in `tests/test_graph_c2.py`. Die alte Furche-Messung bleibt. | `koerper` grün; der Gegenlauf `koerper` macht **genau diese** Messung rot, die acht alten Gegenläufe bleiben rot an genau ihrer Messung. |
-| **14.6.3** | Belege: `p105_b14_layout_probe.py` neu (Normalfall) · `p105_b14_karte_bilder.py` neu (Bilder ersetzen `docs/screenshots/p105_b14_karte_0{1,2,3}_*.png`, dieselben Namen) · `p105_b8_karte_probe.py` neu · volle Suite, `scripts/doc_health.py`, `phase5_ui/scripts/ui_budget.py`. Doku: §4-Zeile hier, Head (Modulstatus, Abnahmezeile **P10.5-72**, Summe, Session-Block), INDEX. | Die Knotenpositionen der Layout-Probe sind **gleich** zu `p105_b14_layout_probe.json` (alle Zellen gleich bis auf `zeit`) ⇒ das Layout ist unberührt, die sechs Gegenläufe müssen **nicht** neu. `koerper` grün mit dem gewählten Wert. Suite grün, `doc_health` 0, `ui_budget` grün. |
+| **14.6.3** ✅ 2026-10-28 | Belege: `p105_b14_layout_probe.py` neu (Normalfall) · `p105_b14_karte_bilder.py` neu (Bilder ersetzen `docs/screenshots/p105_b14_karte_0{1,2,3}_*.png`, dieselben Namen) · `p105_b8_karte_probe.py` neu · volle Suite, `scripts/doc_health.py`, `phase5_ui/scripts/ui_budget.py`. Doku: §4-Zeile hier, Head (Modulstatus, Abnahmezeile **P10.5-72**, Summe, Session-Block), INDEX. | Die Knotenpositionen der Layout-Probe sind **gleich** zu `p105_b14_layout_probe.json` (alle Zellen gleich bis auf `zeit`) ⇒ das Layout ist unberührt, die sechs Gegenläufe müssen **nicht** neu. `koerper` grün mit dem gewählten Wert. Suite grün, `doc_health` 0, `ui_budget` grün. |
 | 14.6.4 | **Claude Code:** Update-Log-Zeile anpassen (sie sagt heute „eigene Insel"), Sichtung **P10.5-70** neu beim Nikinger | — |
 
 ### Die Schritte 14.6.0 bis 14.6.4 — die Anmerkungen
@@ -181,6 +181,39 @@ vermutet.
 `~/p105_b14_6_varianten/<D>/` (**außerhalb** des Repos). Der **Standard** nach §3 wäre **160**
 (der kleinste Wert mit einer Komponente und einem Lappen je Space). Der Commit trägt
 `LOBE_CLOSE_PX = 0` — gesetzt wird der Wert in **14.6.2**.
+
+#### 14.6.3 ✅ 2026-10-28 — die Belege neu, **P10.5-72** geschlossen
+
+**Das Layout ist unberührt — gemessen, nicht behauptet.** Die Layout-Probe ist neu gefahren:
+**alle sechs Messungen sind identisch** mit dem Stand vor dem Schließen (Determinismus,
+Regionen, Kamera, Beschriftungen, Stabilität) — **bis auf** die *Tintenpixel* des Budgets:
+**7250 → 7253** (drei Pixel mehr, weil der geschlossene Körper eine winzige Fläche mehr
+malt). Die **Knotenpositionen** sind also **gleich** ⇒ das Layout ist unberührt ✓ (das ist die
+Abnahme des Plans §4).
+
+**Die Belege.** `p105_b14_karte_bilder.py` (neu): die `koerper`-Zelle ist **grün** — **1**
+Komponente (6274 Zellen), **1** Lappen je Space, **146** Furche-Zellen, **4** Paare, Reach
+**47,9 / 44,1 / 48,4 / 44,6 px** (Grenze 52), Luft **7,2 / 10,7 / 82,9 / 85,6 px**,
+`computeLobes()` **30,8 ms** (152 Knoten) · **34,6 ms** (201 Knoten, Median aus fünf Aufrufen)
+— und die **drei Bilder im Repo sind ersetzt** (derselbe Saat, derselbe Dateiname). Die
+Karten-Probe (`p105_b8_karte_probe.py`, Browser): **alle Messungen grün**.
+
+**Der Wächter folgt dem Zustand.** `tests/test_b14_karte_bilder.py` prüft jetzt die
+**Kriterien des Plans §5** statt der Zahlen der Basislinie: **ein** Körper, **ein** Lappen je
+Space, Furche-Zellen, mindestens **vier** Paare. Die Gegenproben sind **umgedreht**: an der
+Basislinie (14.6.0) musste ein *grüner* Beleg abgelehnt werden, jetzt muss ein *roter* abgelehnt
+werden — und zwei neue: **drei** Komponenten und **null** Furche-Zellen müssen rot machen.
+**19** Tests.
+
+**P10.5-72 ist geschlossen** (Plan §5): die Zeile steht jetzt **verbatim** im
+`ABNAHME_ARCHIVE.md`, die Summe im Head ist **64 ✅ · 0 ⚠️ · 8 ⬜ (von 72)**. **P10.5-70
+(Sichtung) bleibt ⬜** — die Bilder im Repo sind die neuen, das Urteil steht beim Nikinger.
+
+**Ein Detail, das die Zahlen verraten:** die Zeiten sind **kleiner** als in der Variante 160
+aus 14.6.1 (30,8 statt 28,4 ms bei 152 Knoten — das ist der Median aus fünf Aufrufen, und der
+einzelne Wert schwankt zwischen 16 und 31 ms). Die **Variante 160** und der **Wert 160** sind
+dieselbe Rechnung — die Bilder sind **byteweise identisch** mit den Variantenbildern unter
+`~/p105_b14_6_varianten/160/` ✓.
 
 #### 14.6.2 ✅ 2026-10-28 — der Wert steht, der Wächter beißt
 

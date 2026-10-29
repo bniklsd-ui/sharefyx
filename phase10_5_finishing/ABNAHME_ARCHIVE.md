@@ -1,13 +1,13 @@
 ---
 status: archive
-purpose: L3-Archiv der **geschlossenen** Abnahmezeilen der Phase 10.5 (P10.5-1–71 — die Zahl im Plan §5; bis 2026-10-25 stand hier „1–64", das ist die datierte Korrektur) — verbatim aus dem Phase-Head verschoben, weil der Head über dem Softcap stand. Der Head trägt die **offenen** Zeilen und die Summe, dieses Archiv die geschlossenen (mit ihrem Beleg).
+purpose: L3-Archiv der **geschlossenen** Abnahmezeilen der Phase 10.5 (P10.5-1–72 — die Zahl im Plan §5; bis 2026-10-25 stand hier „1–64", das ist die datierte Korrektur) — verbatim aus dem Phase-Head verschoben, weil der Head über dem Softcap stand. Der Head trägt die **offenen** Zeilen und die Summe, dieses Archiv die geschlossenen (mit ihrem Beleg).
 read-when: wenn zu einer abgeschlossenen Abnahmezeile der Beleg gesucht wird — der Kurzstand im Head nennt nur die Nummer
 detail: L3
 up: ../ROADMAP.md
 down:
   - CLAUDE.md                                          # der Phase-Head, aus dem die Zeilen verschoben wurden
   - ../docs/concepts/phase10_5_finishing_plan.md       # 📕 der Plan: Locks P10.5-A–W, Blöcke 0–12/Z, Abnahme
-updated: 2026-10-27 (Block 14.35: eine geschlossene Zeile ergänzt — P10.5-71 die Beschriftungen) | 2026-10-26 (Block 14.3: eine geschlossene Zeile ergänzt — P10.5-67 die Kamera) | 2026-10-26 (Block 14.2: drei geschlossene Zeilen ergänzt — P10.5-66 die Regionen, P10.5-68 die Stabilität, P10.5-69 das Budget) | 2026-10-26 (Block 14.1: P10.5-65 geschlossen — der Determinismus) | 2026-10-26 (Nikinger-Sichtung: P10.5-32/37/51 geschlossen) | 2026-10-25 (Block 13: drei geschlossene Zeilen ergänzt — P10.5-62/63/64) | 2026-10-25 (aus dem Phase-Head verschoben: der Head stand bei 41.398 B und damit über dem Softcap — derselbe Schnitt wie beim Modulstatus in Block 11.4)
+updated: 2026-10-28 (Block 14.6.3: eine geschlossene Zeile ergänzt — P10.5-72 der Körper) | 2026-10-27 (Block 14.35: eine geschlossene Zeile ergänzt — P10.5-71 die Beschriftungen) | 2026-10-26 (Block 14.3: eine geschlossene Zeile ergänzt — P10.5-67 die Kamera) | 2026-10-26 (Block 14.2: drei geschlossene Zeilen ergänzt — P10.5-66 die Regionen, P10.5-68 die Stabilität, P10.5-69 das Budget) | 2026-10-26 (Block 14.1: P10.5-65 geschlossen — der Determinismus) | 2026-10-26 (Nikinger-Sichtung: P10.5-32/37/51 geschlossen) | 2026-10-25 (Block 13: drei geschlossene Zeilen ergänzt — P10.5-62/63/64) | 2026-10-25 (aus dem Phase-Head verschoben: der Head stand bei 41.398 B und damit über dem Softcap — derselbe Schnitt wie beim Modulstatus in Block 11.4)
 ---
 # Abnahme-Archiv — die geschlossenen Zeilen der Phase 10.5
 
@@ -25,6 +25,7 @@ updated: 2026-10-27 (Block 14.35: eine geschlossene Zeile ergänzt — P10.5-71 
 
 | # | Kriterium | Status | Beleg |
 |---|---|---|---|
+| P10.5-72 | **Die Karte ist ein Körper** (Plan 14.6 §5): die Körpermaske aller Spaces bildet **eine** 4-zusammenhängende Komponente (mit den Furche-Zellen), jeder Space hat **genau einen** Lappen, zwischen berührenden Lappen liegt eine Furche und mindestens **vier** solche Paare existieren; die Kontur reicht ≤ 52 px über den äußersten Knoten (mit Luft > 0 px), die Knotenpositionen sind gleich zum Stand 14.5, `computeLobes()` ≤ 50 ms bei 201 Knoten | ✅ | `probes/p105_b14_karte_bilder.json` (Schritt 14.6.3): **1** Komponente (6274 Zellen), **1** Lappen je Space, **146** Furche-Zellen, **4** Paare, Reach **47,9 / 44,1 / 48,4 / 44,6 px**, Luft **7,2 / 10,7 / 82,9 / 85,6 px**, **30,8 ms** (152) · **34,6 ms** (201 Knoten) — der Gegenlauf `koerper` (`LOBE_CLOSE_PX` → 0) macht **genau diese** Zelle rot (3 Komponenten) |
 | P10.5-1 | Step-0-Bericht steht im Session-Block, `doc_health` 0 | ✅ | d5f6081 · doc_health 0 |
 | P10.5-2 | DO-2: INDEX ≥ 3.000 B unter der Grenze; ROADMAP-Wächter eingefroren; **[Nachtrag 2026-10-21]** Register ≥ 3.000 B unter der Grenze (0.8); Suite grün | ✅ | d5f6081 · 3e15f9e · f7ad5d9 |
 | P10.5-3 | DO-3: Wächter grün auf dem echten Head | ✅ | dieser Commit |

@@ -2,15 +2,15 @@
   "gegenlauf": null,
   "messungen": {
     "lappen": {
-      "lappen_pixel": 75256,
-      "kern_pixel": 1213,
+      "lappen_pixel": 284,
+      "kern_pixel": 1207,
       "ok": true
     },
     "filter": {
       "treffer_text": "10 Treffer",
-      "kern_ohne_suche": 1213,
-      "kern_mit_suche": 74,
-      "gedimmt_mit_suche": 1272,
+      "kern_ohne_suche": 1207,
+      "kern_mit_suche": 73,
+      "gedimmt_mit_suche": 1053,
       "filter_typ": "task",
       "kern_mit_filter": 383,
       "ok": true
@@ -24,20 +24,20 @@
         24,
         24
       ],
-      "kerne": 1213,
+      "kerne": 1207,
       "abstand": 13,
       "ablage_geaendert": true,
       "eintraege": 200,
       "pixel_vorher": 13,
       "pixel_nachher": 11,
-      "bild_vorher": 3782740024,
-      "bild_nachher": 142671744,
+      "bild_vorher": 3945794100,
+      "bild_nachher": 747972528,
       "bild_gleich": false,
       "ok": true
     },
     "reducedmotion": {
       "raf_calls": 0,
-      "kern_pixel": 1213,
+      "kern_pixel": 1207,
       "ok": true
     }
   },

@@ -15,9 +15,10 @@
     "CROSS_SPRING_FACTOR": "0.15",
     "CROSS_SPRING_LENGTH_FACTOR": "3",
     "ALPHA_START_SEEDED": "0.5",
-    "FIT_MARGIN": "56"
+    "FIT_MARGIN": "56",
+    "LOBE_CLOSE_PX": "160"
   },
-  "zeit": "2026-10-28T16:36:05.637525+00:00",
+  "zeit": "2026-10-29T09:55:19.115680+00:00",
   "seed": {
     "spaces": 5,
     "items": 152,
@@ -190,8 +191,8 @@
       "luecken_ms": [],
       "raf_calls": 130,
       "raf_calls_reduced_motion": 0,
-      "kern_pixel_reduced_motion": 7250,
-      "kern_pixel": 7250,
+      "kern_pixel_reduced_motion": 7253,
+      "kern_pixel": 7253,
       "grenze_ms": 3000,
       "kamera_200_knoten": {
         "messbar": true,

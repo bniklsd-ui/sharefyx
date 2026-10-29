@@ -93,8 +93,10 @@ def _abnahme_zeilen() -> list[str]:
     **Die Zahl ist nicht festgemacht, sie ist eine Zusage über den Plan:** Block 13 hat
     drei Zeilen (62/63/64) hinzugefügt, der Plan §5 sagt seither „64 Zeilen"; Block 14.0
     hat sieben weitere (65–71, das Kartenlayout — Plan
-    `docs/concepts/phase10_5_block14_kartenlayout_plan.md` §5) hinzugefügt, der Plan sagt
-    seither „71 Zeilen". Wer eine Zeile hinzufügt, muss **hier und im Plan** dieselbe Zahl
+    `docs/concepts/phase10_5_block14_kartenlayout_plan.md` §5) hinzugefügt, der Plan sagte
+    seither „71 Zeilen"; Block 14.6.3 hat eine weitere (72, die Gehirnkarte als **ein
+    Körper** — Plan `docs/concepts/phase10_5_block14_6_plan.md` §5) hinzugefügt, der Plan sagt
+    seither „72 Zeilen". Wer eine Zeile hinzufügt, muss **hier und im Plan** dieselbe Zahl
     schreiben — sonst prüft der Wächter eine andere Menge als die, die der Plan verspricht.
     """
     zeilen: list[str] = []
@@ -119,7 +121,7 @@ def test_the_acceptance_sum_matches_the_table():
     geschlossenen Zeilen stehen im L3-Archiv `ABNAHME_ARCHIVE.md`.
     """
     rows = _abnahme_zeilen()
-    assert len(rows) == 71, f"die Abnahmetabelle hat {len(rows)} Zeilen, erwartet 71"
+    assert len(rows) == 72, f"die Abnahmetabelle hat {len(rows)} Zeilen, erwartet 72"
     counted = {
         "✅": sum(1 for line in rows if "| ✅ |" in line),
         "⚠️": sum(1 for line in rows if "| ⚠️ |" in line),
@@ -154,9 +156,9 @@ def test_the_closed_rows_are_in_the_archive_and_the_open_ones_in_the_head():
     assert not (nummern_head & nummern_archiv), (
         f"diese Zeilen stehen in beiden Listen: {sorted(nummern_head & nummern_archiv)}"
     )
-    assert len(nummern_head | nummern_archiv) == 71, (
+    assert len(nummern_head | nummern_archiv) == 72, (
         f"zusammen tragen die beiden Listen {len(nummern_head | nummern_archiv)} Zeilen, "
-        "erwartet 71"
+        "erwartet 72"
     )
 
 
