@@ -261,6 +261,8 @@ BLOCK14_KONSTANTEN = [
     "REGION_ITEM_STEP", "REGION_PAD", "REGION_GAP", "ISLAND_FACTOR", "ITEM_STEP",
     "ITEM_JITTER_PX", "GOLDEN_ANGLE", "ANCHOR_GRAVITY", "CROSS_SPRING_FACTOR",
     "CROSS_SPRING_LENGTH_FACTOR", "ALPHA_START_SEEDED", "FIT_MARGIN", "LOBE_CLOSE_PX",
+    # Plan 14.7 (Schritt 14.7.1): die drei Hebel und die Glaettung
+    "ANCHOR_LAYOUT", "ANCHOR_HEX_ORDER", "LOBE_SCALE", "LOBE_SMOOTH_PASSES",
 ]
 
 #: **Das Messpflaster** (Schritt 14.6.0): ein Patch, der **keinen Fehler** einbaut, sondern

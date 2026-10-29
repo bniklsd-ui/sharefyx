@@ -1760,10 +1760,17 @@ function traceContour(member, cols, rows, cell, minX, minY) {
     var idx = Number(key);
     var gx = idx % cols;
     var gy = Math.floor(idx / cols);
-    var x0 = minX + gx * cell;
-    var y0 = minY + gy * cell;
-    var x1 = x0 + cell;
-    var y1 = y0 + cell;
+    // **In Gitterkoordinaten, nicht in Weltkoordinaten** (Plan 14.7, Fund 14.7.2, 2026-10-29):
+    // `chainEdges()` verkettet ueber die Endpunkte als **Text-Schluessel**. Mit einer krummen
+    // Zellgroesse (der Deckel `LOBE_MAX_CELLS` macht aus 8 px z. B. 8,37 px) ist `x0 + cell`
+    // nicht bitgleich zu `minX + (gx + 1) * cell` -- die Schluessel passen nicht, die Kontur
+    // zerfaellt in Bruchstuecke mit Sehnen und der Koerper verschwindet (gemessen: eine
+    // Kreisscheibe → 4 Schleifen bei 8,37 px). Ganzzahlige Ecken verketten immer; in Welt-
+    // koordinaten wird erst **nach** dem Verketten umgerechnet.
+    var x0 = gx;
+    var y0 = gy;
+    var x1 = gx + 1;
+    var y1 = gy + 1;
     // Orientierung im Uhrzeigersinn (y nach unten): oben (x1→x0), links (y0→y1),
     // unten (x0→x1), rechts (y1→y0). So laeuft die Kontur geschlossen um die Menge.
     // **Der Rasterrand ist "draussen"** (2026-10-28): vorher fiel die Kante dort *weg* -- die
@@ -1777,7 +1784,11 @@ function traceContour(member, cols, rows, cell, minX, minY) {
     if (gx === cols - 1 || !member[idx + 1]) edges.push([x1, y1, x1, y0]);
   }
   if (!edges.length) return null;
-  return chainEdges(edges);
+  var loops = chainEdges(edges);
+  if (!loops) return null;
+  return loops.map(function (l) {
+    return l.map(function (p) { return [minX + p[0] * cell, minY + p[1] * cell]; });
+  });
 }
 
 // Die Kanten zu Konturen verketten: eine Kante beginnt dort, wo die vorige endet.

@@ -1,0 +1,1410 @@
+{
+  "probe": "p105_b14_7_raster",
+  "schritt": "14.7.2",
+  "varianten": {
+    "spirale_s1": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"spirale\"",
+        "LOBE_SCALE": "1"
+      },
+      "layout_lauf": {
+        "sekunden": 43
+      },
+      "layout": {
+        "zellen": {
+          "determinismus": true,
+          "regionen": true,
+          "kamera": true,
+          "beschriftungen": true,
+          "stabilitaet": true,
+          "budget": true
+        },
+        "stabil": true,
+        "stabilitaet_median_px": 0.0,
+        "stabilitaet_max_px": 2.23606797749979,
+        "regionen_anteil": 1.0,
+        "regionen_marge_min_px": 171.79457725535065,
+        "kamera_fuellgrad": 0.9112933333333333,
+        "kamera_zoom": 0.90018,
+        "budget_ruhe_ms": 2146,
+        "beschriftungen_gezeichnet": 10,
+        "konstanten_gesendet": {
+          "REGION_ITEM_STEP": "22",
+          "REGION_PAD": "30",
+          "REGION_GAP": "40",
+          "ISLAND_FACTOR": "0.55",
+          "ITEM_STEP": "14",
+          "ITEM_JITTER_PX": "8",
+          "GOLDEN_ANGLE": "2.399963229728653",
+          "ANCHOR_GRAVITY": "0.02",
+          "CROSS_SPRING_FACTOR": "0.15",
+          "CROSS_SPRING_LENGTH_FACTOR": "3",
+          "ALPHA_START_SEEDED": "0.5",
+          "FIT_MARGIN": "56",
+          "LOBE_CLOSE_PX": "160",
+          "ANCHOR_LAYOUT": "\"spirale\"",
+          "ANCHOR_HEX_ORDER": "\"fortlaufend\"",
+          "LOBE_SCALE": "1",
+          "LOBE_SMOOTH_PASSES": "0"
+        },
+        "alle_kriterien_erfuellt": true
+      },
+      "bilder_lauf": {
+        "sekunden": 38
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "epsilon": 1,
+          "delta": 1,
+          "alpha": 1,
+          "gamma": 1,
+          "beta": 1
+        },
+        "furche_zellen": 146,
+        "paare": 4,
+        "reach_px": {
+          "links": 47.89908406439142,
+          "rechts": 44.10091593560878,
+          "oben": 48.37936204754027,
+          "unten": 44.620637952459674
+        },
+        "luft_px": {
+          "links": 7.200718167317206,
+          "rechts": 10.687633749949555,
+          "oben": 82.90286831994558,
+          "unten": 85.5828132138679
+        },
+        "compute_lobes_ms_201": 36.39999997615814,
+        "soliditaet": 0.497,
+        "nn_median_px": 25.1,
+        "zusatzkruemmung": 11.096,
+        "kontur_abstand_px": 8.0,
+        "kanten_aussen": 0.2949,
+        "form_zellen": {
+          "fuelle": false,
+          "verteilung": false,
+          "kontur_welligkeit": false,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/spirale_s1"
+    },
+    "spirale_s1.25": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"spirale\"",
+        "LOBE_SCALE": "1.25"
+      },
+      "layout_lauf": {
+        "sekunden": 44
+      },
+      "layout": {
+        "zellen": {
+          "determinismus": true,
+          "regionen": true,
+          "kamera": true,
+          "beschriftungen": true,
+          "stabilitaet": true,
+          "budget": true
+        },
+        "stabil": false,
+        "stabilitaet_median_px": 1.4142135623730951,
+        "stabilitaet_max_px": 34.88552708502482,
+        "regionen_anteil": 1.0,
+        "regionen_marge_min_px": 111.67989915046014,
+        "kamera_fuellgrad": 0.9134133051146385,
+        "kamera_zoom": 0.879296,
+        "budget_ruhe_ms": 2146,
+        "beschriftungen_gezeichnet": 10,
+        "konstanten_gesendet": {
+          "REGION_ITEM_STEP": "22",
+          "REGION_PAD": "30",
+          "REGION_GAP": "40",
+          "ISLAND_FACTOR": "0.55",
+          "ITEM_STEP": "14",
+          "ITEM_JITTER_PX": "8",
+          "GOLDEN_ANGLE": "2.399963229728653",
+          "ANCHOR_GRAVITY": "0.02",
+          "CROSS_SPRING_FACTOR": "0.15",
+          "CROSS_SPRING_LENGTH_FACTOR": "3",
+          "ALPHA_START_SEEDED": "0.5",
+          "FIT_MARGIN": "56",
+          "LOBE_CLOSE_PX": "160",
+          "ANCHOR_LAYOUT": "\"spirale\"",
+          "ANCHOR_HEX_ORDER": "\"fortlaufend\"",
+          "LOBE_SCALE": "1.25",
+          "LOBE_SMOOTH_PASSES": "0"
+        },
+        "alle_kriterien_erfuellt": true
+      },
+      "bilder_lauf": {
+        "sekunden": 36
+      },
+      "bilder": {
+        "koerper_ok": false,
+        "koerper_grund": "Reach {'links': 46.746484339815936, 'rechts': 47.03598349931167, 'oben': 55.083000468695, 'unten': 52.320295854637834} / Luft {'links': 7.900065949830591, 'rechts': 7.900069549588807, 'oben': 69.53778027851581, 'unten': 71.79935652480401}",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "epsilon": 1,
+          "delta": 1,
+          "gamma": 1,
+          "alpha": 1,
+          "beta": 1
+        },
+        "furche_zellen": 244,
+        "paare": 5,
+        "reach_px": {
+          "links": 46.746484339815936,
+          "rechts": 47.03598349931167,
+          "oben": 55.083000468695,
+          "unten": 52.320295854637834
+        },
+        "luft_px": {
+          "links": 7.900065949830591,
+          "rechts": 7.900069549588807,
+          "oben": 69.53778027851581,
+          "unten": 71.79935652480401
+        },
+        "compute_lobes_ms_201": 40.10000002384186,
+        "soliditaet": 0.6026,
+        "nn_median_px": 30.8,
+        "zusatzkruemmung": 9.279,
+        "kontur_abstand_px": 8.05,
+        "kanten_aussen": 0.1598,
+        "form_zellen": {
+          "fuelle": false,
+          "verteilung": false,
+          "kontur_welligkeit": false,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/spirale_s1.25"
+    },
+    "spirale_s1.5": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"spirale\"",
+        "LOBE_SCALE": "1.5"
+      },
+      "layout_lauf": {
+        "sekunden": 43
+      },
+      "layout": {
+        "zellen": {
+          "determinismus": true,
+          "regionen": true,
+          "kamera": true,
+          "beschriftungen": true,
+          "stabilitaet": false,
+          "budget": true
+        },
+        "stabil": false,
+        "stabilitaet_median_px": 4.242640687119285,
+        "stabilitaet_max_px": 195.15122341404884,
+        "regionen_anteil": 1.0,
+        "regionen_marge_min_px": 78.08455376682838,
+        "kamera_fuellgrad": 0.9156790850440917,
+        "kamera_zoom": 0.85322932,
+        "budget_ruhe_ms": 2147,
+        "beschriftungen_gezeichnet": 9,
+        "konstanten_gesendet": {
+          "REGION_ITEM_STEP": "22",
+          "REGION_PAD": "30",
+          "REGION_GAP": "40",
+          "ISLAND_FACTOR": "0.55",
+          "ITEM_STEP": "14",
+          "ITEM_JITTER_PX": "8",
+          "GOLDEN_ANGLE": "2.399963229728653",
+          "ANCHOR_GRAVITY": "0.02",
+          "CROSS_SPRING_FACTOR": "0.15",
+          "CROSS_SPRING_LENGTH_FACTOR": "3",
+          "ALPHA_START_SEEDED": "0.5",
+          "FIT_MARGIN": "56",
+          "LOBE_CLOSE_PX": "160",
+          "ANCHOR_LAYOUT": "\"spirale\"",
+          "ANCHOR_HEX_ORDER": "\"fortlaufend\"",
+          "LOBE_SCALE": "1.5",
+          "LOBE_SMOOTH_PASSES": "0"
+        },
+        "alle_kriterien_erfuellt": false
+      },
+      "bilder_lauf": {
+        "sekunden": 34
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "epsilon": 1,
+          "delta": 1,
+          "gamma": 1,
+          "alpha": 1,
+          "beta": 1
+        },
+        "furche_zellen": 312,
+        "paare": 6,
+        "reach_px": {
+          "links": 50.85261392748477,
+          "rechts": 51.75593082412388,
+          "oben": 50.8553474298821,
+          "unten": 48.06925539489248
+        },
+        "luft_px": {
+          "links": 4.013339259312332,
+          "rechts": 4.0133306383463605,
+          "oben": 61.20118930990782,
+          "unten": 64.20848004252105
+        },
+        "compute_lobes_ms_201": 32.80000001192093,
+        "soliditaet": 0.6739,
+        "nn_median_px": 37.56,
+        "zusatzkruemmung": 9.629,
+        "kontur_abstand_px": 8.25,
+        "kanten_aussen": 0.0584,
+        "form_zellen": {
+          "fuelle": false,
+          "verteilung": true,
+          "kontur_welligkeit": false,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/spirale_s1.5"
+    },
+    "hexf_s1": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"hex\"",
+        "ANCHOR_HEX_ORDER": "\"fortlaufend\"",
+        "LOBE_SCALE": "1"
+      },
+      "layout_lauf": {
+        "sekunden": 44
+      },
+      "layout": {
+        "zellen": {
+          "determinismus": true,
+          "regionen": true,
+          "kamera": true,
+          "beschriftungen": true,
+          "stabilitaet": true,
+          "budget": true
+        },
+        "stabil": false,
+        "stabilitaet_median_px": 1.0,
+        "stabilitaet_max_px": 9.848857801796104,
+        "regionen_anteil": 1.0,
+        "regionen_marge_min_px": 107.92745065734168,
+        "kamera_fuellgrad": 0.6811918501943234,
+        "kamera_zoom": 1,
+        "budget_ruhe_ms": 2147,
+        "beschriftungen_gezeichnet": 11,
+        "konstanten_gesendet": {
+          "REGION_ITEM_STEP": "22",
+          "REGION_PAD": "30",
+          "REGION_GAP": "40",
+          "ISLAND_FACTOR": "0.55",
+          "ITEM_STEP": "14",
+          "ITEM_JITTER_PX": "8",
+          "GOLDEN_ANGLE": "2.399963229728653",
+          "ANCHOR_GRAVITY": "0.02",
+          "CROSS_SPRING_FACTOR": "0.15",
+          "CROSS_SPRING_LENGTH_FACTOR": "3",
+          "ALPHA_START_SEEDED": "0.5",
+          "FIT_MARGIN": "56",
+          "LOBE_CLOSE_PX": "160",
+          "ANCHOR_LAYOUT": "\"hex\"",
+          "ANCHOR_HEX_ORDER": "\"fortlaufend\"",
+          "LOBE_SCALE": "1",
+          "LOBE_SMOOTH_PASSES": "0"
+        },
+        "alle_kriterien_erfuellt": true
+      },
+      "bilder_lauf": {
+        "sekunden": 31
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "gamma": 1,
+          "epsilon": 1,
+          "beta": 1,
+          "alpha": 1,
+          "delta": 1
+        },
+        "furche_zellen": 284,
+        "paare": 7,
+        "reach_px": {
+          "links": 48.09520516455822,
+          "rechts": 45.90479483544175,
+          "oben": 48.05870658126477,
+          "unten": 44.9412934187352
+        },
+        "luft_px": {
+          "links": 141.99548163353748,
+          "rechts": 144.00451836646255,
+          "oben": 121.37054222854968,
+          "unten": 124.00445777145035
+        },
+        "compute_lobes_ms_201": 34,
+        "soliditaet": 0.8762,
+        "nn_median_px": 25.02,
+        "zusatzkruemmung": 12.797,
+        "kontur_abstand_px": 8.0,
+        "kanten_aussen": 0.0,
+        "form_zellen": {
+          "fuelle": true,
+          "verteilung": false,
+          "kontur_welligkeit": false,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/hexf_s1"
+    },
+    "hexf_s1.25": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"hex\"",
+        "ANCHOR_HEX_ORDER": "\"fortlaufend\"",
+        "LOBE_SCALE": "1.25"
+      },
+      "layout_lauf": {
+        "sekunden": 53
+      },
+      "layout": {
+        "zellen": {
+          "determinismus": true,
+          "regionen": true,
+          "kamera": true,
+          "beschriftungen": true,
+          "stabilitaet": true,
+          "budget": true
+        },
+        "stabil": false,
+        "stabilitaet_median_px": 1.0,
+        "stabilitaet_max_px": 5.0990195135927845,
+        "regionen_anteil": 1.0,
+        "regionen_marge_min_px": 57.423929910136536,
+        "kamera_fuellgrad": 0.726560616517163,
+        "kamera_zoom": 1.0001987994239998,
+        "budget_ruhe_ms": 2147,
+        "beschriftungen_gezeichnet": 11,
+        "konstanten_gesendet": {
+          "REGION_ITEM_STEP": "22",
+          "REGION_PAD": "30",
+          "REGION_GAP": "40",
+          "ISLAND_FACTOR": "0.55",
+          "ITEM_STEP": "14",
+          "ITEM_JITTER_PX": "8",
+          "GOLDEN_ANGLE": "2.399963229728653",
+          "ANCHOR_GRAVITY": "0.02",
+          "CROSS_SPRING_FACTOR": "0.15",
+          "CROSS_SPRING_LENGTH_FACTOR": "3",
+          "ALPHA_START_SEEDED": "0.5",
+          "FIT_MARGIN": "56",
+          "LOBE_CLOSE_PX": "160",
+          "ANCHOR_LAYOUT": "\"hex\"",
+          "ANCHOR_HEX_ORDER": "\"fortlaufend\"",
+          "LOBE_SCALE": "1.25",
+          "LOBE_SMOOTH_PASSES": "0"
+        },
+        "alle_kriterien_erfuellt": true
+      },
+      "bilder_lauf": {
+        "sekunden": 31
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "gamma": 1,
+          "epsilon": 1,
+          "beta": 1,
+          "alpha": 1,
+          "delta": 1
+        },
+        "furche_zellen": 326,
+        "paare": 7,
+        "reach_px": {
+          "links": 47.75909576861483,
+          "rechts": 49.24090423138523,
+          "oben": 48.15406779906941,
+          "unten": 44.84593220093063
+        },
+        "luft_px": {
+          "links": 123.70052184613127,
+          "rechts": 122.29947815386868,
+          "oben": 97.20144672729778,
+          "unten": 100.17355327270218
+        },
+        "compute_lobes_ms_201": 39.80000001192093,
+        "soliditaet": 0.8754,
+        "nn_median_px": 30.38,
+        "zusatzkruemmung": 12.267,
+        "kontur_abstand_px": 8.0,
+        "kanten_aussen": 0.0,
+        "form_zellen": {
+          "fuelle": true,
+          "verteilung": false,
+          "kontur_welligkeit": false,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/hexf_s1.25"
+    },
+    "hexf_s1.5": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"hex\"",
+        "ANCHOR_HEX_ORDER": "\"fortlaufend\"",
+        "LOBE_SCALE": "1.5"
+      },
+      "layout_lauf": {
+        "sekunden": 58
+      },
+      "layout": {
+        "zellen": {
+          "determinismus": true,
+          "regionen": true,
+          "kamera": true,
+          "beschriftungen": true,
+          "stabilitaet": false,
+          "budget": true
+        },
+        "stabil": false,
+        "stabilitaet_median_px": 1.0,
+        "stabilitaet_max_px": 20.396078054371138,
+        "regionen_anteil": 1.0,
+        "regionen_marge_min_px": 11.83238326806159,
+        "kamera_fuellgrad": 0.7664469861453304,
+        "kamera_zoom": 1.00059984,
+        "budget_ruhe_ms": 2147,
+        "beschriftungen_gezeichnet": 11,
+        "konstanten_gesendet": {
+          "REGION_ITEM_STEP": "22",
+          "REGION_PAD": "30",
+          "REGION_GAP": "40",
+          "ISLAND_FACTOR": "0.55",
+          "ITEM_STEP": "14",
+          "ITEM_JITTER_PX": "8",
+          "GOLDEN_ANGLE": "2.399963229728653",
+          "ANCHOR_GRAVITY": "0.02",
+          "CROSS_SPRING_FACTOR": "0.15",
+          "CROSS_SPRING_LENGTH_FACTOR": "3",
+          "ALPHA_START_SEEDED": "0.5",
+          "FIT_MARGIN": "56",
+          "LOBE_CLOSE_PX": "160",
+          "ANCHOR_LAYOUT": "\"hex\"",
+          "ANCHOR_HEX_ORDER": "\"fortlaufend\"",
+          "LOBE_SCALE": "1.5",
+          "LOBE_SMOOTH_PASSES": "0"
+        },
+        "alle_kriterien_erfuellt": false
+      },
+      "bilder_lauf": {
+        "sekunden": 31
+      },
+      "bilder": {
+        "koerper_ok": false,
+        "koerper_grund": "Reach {'links': 47.586573788433554, 'rechts': 52.4134262115665, 'oben': 47.75869285766471, 'unten': 51.241307142335245} / Luft {'links': 92.98775177308988, 'rechts': 89.01224822691006, 'oben': 76.14751899536263, 'unten': 73.22748100463741}",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "gamma": 1,
+          "epsilon": 1,
+          "beta": 1,
+          "alpha": 1,
+          "delta": 1
+        },
+        "furche_zellen": 374,
+        "paare": 7,
+        "reach_px": {
+          "links": 47.586573788433554,
+          "rechts": 52.4134262115665,
+          "oben": 47.75869285766471,
+          "unten": 51.241307142335245
+        },
+        "luft_px": {
+          "links": 92.98775177308988,
+          "rechts": 89.01224822691006,
+          "oben": 76.14751899536263,
+          "unten": 73.22748100463741
+        },
+        "compute_lobes_ms_201": 37,
+        "soliditaet": 0.8871,
+        "nn_median_px": 36.03,
+        "zusatzkruemmung": 11.868,
+        "kontur_abstand_px": 8.0,
+        "kanten_aussen": 0.0,
+        "form_zellen": {
+          "fuelle": true,
+          "verteilung": true,
+          "kontur_welligkeit": false,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/hexf_s1.5"
+    },
+    "hexg_s1": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"hex\"",
+        "ANCHOR_HEX_ORDER": "\"gegenueber\"",
+        "LOBE_SCALE": "1"
+      },
+      "layout_lauf": {
+        "sekunden": 50
+      },
+      "layout": {
+        "zellen": {
+          "determinismus": true,
+          "regionen": true,
+          "kamera": true,
+          "beschriftungen": true,
+          "stabilitaet": true,
+          "budget": true
+        },
+        "stabil": false,
+        "stabilitaet_median_px": 1.0,
+        "stabilitaet_max_px": 22.80350850198276,
+        "regionen_anteil": 1.0,
+        "regionen_marge_min_px": 101.61505738022595,
+        "kamera_fuellgrad": 0.6790123456790124,
+        "kamera_zoom": 1,
+        "budget_ruhe_ms": 2147,
+        "beschriftungen_gezeichnet": 7,
+        "konstanten_gesendet": {
+          "REGION_ITEM_STEP": "22",
+          "REGION_PAD": "30",
+          "REGION_GAP": "40",
+          "ISLAND_FACTOR": "0.55",
+          "ITEM_STEP": "14",
+          "ITEM_JITTER_PX": "8",
+          "GOLDEN_ANGLE": "2.399963229728653",
+          "ANCHOR_GRAVITY": "0.02",
+          "CROSS_SPRING_FACTOR": "0.15",
+          "CROSS_SPRING_LENGTH_FACTOR": "3",
+          "ALPHA_START_SEEDED": "0.5",
+          "FIT_MARGIN": "56",
+          "LOBE_CLOSE_PX": "160",
+          "ANCHOR_LAYOUT": "\"hex\"",
+          "ANCHOR_HEX_ORDER": "\"gegenueber\"",
+          "LOBE_SCALE": "1",
+          "LOBE_SMOOTH_PASSES": "0"
+        },
+        "alle_kriterien_erfuellt": true
+      },
+      "bilder_lauf": {
+        "sekunden": 31
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "beta": 1,
+          "gamma": 1,
+          "alpha": 1,
+          "epsilon": 1,
+          "delta": 1
+        },
+        "furche_zellen": 248,
+        "paare": 6,
+        "reach_px": {
+          "links": 48.085333043754815,
+          "rechts": 45.91466695624513,
+          "oben": 47.645134771468605,
+          "unten": 47.35486522853137
+        },
+        "luft_px": {
+          "links": 133.70765668708015,
+          "rechts": 136.2923433129199,
+          "oben": 134.38847080409292,
+          "unten": 134.9865291959071
+        },
+        "compute_lobes_ms_201": 36.59999996423721,
+        "soliditaet": 0.7308,
+        "nn_median_px": 24.4,
+        "zusatzkruemmung": 11.227,
+        "kontur_abstand_px": 8.0,
+        "kanten_aussen": 0.2151,
+        "form_zellen": {
+          "fuelle": false,
+          "verteilung": false,
+          "kontur_welligkeit": false,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/hexg_s1"
+    },
+    "hexg_s1.25": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"hex\"",
+        "ANCHOR_HEX_ORDER": "\"gegenueber\"",
+        "LOBE_SCALE": "1.25"
+      },
+      "layout_lauf": {
+        "sekunden": 48
+      },
+      "layout": {
+        "zellen": {
+          "determinismus": true,
+          "regionen": true,
+          "kamera": true,
+          "beschriftungen": true,
+          "stabilitaet": false,
+          "budget": true
+        },
+        "stabil": false,
+        "stabilitaet_median_px": 1.0,
+        "stabilitaet_max_px": 13.45362404707371,
+        "regionen_anteil": 1.0,
+        "regionen_marge_min_px": 67.41552443561436,
+        "kamera_fuellgrad": 0.7425044091710759,
+        "kamera_zoom": 1,
+        "budget_ruhe_ms": 2147,
+        "beschriftungen_gezeichnet": 10,
+        "konstanten_gesendet": {
+          "REGION_ITEM_STEP": "22",
+          "REGION_PAD": "30",
+          "REGION_GAP": "40",
+          "ISLAND_FACTOR": "0.55",
+          "ITEM_STEP": "14",
+          "ITEM_JITTER_PX": "8",
+          "GOLDEN_ANGLE": "2.399963229728653",
+          "ANCHOR_GRAVITY": "0.02",
+          "CROSS_SPRING_FACTOR": "0.15",
+          "CROSS_SPRING_LENGTH_FACTOR": "3",
+          "ALPHA_START_SEEDED": "0.5",
+          "FIT_MARGIN": "56",
+          "LOBE_CLOSE_PX": "160",
+          "ANCHOR_LAYOUT": "\"hex\"",
+          "ANCHOR_HEX_ORDER": "\"gegenueber\"",
+          "LOBE_SCALE": "1.25",
+          "LOBE_SMOOTH_PASSES": "0"
+        },
+        "alle_kriterien_erfuellt": false
+      },
+      "bilder_lauf": {
+        "sekunden": 30
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "beta": 1,
+          "gamma": 1,
+          "alpha": 1,
+          "epsilon": 1,
+          "delta": 1
+        },
+        "furche_zellen": 326,
+        "paare": 6,
+        "reach_px": {
+          "links": 48.494496547295455,
+          "rechts": 45.50550345270449,
+          "oben": 48.45745223930393,
+          "unten": 44.54254776069604
+        },
+        "luft_px": {
+          "links": 97.80810335962593,
+          "rechts": 100.19189664037413,
+          "oben": 104.86411338874782,
+          "unten": 108.5108866112522
+        },
+        "compute_lobes_ms_201": 9.300000011920929,
+        "soliditaet": 0.7962,
+        "nn_median_px": 30.91,
+        "zusatzkruemmung": 11.381,
+        "kontur_abstand_px": 8.0,
+        "kanten_aussen": 0.1198,
+        "form_zellen": {
+          "fuelle": true,
+          "verteilung": false,
+          "kontur_welligkeit": false,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/hexg_s1.25"
+    },
+    "hexg_s1.5": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"hex\"",
+        "ANCHOR_HEX_ORDER": "\"gegenueber\"",
+        "LOBE_SCALE": "1.5"
+      },
+      "layout_lauf": {
+        "sekunden": 46
+      },
+      "layout": {
+        "zellen": {
+          "determinismus": true,
+          "regionen": true,
+          "kamera": true,
+          "beschriftungen": true,
+          "stabilitaet": true,
+          "budget": true
+        },
+        "stabil": false,
+        "stabilitaet_median_px": 1.0,
+        "stabilitaet_max_px": 9.055385138137417,
+        "regionen_anteil": 1.0,
+        "regionen_marge_min_px": 21.820406539315314,
+        "kamera_fuellgrad": 0.7828115399999795,
+        "kamera_zoom": 1.0007985190078657,
+        "budget_ruhe_ms": 2147,
+        "beschriftungen_gezeichnet": 13,
+        "konstanten_gesendet": {
+          "REGION_ITEM_STEP": "22",
+          "REGION_PAD": "30",
+          "REGION_GAP": "40",
+          "ISLAND_FACTOR": "0.55",
+          "ITEM_STEP": "14",
+          "ITEM_JITTER_PX": "8",
+          "GOLDEN_ANGLE": "2.399963229728653",
+          "ANCHOR_GRAVITY": "0.02",
+          "CROSS_SPRING_FACTOR": "0.15",
+          "CROSS_SPRING_LENGTH_FACTOR": "3",
+          "ALPHA_START_SEEDED": "0.5",
+          "FIT_MARGIN": "56",
+          "LOBE_CLOSE_PX": "160",
+          "ANCHOR_LAYOUT": "\"hex\"",
+          "ANCHOR_HEX_ORDER": "\"gegenueber\"",
+          "LOBE_SCALE": "1.5",
+          "LOBE_SMOOTH_PASSES": "0"
+        },
+        "alle_kriterien_erfuellt": true
+      },
+      "bilder_lauf": {
+        "sekunden": 31
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "beta": 1,
+          "gamma": 1,
+          "alpha": 1,
+          "epsilon": 1,
+          "delta": 1
+        },
+        "furche_zellen": 387,
+        "paare": 7,
+        "reach_px": {
+          "links": 47.52373135382075,
+          "rechts": 49.47626864617928,
+          "oben": 48.01929302192244,
+          "unten": 48.98070697807759
+        },
+        "luft_px": {
+          "links": 75.96744239038091,
+          "rechts": 74.03255760961906,
+          "oben": 83.08672599815813,
+          "unten": 82.28827400184184
+        },
+        "compute_lobes_ms_201": 48.40000003576279,
+        "soliditaet": 0.8303,
+        "nn_median_px": 35.95,
+        "zusatzkruemmung": 11.423,
+        "kontur_abstand_px": 8.0,
+        "kanten_aussen": 0.0492,
+        "form_zellen": {
+          "fuelle": true,
+          "verteilung": true,
+          "kontur_welligkeit": false,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/hexg_s1.5"
+    },
+    "spirale_s1.5_glatt2": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"spirale\"",
+        "LOBE_SCALE": "1.5",
+        "LOBE_SMOOTH_PASSES": "2"
+      },
+      "bilder_lauf": {
+        "sekunden": 32
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "epsilon": 1,
+          "delta": 1,
+          "gamma": 1,
+          "alpha": 1,
+          "beta": 1
+        },
+        "furche_zellen": 312,
+        "paare": 6,
+        "reach_px": {
+          "links": 50.85261392748477,
+          "rechts": 51.240458736329856,
+          "oben": 50.339875342088504,
+          "unten": 48.06925539489248
+        },
+        "luft_px": {
+          "links": 4.013339259312332,
+          "rechts": 4.4531639704177906,
+          "oben": 61.64102264197904,
+          "unten": 64.20848004252105
+        },
+        "compute_lobes_ms_201": 44.60000002384186,
+        "soliditaet": 0.6739,
+        "nn_median_px": 37.56,
+        "zusatzkruemmung": 1.941,
+        "kontur_abstand_px": 11.66,
+        "kanten_aussen": 0.0584,
+        "form_zellen": {
+          "fuelle": false,
+          "verteilung": true,
+          "kontur_welligkeit": true,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/spirale_s1.5_glatt2"
+    },
+    "spirale_s1.5_glatt4": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"spirale\"",
+        "LOBE_SCALE": "1.5",
+        "LOBE_SMOOTH_PASSES": "4"
+      },
+      "bilder_lauf": {
+        "sekunden": 42
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "epsilon": 1,
+          "delta": 1,
+          "gamma": 1,
+          "alpha": 1,
+          "beta": 1
+        },
+        "furche_zellen": 312,
+        "paare": 6,
+        "reach_px": {
+          "links": 50.85261392748477,
+          "rechts": 50.273948571717256,
+          "oben": 49.373365177475506,
+          "unten": 47.94844162431559
+        },
+        "luft_px": {
+          "links": 4.013339259312332,
+          "rechts": 5.27785146805104,
+          "oben": 62.4657101396126,
+          "unten": 64.3115659797254
+        },
+        "compute_lobes_ms_201": 41.30000001192093,
+        "soliditaet": 0.6739,
+        "nn_median_px": 37.56,
+        "zusatzkruemmung": 0.962,
+        "kontur_abstand_px": 11.75,
+        "kanten_aussen": 0.0584,
+        "form_zellen": {
+          "fuelle": false,
+          "verteilung": true,
+          "kontur_welligkeit": true,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/spirale_s1.5_glatt4"
+    },
+    "spirale_s1.5_glatt6": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"spirale\"",
+        "LOBE_SCALE": "1.5",
+        "LOBE_SMOOTH_PASSES": "6"
+      },
+      "bilder_lauf": {
+        "sekunden": 31
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "epsilon": 1,
+          "delta": 1,
+          "gamma": 1,
+          "alpha": 1,
+          "beta": 1
+        },
+        "furche_zellen": 312,
+        "paare": 6,
+        "reach_px": {
+          "links": 50.85261392748477,
+          "rechts": 49.55409985536471,
+          "oben": 48.639421521222516,
+          "unten": 47.66880808450196
+        },
+        "luft_px": {
+          "links": 4.013339259312332,
+          "rechts": 5.892071843892836,
+          "oben": 63.09195720812807,
+          "unten": 64.5501669718791
+        },
+        "compute_lobes_ms_201": 32.5,
+        "soliditaet": 0.6739,
+        "nn_median_px": 37.56,
+        "zusatzkruemmung": 0.644,
+        "kontur_abstand_px": 12.04,
+        "kanten_aussen": 0.0584,
+        "form_zellen": {
+          "fuelle": false,
+          "verteilung": true,
+          "kontur_welligkeit": true,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/spirale_s1.5_glatt6"
+    },
+    "hexf_s1.5_glatt2": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"hex\"",
+        "ANCHOR_HEX_ORDER": "\"fortlaufend\"",
+        "LOBE_SCALE": "1.5",
+        "LOBE_SMOOTH_PASSES": "2"
+      },
+      "bilder_lauf": {
+        "sekunden": 44
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "gamma": 1,
+          "epsilon": 1,
+          "beta": 1,
+          "alpha": 1,
+          "delta": 1
+        },
+        "furche_zellen": 374,
+        "paare": 7,
+        "reach_px": {
+          "links": 47.586573788433554,
+          "rechts": 49.4134262115665,
+          "oben": 47.75869285766471,
+          "unten": 50.741307142335245
+        },
+        "luft_px": {
+          "links": 92.98775177308988,
+          "rechts": 92.01224822691006,
+          "oben": 76.14751899536263,
+          "unten": 73.72748100463741
+        },
+        "compute_lobes_ms_201": 43,
+        "soliditaet": 0.8871,
+        "nn_median_px": 36.03,
+        "zusatzkruemmung": 1.946,
+        "kontur_abstand_px": 11.31,
+        "kanten_aussen": 0.0,
+        "form_zellen": {
+          "fuelle": true,
+          "verteilung": true,
+          "kontur_welligkeit": true,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/hexf_s1.5_glatt2"
+    },
+    "hexf_s1.5_glatt4": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"hex\"",
+        "ANCHOR_HEX_ORDER": "\"fortlaufend\"",
+        "LOBE_SCALE": "1.5",
+        "LOBE_SMOOTH_PASSES": "4"
+      },
+      "bilder_lauf": {
+        "sekunden": 31
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "gamma": 1,
+          "epsilon": 1,
+          "beta": 1,
+          "alpha": 1,
+          "delta": 1
+        },
+        "furche_zellen": 374,
+        "paare": 7,
+        "reach_px": {
+          "links": 47.274073788433554,
+          "rechts": 48.3509262115665,
+          "oben": 47.75088035766473,
+          "unten": 49.803807142335245
+        },
+        "luft_px": {
+          "links": 93.30025177308988,
+          "rechts": 93.07474822691006,
+          "oben": 76.15533149536262,
+          "unten": 74.66498100463741
+        },
+        "compute_lobes_ms_201": 34.80000001192093,
+        "soliditaet": 0.8871,
+        "nn_median_px": 36.03,
+        "zusatzkruemmung": 1.016,
+        "kontur_abstand_px": 11.31,
+        "kanten_aussen": 0.0,
+        "form_zellen": {
+          "fuelle": true,
+          "verteilung": true,
+          "kontur_welligkeit": true,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/hexf_s1.5_glatt4"
+    },
+    "hexf_s1.5_glatt6": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"hex\"",
+        "ANCHOR_HEX_ORDER": "\"fortlaufend\"",
+        "LOBE_SCALE": "1.5",
+        "LOBE_SMOOTH_PASSES": "6"
+      },
+      "bilder_lauf": {
+        "sekunden": 42
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "gamma": 1,
+          "epsilon": 1,
+          "beta": 1,
+          "alpha": 1,
+          "delta": 1
+        },
+        "furche_zellen": 374,
+        "paare": 7,
+        "reach_px": {
+          "links": 46.846339413433554,
+          "rechts": 47.7503402740665,
+          "oben": 47.68130027953973,
+          "unten": 49.091893079835245
+        },
+        "luft_px": {
+          "links": 93.72798614808988,
+          "rechts": 93.67533416441006,
+          "oben": 76.22491157348762,
+          "unten": 75.37689506713741
+        },
+        "compute_lobes_ms_201": 41.39999997615814,
+        "soliditaet": 0.8871,
+        "nn_median_px": 36.03,
+        "zusatzkruemmung": 0.771,
+        "kontur_abstand_px": 11.31,
+        "kanten_aussen": 0.0,
+        "form_zellen": {
+          "fuelle": true,
+          "verteilung": true,
+          "kontur_welligkeit": true,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/hexf_s1.5_glatt6"
+    },
+    "hexg_s1.5_glatt2": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"hex\"",
+        "ANCHOR_HEX_ORDER": "\"gegenueber\"",
+        "LOBE_SCALE": "1.5",
+        "LOBE_SMOOTH_PASSES": "2"
+      },
+      "bilder_lauf": {
+        "sekunden": 31
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "beta": 1,
+          "gamma": 1,
+          "alpha": 1,
+          "epsilon": 1,
+          "delta": 1
+        },
+        "furche_zellen": 387,
+        "paare": 7,
+        "reach_px": {
+          "links": 47.52373135382075,
+          "rechts": 49.35126864617905,
+          "oben": 48.01929302192244,
+          "unten": 48.85570697807748
+        },
+        "luft_px": {
+          "links": 75.96744239038091,
+          "rechts": 74.15755760961929,
+          "oben": 83.08672599815813,
+          "unten": 82.41327400184196
+        },
+        "compute_lobes_ms_201": 42.19999998807907,
+        "soliditaet": 0.8303,
+        "nn_median_px": 35.95,
+        "zusatzkruemmung": 1.858,
+        "kontur_abstand_px": 11.31,
+        "kanten_aussen": 0.0492,
+        "form_zellen": {
+          "fuelle": true,
+          "verteilung": true,
+          "kontur_welligkeit": true,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/hexg_s1.5_glatt2"
+    },
+    "hexg_s1.5_glatt4": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"hex\"",
+        "ANCHOR_HEX_ORDER": "\"gegenueber\"",
+        "LOBE_SCALE": "1.5",
+        "LOBE_SMOOTH_PASSES": "4"
+      },
+      "bilder_lauf": {
+        "sekunden": 34
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "beta": 1,
+          "gamma": 1,
+          "alpha": 1,
+          "epsilon": 1,
+          "delta": 1
+        },
+        "furche_zellen": 387,
+        "paare": 7,
+        "reach_px": {
+          "links": 47.52373135382075,
+          "rechts": 48.75751864617905,
+          "oben": 48.01929302192244,
+          "unten": 48.26195697807748
+        },
+        "luft_px": {
+          "links": 75.96744239038091,
+          "rechts": 74.75130760961929,
+          "oben": 83.08672599815813,
+          "unten": 83.00702400184196
+        },
+        "compute_lobes_ms_201": 49.80000001192093,
+        "soliditaet": 0.8303,
+        "nn_median_px": 35.95,
+        "zusatzkruemmung": 1.052,
+        "kontur_abstand_px": 11.36,
+        "kanten_aussen": 0.0492,
+        "form_zellen": {
+          "fuelle": true,
+          "verteilung": true,
+          "kontur_welligkeit": true,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/hexg_s1.5_glatt4"
+    },
+    "hexg_s1.5_glatt6": {
+      "konstanten": {
+        "ANCHOR_LAYOUT": "\"hex\"",
+        "ANCHOR_HEX_ORDER": "\"gegenueber\"",
+        "LOBE_SCALE": "1.5",
+        "LOBE_SMOOTH_PASSES": "6"
+      },
+      "bilder_lauf": {
+        "sekunden": 31
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "beta": 1,
+          "gamma": 1,
+          "alpha": 1,
+          "epsilon": 1,
+          "delta": 1
+        },
+        "furche_zellen": 387,
+        "paare": 7,
+        "reach_px": {
+          "links": 47.52373135382075,
+          "rechts": 48.16474520867905,
+          "oben": 48.01929302192244,
+          "unten": 47.67357807182748
+        },
+        "luft_px": {
+          "links": 75.96744239038091,
+          "rechts": 75.34408104711929,
+          "oben": 83.08672599815813,
+          "unten": 83.59540290809196
+        },
+        "compute_lobes_ms_201": 41.40000003576279,
+        "soliditaet": 0.8303,
+        "nn_median_px": 35.95,
+        "zusatzkruemmung": 0.794,
+        "kontur_abstand_px": 11.57,
+        "kanten_aussen": 0.0492,
+        "form_zellen": {
+          "fuelle": true,
+          "verteilung": true,
+          "kontur_welligkeit": true,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/hexg_s1.5_glatt6"
+    },
+    "spirale_s1_glatt2": {
+      "konstanten": {
+        "LOBE_SMOOTH_PASSES": "2"
+      },
+      "bilder_lauf": {
+        "sekunden": 33
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "epsilon": 1,
+          "delta": 1,
+          "alpha": 1,
+          "gamma": 1,
+          "beta": 1
+        },
+        "furche_zellen": 146,
+        "paare": 4,
+        "reach_px": {
+          "links": 47.89908406439142,
+          "rechts": 44.10091593560878,
+          "oben": 48.37936204754027,
+          "unten": 44.620637952459674
+        },
+        "luft_px": {
+          "links": 7.200718167317206,
+          "rechts": 10.687633749949555,
+          "oben": 82.90286831994558,
+          "unten": 85.5828132138679
+        },
+        "compute_lobes_ms_201": 37.30000001192093,
+        "soliditaet": 0.497,
+        "nn_median_px": 25.1,
+        "zusatzkruemmung": 1.773,
+        "kontur_abstand_px": 10.84,
+        "kanten_aussen": 0.2949,
+        "form_zellen": {
+          "fuelle": false,
+          "verteilung": false,
+          "kontur_welligkeit": true,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/spirale_s1_glatt2"
+    },
+    "spirale_s1_glatt4": {
+      "konstanten": {
+        "LOBE_SMOOTH_PASSES": "4"
+      },
+      "bilder_lauf": {
+        "sekunden": 33
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "epsilon": 1,
+          "delta": 1,
+          "alpha": 1,
+          "gamma": 1,
+          "beta": 1
+        },
+        "furche_zellen": 146,
+        "paare": 4,
+        "reach_px": {
+          "links": 47.86783406439142,
+          "rechts": 43.98372843560833,
+          "oben": 48.37936204754027,
+          "unten": 44.620637952459674
+        },
+        "luft_px": {
+          "links": 7.228845981028968,
+          "rechts": 10.793113051368891,
+          "oben": 82.90286831994558,
+          "unten": 85.5828132138679
+        },
+        "compute_lobes_ms_201": 40,
+        "soliditaet": 0.497,
+        "nn_median_px": 25.1,
+        "zusatzkruemmung": 0.907,
+        "kontur_abstand_px": 11.69,
+        "kanten_aussen": 0.2949,
+        "form_zellen": {
+          "fuelle": false,
+          "verteilung": false,
+          "kontur_welligkeit": true,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/spirale_s1_glatt4"
+    },
+    "spirale_s1_glatt6": {
+      "konstanten": {
+        "LOBE_SMOOTH_PASSES": "6"
+      },
+      "bilder_lauf": {
+        "sekunden": 31
+      },
+      "bilder": {
+        "koerper_ok": true,
+        "koerper_grund": "alle Kriterien erfuellt",
+        "komponenten": 1,
+        "lappen_je_space": {
+          "epsilon": 1,
+          "delta": 1,
+          "alpha": 1,
+          "gamma": 1,
+          "beta": 1
+        },
+        "furche_zellen": 146,
+        "paare": 4,
+        "reach_px": {
+          "links": 47.71842000189142,
+          "rechts": 43.71663859185833,
+          "oben": 48.37936204754027,
+          "unten": 44.620637952459674
+        },
+        "luft_px": {
+          "links": 7.363332090338332,
+          "rechts": 11.03351795918661,
+          "oben": 82.90286831994558,
+          "unten": 85.5828132138679
+        },
+        "compute_lobes_ms_201": 43.10000002384186,
+        "soliditaet": 0.497,
+        "nn_median_px": 25.1,
+        "zusatzkruemmung": 0.638,
+        "kontur_abstand_px": 12.06,
+        "kanten_aussen": 0.2949,
+        "form_zellen": {
+          "fuelle": false,
+          "verteilung": false,
+          "kontur_welligkeit": true,
+          "kontur_abstand": true
+        }
+      },
+      "bilder_verzeichnis": "/home/savefyx/p105_b14_7_varianten/spirale_s1_glatt6"
+    }
+  }
+}

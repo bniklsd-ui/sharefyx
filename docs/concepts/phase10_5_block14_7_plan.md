@@ -10,7 +10,7 @@ down:
   - ../../phase5_ui/webui/static/js/graph.js             # `computeRegions()`, `computeLobes()`, `chainEdges()`
   - ../../phase10_5_finishing/probes/p105_b14_karte_bilder.py  # Bilder-Probe (`--konstante`, `--bilder`, Messpflaster)
   - ../../phase10_5_finishing/probes/p105_b14_startwerte.py    # Varianten-Treiber (Muster für das Raster 14.7.2)
-updated: 2026-10-29 (Schritt 14.7.1: die vier Konstanten gebaut, Nullwerte = Block 14 — Layout gleich, Bilder byteweise gleich; H1–H5 grün, H1 korrigiert) | 2026-10-29 (Schritt 14.7.0 (a)+(c): Basislinie der Form gemessen; §2.2 neu gefasst — `LOBE_SCALE`, Nikinger: A) | 2026-10-29 (Schritt 14.7.0 (b): Ursache von B4 gemessen — **Kandidat (ii), Chaos**; STOPP) | 2026-10-29 (Entwurf, Claude Code — nach der Sichtung der 14.6-Bilder; freigegeben im Chat „schreibe den Plan, und setze ihn danach selber um")
+updated: 2026-10-29 (Schritt 14.7.2: das Raster gemessen — keine gestreckte Variante hält Max ≤ 3 px; Kandidat hexg_s1.5 + Glättung 2; Fund: Kontur zerfällt bei krummer Zellgröße, behoben; STOPP E1 + E2) | 2026-10-29 (Schritt 14.7.1: die vier Konstanten gebaut, Nullwerte = Block 14 — Layout gleich, Bilder byteweise gleich; H1–H5 grün, H1 korrigiert) | 2026-10-29 (Schritt 14.7.0 (a)+(c): Basislinie der Form gemessen; §2.2 neu gefasst — `LOBE_SCALE`, Nikinger: A) | 2026-10-29 (Schritt 14.7.0 (b): Ursache von B4 gemessen — **Kandidat (ii), Chaos**; STOPP) | 2026-10-29 (Entwurf, Claude Code — nach der Sichtung der 14.6-Bilder; freigegeben im Chat „schreibe den Plan, und setze ihn danach selber um")
 ---
 # P10.5 Block 14.7 — Kompakt und verteilt: aus dem Seestern wird ein Gehirn
 
@@ -165,7 +165,7 @@ Entscheidung und steht hier bewusst **nicht** als Option.
 |---|---|---|
 | **14.7.0** ✅ 2026-10-29 (b: STOPP → A) | **Messung zuerst.** (a) Bilder-Probe: neue Zellen `fuelle`, `verteilung`, `kontur_welligkeit`, `kontur_abstand`, `kanten_aussen` (§5) — über das Messpflaster, **kein** Haken im Produktcode. (b) **Ursache von B4:** an `step20` und `insel0.75` (14.4) messen, **welche** Knoten sich bei der Stabilitätsprobe bewegen, wie weit sie **nach der Entspannung** von ihrem Anker liegen (relativ zu `radius`) und ob sie nahe am Nachbar-Space sitzen — Kandidat (i) — oder mitten im eigenen Lappen umspringen — Kandidat (ii). (c) Abnahmezeilen **P10.5-73/74** in den Head (⬜). | Basislinie steht als Zahl im Beleg; (i) oder (ii) aus §0 ist **mit Zahlen** gestützt. Nur (ii) ⇒ **STOPP**, Bericht — `SPREAD` allein löst es dann nicht. |
 | **14.7.1** ✅ 2026-10-29 | Die Hebel `ANCHOR_LAYOUT`/`ANCHOR_HEX_ORDER` (§2.1), `LOBE_SCALE` (§2.2) und `LOBE_SMOOTH_PASSES` (§2.3) bauen, **Defaults = heute**. Node-Tests H1–H5. | Layout-Probe mit Defaults: **alle** Knotenpositionen gleich zu `p105_b14_layout_probe.json`; Bilder **byteweise** gleich zu denen im Repo. H1–H5 grün. |
-| **14.7.2** | **Das Raster:** `ANCHOR_LAYOUT` {`spirale`, `hex`/`fortlaufend`, `hex`/`gegenueber`} × `LOBE_SCALE` {1 · 1,25 · 1,5} = 9 Läufe (dazu die Glättung {0 · 2 · 4 · 6} am Bild des besten Laufs, §3 E2) (Treiber nach dem Muster `p105_b14_startwerte.py`), je Lauf **alle** Layout-Zellen + `koerper` + die neuen Zellen + Reach/Luft + `computeLobes()`-Zeit; Bilder nach `~/p105_b14_7_varianten/<label>/` (**außerhalb** des Repos). | Tabelle; Stabilität zuerst gefiltert. **STOPP — E1.** |
+| **14.7.2** 🔄 **STOPP E1 + E2 2026-10-29** | **Das Raster:** `ANCHOR_LAYOUT` {`spirale`, `hex`/`fortlaufend`, `hex`/`gegenueber`} × `LOBE_SCALE` {1 · 1,25 · 1,5} = 9 Läufe (dazu die Glättung {0 · 2 · 4 · 6} am Bild des besten Laufs, §3 E2) (Treiber nach dem Muster `p105_b14_startwerte.py`), je Lauf **alle** Layout-Zellen + `koerper` + die neuen Zellen + Reach/Luft + `computeLobes()`-Zeit; Bilder nach `~/p105_b14_7_varianten/<label>/` (**außerhalb** des Repos). | Tabelle; Stabilität zuerst gefiltert. **STOPP — E1.** |
 | **14.7.3** | Den gewählten Wert setzen (Kommentar „gewählt vom Nikinger am <Datum>, gemessen in 14.7.2"). Wächter: Gegenläufe `anker` (`ANCHOR_LAYOUT` → `spirale`) und `spreizung` (`LOBE_SCALE` → 1) machen **genau** `fuelle` bzw. `verteilung` rot. **Die sechs Layout-Gegenläufe neu** (die Knoten haben sich bewegt — anders als in 14.6). | Alle Zellen 65–69, 71, 72 grün mit neuen Zahlen; jeder Gegenlauf rot an genau seiner Zelle. |
 | **14.7.4** | **Glätten** (§2.3, eigenes Tor): `LOBE_SMOOTH_PASSES` {0 · 2 · 4 · 6}, Default 0 = heute. Varianten-Bilder außerhalb des Repos. **STOPP — E2.** Danach Wert setzen + Gegenlauf `glatt` (→ 0 macht `kontur_welligkeit` rot). | `kontur_abstand` > 0, Reach ≤ 52, Zeit ≤ 50 ms; `test_lobe_kontur_geschlossen.py` grün. |
 | **14.7.5** | Belege neu: Layout-Probe, Bilder-Probe (Bilder ersetzen `docs/screenshots/p105_b14_karte_0{1,2,3}_*.png`), Karten-Probe `p105_b8_karte_probe.py`, C2-Probe, volle Suite, `doc_health`, `ui_budget`. Abnahme P10.5-73/74. Update-Log-Zeile (Z. 19) nachziehen, wenn sich die Aussage ändert. Deploy-Tabelle: D enthält 14.7. | Alles grün; **P10.5-70 neu beim Nikinger** (Sichtung der neuen Bilder). |
@@ -287,3 +287,46 @@ Bahnen), Beleg `probes/p105_b14_karte_bilder.json` → `form`. Die drei Bilder s
 - **Datierte Korrektur H1** (oben in §2.1): „ein neuer Space verschiebt keinen Anker" gilt wegen der
   Hash-Reihenfolge schon bei der Spirale nicht; geprüft wird jetzt, was die Regel verspricht —
   der Platz *k* ist unabhängig von der Zahl der Spaces.
+
+## Anmerkungen 14.7.2 — das Raster (2026-10-29, Claude Code)
+
+Beleg `probes/p105_b14_7_raster.json` (Treiber daneben; Bilder je Variante unter
+`~/p105_b14_7_varianten/<label>/`, **außerhalb** des Repos). Nacheinander gefahren, 21 Läufe.
+
+| Variante | Median / Max (px) | Zelle 68 | Solidität | NN (px) | Reach (px) | Querbahnen außen | `koerper` |
+|---|---|---|---|---|---|---|---|
+| spirale_s1 (heute) | 0,0 / 2,2 | ✅ | 0,497 | 25,1 | 48,4 | 29,5 % | ✅ |
+| spirale_s1.25 | 1,4 / 34,9 | ✅ | 0,603 | 30,8 | **55,1** | 16,0 % | ❌ Reach |
+| spirale_s1.5 | 4,2 / 195,2 | ❌ | 0,674 | 37,6 | 51,8 | 5,8 % | ✅ |
+| hexf_s1 | 1,0 / 9,8 | ✅ | 0,876 | 25,0 | 48,1 | 0 % | ✅ |
+| hexf_s1.25 | 1,0 / 5,1 | ✅ | 0,875 | 30,4 | 49,2 | 0 % | ✅ |
+| hexf_s1.5 | 1,0 / 20,4 | ❌ | 0,887 | 36,0 | **52,4** | 0 % | ❌ Reach |
+| hexg_s1 | 1,0 / 22,8 | ✅ | 0,731 | 24,4 | 48,1 | 21,5 % | ✅ |
+| hexg_s1.25 | 1,0 / 13,5 | ❌ | 0,796 | 30,9 | 48,5 | 12,0 % | ✅ |
+| **hexg_s1.5** | **1,0 / 9,1** | ✅ | **0,830** | **36,0** | 49,5 | 4,9 % | ✅ |
+
+**Glättung** (nur Bilder-Probe; die Positionen hängen nicht daran): Zusatzkrümmung bei 2/4/6
+Durchläufen an jeder Anordnung **1,77–1,95 / 0,91–1,05 / 0,64–0,79** rad/100 px (Basislinie 11,10,
+Ziel ≤ 5,55); Konturabstand steigt von 8,0 auf **10,8–12,1 px**; Reach sinkt leicht. **2** erfüllt
+die Standardregel E2.
+
+**Befunde:**
+1. **Die Vorhersage aus §2.2 ist widerlegt.** Strecken hält die Stabilität **nicht**: spirale_s1.25
+   Max 34,9 px. Die Abweichungen von der Selbstähnlichkeit (Jitter, Querkräfte, fester `LOBE_REACH`)
+   reichen, um das Chaos aus 14.7.0 (b) auszulösen.
+2. **Das Hexgitter allein** (s = 1) koppelt schon: Max 9,8 / 22,8 px — die Spaces liegen näher.
+3. **Die strenge Regel (Max ≤ 3 px) hält keine Variante außer heute.** Die **Abnahmezeile**
+   P10.5-68 verlangt nur Median ≤ 2 px + Region — die halten 6 von 9.
+4. **Nur hexg_s1.5** erfüllt P10.5-73 (Solidität ≥ 0,75, NN ≥ 31,4 px) **und** Zelle 68 und
+   `koerper`. hexf_s1.25 verfehlt NN knapp (30,4).
+5. **`computeLobes()`-Zeit rauscht** zwischen 9 und 50 ms (ein Lauf 49,8 ms an der 50-ms-Grenze);
+   die Grenze ist ein Median aus 5 Aufrufen, nah an der Kante.
+
+**Fund (Produktcode, behoben):** die Kontur zerfiel bei **krummer Zellgröße** — `LOBE_MAX_CELLS`
+deckelt das Raster, die Zelle wird z. B. 8,37 px, `chainEdges()` verkettet über Text-Schlüssel der
+Weltkoordinaten, und `x0 + cell` ≠ `minX + (gx+1)·cell` ⇒ Bruchstücke mit Sehnen, der Körper fast
+weg (spirale_s1.25, hexf_s1.25 im ersten Rasterlauf). **Betrifft auch heute** jede Karte, die mit
+Schließ-Polster breiter als 198 Zellen wird. Behoben: `traceContour()` verkettet in **ganzzahligen**
+Gitterkoordinaten, rechnet danach um. Bilder im Repo **byteweise gleich**. Wächter
+`tests/test_b14_7_kontur_zellgroesse.py` (Gegenprobe: alte Rechnung ⇒ 4 Schleifen). Das Raster ist
+danach **komplett neu** gefahren (die Tabelle oben).
