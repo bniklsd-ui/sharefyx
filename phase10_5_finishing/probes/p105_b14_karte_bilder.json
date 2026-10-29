@@ -1,7 +1,7 @@
 {
   "probe": "p105_b14_karte_bilder",
   "schritt": "14.6.0",
-  "zeit": "2026-10-29T09:55:46.415298+00:00",
+  "zeit": "2026-10-29T12:52:53.004573+00:00",
   "seed": {
     "spaces": 5,
     "items": 152,
@@ -165,14 +165,14 @@
     "ok": true,
     "grund": "alle Kriterien erfuellt",
     "abnahme": {
-      "zeit_ms": 30.80000001192093,
-      "zeit_ms_erster": 32.80000001192093,
+      "zeit_ms": 27.099999964237213,
+      "zeit_ms_erster": 40.5,
       "zeit_messungen": [
-        32.80000001192093,
-        169.89999997615814,
-        24.80000001192093,
-        30.80000001192093,
-        16.5
+        40.5,
+        173.39999997615814,
+        22.100000023841858,
+        27.099999964237213,
+        17.100000023841858
       ],
       "komponenten": 1,
       "komponenten_groessen": [
@@ -213,14 +213,14 @@
       "min_abstand_zwei_spaces_px": 183.04
     },
     "zeit": {
-      "zeit_ms": 34.60000002384186,
-      "zeit_ms_erster": 36.09999996423721,
+      "zeit_ms": 32.39999997615814,
+      "zeit_ms_erster": 40.5,
       "zeit_messungen": [
-        36.09999996423721,
-        224,
-        31.100000023841858,
-        34.60000002384186,
-        18.299999952316284
+        40.5,
+        38.40000003576279,
+        32.39999997615814,
+        22.19999998807907,
+        31
       ],
       "komponenten": 1,
       "komponenten_groessen": [
@@ -278,5 +278,54 @@
   "zellen": {
     "bilder": true,
     "koerper": true
+  },
+  "form": {
+    "fuelle": {
+      "koerper_zellen": 6274,
+      "huelle_zellen": 12624,
+      "soliditaet": 0.497
+    },
+    "verteilung": {
+      "nn_median_px": 25.1,
+      "nn_median_je_space_px": {
+        "alpha": 25.18,
+        "beta": 24.72,
+        "delta": 25.1,
+        "epsilon": 26.49,
+        "gamma": 24.02
+      }
+    },
+    "welligkeit": {
+      "zusatzkruemmung_rad_je_100px": 11.096,
+      "schleifen": 5,
+      "umfang_px": 7248.0
+    },
+    "kontur_abstand": {
+      "min_px": 8.0,
+      "paar": [
+        "alpha",
+        "delta"
+      ],
+      "hinweis": null
+    },
+    "kanten_aussen": {
+      "anteil": 0.2949,
+      "stuetzpunkte": 651
+    },
+    "schwellen": {
+      "fuelle_min": 0.75,
+      "verteilung_faktor": 1.25,
+      "verteilung_basis_px": 25.1,
+      "welligkeit_anteil": 0.5,
+      "welligkeit_basis": 11.096
+    },
+    "zellen": {
+      "fuelle": false,
+      "verteilung": false,
+      "kontur_welligkeit": false,
+      "kontur_abstand": true
+    },
+    "p10_5_73": false,
+    "p10_5_74": false
   }
 }

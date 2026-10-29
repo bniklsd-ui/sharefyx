@@ -171,7 +171,19 @@ MESS_PFLASTER = {
         "  globalThis.__koerper = { cols: cols, rows: rows, cell: cell,\n"
         "    minX: minX, minY: minY, koerper: Array.prototype.slice.call(__koerper),\n"
         "    space: spaceOf, furrow: Array.prototype.slice.call(furrow),\n"
-        "    knoten: __knoten };\n"
+        "    knoten: __knoten,\n"
+        "    konturen: lobes.map(function (l) { return { space: l.space, outer: l.outer }; }),\n"
+        "    kanten: (function () {\n"
+        "      var out = [];\n"
+        "      var alle = explicitEdges.concat(implicitEdges);\n"
+        "      for (var i = 0; i < alle.length; i++) {\n"
+        "        var a = nodeById[alle[i].src], b = nodeById[alle[i].dst];\n"
+        "        if (!a || !b) continue;\n"
+        "        var g = edgeGeometry(a, b);\n"
+        "        out.push([a.x, a.y, g.cx, g.cy, b.x, b.y, a.space !== b.space ? 1 : 0]);\n"
+        "      }\n"
+        "      return out;\n"
+        "    })() };\n"
         "  return { key: lobeKey(shown), lobes: lobes };"
     ),
     "  function settle() {\n    lobeCache = computeLobes(visibleNodes());": (
@@ -325,6 +337,218 @@ def _analyse_raster(raster: dict) -> dict:
         "knoten": len(knoten),
         "min_abstand_zwei_spaces_px": (round(min_abstand, 2)
                                        if min_abstand is not None else None),
+    }
+
+
+# ============================================================================================
+# Die Form der Karte (Plan 14.7 §5, Schritt 14.7.0 (a)) — Abnahme P10.5-73/74
+# ============================================================================================
+#
+# Gemessen an **denselben** Daten wie `koerper` (Messpflaster, gepatchter Durchgang): dem
+# Raster, den Knoten, den **berechneten** Konturen (`lobe.outer` — die Punkte, durch die
+# `traceSmooth()` die Kurve legt) und den Bahnen (`edgeGeometry()`).
+
+#: **Solidität** (P10.5-73): Körperzellen ÷ Zellen der konvexen Hülle des Körpers. **Startwert**
+#: 0,75 (Plan 14.7 §5) — bestätigt oder geändert bei E1, **nach** der Basislinie.
+FUELLE_MIN = 0.75
+#: **Verteilung** (P10.5-73): der Median des Nächster-Nachbar-Abstands **innerhalb** eines
+#: Space muss mindestens das 1,25-Fache der **Basislinie** sein (Plan 14.7 §5). Die Basislinie
+#: ist die Zahl aus 14.7.0 — `None` heißt: noch nicht gemessen, die Zelle ist dann rot.
+VERTEILUNG_FAKTOR = 1.25
+VERTEILUNG_BASIS_PX = 25.1     # gemessen 14.7.0 (2026-10-29), Median aller Spaces
+#: **Welligkeit** (P10.5-74): die **Zusatzkrümmung** der Kontur je 100 px — höchstens 50 % der
+#: Basislinie. `None` heißt: noch nicht gemessen.
+WELLIGKEIT_ANTEIL = 0.5
+WELLIGKEIT_BASIS = 11.096       # gemessen 14.7.0 (2026-10-29), rad je 100 px
+
+
+def _huelle(punkte: list) -> list:
+    """Die konvexe Hülle (Andrew, monotone Kette), gegen den Uhrzeigersinn."""
+    pts = sorted(set(punkte))
+    if len(pts) < 3:
+        return pts
+
+    def kreuz(o, a, b):
+        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+
+    unten, oben = [], []
+    for p in pts:
+        while len(unten) >= 2 and kreuz(unten[-2], unten[-1], p) <= 0:
+            unten.pop()
+        unten.append(p)
+    for p in reversed(pts):
+        while len(oben) >= 2 and kreuz(oben[-2], oben[-1], p) <= 0:
+            oben.pop()
+        oben.append(p)
+    return unten[:-1] + oben[:-1]
+
+
+def _in_huelle(huelle: list, x: float, y: float) -> bool:
+    n = len(huelle)
+    for i in range(n):
+        a, b = huelle[i], huelle[(i + 1) % n]
+        if (b[0] - a[0]) * (y - a[1]) - (b[1] - a[1]) * (x - a[0]) < 0:
+            return False
+    return True
+
+
+def _fuelle(raster: dict) -> dict:
+    cols, rows = raster["cols"], raster["rows"]
+    koerper = raster["koerper"]
+    zellen = [(i % cols, i // cols) for i, v in enumerate(koerper) if v]
+    # die Hülle über die **Ecken** der Zellen — sonst fiele die Randreihe halb heraus
+    ecken = []
+    for gx, gy in zellen:
+        ecken += [(gx, gy), (gx + 1, gy), (gx, gy + 1), (gx + 1, gy + 1)]
+    huelle = _huelle(ecken)
+    xs = [p[0] for p in huelle]
+    ys = [p[1] for p in huelle]
+    in_huelle = 0
+    for gy in range(max(0, int(min(ys))), min(rows, int(max(ys)) + 1)):
+        for gx in range(max(0, int(min(xs))), min(cols, int(max(xs)) + 1)):
+            if _in_huelle(huelle, gx + 0.5, gy + 0.5):
+                in_huelle += 1
+    return {"koerper_zellen": len(zellen), "huelle_zellen": in_huelle,
+            "soliditaet": round(len(zellen) / in_huelle, 4) if in_huelle else None}
+
+
+def _verteilung(knoten: list) -> dict:
+    je_space = {}
+    alle = []
+    for i, a in enumerate(knoten):
+        best = None
+        for j, b in enumerate(knoten):
+            if i == j or a[2] != b[2]:
+                continue
+            d = ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5
+            if best is None or d < best:
+                best = d
+        if best is not None:
+            je_space.setdefault(a[2], []).append(best)
+            alle.append(best)
+
+    def median(v):
+        v = sorted(v)
+        return round(v[len(v) // 2], 2) if v else None
+
+    return {"nn_median_px": median(alle),
+            "nn_median_je_space_px": {k: median(v) for k, v in sorted(je_space.items())}}
+
+
+def _welligkeit(konturen: list) -> dict:
+    """**Zusatzkrümmung** je 100 px: (Σ|Knickwinkel| − |ΣKnickwinkel|) ÷ Umfang × 100, über
+    alle äußeren Konturschleifen. Eine glatte konvexe Schleife hat **0** (sie dreht genau
+    einmal), jede Treppenstufe kostet 2 × 90°. **Nicht** „Vorzeichenwechsel je 100 px" (Plan
+    §5 erster Entwurf): das zählt nach dem Glätten auch winzige Restwellen voll — die
+    Zusatzkrümmung wiegt sie nach ihrer Stärke (datierte Änderung im Plan, 14.7.0)."""
+    import math
+    gesamt_abs = gesamt_netto = umfang = 0.0
+    schleifen = 0
+    for kontur in konturen or []:
+        for schleife in kontur.get("outer") or []:
+            n = len(schleife)
+            if n < 3:
+                continue
+            schleifen += 1
+            summe = summe_abs = 0.0
+            for i in range(n):
+                a, b, c = schleife[i - 1], schleife[i], schleife[(i + 1) % n]
+                w1 = math.atan2(b[1] - a[1], b[0] - a[0])
+                w2 = math.atan2(c[1] - b[1], c[0] - b[0])
+                d = (w2 - w1 + math.pi) % (2 * math.pi) - math.pi
+                summe += d
+                summe_abs += abs(d)
+                umfang += math.dist(b, c)
+            gesamt_abs += summe_abs
+            gesamt_netto += abs(summe)
+    wert = (gesamt_abs - gesamt_netto) / umfang * 100 if umfang else None
+    return {"zusatzkruemmung_rad_je_100px": round(wert, 3) if wert is not None else None,
+            "schleifen": schleifen, "umfang_px": round(umfang, 1)}
+
+
+def _kontur_abstand(konturen: list) -> dict:
+    """Der kleinste Abstand zweier Konturen **verschiedener** Lappen (Punkt–Strecke, über ein
+    16-px-Gitter vorsortiert)."""
+    import math
+    zelle = 16.0
+    gitter = {}
+    for li, kontur in enumerate(konturen or []):
+        for schleife in kontur.get("outer") or []:
+            n = len(schleife)
+            for i in range(n):
+                a, b = schleife[i], schleife[(i + 1) % n]
+                for gx in range(int(min(a[0], b[0]) // zelle) - 1, int(max(a[0], b[0]) // zelle) + 2):
+                    for gy in range(int(min(a[1], b[1]) // zelle) - 1, int(max(a[1], b[1]) // zelle) + 2):
+                        gitter.setdefault((gx, gy), []).append((li, a, b))
+    best = None
+    paar = None
+    for li, kontur in enumerate(konturen or []):
+        for schleife in kontur.get("outer") or []:
+            for p in schleife:
+                for (lj, a, b) in gitter.get((int(p[0] // zelle), int(p[1] // zelle)), []):
+                    if lj == li:
+                        continue
+                    dx, dy = b[0] - a[0], b[1] - a[1]
+                    ll = dx * dx + dy * dy
+                    t = 0.0 if ll == 0 else max(0.0, min(1.0, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / ll))
+                    d = math.dist(p, (a[0] + t * dx, a[1] + t * dy))
+                    if best is None or d < best:
+                        best = d
+                        paar = sorted((konturen[li]["space"], konturen[lj]["space"]))
+    return {"min_px": round(best, 2) if best is not None else None, "paar": paar,
+            "hinweis": None if best is not None else "keine zwei Konturen naeher als 16 px"}
+
+
+def _kanten_aussen(raster: dict) -> dict:
+    """Der Anteil der **Querbahnen** (zwei Spaces), der **außerhalb** des Körpers verläuft —
+    21 Stützpunkte je quadratischer Bahn (nur berichtet, kein Tor, Plan §5)."""
+    cols, rows, cell = raster["cols"], raster["rows"], raster["cell"]
+    koerper = raster["koerper"]
+    aussen = gesamt = 0
+    for ax, ay, cx, cy, bx, by, quer in raster.get("kanten") or []:
+        if not quer:
+            continue
+        for k in range(21):
+            t = k / 20
+            x = (1 - t) ** 2 * ax + 2 * (1 - t) * t * cx + t * t * bx
+            y = (1 - t) ** 2 * ay + 2 * (1 - t) * t * cy + t * t * by
+            gx = int((x - raster["minX"]) // cell)
+            gy = int((y - raster["minY"]) // cell)
+            gesamt += 1
+            if not (0 <= gx < cols and 0 <= gy < rows and koerper[gy * cols + gx]):
+                aussen += 1
+    return {"anteil": round(aussen / gesamt, 4) if gesamt else None, "stuetzpunkte": gesamt}
+
+
+def _form(koerper_roh: dict) -> dict:
+    """Die Form-Zellen (Plan 14.7 §5) am Abnahme-Seed (152 Knoten)."""
+    raster = koerper_roh["messungen"][0]
+    fuelle = _fuelle(raster)
+    verteilung = _verteilung(raster.get("knoten") or [])
+    welligkeit = _welligkeit(raster.get("konturen"))
+    abstand = _kontur_abstand(raster.get("konturen"))
+    kanten = _kanten_aussen(raster)
+    zellen = {
+        "fuelle": bool(fuelle["soliditaet"] is not None and fuelle["soliditaet"] >= FUELLE_MIN),
+        "verteilung": bool(VERTEILUNG_BASIS_PX is not None and verteilung["nn_median_px"]
+                           is not None and verteilung["nn_median_px"]
+                           >= VERTEILUNG_FAKTOR * VERTEILUNG_BASIS_PX),
+        "kontur_welligkeit": bool(WELLIGKEIT_BASIS is not None
+                                  and welligkeit["zusatzkruemmung_rad_je_100px"] is not None
+                                  and welligkeit["zusatzkruemmung_rad_je_100px"]
+                                  <= WELLIGKEIT_ANTEIL * WELLIGKEIT_BASIS),
+        # **kein** Paar näher als 16 px ⇒ es gibt keinen Berührpunkt — das ist grün
+        "kontur_abstand": bool(abstand["min_px"] is None or abstand["min_px"] > 0.0),
+    }
+    return {
+        "fuelle": fuelle, "verteilung": verteilung, "welligkeit": welligkeit,
+        "kontur_abstand": abstand, "kanten_aussen": kanten,
+        "schwellen": {"fuelle_min": FUELLE_MIN, "verteilung_faktor": VERTEILUNG_FAKTOR,
+                      "verteilung_basis_px": VERTEILUNG_BASIS_PX,
+                      "welligkeit_anteil": WELLIGKEIT_ANTEIL, "welligkeit_basis": WELLIGKEIT_BASIS},
+        "zellen": zellen,
+        "p10_5_73": bool(zellen["fuelle"] and zellen["verteilung"]),
+        "p10_5_74": bool(zellen["kontur_welligkeit"] and zellen["kontur_abstand"]),
     }
 
 
@@ -539,7 +763,7 @@ KOERPER = r"""() => {
   return {
     cols: k.cols, rows: k.rows, cell: k.cell, minX: k.minX, minY: k.minY,
     koerper: k.koerper, space: space, furrow: k.furrow, knoten: k.knoten,
-    raeume: raeume,
+    raeume: raeume, konturen: k.konturen || null, kanten: k.kanten || null,
     zeit_ms: (typeof window.__koerperZeit === 'number') ? window.__koerperZeit : null,
     zeiten: window.__koerperZeiten || null,
   };
@@ -957,6 +1181,9 @@ def _merge(berichte: dict) -> dict:
         and bilder["knoten"]["anzahl"] == bilder["seed"]["items"])
     bericht["zellen"] = {"bilder": bilder_ok, "koerper": bericht["koerper"]["ok"]}
     bericht["alle_kriterien_erfuellt"] = bool(bilder_ok and bericht["koerper"]["ok"])
+    # **Die Form** (Plan 14.7, Schritt 14.7.0): eigene Zellen, eigene Summe — sie gehören zu
+    # P10.5-73/74, nicht zu P10.5-72 (`alle_kriterien_erfuellt` bleibt die Summe von 72).
+    bericht["form"] = _form(berichte["koerper"])
     return bericht
 
 

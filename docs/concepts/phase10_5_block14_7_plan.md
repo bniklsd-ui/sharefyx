@@ -10,7 +10,7 @@ down:
   - ../../phase5_ui/webui/static/js/graph.js             # `computeRegions()`, `computeLobes()`, `chainEdges()`
   - ../../phase10_5_finishing/probes/p105_b14_karte_bilder.py  # Bilder-Probe (`--konstante`, `--bilder`, Messpflaster)
   - ../../phase10_5_finishing/probes/p105_b14_startwerte.py    # Varianten-Treiber (Muster für das Raster 14.7.2)
-updated: 2026-10-29 (Schritt 14.7.0 (b): Ursache von B4 gemessen — **Kandidat (ii), Chaos**; STOPP) | 2026-10-29 (Entwurf, Claude Code — nach der Sichtung der 14.6-Bilder; freigegeben im Chat „schreibe den Plan, und setze ihn danach selber um")
+updated: 2026-10-29 (Schritt 14.7.0 (a)+(c): Basislinie der Form gemessen; §2.2 neu gefasst — `LOBE_SCALE`, Nikinger: A) | 2026-10-29 (Schritt 14.7.0 (b): Ursache von B4 gemessen — **Kandidat (ii), Chaos**; STOPP) | 2026-10-29 (Entwurf, Claude Code — nach der Sichtung der 14.6-Bilder; freigegeben im Chat „schreibe den Plan, und setze ihn danach selber um")
 ---
 # P10.5 Block 14.7 — Kompakt und verteilt: aus dem Seestern wird ein Gehirn
 
@@ -43,8 +43,10 @@ Faktor) — der Abstand zwischen den Spaces wächst dann im selben Verhältnis w
 
 ## §1 Das Prinzip — drei Hebel, jeder für sich abschaltbar
 
-1. **Verteilen (`SPREAD`):** ein Faktor auf `ITEM_STEP`, `REGION_ITEM_STEP` und `REGION_PAD`
-   gemeinsam. `SPREAD = 1` ist das heutige Bild.
+1. **Verteilen (`LOBE_SCALE`):** ~~ein Faktor auf `ITEM_STEP`, `REGION_ITEM_STEP` und
+   `REGION_PAD` gemeinsam (`SPREAD`)~~ — **[2026-10-29, nach 14.7.0 (b), Nikinger: Empfehlung A]**
+   ein Faktor *s* auf das **Gleichgewicht im Lappen** und den Seed darin (§2.2).
+   `LOBE_SCALE = 1` ist das heutige Bild.
 2. **Dicht packen (`ANCHOR_LAYOUT`):** die Anker auf einem **Hexagonalgitter**, Ring für Ring,
    statt auf der √k-Spirale. `"spirale"` ist das heutige Bild.
 3. **Glätten (`LOBE_SMOOTH_PASSES`):** die Kontur vor dem Zeichnen glätten. `0` ist das heutige
@@ -83,15 +85,38 @@ Nikinger 2026-10-26) und der größte Umbau.
 | H4 | `ANCHOR_LAYOUT = "spirale"` ⇒ die Positionen sind **bitgleich** zu heute | Regressionsprobe |
 | H5 | Determinismus: zwei Aufrufe ⇒ dieselben Positionen | P10.5-65 |
 
-### 2.2 `SPREAD` (nur `computeRegions()`, Schritte 3 und 6)
+### 2.2 `LOBE_SCALE` — das Gleichgewicht im Lappen weiten (neu gefasst 2026-10-29)
+
+> **Datierte Änderung (2026-10-29, nach 14.7.0 (b); Nikinger: „Lass uns deine Empfehlung A
+> nehmen").** Der erste Entwurf (`SPREAD` = nur Seed-Abstände ×*s*) ist **verworfen**: die Dichte
+> setzt das Kräftegleichgewicht, nicht der Seed, und ein größerer Seed sortiert die Lappen
+> chaotisch um (Anmerkungen 14.7.0 unten). Der Entwurf bleibt durchgestrichen stehen:
+> ~~Radius = `SPREAD · (REGION_ITEM_STEP·√n + REGION_PAD)`, Item-Abstand = `SPREAD · ITEM_STEP·√t`.~~
+
+**Die Idee — Selbstähnlichkeit.** Werden **alle Längen im Lappen** um *s* gestreckt, bleibt die
+Bewegung des Lappens **dieselbe**, nur *s*-fach größer — wenn jede Kraft mit *s* mitwächst:
+
+| Kraft | heute | Skalierung | warum |
+|---|---|---|---|
+| Abstoßung **im eigenen Space** | `R/d²` | `R·s³` | bei Abständen ×*s* fällt `R/d²` um *s²* — mal *s³* ergibt ×*s* |
+| Feder **im eigenen Space** | `(d − L)·k` | `L·s` | `(sd − sL)·k` = *s*·heute |
+| Anker-Gravitation | `(anker − x)·G·α` | — | ist schon linear in der Länge |
+| Seed im Lappen | Inseln `ISLAND_FACTOR·radius·√…`, Items `ITEM_STEP·√t`, Jitter | ×*s* | Startlage = gestreckte heutige Startlage |
+
+Geschwindigkeit, Dämpfung und `α`-Verlauf sind dann ebenfalls bloß gestreckt — die Bahn jedes
+Knotens ist die heutige ×*s* um seinen Anker. **Vorhersage (zu messen, nicht angenommen):** die
+Stabilität des Lappens **in sich** bleibt wie heute.
+
+**Was bewusst nicht mitwächst:** die **Anker** (`slot`, Region-Radius) — sonst wüchse die ganze Welt
+und `fitView()` zoomte sie zurück auf dasselbe Bild. Die **Querkräfte** zwischen Spaces (Abstoßung
+fremder Paare, Querfedern) bleiben wie heute. Die Lappen werden also **größer im Verhältnis zu den
+Lücken** — genau das gewünschte „verteilter", und bei *s* ≈ 1,45 füllt ein Lappen (heute ≈ 105 px
+Radius) seine Region (154 px). **Restrisiko:** die Querkräfte wirken jetzt auf weiter außen
+liegende Knoten — darum misst das Raster (14.7.2) die Stabilität zuerst.
 
 ```js
-const SPREAD = 1;  // Plan 14.7 §2.2 — skaliert ITEM_STEP, REGION_ITEM_STEP und REGION_PAD gemeinsam; 1 = Block 14
+const LOBE_SCALE = 1;  // Plan 14.7 §2.2 — das Gleichgewicht im Lappen ×s (Abstoßung im Space ×s³, Federlänge im Space ×s, Seed im Lappen ×s); 1 = Block 14
 ```
-
-Radius = `SPREAD · (REGION_ITEM_STEP·√n + REGION_PAD)`, Item-Abstand = `SPREAD · ITEM_STEP·√t`.
-`ISLAND_FACTOR`, `ITEM_JITTER_PX` und die L4-Kräfte bleiben. **Nur gebaut, wenn 14.7.0 Kandidat (i)
-aus §0 stützt** — sonst STOPP und Bericht (§4).
 
 ### 2.3 Die Konturglättung (nur `computeLobes()`/`chainEdges()`)
 
@@ -127,7 +152,7 @@ heraus, deren `stabilitaet` rot ist — ihre Bilder werden gar nicht erst vorgel
 72) die mit der höchsten **Solidität** (§5); bei Gleichstand (± 0,02) die mit dem größeren
 **Nachbarabstand**.
 
-**E2 — Glättung** (nach 14.7.4). **Standardregel:** der kleinste Wert, bei dem die **Welligkeit**
+**E2 — Glättung** (nach 14.7.4; **[2026-10-29]** die Glättungs-Varianten werden **mit** dem Raster 14.7.2 gezeigt, damit E1 und E2 an **einem** STOPP fallen — zwei Tore, ein Termin). **Standardregel:** der kleinste Wert, bei dem die **Welligkeit**
 ≤ 50 % der Basislinie ist und `kontur_abstand` > 0 bleibt.
 
 **Kein Lockern der Grenzen durch Claude Code.** Hält keine Variante die Stabilität (Median ≤ 2 px,
@@ -138,10 +163,10 @@ Entscheidung und steht hier bewusst **nicht** als Option.
 
 | Schritt | Inhalt | Fertig, wenn |
 |---|---|---|
-| **14.7.0** 🔄 **STOPP (b) 2026-10-29** | **Messung zuerst.** (a) Bilder-Probe: neue Zellen `fuelle`, `verteilung`, `kontur_welligkeit`, `kontur_abstand`, `kanten_aussen` (§5) — über das Messpflaster, **kein** Haken im Produktcode. (b) **Ursache von B4:** an `step20` und `insel0.75` (14.4) messen, **welche** Knoten sich bei der Stabilitätsprobe bewegen, wie weit sie **nach der Entspannung** von ihrem Anker liegen (relativ zu `radius`) und ob sie nahe am Nachbar-Space sitzen — Kandidat (i) — oder mitten im eigenen Lappen umspringen — Kandidat (ii). (c) Abnahmezeilen **P10.5-73/74** in den Head (⬜). | Basislinie steht als Zahl im Beleg; (i) oder (ii) aus §0 ist **mit Zahlen** gestützt. Nur (ii) ⇒ **STOPP**, Bericht — `SPREAD` allein löst es dann nicht. |
-| **14.7.1** | Die Hebel `ANCHOR_LAYOUT`/`ANCHOR_HEX_ORDER` (§2.1) und `SPREAD` (§2.2) bauen, **Defaults = heute**. Node-Tests H1–H5. | Layout-Probe mit Defaults: **alle** Knotenpositionen gleich zu `p105_b14_layout_probe.json`; Bilder **byteweise** gleich zu denen im Repo. H1–H5 grün. |
-| **14.7.2** | **Das Raster:** `ANCHOR_LAYOUT` {`spirale`, `hex`/`fortlaufend`, `hex`/`gegenueber`} × `SPREAD` {1 · 1,25 · 1,5} = 9 Läufe (Treiber nach dem Muster `p105_b14_startwerte.py`), je Lauf **alle** Layout-Zellen + `koerper` + die neuen Zellen + Reach/Luft + `computeLobes()`-Zeit; Bilder nach `~/p105_b14_7_varianten/<label>/` (**außerhalb** des Repos). | Tabelle; Stabilität zuerst gefiltert. **STOPP — E1.** |
-| **14.7.3** | Den gewählten Wert setzen (Kommentar „gewählt vom Nikinger am <Datum>, gemessen in 14.7.2"). Wächter: Gegenläufe `anker` (`ANCHOR_LAYOUT` → `spirale`) und `spreizung` (`SPREAD` → 1) machen **genau** `fuelle` bzw. `verteilung` rot. **Die sechs Layout-Gegenläufe neu** (die Knoten haben sich bewegt — anders als in 14.6). | Alle Zellen 65–69, 71, 72 grün mit neuen Zahlen; jeder Gegenlauf rot an genau seiner Zelle. |
+| **14.7.0** ✅ 2026-10-29 (b: STOPP → A) | **Messung zuerst.** (a) Bilder-Probe: neue Zellen `fuelle`, `verteilung`, `kontur_welligkeit`, `kontur_abstand`, `kanten_aussen` (§5) — über das Messpflaster, **kein** Haken im Produktcode. (b) **Ursache von B4:** an `step20` und `insel0.75` (14.4) messen, **welche** Knoten sich bei der Stabilitätsprobe bewegen, wie weit sie **nach der Entspannung** von ihrem Anker liegen (relativ zu `radius`) und ob sie nahe am Nachbar-Space sitzen — Kandidat (i) — oder mitten im eigenen Lappen umspringen — Kandidat (ii). (c) Abnahmezeilen **P10.5-73/74** in den Head (⬜). | Basislinie steht als Zahl im Beleg; (i) oder (ii) aus §0 ist **mit Zahlen** gestützt. Nur (ii) ⇒ **STOPP**, Bericht — `SPREAD` allein löst es dann nicht. |
+| **14.7.1** | Die Hebel `ANCHOR_LAYOUT`/`ANCHOR_HEX_ORDER` (§2.1), `LOBE_SCALE` (§2.2) und `LOBE_SMOOTH_PASSES` (§2.3) bauen, **Defaults = heute**. Node-Tests H1–H5. | Layout-Probe mit Defaults: **alle** Knotenpositionen gleich zu `p105_b14_layout_probe.json`; Bilder **byteweise** gleich zu denen im Repo. H1–H5 grün. |
+| **14.7.2** | **Das Raster:** `ANCHOR_LAYOUT` {`spirale`, `hex`/`fortlaufend`, `hex`/`gegenueber`} × `LOBE_SCALE` {1 · 1,25 · 1,5} = 9 Läufe (dazu die Glättung {0 · 2 · 4 · 6} am Bild des besten Laufs, §3 E2) (Treiber nach dem Muster `p105_b14_startwerte.py`), je Lauf **alle** Layout-Zellen + `koerper` + die neuen Zellen + Reach/Luft + `computeLobes()`-Zeit; Bilder nach `~/p105_b14_7_varianten/<label>/` (**außerhalb** des Repos). | Tabelle; Stabilität zuerst gefiltert. **STOPP — E1.** |
+| **14.7.3** | Den gewählten Wert setzen (Kommentar „gewählt vom Nikinger am <Datum>, gemessen in 14.7.2"). Wächter: Gegenläufe `anker` (`ANCHOR_LAYOUT` → `spirale`) und `spreizung` (`LOBE_SCALE` → 1) machen **genau** `fuelle` bzw. `verteilung` rot. **Die sechs Layout-Gegenläufe neu** (die Knoten haben sich bewegt — anders als in 14.6). | Alle Zellen 65–69, 71, 72 grün mit neuen Zahlen; jeder Gegenlauf rot an genau seiner Zelle. |
 | **14.7.4** | **Glätten** (§2.3, eigenes Tor): `LOBE_SMOOTH_PASSES` {0 · 2 · 4 · 6}, Default 0 = heute. Varianten-Bilder außerhalb des Repos. **STOPP — E2.** Danach Wert setzen + Gegenlauf `glatt` (→ 0 macht `kontur_welligkeit` rot). | `kontur_abstand` > 0, Reach ≤ 52, Zeit ≤ 50 ms; `test_lobe_kontur_geschlossen.py` grün. |
 | **14.7.5** | Belege neu: Layout-Probe, Bilder-Probe (Bilder ersetzen `docs/screenshots/p105_b14_karte_0{1,2,3}_*.png`), Karten-Probe `p105_b8_karte_probe.py`, C2-Probe, volle Suite, `doc_health`, `ui_budget`. Abnahme P10.5-73/74. Update-Log-Zeile (Z. 19) nachziehen, wenn sich die Aussage ändert. Deploy-Tabelle: D enthält 14.7. | Alles grün; **P10.5-70 neu beim Nikinger** (Sichtung der neuen Bilder). |
 
@@ -161,8 +186,10 @@ Bei 5 Spaces (30/32/30/30/30 = 152 Items, Saat der Abnahme):
 - Gegenläufe `anker` und `spreizung` machen **genau** ihre Zelle rot.
 
 **P10.5-74 — die Kontur ist glatt.**
-- **Welligkeit** (`kontur_welligkeit`) = Vorzeichenwechsel der Krümmung je 100 px gezeichneter
-  Kontur ≤ **50 %** der Basislinie. (**Nicht** „Anteil achsenparalleler Segmente": der ist heute
+- **Welligkeit** (`kontur_welligkeit`) = ~~Vorzeichenwechsel der Krümmung je 100 px~~
+  **Zusatzkrümmung** je 100 px — (Σ|Knickwinkel| − |ΣKnickwinkel|) ÷ Umfang × 100 über die
+  berechneten Konturpunkte — ≤ **50 %** der Basislinie. **[2026-10-29, 14.7.0]** Vorzeichenwechsel
+  zählen nach dem Glätten auch winzige Restwellen voll; die Zusatzkrümmung wiegt sie nach Stärke. (**Nicht** „Anteil achsenparalleler Segmente": der ist heute
   per Konstruktion 100 % und nach jedem Glätten ≈ 0 — er unterscheidet gutes von schlechtem
   Glätten nicht.)
 - **`kontur_abstand`** = kleinster Abstand zweier Konturen **verschiedener** Lappen > 0 px.
@@ -195,7 +222,7 @@ PID-Datei, **nie** `pkill -f`, **nie** `systemctl` (Hard Rule 9) · Umgebung ohn
 Session-Block **ans Ende** des Heads, dann `scripts/rotate_session_block.sh phase10_5_finishing` ·
 INDEX-Reserve 3.000 B (`test_register_archive.py`).
 
-**STOPP-Punkte:** nur Kandidat (ii) gestützt (14.7.0) · E1 (14.7.2) · E2 (14.7.4) · keine Variante hält
+**STOPP-Punkte:** ~~nur Kandidat (ii) gestützt (14.7.0)~~ (eingetreten, entschieden: A) · E1 + E2 (14.7.2) · keine Variante hält
 die Stabilität · Reach > 52 px oder Luft ≤ 0 · `computeLobes()` > 50 ms bei 201 Knoten ·
 `kontur_abstand` ≤ 0 bei jedem Glättungswert.
 
@@ -224,5 +251,21 @@ Wegwerf-Ordner `/tmp/opencode/sharefyx-wegwerf-b14/`, alle drei scheiterten mit 
 
 **Folge für den Plan:** `SPREAD` in der Form von §2.2 (nur Seed-Abstände) ist **wirkungslos und
 instabil** — gebaut wird er nicht (§4, STOPP). Der Hebel für „mehr verteilt" ist das
-**Gleichgewicht**; ein Vorschlag liegt beim Nikinger (Session-Block im Head). `ANCHOR_LAYOUT` und
+**Gleichgewicht** — **entschieden 2026-10-29 (Nikinger: A)**, §2.2 neu gefasst (`LOBE_SCALE`). `ANCHOR_LAYOUT` und
 die Glättung sind von diesem Befund **nicht** berührt.
+
+## Anmerkungen 14.7.0 — (a) die Basislinie der Form (2026-10-29, Claude Code)
+
+Bilder-Probe mit den neuen Zellen (Messpflaster: zusätzlich die berechneten Konturen und die
+Bahnen), Beleg `probes/p105_b14_karte_bilder.json` → `form`. Die drei Bilder sind dabei
+**byteweise gleich** geblieben (kein Produktcode geändert).
+
+| Zelle | Basislinie | Tor (Plan §5) | Stand |
+|---|---|---|---|
+| `fuelle` (Solidität) | **0,497** (6274 von 12624 Hüllzellen) | ≥ 0,75 (Startwert) | rot |
+| `verteilung` (NN-Median) | **25,1 px** (je Space 24,0–26,5) | ≥ 1,25 × 25,1 = **31,4 px** | rot |
+| `kontur_welligkeit` | **11,10 rad/100 px** (5 Schleifen, 7248 px) | ≤ **5,55** | rot |
+| `kontur_abstand` | **8,0 px** (alpha–delta) | > 0 | grün |
+| `kanten_aussen` | **29,5 %** der Querbahn-Stützpunkte | nur berichtet | — |
+
+**(c)** Die Abnahmezeilen **P10.5-73/74** stehen im Head (⬜).
