@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-10-29 (14.7.3) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-10-29 (14.7.5) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -59,16 +59,16 @@ updated: 2026-10-29 (14.7.3) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing — alle Baustellen schließen; Plan `docs/concepts/phase10_5_finishing_plan.md`)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **38578 B** · Phase-10.5-Head: Modulstatus 0–14/Z, Deploy A–D, Abnahmestand (64 ✅ · 0 ⚠️ · 10 ⬜), offene Punkte
-- [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **36.212 B** · die **geschlossenen** Abnahmezeilen, verbatim
-- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **175986 B** · L3-Archiv der Session-Blöcke, verbatim
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **38538 B** · Phase-10.5-Head: Modulstatus 0–14/Z, Deploy A–D, Abnahmestand (66 ✅ · 0 ⚠️ · 8 ⬜), offene Punkte
+- [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **37296 B** · die **geschlossenen** Abnahmezeilen, verbatim
+- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **177336 B** · L3-Archiv der Session-Blöcke, verbatim
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · Startaufträge Block 7 und 9, verbatim
 - [phase10_5_finishing/FREIGABEN_ARCHIVE.md](../phase10_5_finishing/FREIGABEN_ARCHIVE.md) — 📦 **3.577 B** · die Freigaben der Phase, verbatim aus dem Head
 - [phase10_5_finishing/MODULSTATUS_ARCHIVE.md](../phase10_5_finishing/MODULSTATUS_ARCHIVE.md) — 📦 **8.581 B** · Statusspalten Blöcke 0–10, verbatim
 - [docs/concepts/phase10_5_block14_kartenlayout_plan.md](./concepts/phase10_5_block14_kartenlayout_plan.md) — 📗 **33216 B** · Plan Block 14: Kartenlayout
 - [docs/concepts/phase10_5_block14_kartenlayout_plan_anhang.md](./concepts/phase10_5_block14_kartenlayout_plan_anhang.md) — 📦 **20525 B** · Anhang: §0, §3, §6, Anmerkungen 14.0–14.4
 - [docs/concepts/phase10_5_block14_6_plan.md](./concepts/phase10_5_block14_6_plan.md) — 📗 **27332 B** · Plan 14.6
-- [docs/concepts/phase10_5_block14_7_plan.md](./concepts/phase10_5_block14_7_plan.md) — 📗 **29615 B** · Plan 14.7: kompakt + verteilt, Ausführung Claude Code
+- [docs/concepts/phase10_5_block14_7_plan.md](./concepts/phase10_5_block14_7_plan.md) — 📗 **29756 B** · Plan 14.7: kompakt + verteilt, Ausführung Claude Code
 - [phase10_5_finishing/UPDATES_ARCHIVE.md](../phase10_5_finishing/UPDATES_ARCHIVE.md) — 📦 **12285 B** · ältere `updated:`-Fäden des Heads, verbatim
 
 ## Phase 8.6 — ✅ abgeschlossen 2026-09-19 (UI-Politur, live `v3.0.2`; zwei Pläne)
