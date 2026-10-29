@@ -6,7 +6,7 @@ prüfbar. Der Harness `phase10_5_finishing/probes/p105_b8_c2_probe.mjs` lädt da
 Node mit einem minimalen DOM-Shim und misst die Zeichenbefehle. Er schreibt seine Rohwerte
 nach `p105_b8_c2_probe.json` (neben der Probe).
 
-**Acht Messungen, acht Gegenläufe.** Ein Wächter ohne Gegenlauf beweist nichts: eine Messung,
+**Neun Messungen, neun Gegenläufe.** Ein Wächter ohne Gegenlauf beweist nichts: eine Messung,
 die die falsche Sache misst, ist grün und falsch zugleich (die Fehlerklasse, die dieser
 Ordner zweimal gesehen hat). Jeder Gegenlauf patcht **eine** Regel in einer Kopie von
 `graph.js` und muss **genau die** zugehörige Messung rot machen:
@@ -21,6 +21,7 @@ Ordner zweimal gesehen hat). Jeder Gegenlauf patcht **eine** Regel in einer Kopi
 | `layout` | 8.5 | `layout` | die gemerkte Position wird nicht festgehalten |
 | `filter` | 8.6 | `filter` | der Filter lässt alles durch |
 | `reducedmotion` | 8.7 | `reducedmotion` | der reduced-motion-Pfad läuft über rAF |
+| `koerper` | 14.6 | `koerper` | der Körper wird nicht geschlossen — die Inseln bleiben Inseln |
 
 Kein Netz, kein Browser, kein DATA_ROOT, kein Dienst. Node muss vorhanden sein; fehlt es,
 überspringt die Laufzeitprüfung (die Testdateien laufen trotzdem).
@@ -63,6 +64,7 @@ MESSUNGEN = [
     ("layout", "layout"),
     ("filter", "filter"),
     ("reducedmotion", "reducedmotion"),
+    ("koerper", "koerper"),
 ]
 
 
@@ -173,6 +175,22 @@ def test_reduced_motion_ist_statisch_und_hat_null_frames(messung: dict) -> None:
     m = messung["reducedmotion"]
     assert m["raf_calls"] == 0, m
     assert m["painted_nodes"] > 0, m
+
+
+@needs_node
+def test_der_koerper_ist_ein_koerper_mit_einem_lappen_je_space(messung: dict) -> None:
+    """14.6 (Schritt 14.6.2): aus den Inseln wird **ein** Körper — ohne dass ein Knoten
+    seinen Platz wechselt.
+
+    Der Eingang ist ein **zweiter** fester Satz (`KOERPER_POSITIONEN`): die drei Gruppen
+    stehen so weit auseinander, dass sie sich bei `LOBE_CLOSE_PX = 0` **nicht** berühren.
+    Mit den Positionen der älteren Messung (`FESTE_POSITIONEN`) wäre die Messung wertlos —
+    dort berühren sich zwei Spaces von selbst, und der Gegenlauf bliebe grün.
+    """
+    m = messung["koerper"]
+    assert m["components"] == 1, m
+    assert m["lobes"] == 3, m
+    assert m["furrow_cells"] > 0, m
 
 
 @needs_node

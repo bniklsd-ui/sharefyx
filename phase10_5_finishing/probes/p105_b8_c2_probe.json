@@ -25,7 +25,7 @@
     "ok": true
   },
   "furche": {
-    "furrow_cells": 36,
+    "furrow_cells": 51,
     "contours_compared": 3,
     "separation_px": 11.3,
     "ok": true
@@ -86,9 +86,16 @@
     "painted_nodes": 26,
     "ok": true
   },
+  "koerper": {
+    "positions": "KOERPER_POSITIONEN",
+    "components": 1,
+    "lobes": 3,
+    "furrow_cells": 53,
+    "ok": true
+  },
   "ausfuehrer": {
     "ticks": 129,
-    "fetch_calls": 3,
+    "fetch_calls": 4,
     "gegenlauf": null
   }
 }

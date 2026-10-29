@@ -184,7 +184,15 @@ const LOBE_INNER_CELLS = 3;    // Erosionstiefe der inneren Kontur (3 Zellen = 2
 // bleibt (fast) wo er ist -- und **kein Knoten bewegt sich**.
 // `0` = die Inseln von Block 14 (der Stand vor dem Schließen). Der Wert wird **gemessen**
 // (Plan §3, Entscheidung E1), nicht gesetzt.
-const LOBE_CLOSE_PX = 0;
+//
+// **Der Wert: 160 — gewählt vom Nikinger am 2026-10-28, gemessen in 14.6.1** (Plan §3, die
+// Standardregel: der **kleinste** Wert, bei dem der Körper **eine** Komponente ist und jeder
+// Space **einen** Lappen hat). Die sechs Varianten (0/80/120/160/200/240) sind in
+// `phase10_5_finishing/probes/p105_b14_6_varianten_messung.json` belegt.
+// **160 ist der letzte Wert, der den äußeren Reach unangetastet lässt** (48,4 px, wie
+// vorher): ab 200 frisst die Furche die Lappen von außen (Reach rechts −3,9 px), ab 240 reißt
+// die 52-px-Grenze des Plans (§2.4) und die Luft schrumpft auf 2,8 px.
+const LOBE_CLOSE_PX = 160;
 const EDGE_CURVE = 0.24;       // Krümmung der Bahn: Kontrollpunkt = Mitte + 0,24·(−dy, dx)
 const EDGE_WIDTH_BASE = 1;     // Plan 8.2: Breite = 1 + log2(1 + min(deg(a), deg(b)))
 const CANVAS_SURFACE = "#14181D";  // `--surface` -- die Fläche unter dem Canvas; Mix-Ziel für

@@ -9,7 +9,7 @@ down:
   - ../../phase5_ui/webui/static/js/graph.js            # der einzige Produktcode, der sich ändert: `computeLobes()`
   - ../../phase10_5_finishing/probes/p105_b14_karte_bilder.py  # die Bilder-Probe (Recorder, `--konstante`, `--bilder`)
   - ../../phase10_5_finishing/probes/p105_b8_c2_probe.mjs      # der C2-Wächter (feste Positionen, Messpflaster)
-updated: 2026-10-28 (Schritt 14.6.1: der Algorithmus steht, die sechs Varianten sind gemessen — der kleinste Wert mit EINER Komponente ist 160; STOPP E1) | 2026-10-28 (Schritt 14.6.0 gebaut: die Basislinie gemessen — 5 Komponenten, 0 Furche-Zellen) | 2026-10-28 (Entwurf, Claude Code — nach der Sichtung der 14.5-Bilder)
+updated: 2026-10-28 (Schritt 14.6.2: der Wert steht — 160; der Wächter `koerper` beißt) | 2026-10-28 (Schritt 14.6.1: der Algorithmus steht, die sechs Varianten sind gemessen — der kleinste Wert mit EINER Komponente ist 160; STOPP E1) | 2026-10-28 (Schritt 14.6.0 gebaut: die Basislinie gemessen — 5 Komponenten, 0 Furche-Zellen) | 2026-10-28 (Entwurf, Claude Code — nach der Sichtung der 14.5-Bilder)
 ---
 # P10.5 Block 14.6 — Der Körper: aus Inseln wird eine Gehirnkarte
 
@@ -121,7 +121,7 @@ solchen Wert: STOPP, berichten.
 |---|---|---|
 | **14.6.0** ✅ 2026-10-28 | **Messung zuerst:** die Bilder-Probe `p105_b14_karte_bilder.py` bekommt die Zelle `koerper` (§5) — gemessen über ein **Messpflaster in einer Kopie** von `graph.js` (Muster `p105_b8_c2_probe.mjs` Z. ~95, `globalThis.__furrowCells`; **kein** Haken im Produktcode). **Zwei Durchgänge je Lauf:** die **Bilder** und der Rand (Reach/Luft) aus den **ungepatchten** Dateien (die Bilder im Repo zeigen Produktcode — `test_b14_karte_bilder.py`), die `koerper`-Zahlen und die `computeLobes()`-Zeit aus einem **eigenen**, gepatchten Durchgang. Dazu `LOBE_CLOSE_PX` in `BLOCK14_KONSTANTEN` (`p105_b14_layout_probe.py` Z. 253), damit `--konstante=` es meldet. **Gegen den heutigen Code.** | `koerper` ist **rot** an der Basislinie: **5** Komponenten, **0** Furche-Zellen (das ist der gemessene Befund aus §0). Alle übrigen Zellen der Probe unverändert. **✅ erfüllt** — die Anmerkungen unten. |
 | **14.6.1** ✅ 2026-10-28 | Der Algorithmus (§2.1) mit `LOBE_CLOSE_PX = 0` (= heute, §2.2) — dann die **Varianten** `--konstante=LOBE_CLOSE_PX=` **0 · 80 · 120 · 160 · 200 · 240**, je mit `--bilder=~/p105_b14_6_varianten/<D>/` (**außerhalb** des Repos). | Mit `0` ist das Bild gleich dem von heute (§2.2). Tabelle je Variante: Komponenten, Lappen je Space, Furche-Zellen, Reach je Seite, Luft, Zellgröße, `computeLobes()`-Zeit (152/201 Knoten). **STOPP — Bericht an den Nikinger (E1).** Commit mit `LOBE_CLOSE_PX = 0`. **✅ erfüllt** — die Bilder bei `0` sind **byteweise identisch** mit den drei im Repo; die Tabelle und der Befund stehen unten. |
-| **14.6.2** | Den gewählten Wert setzen (Kommentar „gewählt vom Nikinger am <Datum>, gemessen in 14.6.1"). C2-Wächter: neue Messung `koerper` in `p105_b8_c2_probe.mjs` an einem **festen** Eingang (3 Gruppen, Abstand so, dass sie sich bei `LOBE_CLOSE_PX = 0` **nicht** berühren — Muster `FESTE_POSITIONEN`, Z. ~407) + Gegenlauf `koerper` (`LOBE_CLOSE_PX` → 0) in `tests/test_graph_c2.py`. Die alte Furche-Messung bleibt. | `koerper` grün; der Gegenlauf `koerper` macht **genau diese** Messung rot, die acht alten Gegenläufe bleiben rot an genau ihrer Messung. |
+| **14.6.2** ✅ 2026-10-28 | Den gewählten Wert setzen (Kommentar „gewählt vom Nikinger am <Datum>, gemessen in 14.6.1"). C2-Wächter: neue Messung `koerper` in `p105_b8_c2_probe.mjs` an einem **festen** Eingang (3 Gruppen, Abstand so, dass sie sich bei `LOBE_CLOSE_PX = 0` **nicht** berühren — Muster `FESTE_POSITIONEN`, Z. ~407) + Gegenlauf `koerper` (`LOBE_CLOSE_PX` → 0) in `tests/test_graph_c2.py`. Die alte Furche-Messung bleibt. | `koerper` grün; der Gegenlauf `koerper` macht **genau diese** Messung rot, die acht alten Gegenläufe bleiben rot an genau ihrer Messung. |
 | **14.6.3** | Belege: `p105_b14_layout_probe.py` neu (Normalfall) · `p105_b14_karte_bilder.py` neu (Bilder ersetzen `docs/screenshots/p105_b14_karte_0{1,2,3}_*.png`, dieselben Namen) · `p105_b8_karte_probe.py` neu · volle Suite, `scripts/doc_health.py`, `phase5_ui/scripts/ui_budget.py`. Doku: §4-Zeile hier, Head (Modulstatus, Abnahmezeile **P10.5-72**, Summe, Session-Block), INDEX. | Die Knotenpositionen der Layout-Probe sind **gleich** zu `p105_b14_layout_probe.json` (alle Zellen gleich bis auf `zeit`) ⇒ das Layout ist unberührt, die sechs Gegenläufe müssen **nicht** neu. `koerper` grün mit dem gewählten Wert. Suite grün, `doc_health` 0, `ui_budget` grün. |
 | 14.6.4 | **Claude Code:** Update-Log-Zeile anpassen (sie sagt heute „eigene Insel"), Sichtung **P10.5-70** neu beim Nikinger | — |
 
@@ -181,6 +181,46 @@ vermutet.
 `~/p105_b14_6_varianten/<D>/` (**außerhalb** des Repos). Der **Standard** nach §3 wäre **160**
 (der kleinste Wert mit einer Komponente und einem Lappen je Space). Der Commit trägt
 `LOBE_CLOSE_PX = 0` — gesetzt wird der Wert in **14.6.2**.
+
+#### 14.6.2 ✅ 2026-10-28 — der Wert steht, der Wächter beißt
+
+**E1 ist entschieden: `LOBE_CLOSE_PX = 160`.** Der Nikinger hat am 2026-10-28 die **Standardregel
+des Plans** (§3) entschieden: der kleinste Wert, bei dem der Körper **eine** Komponente ist und
+jeder Space **einen** Lappen hat. Der Wert steht im Produktcode mit dem Kommentar
+„gewählt vom Nikinger am 2026-10-28, gemessen in 14.6.1".
+
+**Der Wächter `koerper` (neue Messung in `p105_b8_c2_probe.mjs`).** Die alte Furche-Messung
+bleibt; neu ist eine **neunte** Messung mit einem **zweiten festen Eingang**
+(`KOERPER_POSITIONEN`): drei Gruppen mit den Abständen **190 px** (alpha|beta), **130,8 px**
+(alpha|gamma) und **161,2 px** (beta|gamma) — alle **größer** als zwei Reach-Radien (96 px),
+damit die Masken bei `LOBE_CLOSE_PX = 0` getrennt bleiben, und alle **kleiner** als zwei
+Schließ-Radien (416 px), damit sie bei 160 verschmelzen.
+
+**Warum ein zweiter Eingang (der Plan verlangt dieselbe Art von Eingangs-Fixierung).** Die
+alten `FESTE_POSITIONEN` lassen alpha und beta **berühren** (30 px) — dort gäbe es bei *jeder*
+Schließung einen Körper, und der Gegenlauf (`LOBE_CLOSE_PX` → 0) bliebe **grün**, ohne dass der
+Fehler wiederhergestellt wäre. Genau das ist die Fehlerklasse, die dieser Ordner zweimal
+gesehen hat: eine grüne Messung ohne Gegenlauf beweist, dass der Wächter läuft, nicht dass er
+die richtige Sache misst.
+
+**Die Zahlen (Normalfall):** `components` **1**, `lobes` **3**, `furrow_cells` **53** → grün.
+**Der Gegenlauf `koerper`** (`LOBE_CLOSE_PX` → 0): `components` **3**, `furrow_cells` **0** →
+rot — und **nur** diese Messung; die acht alten bleiben grün (der Anker des Gegenlaufs ist die
+**Konstante**, und ein fehlender Anker bricht die Probe **laut** ab).
+
+**Datierte Korrektur zum Plan (§4, Schritt 14.6.2).** Der Plan verlangt die neue Messung „an
+einem **festen** Eingang (3 Gruppen …) — Muster `FESTE_POSITIONEN`". Das **Muster** ist
+übernommen (ein fester, in der Ablage liegender Positionssatz), aber die **Positionen** sind
+**andere**: die alten lassen zwei Gruppen berühren. Beide Sätze stehen jetzt nebeneinander im
+Probe-File (`FESTE_POSITIONEN` für die acht alten Messungen, `KOERPER_POSITIONEN` für die
+neue).
+
+**Der Browser bestätigt den Wert (ein Lauf, die Bilder außerhalb des Repos).** 201 Knoten:
+`components` **1**, `lobes_je_space` **1** je Space, **146** Furche-Zellen, **4** Paare,
+Reach **47,9 / 44,1 / 48,4 / 44,6 px** (Grenze 52), Luft **7,2 / 10,7 / 82,9 / 85,6 px**,
+Zeit **29,7 ms** (152) und **43,0 ms** (201 Knoten, Median aus fünf Aufrufen — Grenze 50).
+Die Sichtprüfung des Bildes bestätigt: **ein** zusammenhängendes, gehirn-ähnliches Gebilde mit
+Lappen und Furchen.
 
 #### 14.6.0 ✅ 2026-10-28 — die Basislinie, gemessen
 

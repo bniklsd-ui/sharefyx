@@ -82,6 +82,12 @@ const GEGENLAEUFE = {
     ["    if (reducedMotion) {\n      resize();",
      "    if (false && reducedMotion) {\n      resize();"],
   ],
+  // **Der Koerper wird nicht geschlossen** (Plan 14.6, Schritt 14.6.2): die drei Gruppen
+  // bleiben drei Inseln. Der Anker ist die **Konstante** (nicht ein Kommentar darüber) --
+  // fehlt sie, bricht die Probe **laut** ab.
+  koerper: [
+    ["const LOBE_CLOSE_PX = 160;", "const LOBE_CLOSE_PX = 0;"],
+  ],
 };
 
 // -- Die Messpflaster: sie machen sichtbar, was die Regel tut (Verhalten unveraendert) ----------
@@ -92,7 +98,7 @@ const GEGENLAEUFE = {
 // macht genau das sichtbar (siehe `FESTE_POSITIONEN`).
 const MESS_PFLASTER = [
   ["return { key: lobeKey(shown), lobes: lobes };",
-   "globalThis.__furrowCells = 0; for (var fi2 = 0; fi2 < furrow.length; fi2++) globalThis.__furrowCells += furrow[fi2]; return { key: lobeKey(shown), lobes: lobes };"],
+   "globalThis.__furrowCells = 0; for (var fi2 = 0; fi2 < furrow.length; fi2++) globalThis.__furrowCells += furrow[fi2]; globalThis.__koerperRaster = { cols: cols, rows: rows, koerper: Array.prototype.slice.call(koerper), lobes: lobes.length }; return { key: lobeKey(shown), lobes: lobes };"],
 ];
 
 // -- Die Kamera steht still (Schritt 14.3, 2026-10-26) --------------------------------------------
@@ -410,6 +416,23 @@ const FESTE_POSITIONEN = {
   itm_g1: [200, 500],
 };
 
+// **Die Koerper-Positionen** (Plan 14.6, Schritt 14.6.2): ein **zweiter** fester Eingang fuer
+// die Messung `koerper`. Die drei Gruppen stehen so weit auseinander, dass sie sich bei
+// `LOBE_CLOSE_PX = 0` **nicht** beruehren -- und bei 160 px **einen** Koerper bilden.
+//
+// **Warum ein zweiter Eingang:** die `FESTE_POSITIONEN` oben lassen alpha und beta
+// **beruehren** (30 px) -- dort gibt es bei **jeder** Schliessung einen Koerper. Die Messung
+// waere damit wertlos: der Gegenlauf (0) bliebe gruen, ohne dass der Fehler wiederhergestellt
+// war. Die Abstaende hier: alpha-beta **190 px**, alpha-gamma **130,8 px**, beta-gamma
+// **161,2 px** -- alle groesser als zwei Reach-Radien (96 px), damit die Masken bei 0
+// getrennt bleiben, und alle kleiner als zwei Schliess-Radien (2 · 208 = 416 px), damit sie
+// bei 160 verschmelzen.
+const KOERPER_POSITIONEN = {
+  itm_a1: [300, 300], itm_a2: [300, 340], itm_a3: [300, 380],
+  itm_b1: [490, 300], itm_b2: [490, 340],
+  itm_g1: [395, 470],
+};
+
 const fetchLog = [];
 globalThis.fetch = function (url) {
   fetchLog.push(url);
@@ -716,12 +739,67 @@ results.reducedmotion = {
   ok: rafCallsAfterLoad === 0 && rmArcs > 0,
 };
 
+// 9) Der Koerper (Plan 14.6, Schritt 14.6.2) ------------------------------------------------------
+//
+// **Der Filter muss zurueck:** die Filter-Messung oben hat den Typfilter auf "note"
+// gesetzt -- mit dem Filter waere der Koerper nur der der Notizen (ein Space, ein Lappen).
+typeSelectEl.value = "";
+typeSelectEl.listeners.change({ target: typeSelectEl });
+
+// Der **zweite** feste Eingang (siehe `KOERPER_POSITIONEN`): die drei Gruppen beruehren sich
+// bei `LOBE_CLOSE_PX = 0` nicht -- bei 160 px bilden sie **einen** Koerper.
+store.set("sfx:graph:layout:v1:alpha", JSON.stringify({ v: 1, pos: KOERPER_POSITIONEN }));
+await graph.loadGraph({ force: true });
+flushOneFrame();
+runTicks(400);
+
+const raster = globalThis.__koerperRaster;
+if (!raster) throw new Error("das Koerper-Raster fehlt -- der Messpflaster griff nicht");
+
+// Die Komponenten: **4-Nachbar** (dieselbe Lesart wie in der Python-Probe
+// `p105_b14_karte_bilder.py`) -- ein zusammenhaengender Koerper.
+function koerperKomponenten(r) {
+  const cols = r.cols, rows = r.rows, felder = r.koerper;
+  const seen = new Uint8Array(cols * rows);
+  let n = 0;
+  for (let i = 0; i < felder.length; i++) {
+    if (!felder[i] || seen[i]) continue;
+    n += 1;
+    const stapel = [i];
+    seen[i] = 1;
+    while (stapel.length) {
+      const c = stapel.pop();
+      const x = c % cols;
+      const y = (c - x) / cols;
+      const nachbarn = [];
+      if (x > 0) nachbarn.push(c - 1);
+      if (x < cols - 1) nachbarn.push(c + 1);
+      if (y > 0) nachbarn.push(c - cols);
+      if (y < rows - 1) nachbarn.push(c + cols);
+      for (const m of nachbarn) {
+        if (felder[m] && !seen[m]) { seen[m] = 1; stapel.push(m); }
+      }
+    }
+  }
+  return n;
+}
+
+const komponenten = koerperKomponenten(raster);
+results.koerper = {
+  positions: "KOERPER_POSITIONEN",
+  components: komponenten,
+  lobes: raster.lobes,
+  furrow_cells: globalThis.__furrowCells,
+  // **Ein** Koerper, **ein** Lappen je Space (3 Spaces im Eingang) -- und die Furche muss
+  // Zellen haben, sonst waere die Karte ein Klumpen ohne Grenzen.
+  ok: komponenten === 1 && raster.lobes === 3 && globalThis.__furrowCells > 0,
+};
+
 results.ausfuehrer = {
   ticks: ticks,
   fetch_calls: fetchLog.length,
   gegenlauf: gegenlauf || null,
 };
-
 const json = JSON.stringify(results, null, 2) + "\n";
 // Die Rohwerte liegen **neben** der Probe (Plan §2.3: "Rohwerte als JSON daneben") -- aber nur
 // der Normalfall: die acht Gegenlaeufe schreiben nach /tmp, sonst liegen neun JSON-Dateien im
