@@ -176,6 +176,15 @@ const LOBE_REACH = 48;         // Radius der Körpermaske um den nächsten Knote
 const LOBE_MAX_CELLS = 200;    // Deckel je Achse -- ein weit auseinandergezogenes Layout darf
                                // das Raster nicht unbegrenzt wachsen lassen
 const LOBE_INNER_CELLS = 3;    // Erosionstiefe der inneren Kontur (3 Zellen = 24 px)
+// P10.5 Block 14, Schritt 14.6 (Plan `docs/concepts/phase10_5_block14_6_plan.md` §2.1):
+// der **Schließ-Radius** der Körpermaske. Das Layout aus Block 14 stellt die Spaces weit
+// auseinander — die Lappen zweier Spaces berühren sich **nie** (gemessen: 5 Inseln, 0
+// Furche-Zellen). `LOBE_CLOSE_PX > 0` **schließt** die Maske: erst um `D` **wachsen**, dann
+// um `D` **schrumpfen**. Die Lücken zwischen den Inseln füllen sich, der **äußere** Rand
+// bleibt (fast) wo er ist -- und **kein Knoten bewegt sich**.
+// `0` = die Inseln von Block 14 (der Stand vor dem Schließen). Der Wert wird **gemessen**
+// (Plan §3, Entscheidung E1), nicht gesetzt.
+const LOBE_CLOSE_PX = 0;
 const EDGE_CURVE = 0.24;       // Krümmung der Bahn: Kontrollpunkt = Mitte + 0,24·(−dy, dx)
 const EDGE_WIDTH_BASE = 1;     // Plan 8.2: Breite = 1 + log2(1 + min(deg(a), deg(b)))
 const CANVAS_SURFACE = "#14181D";  // `--surface` -- die Fläche unter dem Canvas; Mix-Ziel für
@@ -1445,33 +1454,42 @@ function computeLobes(shown) {
   if (!list.length) return null;
 
   // -- Weltbereich: die Knoten plus der Reach-Radius -------------------------------------------------
-  var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  var nodeMinX = Infinity, nodeMinY = Infinity, nodeMaxX = -Infinity, nodeMaxY = -Infinity;
   for (var j = 0; j < list.length; j++) {
     var n = list[j];
-    if (n.x < minX) minX = n.x;
-    if (n.y < minY) minY = n.y;
-    if (n.x > maxX) maxX = n.x;
-    if (n.y > maxY) maxY = n.y;
+    if (n.x < nodeMinX) nodeMinX = n.x;
+    if (n.y < nodeMinY) nodeMinY = n.y;
+    if (n.x > nodeMaxX) nodeMaxX = n.x;
+    if (n.y > nodeMaxY) nodeMaxY = n.y;
   }
-  minX -= LOBE_REACH;
-  minY -= LOBE_REACH;
-  maxX += LOBE_REACH;
-  maxY += LOBE_REACH;
 
+  // **Das Polster (Plan 14.6 §2.1, Schritt 1):** `LOBE_REACH` + `LOBE_CLOSE_PX` + **eine
+  // Zelle**. Die eine Zelle ist der Puffer, damit das **Schrumpfen** (Schritt 3) den Rand
+  // des aeussersten Lappens nicht abschneidet -- das Raster muss dort **eine Zelle weiter**
+  // reichen als die Koerpermaske.
+  var reach = LOBE_REACH + LOBE_CLOSE_PX;
+  var spanX = (nodeMaxX - nodeMinX) + 2 * reach;
+  var spanY = (nodeMaxY - nodeMinY) + 2 * reach;
   // Zellgroesse: 8 px (Plan), aber gedeckelt, damit ein weit auseinandergezogenes Layout
-  // das Raster nicht explodieren laesst (Deckel LOBE_MAX_CELLS je Achse).
+  // das Raster nicht explodieren laesst (Deckel LOBE_MAX_CELLS je Achse). **Der Deckel gilt
+  // fuer die gesamte Spanne -- auch fuer das Zell-Polster** (Plan 14.6 §2.5): sonst wueschse
+  // das Raster um zwei Zellen darueber hinaus. Bei `LOBE_CLOSE_PX = 0` ist die Zellgroesse
+  // damit **unveraendert** (das Polster ist genau eine Zelle).
   var cell = LOBE_CELL_PX;
-  var spanX = maxX - minX;
-  var spanY = maxY - minY;
-  if (spanX / cell > LOBE_MAX_CELLS) cell = spanX / LOBE_MAX_CELLS;
-  if (spanY / cell > LOBE_MAX_CELLS) cell = Math.max(cell, spanY / LOBE_MAX_CELLS);
-  var cols = Math.max(1, Math.ceil(spanX / cell));
-  var rows = Math.max(1, Math.ceil(spanY / cell));
+  var maxCells = LOBE_MAX_CELLS - 2;
+  if (spanX / cell > maxCells) cell = spanX / maxCells;
+  if (spanY / cell > maxCells) cell = Math.max(cell, spanY / maxCells);
+  var cols = Math.max(1, Math.ceil((spanX + 2 * cell) / cell));
+  var rows = Math.max(1, Math.ceil((spanY + 2 * cell) / cell));
+  var minX = nodeMinX - reach - cell;
+  var minY = nodeMinY - reach - cell;
 
   // -- 1) Zuordnung: je Zelle der naechste Knoten (und damit sein Space) ----------------------
   var assign = new Int32Array(cols * rows);      // Index des naechsten Knoten, -1 = ausserhalb
   var spaceOf = new Array(cols * rows);           // der Space-Name (oder null)
+  var mask = new Uint8Array(cols * rows);         // 1 = Zelle der **heutigen** Maske (Reach 48)
   var reachSq = LOBE_REACH * LOBE_REACH;
+  var growSq = reach * reach;
   for (var gy = 0; gy < rows; gy++) {
     var cy = minY + gy * cell + cell / 2;
     for (var gx = 0; gx < cols; gx++) {
@@ -1485,11 +1503,39 @@ function computeLobes(shown) {
         if (d < bestD) { bestD = d; best = k; }
       }
       var idx = gy * cols + gx;
-      // (b) die Koerpermaske: nur Zellen innerhalb des Reach-Radius um den naechsten Knoten
-      if (best < 0 || bestD > reachSq) { assign[idx] = -1; spaceOf[idx] = null; continue; }
+      // (b) die **gewachsene** Koerpermaske: die Zellen innerhalb von `LOBE_REACH +
+      // LOBE_CLOSE_PX` vom naechsten Knoten. **Dieselbe** Schleife wie bisher -- nur die
+      // Schwelle ist groesser (Plan 14.6 §2.1, Schritt 2).
+      if (best < 0 || bestD > growSq) { assign[idx] = -1; spaceOf[idx] = null; continue; }
       assign[idx] = best;
       spaceOf[idx] = list[best].space || "";
+      if (bestD <= reachSq) mask[idx] = 1;
     }
+  }
+
+  // -- 2) Das Schliessen (Plan 14.6 §2.1, Schritt 3 und 4) ----------------------------------
+  //
+  // **Schrumpfen:** eine Zelle bleibt, wenn ihr euklidischer Abstand (in Zellen) zur
+  // naechsten Zelle **ausserhalb** des gewachsenen Satzes groesser als
+  // `LOBE_CLOSE_PX / cell` ist. Die Distanz ist die **exakte** euklidische
+  // (Felzenszwalb-Huttenlocher) -- eine Chamfer-Naeherung wiche bis ~8 % ab und machte die
+  // Raender **achteckig** statt rund.
+  //
+  // **Der Koerper** = der geschlossene Satz **∪** die heutige Maske: die Vereinigung
+  // faengt die Rasterungs-Kante ab (ohne sie koennte das Schliessen eine Zelle der heutigen
+  // Maske verlieren). Bei `LOBE_CLOSE_PX = 0` ist das Schrumpfen die Identitaet (der Abstand
+  // jeder Zelle zum Satz ausserhalb ist mindestens eine Zelle) -- der Koerper ist damit
+  // **exakt** die heutige Maske (Plan 14.6 §2.2: die Regressionsprobe).
+  var ausserhalb = new Uint8Array(cols * rows);
+  for (var q = 0; q < cols * rows; q++) ausserhalb[q] = assign[q] < 0 ? 1 : 0;
+  var dist2 = distanzQuadrat(ausserhalb, cols, rows);
+  var grenze = LOBE_CLOSE_PX * LOBE_CLOSE_PX;
+  var koerper = new Uint8Array(cols * rows);
+  for (var w = 0; w < cols * rows; w++) {
+    if (assign[w] < 0) continue;
+    if (dist2[w] * cell * cell > grenze) koerper[w] = 1;
+    if (mask[w]) koerper[w] = 1;                 // die heutige Maske bleibt (Schritt 4)
+    if (!koerper[w]) { spaceOf[w] = null; assign[w] = -1; }
   }
 
   // -- 2) Furche: ein 4-Nachbar aus einem anderen Space macht die Zelle zur Furche ----------
@@ -1543,6 +1589,76 @@ function computeLobes(shown) {
 // Der Schluessel des Lappen-Zustands: welcher Filter stand bei der Berechnung.
 function lobeKey(shown) {
   return filterType + "|" + filterStatus + "|" + (shown ? Object.keys(shown).length : 0);
+}
+
+// Die **exakte** euklidische Distanztransformation auf dem Raster (Felzenszwalb & Huttenlocher,
+// 2012): je Zelle das **quadrierte** Abstand zur naechsten **Zielzelle** (deren Marke gesetzt
+// ist). Zwei 1-D-Durchlaenge (einer je Zeile, einer je Spalte), O(Zellen).
+//
+// **Warum exakt und nicht Chamfer:** die Chamfer-Naeherung (3-4-5) weicht bis zu ~8 % vom
+// euklidischen Abstand ab -- bei einem Radius von 200 px sind das 16 px, und die Raender des
+// Koerpers werden **achteckig** statt rund. Der Abstand ist die *Form* der Karte (Plan 14.6
+// §2.1: "eine Chamfer-Naeherung ist **nicht** zulaessig").
+//
+// `quelle` = 1 fuer die Zielzellen. Das Ergebnis ist in **Zellen** squared (die Umrechnung in
+// Pixel macht der Aufrufer: `dist2 * cell * cell`).
+function distanzQuadrat(quelle, cols, rows) {
+  var n = Math.max(cols, rows);
+  var f = new Float64Array(n);
+  var d = new Float64Array(n);
+  var v = new Int32Array(n);
+  var z = new Float64Array(n + 1);
+  var out = new Float64Array(cols * rows);
+  var x, y, q;
+  // die Zeilen
+  for (y = 0; y < rows; y++) {
+    for (x = 0; x < cols; x++) f[x] = sourceCost(quelle[y * cols + x]);
+    distanz1d(f, d, v, z, cols);
+    for (x = 0; x < cols; x++) out[y * cols + x] = d[x];
+  }
+  // die Spalten
+  for (x = 0; x < cols; x++) {
+    for (y = 0; y < rows; y++) f[y] = out[y * cols + x];
+    distanz1d(f, d, v, z, rows);
+    for (y = 0; y < rows; y++) out[y * cols + x] = d[y];
+  }
+  return out;
+}
+
+// Die Kosten einer Zelle fuer den 1-D-Durchlauf: 0 fuer die Zielzellen, sonst ein **grosser
+// endlicher** Wert. `Infinity` waere falsch: die Trennlinie der Parabeln waere dann `Infinity`
+// und die Huelle kaeme nicht voran (der Durchlauf muesste mit `k` unter null laufen). Mit dem
+// grossen Wert ist die Grenzlinie die **Winkelhalbierende** -- das ist das richtige Grenzverhalten
+// fuer eine Zelle, die nie die kleinste sein wird.
+function sourceCost(istZiel) {
+  return istZiel ? 0 : 1e20;
+}
+
+// Der 1-D-Durchlauf der quadratischen Distanztransformation:
+// `d[q] = min_p ((q - p)^2 + f[p])` -- die untere Huelle der Parabeln (Felzenszwalb 2012).
+function distanz1d(f, d, v, z, n) {
+  var k = 0;
+  var q, s, dq;
+  v[0] = 0;
+  z[0] = -Infinity;
+  z[1] = Infinity;
+  for (q = 1; q < n; q++) {
+    s = ((f[q] + q * q) - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]);
+    while (s <= z[k]) {
+      k--;
+      s = ((f[q] + q * q) - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]);
+    }
+    k++;
+    v[k] = q;
+    z[k] = s;
+    z[k + 1] = Infinity;
+  }
+  k = 0;
+  for (q = 0; q < n; q++) {
+    while (z[k + 1] < q) k++;
+    dq = q - v[k];
+    d[q] = dq * dq + f[v[k]];
+  }
 }
 
 // Erosion: Zellen, deren 4-Nachbarn alle zur Menge gehoeren. `times` Schritte.

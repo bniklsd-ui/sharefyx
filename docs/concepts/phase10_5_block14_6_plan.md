@@ -9,7 +9,7 @@ down:
   - ../../phase5_ui/webui/static/js/graph.js            # der einzige Produktcode, der sich ändert: `computeLobes()`
   - ../../phase10_5_finishing/probes/p105_b14_karte_bilder.py  # die Bilder-Probe (Recorder, `--konstante`, `--bilder`)
   - ../../phase10_5_finishing/probes/p105_b8_c2_probe.mjs      # der C2-Wächter (feste Positionen, Messpflaster)
-updated: 2026-10-28 (Schritt 14.6.0 gebaut: die Basislinie gemessen — 5 Komponenten, 0 Furche-Zellen, 35,0 ms bei 201 Knoten) | 2026-10-28 (Entwurf, Claude Code — nach der Sichtung der 14.5-Bilder)
+updated: 2026-10-28 (Schritt 14.6.1: der Algorithmus steht, die sechs Varianten sind gemessen — der kleinste Wert mit EINER Komponente ist 160; STOPP E1) | 2026-10-28 (Schritt 14.6.0 gebaut: die Basislinie gemessen — 5 Komponenten, 0 Furche-Zellen) | 2026-10-28 (Entwurf, Claude Code — nach der Sichtung der 14.5-Bilder)
 ---
 # P10.5 Block 14.6 — Der Körper: aus Inseln wird eine Gehirnkarte
 
@@ -120,12 +120,67 @@ solchen Wert: STOPP, berichten.
 | Schritt | Inhalt | Fertig, wenn |
 |---|---|---|
 | **14.6.0** ✅ 2026-10-28 | **Messung zuerst:** die Bilder-Probe `p105_b14_karte_bilder.py` bekommt die Zelle `koerper` (§5) — gemessen über ein **Messpflaster in einer Kopie** von `graph.js` (Muster `p105_b8_c2_probe.mjs` Z. ~95, `globalThis.__furrowCells`; **kein** Haken im Produktcode). **Zwei Durchgänge je Lauf:** die **Bilder** und der Rand (Reach/Luft) aus den **ungepatchten** Dateien (die Bilder im Repo zeigen Produktcode — `test_b14_karte_bilder.py`), die `koerper`-Zahlen und die `computeLobes()`-Zeit aus einem **eigenen**, gepatchten Durchgang. Dazu `LOBE_CLOSE_PX` in `BLOCK14_KONSTANTEN` (`p105_b14_layout_probe.py` Z. 253), damit `--konstante=` es meldet. **Gegen den heutigen Code.** | `koerper` ist **rot** an der Basislinie: **5** Komponenten, **0** Furche-Zellen (das ist der gemessene Befund aus §0). Alle übrigen Zellen der Probe unverändert. **✅ erfüllt** — die Anmerkungen unten. |
-| **14.6.1** | Der Algorithmus (§2.1) mit `LOBE_CLOSE_PX = 0` (= heute, §2.2) — dann die **Varianten** `--konstante=LOBE_CLOSE_PX=` **0 · 80 · 120 · 160 · 200 · 240**, je mit `--bilder=~/p105_b14_6_varianten/<D>/` (**außerhalb** des Repos). | Mit `0` ist das Bild gleich dem von heute (§2.2). Tabelle je Variante: Komponenten, Lappen je Space, Furche-Zellen, Reach je Seite, Luft, Zellgröße, `computeLobes()`-Zeit (152/201 Knoten). **STOPP — Bericht an den Nikinger (E1).** Commit mit `LOBE_CLOSE_PX = 0`. |
+| **14.6.1** ✅ 2026-10-28 | Der Algorithmus (§2.1) mit `LOBE_CLOSE_PX = 0` (= heute, §2.2) — dann die **Varianten** `--konstante=LOBE_CLOSE_PX=` **0 · 80 · 120 · 160 · 200 · 240**, je mit `--bilder=~/p105_b14_6_varianten/<D>/` (**außerhalb** des Repos). | Mit `0` ist das Bild gleich dem von heute (§2.2). Tabelle je Variante: Komponenten, Lappen je Space, Furche-Zellen, Reach je Seite, Luft, Zellgröße, `computeLobes()`-Zeit (152/201 Knoten). **STOPP — Bericht an den Nikinger (E1).** Commit mit `LOBE_CLOSE_PX = 0`. **✅ erfüllt** — die Bilder bei `0` sind **byteweise identisch** mit den drei im Repo; die Tabelle und der Befund stehen unten. |
 | **14.6.2** | Den gewählten Wert setzen (Kommentar „gewählt vom Nikinger am <Datum>, gemessen in 14.6.1"). C2-Wächter: neue Messung `koerper` in `p105_b8_c2_probe.mjs` an einem **festen** Eingang (3 Gruppen, Abstand so, dass sie sich bei `LOBE_CLOSE_PX = 0` **nicht** berühren — Muster `FESTE_POSITIONEN`, Z. ~407) + Gegenlauf `koerper` (`LOBE_CLOSE_PX` → 0) in `tests/test_graph_c2.py`. Die alte Furche-Messung bleibt. | `koerper` grün; der Gegenlauf `koerper` macht **genau diese** Messung rot, die acht alten Gegenläufe bleiben rot an genau ihrer Messung. |
 | **14.6.3** | Belege: `p105_b14_layout_probe.py` neu (Normalfall) · `p105_b14_karte_bilder.py` neu (Bilder ersetzen `docs/screenshots/p105_b14_karte_0{1,2,3}_*.png`, dieselben Namen) · `p105_b8_karte_probe.py` neu · volle Suite, `scripts/doc_health.py`, `phase5_ui/scripts/ui_budget.py`. Doku: §4-Zeile hier, Head (Modulstatus, Abnahmezeile **P10.5-72**, Summe, Session-Block), INDEX. | Die Knotenpositionen der Layout-Probe sind **gleich** zu `p105_b14_layout_probe.json` (alle Zellen gleich bis auf `zeit`) ⇒ das Layout ist unberührt, die sechs Gegenläufe müssen **nicht** neu. `koerper` grün mit dem gewählten Wert. Suite grün, `doc_health` 0, `ui_budget` grün. |
 | 14.6.4 | **Claude Code:** Update-Log-Zeile anpassen (sie sagt heute „eigene Insel"), Sichtung **P10.5-70** neu beim Nikinger | — |
 
 ### Die Schritte 14.6.0 bis 14.6.4 — die Anmerkungen
+
+#### 14.6.1 ✅ 2026-10-28 — der Algorithmus und die sechs Varianten
+
+**Der Algorithmus steht** (§2.1): das Polster (`LOBE_REACH` + `LOBE_CLOSE_PX` + eine Zelle),
+das **Wachsen** (dieselbe Schleife wie bisher, nur die Schwelle `LOBE_REACH + LOBE_CLOSE_PX`),
+das **Schrumpfen** (die **exakte** euklidische Distanztransformation — Felzenszwalb–Huttenlocher,
+zwei 1-D-Durchläufe) und der **Körper** = geschlossener Satz ∪ heutige Maske. **Kein Knoten
+bewegt sich**, die Kontur-/Furchen-/Beschriftungslogik ist unberührt.
+
+**Die Regressionsprobe ist erfüllt:** bei `LOBE_CLOSE_PX = 0` sind die drei Bilder **byteweise
+identisch** mit den drei im Repo (`cmp` sagt: identisch), und die Konturpunkte der Lappen
+(`je_lappe`) sind dieselben. Das Polster verschiebt das Raster um **ganze Zellen** — die
+Zellgrenzen bleiben auf demselben 8-px-Gitter.
+
+**Die Tabelle** (`probes/p105_b14_6_varianten_messung.json`, der Beleg; die Bilder liegen
+**außerhalb** des Repos unter `~/p105_b14_6_varianten/<D>/`):
+
+| `LOBE_CLOSE_PX` | Komponenten | Furche-Zellen | Paare | Raster | Zellgröße | Zeit 152 / 201 | Reach max | Luft min | Kriterien |
+|---|---|---|---|---|---|---|---|---|---|
+| 0 | **5** | 0 | 0 | 158 × 127 | 8,00 px | 13,3 / 34,8 ms | 48,4 px | 7,2 px | rot (Basislinie) |
+| 80 | 3 | 40 | 2 | 178 × 147 | 8,00 px | 21,1 / 42,6 ms | 48,4 px | 7,2 px | rot |
+| 120 | 3 | 64 | 2 | 188 × 157 | 8,00 px | 28,8 / 34,2 ms | 48,4 px | 7,2 px | rot |
+| **160** | **1** | 146 | **4** | 198 × 167 | 8,00 px | **28,4 / 36,3 ms** | 48,4 px | 7,2 px | **grün** |
+| 200 | 1 | 234 | 5 | 200 × 171 | 8,30 px | 36,3 / 33,3 ms | 48,6 px | 6,5 px | grün |
+| 240 | 1 | 247 | 6 | 200 × 172 | 8,71 px | 35,6 / 33,6 ms | **52,8 px** | 2,8 px | rot (Reach > 52) |
+
+**Drei Befunde, die die Wahl tragen.**
+1. **Der kleinste Wert mit *einer* Komponente ist 160.** 80 und 120 ergeben **drei** Komponenten
+   (nur `alpha`|`delta` und `alpha`|`beta` verbinden sich) — das deckt sich mit der Basislinie:
+   die gewachsenen Masken überlappen erst, wenn `2 · (48 + D) ≥ 183`, also ab **43,5 px**; bis
+   120 reicht das für **zwei** Nachbarschaften, ab 160 für **alle vier**.
+2. **Ab 200 werden die Lappen von der Furche aufgefressen.** Der Reach misst die **gezeichnete**
+   Kontur, und die Furche-Zellen gehören zu **keinem** Lappen: bei 200 wird der Reach **rechts
+   −3,9 px** (die Kontur liegt **innerhalb** des Knoten-Umrisses), bei 240 **oben −89,5 px**.
+   Das ist ein **Verlust**, den die Abnahme-Kriterien des Plans (§5) **nicht** fangen — sie
+   prüfen den Reach nur als **Obergrenze**. Der Plan §5 ist damit an dieser Stelle zu
+   schwach; die Wahl von **160** ist durch den **negativen** Reach begründet, nicht durch die
+   Obergrenze allein.
+3. **Die Zeit ist kein Selbstgeschätzt, aber ein einzelner Aufruf ist verrauscht.** Der erste
+   Lauf (ein Aufruf je Messpunkt) meldete 24,2 / 35,0 ms bei `D = 0` und **50,7** / 47,2 ms bei
+   `D = 160` — die **größere** Variante `D = 200` (Raster 200 × 171) war mit **29,8** ms
+   *schneller*: das ist kein Trend, das ist Rauschen (JIT, GC, Last). Das Messpflaster misst
+   deshalb jetzt **fünf** Aufrufe und der **Median** trägt die Entscheidung. Der Median bleibt
+   bei allen sechs Varianten unter der Grenze von **50 ms** (der höchste: **36,3 ms** bei 201
+   Knoten).
+
+**Der Befund, den der Plan nicht erwartet hat:** die **Zeitgrenze** (50 ms bei 201 Knoten) war
+**vor** dem Schließen schon zu **70 %** ausgeschöpft (34,8 ms bei `D = 0`). Das Schließen
+kostet **+1,5 ms** (36,3 ms bei `D = 160`) — die Reserve ist echt, aber sie war knapper als
+vermutet.
+
+**STOPP — Bericht an den Nikinger (E1).** Die Bilder liegen unter
+`~/p105_b14_6_varianten/<D>/` (**außerhalb** des Repos). Der **Standard** nach §3 wäre **160**
+(der kleinste Wert mit einer Komponente und einem Lappen je Space). Der Commit trägt
+`LOBE_CLOSE_PX = 0` — gesetzt wird der Wert in **14.6.2**.
 
 #### 14.6.0 ✅ 2026-10-28 — die Basislinie, gemessen
 

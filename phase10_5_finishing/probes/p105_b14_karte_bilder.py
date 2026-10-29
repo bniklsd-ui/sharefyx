@@ -145,7 +145,15 @@ if L.KONSTANTEN:
 #       `space`  -- der Space je Zelle (null ausserhalb des Koerpers)
 #       `furrow` -- **1** fuer jede Furche-Zelle
 #       `knoten` -- die Knoten (x, y, Space) -- fuer den kleinsten Abstand zweier Spaces
-# (2) `globalThis.__koerperZeit` -- die Zeit von `computeLobes()` in `settle()`.
+# (2) `globalThis.__koerperZeit` -- die Zeit des **ersten** Aufrufs von `computeLobes()` in
+#     `settle()` -- und `globalThis.__koerperZeiten` mit **fuenf** Messungen. **Ein einzelner
+#     Aufruf ist verrauscht** (JIT, GC, Last des Rechners): gemessen am 2026-10-28 lagen die
+#     Varianten 80 und 160 (Raster 178x147 und 198x167) bei **26,6 ms** und **50,7 ms**, die
+#     groessere Variante 200 (Raster 200x171) aber bei **29,8 ms** -- das ist **kein** Trend,
+#     das ist Rauschen. Die **Entscheidung** (Plan §2.5: die Grenze von 50 ms bei 201 Knoten)
+#     traegt deshalb der **Median** aus fuenf Aufrufen. Die **fuenf** Aufrufe kommen **nach**
+#     dem gezeichneten Zustand: der Cache haelt das Ergebnis des **ersten** Aufrufs, das Bild
+#     ist also unveraendert.
 #
 # **Die Anker sind eindeutig** (Regel + Nachbarzeile, nicht nur ein Wert) -- sonst patcht das
 # Pflaster den Kommentar ueber der Regel statt der Regel (diese Fehlerklasse hat dieser
@@ -170,7 +178,15 @@ MESS_PFLASTER = {
         "  function settle() {\n"
         "    var __t0 = performance.now();\n"
         "    lobeCache = computeLobes(visibleNodes());\n"
-        "    globalThis.__koerperZeit = performance.now() - __t0;"
+        "    var __t1 = performance.now();\n"
+        "    globalThis.__koerperZeit = __t1 - __t0;\n"
+        "    var __zeiten = [__t1 - __t0];\n"
+        "    for (var __i = 0; __i < 4; __i++) {\n"
+        "      var __s = performance.now();\n"
+        "      computeLobes(visibleNodes());\n"
+        "      __zeiten.push(performance.now() - __s);\n"
+        "    }\n"
+        "    globalThis.__koerperZeiten = __zeiten;"
     ),
 }
 
@@ -284,7 +300,17 @@ def _analyse_raster(raster: dict) -> dict:
             if min_abstand is None or d < min_abstand:
                 min_abstand = d
 
+    zeiten = raster.get("zeiten") or []
+    if len(zeiten) >= 3:
+        sortiert = sorted(zeiten)
+        zeit_ms = sortiert[len(sortiert) // 2]
+    else:
+        zeit_ms = raster.get("zeit_ms")
+
     return {
+        "zeit_ms": zeit_ms,
+        "zeit_ms_erster": raster.get("zeit_ms"),
+        "zeit_messungen": zeiten,
         "komponenten": komponenten,
         "komponenten_groessen": sorted(groessen, reverse=True)[:10],
         "lappen_je_space": lappen,
@@ -296,7 +322,6 @@ def _analyse_raster(raster: dict) -> dict:
         "zellgroesse_px": raster["cell"],
         "raster": {"cols": cols, "rows": rows, "cell": raster["cell"],
                    "minX": raster["minX"], "minY": raster["minY"]},
-        "zeit_ms": raster.get("zeit_ms"),
         "knoten": len(knoten),
         "min_abstand_zwei_spaces_px": (round(min_abstand, 2)
                                        if min_abstand is not None else None),
@@ -516,6 +541,7 @@ KOERPER = r"""() => {
     koerper: k.koerper, space: space, furrow: k.furrow, knoten: k.knoten,
     raeume: raeume,
     zeit_ms: (typeof window.__koerperZeit === 'number') ? window.__koerperZeit : null,
+    zeiten: window.__koerperZeiten || null,
   };
 }"""
 

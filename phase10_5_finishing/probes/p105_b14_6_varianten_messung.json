@@ -1,0 +1,411 @@
+{
+  "probe": "p105_b14_6_varianten",
+  "schritt": "14.6.1",
+  "zeit": "2026-10-28T20:07:25.048148+00:00",
+  "regel": "Die Standardregel (Plan 14.6 §3): der **kleinste** Wert des Rasters, bei dem der Koerper **eine** Komponente ist und jeder Space **genau einen** Lappen hat. Zusaetzlich gemessen und berichtet: der **Reach** (die Kontur ueber den aeussersten Knoten, Grenze 52 px nach Plan §2.4), die **Luft** zur Leinwand (> 0 px) und die **Zeit** von `computeLobes()` (Median aus fuenf Aufrufen, Grenze 50 ms bei 201 Knoten nach Plan §2.5).",
+  "datenbasis": {
+    "spaces": 5,
+    "items": 152,
+    "items_pro_space": {
+      "alpha": 30,
+      "beta": 32,
+      "gamma": 30,
+      "delta": 30,
+      "epsilon": 30
+    },
+    "bilder": "docs/screenshots/p105_b14_karte_0{1,2,3}_*.png (der Normalfall, unveraendert)"
+  },
+  "varianten": {
+    "0": {
+      "label": "LOBE_CLOSE_PX0",
+      "konstanten": {
+        "LOBE_CLOSE_PX": "0"
+      },
+      "zellen": {
+        "komponenten": 5,
+        "lappen_je_space": {
+          "epsilon": 1,
+          "delta": 1,
+          "gamma": 1,
+          "alpha": 1,
+          "beta": 1
+        },
+        "furche_zellen": 0,
+        "paare": {},
+        "paare_zahl": 0,
+        "koerper_zellen": 4360,
+        "raster": {
+          "cols": 158,
+          "rows": 127,
+          "cell": 8,
+          "minX": -63.8990840643914,
+          "minY": -7.379362047540283
+        },
+        "zellgroesse_px": 8,
+        "zeit_ms_152": 13.300000011920929,
+        "zeit_ms_201": 34.80000001192093,
+        "zeit_messungen_152": [
+          19.900000035762787,
+          105.89999997615814,
+          12.800000011920929,
+          13.199999988079071,
+          13.300000011920929
+        ],
+        "zeit_messungen_201": [
+          32.09999996423721,
+          215.10000002384186,
+          34.80000001192093,
+          37.89999997615814,
+          20.400000035762787
+        ],
+        "reach_welt_px": {
+          "links": 47.8990840643914,
+          "rechts": 44.10091593560878,
+          "oben": 48.37936204754028,
+          "unten": 44.620637952459674
+        },
+        "luft_px": {
+          "links": 7.20071816731722,
+          "rechts": 10.687633749949555,
+          "oben": 82.90286831994557,
+          "unten": 85.5828132138679
+        },
+        "min_abstand_zwei_spaces_px": 183.04
+      },
+      "ok": false,
+      "grund": "5 Komponenten (statt 1); 0 Furche-Zellen, 0 Paare",
+      "bilder": "~/p105_b14_6_varianten/0/ (ausserhalb des Repos)",
+      "bilder_byteweise_gleich_zum_repo": true
+    },
+    "80": {
+      "label": "LOBE_CLOSE_PX80",
+      "konstanten": {
+        "LOBE_CLOSE_PX": "80"
+      },
+      "zellen": {
+        "komponenten": 3,
+        "lappen_je_space": {
+          "epsilon": 1,
+          "delta": 1,
+          "alpha": 1,
+          "gamma": 1,
+          "beta": 1
+        },
+        "furche_zellen": 40,
+        "paare": {
+          "alpha|delta": 24,
+          "alpha|beta": 16
+        },
+        "paare_zahl": 2,
+        "koerper_zellen": 4796,
+        "raster": {
+          "cols": 178,
+          "rows": 147,
+          "cell": 8,
+          "minX": -143.89908406439142,
+          "minY": -87.37936204754028
+        },
+        "zellgroesse_px": 8,
+        "zeit_ms_152": 21.100000023841858,
+        "zeit_ms_201": 42.60000002384186,
+        "zeit_messungen_152": [
+          28.599999964237213,
+          136.80000001192093,
+          18.19999998807907,
+          21.100000023841858,
+          19.19999998807907
+        ],
+        "zeit_messungen_201": [
+          47.60000002384186,
+          223.4000000357628,
+          27.69999998807907,
+          42.60000002384186,
+          19.599999964237213
+        ],
+        "reach_welt_px": {
+          "links": 47.89908406439142,
+          "rechts": 44.10091593560878,
+          "oben": 48.37936204754028,
+          "unten": 44.620637952459674
+        },
+        "luft_px": {
+          "links": 7.200718167317206,
+          "rechts": 10.687633749949555,
+          "oben": 82.90286831994557,
+          "unten": 85.5828132138679
+        },
+        "min_abstand_zwei_spaces_px": 183.04
+      },
+      "ok": false,
+      "grund": "3 Komponenten (statt 1); 40 Furche-Zellen, 2 Paare",
+      "bilder": "~/p105_b14_6_varianten/80/ (ausserhalb des Repos)",
+      "bilder_byteweise_gleich_zum_repo": false
+    },
+    "120": {
+      "label": "LOBE_CLOSE_PX120",
+      "konstanten": {
+        "LOBE_CLOSE_PX": "120"
+      },
+      "zellen": {
+        "komponenten": 3,
+        "lappen_je_space": {
+          "epsilon": 1,
+          "delta": 1,
+          "alpha": 1,
+          "gamma": 1,
+          "beta": 1
+        },
+        "furche_zellen": 64,
+        "paare": {
+          "alpha|delta": 36,
+          "alpha|beta": 28
+        },
+        "paare_zahl": 2,
+        "koerper_zellen": 5060,
+        "raster": {
+          "cols": 188,
+          "rows": 157,
+          "cell": 8,
+          "minX": -183.89908406439142,
+          "minY": -127.37936204754028
+        },
+        "zellgroesse_px": 8,
+        "zeit_ms_152": 28.80000001192093,
+        "zeit_ms_201": 34.19999998807907,
+        "zeit_messungen_152": [
+          28.80000001192093,
+          152.5,
+          19.899999976158142,
+          23.19999998807907,
+          166.80000001192093
+        ],
+        "zeit_messungen_201": [
+          43.30000001192093,
+          225.80000001192093,
+          34,
+          34.19999998807907,
+          19.30000001192093
+        ],
+        "reach_welt_px": {
+          "links": 47.89908406439142,
+          "rechts": 44.10091593560878,
+          "oben": 48.37936204754028,
+          "unten": 44.620637952459674
+        },
+        "luft_px": {
+          "links": 7.200718167317206,
+          "rechts": 10.687633749949555,
+          "oben": 82.90286831994557,
+          "unten": 85.5828132138679
+        },
+        "min_abstand_zwei_spaces_px": 183.04
+      },
+      "ok": false,
+      "grund": "3 Komponenten (statt 1); 64 Furche-Zellen, 2 Paare",
+      "bilder": "~/p105_b14_6_varianten/120/ (ausserhalb des Repos)",
+      "bilder_byteweise_gleich_zum_repo": false
+    },
+    "160": {
+      "label": "LOBE_CLOSE_PX160",
+      "konstanten": {
+        "LOBE_CLOSE_PX": "160"
+      },
+      "zellen": {
+        "komponenten": 1,
+        "lappen_je_space": {
+          "epsilon": 1,
+          "delta": 1,
+          "alpha": 1,
+          "gamma": 1,
+          "beta": 1
+        },
+        "furche_zellen": 146,
+        "paare": {
+          "delta|epsilon": 24,
+          "alpha|delta": 76,
+          "alpha|gamma": 10,
+          "alpha|beta": 36
+        },
+        "paare_zahl": 4,
+        "koerper_zellen": 6274,
+        "raster": {
+          "cols": 198,
+          "rows": 167,
+          "cell": 8,
+          "minX": -223.89908406439142,
+          "minY": -167.37936204754027
+        },
+        "zellgroesse_px": 8,
+        "zeit_ms_152": 28.400000035762787,
+        "zeit_ms_201": 36.30000001192093,
+        "zeit_messungen_152": [
+          28.400000035762787,
+          170.30000001192093,
+          21.400000035762787,
+          24.799999952316284,
+          175.80000001192093
+        ],
+        "zeit_messungen_201": [
+          38.19999998807907,
+          224.89999997615814,
+          36.30000001192093,
+          32.19999998807907,
+          19.80000001192093
+        ],
+        "reach_welt_px": {
+          "links": 47.89908406439142,
+          "rechts": 44.10091593560878,
+          "oben": 48.37936204754027,
+          "unten": 44.620637952459674
+        },
+        "luft_px": {
+          "links": 7.200718167317206,
+          "rechts": 10.687633749949555,
+          "oben": 82.90286831994558,
+          "unten": 85.5828132138679
+        },
+        "min_abstand_zwei_spaces_px": 183.04
+      },
+      "ok": true,
+      "grund": "alle Kriterien erfuellt",
+      "bilder": "~/p105_b14_6_varianten/160/ (ausserhalb des Repos)",
+      "bilder_byteweise_gleich_zum_repo": false
+    },
+    "200": {
+      "label": "LOBE_CLOSE_PX200",
+      "konstanten": {
+        "LOBE_CLOSE_PX": "200"
+      },
+      "zellen": {
+        "komponenten": 1,
+        "lappen_je_space": {
+          "epsilon": 1,
+          "delta": 1,
+          "alpha": 1,
+          "gamma": 1,
+          "beta": 1
+        },
+        "furche_zellen": 234,
+        "paare": {
+          "delta|epsilon": 46,
+          "alpha|delta": 112,
+          "delta|gamma": 9,
+          "alpha|gamma": 30,
+          "alpha|beta": 40
+        },
+        "paare_zahl": 5,
+        "koerper_zellen": 6737,
+        "raster": {
+          "cols": 200,
+          "rows": 171,
+          "cell": 8.302393844107453,
+          "minX": -264.2014779084989,
+          "minY": -207.68175589164773
+        },
+        "zellgroesse_px": 8.302393844107453,
+        "zeit_ms_152": 36.30000001192093,
+        "zeit_ms_201": 33.30000001192093,
+        "zeit_messungen_152": [
+          36.90000003576279,
+          175.79999995231628,
+          23,
+          36.30000001192093,
+          14.900000035762787
+        ],
+        "zeit_messungen_201": [
+          39.09999996423721,
+          222.80000001192093,
+          28.399999976158142,
+          33.30000001192093,
+          19.099999964237213
+        ],
+        "reach_welt_px": {
+          "links": 48.64163180581255,
+          "rechts": -3.8678421998104113,
+          "oben": 21.4438043111682,
+          "unten": 48.16535150393315
+        },
+        "luft_px": {
+          "links": 6.532358341948132,
+          "rechts": 53.86383512011457,
+          "oben": 107.14729552734062,
+          "unten": 82.392251855871
+        },
+        "min_abstand_zwei_spaces_px": 183.04
+      },
+      "ok": true,
+      "grund": "alle Kriterien erfuellt",
+      "bilder": "~/p105_b14_6_varianten/200/ (ausserhalb des Repos)",
+      "bilder_byteweise_gleich_zum_repo": false
+    },
+    "240": {
+      "label": "LOBE_CLOSE_PX240",
+      "konstanten": {
+        "LOBE_CLOSE_PX": "240"
+      },
+      "zellen": {
+        "komponenten": 1,
+        "lappen_je_space": {
+          "epsilon": 1,
+          "delta": 1,
+          "alpha": 1,
+          "gamma": 1,
+          "beta": 1
+        },
+        "furche_zellen": 247,
+        "paare": {
+          "delta|epsilon": 48,
+          "alpha|delta": 106,
+          "alpha|epsilon": 6,
+          "delta|gamma": 15,
+          "alpha|gamma": 34,
+          "alpha|beta": 42
+        },
+        "paare_zahl": 6,
+        "koerper_zellen": 6521,
+        "raster": {
+          "cols": 200,
+          "rows": 172,
+          "cell": 8.706434248147856,
+          "minX": -304.60551831253923,
+          "minY": -248.0857962956881
+        },
+        "zellgroesse_px": 8.706434248147856,
+        "zeit_ms_152": 35.60000002384186,
+        "zeit_ms_201": 33.59999996423721,
+        "zeit_messungen_152": [
+          35.60000002384186,
+          179.69999998807907,
+          17.80000001192093,
+          20.100000023841858,
+          197.19999998807907
+        ],
+        "zeit_messungen_201": [
+          36.89999997615814,
+          226.4000000357628,
+          33.59999996423721,
+          30.400000035762787,
+          18.69999998807907
+        ],
+        "reach_welt_px": {
+          "links": 52.825359364399276,
+          "rechts": -2.243205550314542,
+          "oben": -89.47988432207671,
+          "unten": 48.934301189455255
+        },
+        "luft_px": {
+          "links": 2.7666268415099182,
+          "rechts": 52.40151585527224,
+          "oben": 206.9886027304591,
+          "unten": 81.70012790361227
+        },
+        "min_abstand_zwei_spaces_px": 183.04
+      },
+      "ok": false,
+      "grund": "Reach {'links': 52.825359364399276, 'rechts': -2.243205550314542, 'oben': -89.47988432207671, 'unten': 48.934301189455255} / Luft {'links': 2.7666268415099182, 'rechts': 52.40151585527224, 'oben': 206.9886027304591, 'unten': 81.70012790361227}",
+      "bilder": "~/p105_b14_6_varianten/240/ (ausserhalb des Repos)",
+      "bilder_byteweise_gleich_zum_repo": false
+    }
+  },
+  "befund": "Der kleinste Wert mit **einer** Komponente ist **160** (80 und 120 geben **drei**). Ab 200 wird die Kontur **unruhig**: der Reach rechts wird **negativ** (-3,9 px bei 200, -2,2 px bei 240) und oben **-89,5 px** bei 240 -- die Lappen werden von der Furche **aufgefressen**. Bei 240 ist zudem die Reach-Grenze von 52 px **gerissen** (52,8 px). Der Wert **160** laesst den aeusseren Rand **unveraendert** (Reach 47,9/44,1/48,4/44,6 px wie bei 0) und haelt die Zeit mit 28,4 ms (152 Knoten) und 36,3 ms (201 Knoten) weit unter der Grenze."
+}
