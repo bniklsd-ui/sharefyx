@@ -1474,13 +1474,26 @@ class Store:
                 ))
             return result
 
+    @staticmethod
+    def _asset_matches(target_dir: Path, asset_id: str) -> list[Path]:
+        """Die EINE Stelle, an der eine `asset_id` zu Dateien wird (Ultra-Review B1/B15,
+        2026-10-30). Ohne die Formprüfung ging die ID roh in `Path.glob()`: `..` ist dort ein
+        normales Segment (Lesen/Verschieben beliebiger Dateien des Dienstnutzers), `*` liefert
+        das erste Asset. Eine **formfalsche** ID ist hier schlicht „nicht gefunden" — dieselbe
+        `ItemNotFound`-Antwort wie bei einer unbekannten, die Adapter bilden sie unverändert auf
+        `asset_not_found` / 404 ab, und es gibt kein Orakel, das beide Fälle unterscheidet.
+        Nach der Prüfung enthält die ID kein Glob-Metazeichen und kein Pfadtrennzeichen mehr."""
+        if not files.ASSET_ID_RE.match(asset_id):
+            raise ItemNotFound(asset_id)
+        return list(target_dir.glob(f"{asset_id}.*")) if target_dir.is_dir() else []
+
     def get_asset(self, item_id: str, asset_id: str) -> tuple[bytes, str]:
         """Bytes + MIME — die MIME kommt erneut aus den Magic Bytes, nicht aus der
         Dateiendung (dieselbe Nie-der-Endung-vertrauen-Regel wie beim Upload)."""
         with self._lock, self._file_write_lock():
             row = self._reconcile_and_get_row(item_id, repair_drift=False)
             target_dir = files.asset_dir(self._data_root, row["space"], item_id)
-            matches = list(target_dir.glob(f"{asset_id}.*")) if target_dir.is_dir() else []
+            matches = self._asset_matches(target_dir, asset_id)
             if not matches:
                 raise ItemNotFound(asset_id)
             data = matches[0].read_bytes()
@@ -1498,7 +1511,7 @@ class Store:
             row = self._reconcile_and_get_row(item_id, repair_drift=False)
             space = row["space"]
             target_dir = files.asset_dir(self._data_root, space, item_id)
-            matches = list(target_dir.glob(f"{asset_id}.*")) if target_dir.is_dir() else []
+            matches = self._asset_matches(target_dir, asset_id)
             if not matches:
                 raise ItemNotFound(asset_id)
             trash_dir = target_dir / "_trash"

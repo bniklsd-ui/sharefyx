@@ -38,7 +38,7 @@ def generate_id() -> str:
 
 ASSET_ID_PREFIX = "ast_"
 ITEM_ID_RE = re.compile(r"^itm_[0-9a-f]{8}$")
-ASSET_ID_RE = re.compile(r"^ast_[0-9a-f]{8}$")
+ASSET_ID_RE = re.compile(r"^ast_[0-9a-f]{8}\Z")
 
 
 def new_asset_id() -> str:

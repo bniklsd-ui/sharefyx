@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-10-30 (Ultra-Review gesichert) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-10-30 (Block 15: Plan Review-Fixes) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -50,18 +50,18 @@ updated: 2026-10-30 (Ultra-Review gesichert) | ältere Einträge: docs/INDEX_UPD
 - [phase10_inventory/messung/M1_browser.md](../phase10_inventory/messung/M1_browser.md) — 📗 ~13KB · M1: Browser-Messung (Firefox/Safari, Funnel/Domain): `/overview` 4,8–5,2 s auf allen Wegen, Stau hinter `overview`; D-3-Ziele Z1–Z4 (> 200 ms Ladeanimation)
 - [phase10_inventory/messung/M7_editor.md](../phase10_inventory/messung/M7_editor.md) — 📗 ~5KB · M7: Editor-Bibliothek ohne Build-Schritt — CM5 65,6 KB gz + Roundtrip 10/10 + 239 KB im Korridor ✅, EasyMDE 282 KB ❌ (V201), markdown-it redundant; füttert ED-1
 - [docs/concepts/phase10_inventory_plan.md](./concepts/phase10_inventory_plan.md) — 📕 ~26KB · Plan P10 gegen `main@0a7aaf4`: Locks P10-A–K, M1–M8, Abnahme P10-1–12, V195–V206, P10.5-Schnitt §7, Closeout §8
-- [docs/concepts/phase10_executor_review_glm.md](./concepts/phase10_executor_review_glm.md) — 📗 ~14KB · Auswertung P10-K-Open-Test (GLM via opencode): Kontingent-Treiber, Qualität Q1–Q6, Claude Code + GLM, §5 Entscheidung: GLM verworfen, Marktblick ~2026-11-10
-- [docs/concepts/phase10_intake.md](./concepts/phase10_intake.md) — 📗 ~28KB · Sammelstelle, Herkunft des Registers: Wünsche 2026-10-08/-16, Erbe P9, Fleet-Notizen §5–§7, Notes **an** Fleet §8 (GLM verworfen) und §9 (P10.5: Kontextgrenze 400 K)
-- [docs/concepts/phase10_karte_c_stil_1.svg](./concepts/phase10_karte_c_stil_1.svg) — 📕 Karten-Entwürfe: `phase10_karte_entwurf_{a,b,c}.svg` (erste Runde, Wahl C) und `phase10_karte_c_stil_{1,2,3}.svg` (Stile der Gehirnkarte, gewählt C2); `phase10_logo_entwuerfe{,_c,_mix,_final}.svg` (Logo D-6, vier Runden)
+- [docs/concepts/phase10_executor_review_glm.md](./concepts/phase10_executor_review_glm.md) — 📗 ~14KB · Auswertung P10-K-Open-Test (GLM via opencode): Kontingent, Qualität Q1–Q6, §5 Entscheidung: GLM verworfen
+- [docs/concepts/phase10_intake.md](./concepts/phase10_intake.md) — 📗 ~28KB · Sammelstelle, Herkunft des Registers: Wünsche, Erbe P9, Fleet-Notizen §5–§7, Notes **an** Fleet §8–§9
+- [docs/concepts/phase10_karte_c_stil_1.svg](./concepts/phase10_karte_c_stil_1.svg) — 📕 Karten-Entwürfe: `phase10_karte_entwurf_{a,b,c}.svg` (Wahl C), `phase10_karte_c_stil_{1,2,3}.svg` (Wahl C2), `phase10_logo_entwuerfe{,_c,_mix,_final}.svg` (Logo D-6)
 - [docs/concepts/PHASE10_CLOSEOUT_HANDOVER.md](./concepts/PHASE10_CLOSEOUT_HANDOVER.md) — 📕 ~14KB · Abschluss-Handover P10 → P10.5: Planungsdossier (Step 4 + Tor wandern), offene Entscheidungen, [VERIFY]-Bilanz
 - [docs/concepts/phase10_5_finishing_plan.md](./concepts/phase10_5_finishing_plan.md) — 📕 ~101KB · Plan P10.5 (`main@e5a1879`, 2026-10-21): Locks A–W, Blöcke 0–13/Z, Deploys A–D
 - [docs/concepts/phase10_inventory_uebersicht.svg](./concepts/phase10_inventory_uebersicht.svg) — 📕 ~16KB · Phase-10-Übersichtsgrafik 1080×1080 (Closeout 2026-10-20, gerendert und angesehen)
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing; Plan siehe unten)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **39482 B** · Head: Modulstatus, Deploys, Abnahme (67 ✅ · 7 ⬜)
-- [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **38136 B** · die **geschlossenen** Abnahmezeilen, verbatim
-- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **180440 B** · Session-Blöcke, verbatim
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **40330 B** · Head: Modulstatus, Deploys, Abnahme (68 ✅ · 11 ⬜)
+- [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **38797 B** · die **geschlossenen** Abnahmezeilen, verbatim
+- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **182610 B** · Session-Blöcke, verbatim
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · Startaufträge Block 7 und 9, verbatim
 - [phase10_5_finishing/FREIGABEN_ARCHIVE.md](../phase10_5_finishing/FREIGABEN_ARCHIVE.md) — 📦 **3.577 B** · die Freigaben der Phase, verbatim aus dem Head
 - [phase10_5_finishing/MODULSTATUS_ARCHIVE.md](../phase10_5_finishing/MODULSTATUS_ARCHIVE.md) — 📦 **8.581 B** · Statusspalten 0–10
@@ -70,6 +70,7 @@ updated: 2026-10-30 (Ultra-Review gesichert) | ältere Einträge: docs/INDEX_UPD
 - [docs/concepts/phase10_5_block14_6_plan.md](./concepts/phase10_5_block14_6_plan.md) — 📗 **27332 B** · Plan 14.6
 - [docs/concepts/phase10_5_block14_7_plan.md](./concepts/phase10_5_block14_7_plan.md) — 📗 **29756 B** · Plan 14.7 (Karte kompakt)
 - [docs/concepts/phase10_5_launch_film_plan.md](./concepts/phase10_5_launch_film_plan.md) — 📗 **3338 B** · Notiz: Launch-Film v4.0.0, offene Fragen
+- [docs/concepts/phase10_5_block15_review_fixes_plan.md](./concepts/phase10_5_block15_review_fixes_plan.md) — 📗 **11677 B** · Block 15: Review-Fixes B1–B10
 - [docs/concepts/phase10_5_ultra_review_v4.0.0.md](./concepts/phase10_5_ultra_review_v4.0.0.md) — 📕 **19192 B** · Ultra-Review v4.0.0: 22 Befunde, B1 kritisch
 - [phase10_5_finishing/UPDATES_ARCHIVE.md](../phase10_5_finishing/UPDATES_ARCHIVE.md) — 📦 **12285 B** · ältere `updated:`-Fäden des Heads, verbatim
 
@@ -181,7 +182,7 @@ updated: 2026-10-30 (Ultra-Review gesichert) | ältere Einträge: docs/INDEX_UPD
 - [docs/concepts/P2_ADAPTER_ABNAHME_2026-07-26.md](./concepts/P2_ADAPTER_ABNAHME_2026-07-26.md) — 📕 ~11KB · Abnahmeprotokoll über den echten Custom Connector, 21/21 Prüfungen, beide Befunde behoben (B1, B2 — siehe Nachtrag)
 - [phase2_mcp/SESSIONS_ARCHIVE.md](../phase2_mcp/SESSIONS_ARCHIVE.md) — 📦 ~38KB · acht archivierte Session-Blöcke (Step 0–7), verbatim, newest-first
 - [docs/concepts/PHASE2_CLOSEOUT_HANDOVER.md](./concepts/PHASE2_CLOSEOUT_HANDOVER.md) — 📕 ~11KB · Abschluss-Handover P2→P3: Status, Delta seit dem P1-Handover, offene Entscheidungen für die Exposure-Phase, [VERIFY]-Bilanz V1–V9
-- [phase1_storage/CLAUDE.md](../phase1_storage/CLAUDE.md) — 📗 **20.648 B — wieder unter dem 40-KiB-Softcap** · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [phase1_storage/CLAUDE.md](../phase1_storage/CLAUDE.md) — 📗 **20.889 B — wieder unter dem 40-KiB-Softcap** · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/concepts/phase1_storage_plan.md](./concepts/phase1_storage_plan.md) — 📕 ~15KB · ausführungsreifer P1-Plan (Entscheidungen A–H, Steps 0–7)
 - [phase1_storage/SESSIONS_ARCHIVE.md](../phase1_storage/SESSIONS_ARCHIVE.md) — 📦 ~27KB · archivierte Session-stopped-Blöcke, verbatim, newest-first
 - [phase1_storage/CONTRACTS_ARCHIVE.md](../phase1_storage/CONTRACTS_ARCHIVE.md) — 📦 ~32KB · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**

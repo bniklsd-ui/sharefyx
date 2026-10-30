@@ -25,6 +25,7 @@ from mcpserver.auth import AuthError, Principal
 from mcpserver.permissions import Permissions, SharePolicy
 from mcpserver.tools import UNTRUSTED_CLOSE, UNTRUSTED_OPEN, wrap_untrusted
 from sharefyx_image_bytes import png_bytes
+from storage.errors import ItemNotFound
 from storage.store import Store
 
 # Bewusst keine Nikinger-typischen Spacenamen (Plan §2.2 Erweiterungspfad).
@@ -1211,6 +1212,38 @@ def test_get_item_asset_unknown_asset_id_gives_asset_not_found_not_item_not_foun
 
     with _as(SPACE_A), pytest.raises(ToolError, match="asset_not_found.*get_item_meta"):
         tools_map["get_item_asset"](item.id, "ast_00000000")
+
+
+def test_get_item_asset_traversal_id_cannot_read_a_foreign_item(tools_map, store, tmp_path):
+    """Ultra-Review B1 (kritisch, 2026-10-30): `asset_id` ging ungeprüft in `Path.glob()` --
+    wer ein EIGENES Item hatte, las über `../../../beta/<datei>` jede Datei des Dienstnutzers,
+    auch ein fremdes, ungeteiltes Item. Der Gegenlauf (Prüfung in `Store._asset_matches`
+    entfernt) macht genau diesen Test rot."""
+    secret = store.create(SPACE_B, type="note", title="Geheim", body="NUR-FUER-BETA")
+    own = store.create(SPACE_A, type="note", title="Eigenes")
+    store.put_asset(own.id, data=_PNG)
+    foreign_file = next((tmp_path / SPACE_B).glob(f"{secret.id}__*.md"))
+    traversal = f"../../../{SPACE_B}/{foreign_file.stem}"
+
+    with _as(SPACE_A), pytest.raises(ToolError, match="asset_not_found"):
+        tools_map["get_item_asset"](own.id, traversal)
+
+
+def test_delete_asset_traversal_id_cannot_move_a_foreign_file(store, tmp_path):
+    """B1, zweite Hälfte: `delete_asset` verschob über denselben Pfad fremde Dateien (z. B.
+    die `.share.yml` des Eigentümers) in den Papierkorb des Angreifers. **Kein MCP-Werkzeug ruft
+    `delete_asset` auf** (nur die REST-Route, die kein `/` tragen kann) — der Test ruft deshalb
+    den Store direkt; er liegt hier nur neben seinem Lese-Gegenstück."""
+    own = store.create(SPACE_A, type="note", title="Eigenes")
+    store.put_asset(own.id, data=_PNG)
+    (tmp_path / SPACE_B).mkdir(exist_ok=True)
+    share = tmp_path / SPACE_B / ".share.yml"
+    share.write_text("write: [alpha]\n", encoding="utf-8")
+
+    with pytest.raises(ItemNotFound):
+        store.delete_asset(own.id, f"../../../{SPACE_B}/.share")
+
+    assert share.exists()
 
 
 def test_put_item_asset_writes_and_returns_receipt_without_bytes(tools_map, store):

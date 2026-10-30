@@ -1009,6 +1009,46 @@ def test_get_asset_returns_bytes_and_mime(store):
     assert mime == "image/png"
 
 
+# -- Ultra-Review B1/B15 (2026-10-30): die asset_id wird nie roh zum Pfad -----------------------
+
+_BAD_ASSET_IDS = [
+    "../../../bob/itm_00000000__geheim",   # Traversal aus dem Asset-Verzeichnis heraus
+    "../../../bob/.share",                 # fremde `.share.yml`
+    "*",                                   # Wildcard: lieferte das erste Asset (B15)
+    "ast_*",
+    "ast_0123456?",
+    "ast_01234567\n",                      # `$` liess einen Zeilenumbruch durch, `\Z` nicht
+    "",
+]
+
+
+@pytest.mark.parametrize("bad", _BAD_ASSET_IDS)
+def test_get_asset_rejects_a_malformed_asset_id_as_not_found(store, tmp_path, bad):
+    item = store.create("nikinger", type="note", title="Mit Bild")
+    store.put_asset(item.id, data=_PNG)
+    # Köder ausserhalb des Asset-Verzeichnisses, den die ungeprüfte ID getroffen hätte
+    (tmp_path / "bob").mkdir()
+    (tmp_path / "bob" / ".share.yml").write_text("write: [mallory]\n", encoding="utf-8")
+
+    with pytest.raises(ItemNotFound):
+        store.get_asset(item.id, bad)
+
+
+@pytest.mark.parametrize("bad", _BAD_ASSET_IDS)
+def test_delete_asset_rejects_a_malformed_asset_id_and_moves_nothing(store, tmp_path, bad):
+    item = store.create("nikinger", type="note", title="Mit Bild")
+    asset = store.put_asset(item.id, data=_PNG)
+    (tmp_path / "bob").mkdir()
+    bait = tmp_path / "bob" / ".share.yml"
+    bait.write_text("write: [mallory]\n", encoding="utf-8")
+
+    with pytest.raises(ItemNotFound):
+        store.delete_asset(item.id, bad)
+
+    assert bait.read_text(encoding="utf-8") == "write: [mallory]\n"  # nicht verschoben
+    assert [a.id for a in store.list_assets(item.id)] == [asset.id]   # eigenes Asset unberührt
+
+
 def test_delete_asset_moves_to_trash_not_gone(store, tmp_path):
     item = store.create("nikinger", type="note", title="Mit Bild")
     asset = store.put_asset(item.id, data=_PNG)

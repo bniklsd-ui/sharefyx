@@ -123,7 +123,7 @@ def test_the_acceptance_sum_matches_the_table():
     geschlossenen Zeilen stehen im L3-Archiv `ABNAHME_ARCHIVE.md`.
     """
     rows = _abnahme_zeilen()
-    assert len(rows) == 74, f"die Abnahmetabelle hat {len(rows)} Zeilen, erwartet 74"
+    assert len(rows) == 79, f"die Abnahmetabelle hat {len(rows)} Zeilen, erwartet 79"
     counted = {
         "✅": sum(1 for line in rows if "| ✅ |" in line),
         "⚠️": sum(1 for line in rows if "| ⚠️ |" in line),
@@ -158,9 +158,9 @@ def test_the_closed_rows_are_in_the_archive_and_the_open_ones_in_the_head():
     assert not (nummern_head & nummern_archiv), (
         f"diese Zeilen stehen in beiden Listen: {sorted(nummern_head & nummern_archiv)}"
     )
-    assert len(nummern_head | nummern_archiv) == 74, (
+    assert len(nummern_head | nummern_archiv) == 79, (
         f"zusammen tragen die beiden Listen {len(nummern_head | nummern_archiv)} Zeilen, "
-        "erwartet 74"
+        "erwartet 79"
     )
 
 

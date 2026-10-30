@@ -165,6 +165,7 @@ heißen wörtlich „Drei ... Erweiterungen", P6 Step 1 danach „Dritte, benann
 | 2026-09-30, P9 Step G | `Store.trash(item_id, *, version)` — Löschen ist Verschieben nach `DATA_ROOT/._trash/<space>/`; **bewusst keine elfte Öffnung**, weil der Punkt-Präfix beide Scans ohne Eingriff überspringt | 🟡 live (`v3.1.0`) |
 | 2026-10-02, P9 Block trace | `updated_by` in `Item`/`ItemSummary`, `actor: str = ""` an allen neun Store-Schreibmethoden, `history.commit(author=)`; **kein Index-Schema-Sprung** | 🟡 code-complete, Deploy `v3.1.1` steht aus |
 | 2026-10-25, P10.5 Block 11 · Format-Konvention Stufe 2 | **kein Code** in `storage/` — die Konvention (`[Text]{.rot}`, `::: {.zentriert}`) ist **Client-Seite**: `markdown.js` rendert sie, der Server speichert den Text, wie er ist (Kernprinzip: der Server interpretiert keinen Inhalt). Diese Zeile ist die **Ankündigung**, kein Eingriff — es gibt hier **keinen** neuen Contract und **keine** neue Methode | ✅ (kein Eingriff) |
+| 2026-10-30, P10.5 Block 15.1 (Ultra-Review B1) | `ASSET_ID_RE` `$` → `\Z`; private `Store._asset_matches()` — formfalsche `asset_id` ist „nicht gefunden“. Nur Verschärfung, **keine** Signaturänderung, kein neuer Contract | ✅ |
 
 ---
 

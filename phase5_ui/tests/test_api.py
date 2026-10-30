@@ -1377,6 +1377,22 @@ async def test_asset_delete_moves_to_trash(full_app_items, item_store, totp_code
 
 
 @pytest.mark.asyncio
+async def test_asset_wildcard_id_is_404_not_the_first_asset(full_app_items, item_store, totp_code):
+    """Ultra-Review B15 (2026-10-30): `asset_id="*"` ging als Glob in den Store und lieferte das
+    erste Asset des Items. Pfadtrenner kann die Route nicht tragen (Starlette dekodiert vor dem
+    Routing, 404), Wildcards schon -- der Store lehnt die formfalsche ID jetzt ab."""
+    item = item_store.create(SPACE, type="note", title="Mit Bild")
+    item_store.put_asset(item.id, data=_PNG)
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        got = await client.get(f"/api/v1/items/{item.id}/assets/*")
+        deleted = await client.delete(f"/api/v1/items/{item.id}/assets/*", headers=_headers(csrf))
+    assert got.status_code == 404
+    assert deleted.status_code == 404
+    assert len(item_store.list_assets(item.id)) == 1
+
+
+@pytest.mark.asyncio
 async def test_asset_of_nonexistent_item_is_404(full_app_items, totp_code):
     async with _client(full_app_items) as client:
         await _login(client, totp_code)

@@ -6,6 +6,7 @@ import pytest
 
 from storage.errors import ValidationError
 from storage.files import (
+    ASSET_ID_RE,
     MAX_FOLDER_DEPTH,
     RESERVED_DIR_NAMES,
     asset_dir,
@@ -489,3 +490,10 @@ def test_strip_rejects_bytes_that_do_not_match_the_mime():
         strip_image_metadata(b"\x89PNG\r\n\x1a\nrest", "image/jpeg")
     with pytest.raises(ValidationError):
         strip_image_metadata(b"egal", "image/tiff")
+
+
+def test_asset_id_re_rejects_a_trailing_newline():
+    """Ultra-Review B1 (2026-10-30): `$` lässt vor einem abschliessenden Zeilenumbruch ein
+    Match zu — `\\Z` nicht. Die ID geht danach in einen Glob und einen Dateinamen."""
+    assert ASSET_ID_RE.match("ast_0123abcd")
+    assert not ASSET_ID_RE.match("ast_0123abcd\n")
