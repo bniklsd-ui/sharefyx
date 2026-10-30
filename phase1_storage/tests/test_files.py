@@ -1,9 +1,11 @@
+import os
 import re
 import zlib
 from pathlib import Path
 
 import pytest
 
+from storage import files
 from storage.errors import ValidationError
 from storage.files import (
     ASSET_ID_RE,
@@ -497,3 +499,52 @@ def test_asset_id_re_rejects_a_trailing_newline():
     Match zu — `\\Z` nicht. Die ID geht danach in einen Glob und einen Dateinamen."""
     assert ASSET_ID_RE.match("ast_0123abcd")
     assert not ASSET_ID_RE.match("ast_0123abcd\n")
+
+
+# -- P10.5 Block 15.5 (Ultra-Review B6/B7): eine Eingabe wird nie zum Pfad ----------------
+
+
+def test_item_filename_caps_slug_at_utf8_bytes_on_a_char_boundary():
+    """B7: 100 CJK-Zeichen sind 300 Byte — gekürzt wird an einer Zeichengrenze, nie mitten
+    in einem Zeichen (sonst stünde ein kaputtes UTF-8 im Dateinamen)."""
+    name = files.item_filename("itm_0123abcd", "漢" * 100)
+    slug = name[len("itm_0123abcd__"):-len(".md")]
+    assert slug == "漢" * 33
+    assert len(slug.encode("utf-8")) <= files.MAX_SLUG_BYTES
+
+
+def test_item_filename_leaves_a_short_slug_alone_and_never_ends_on_a_dash():
+    assert files.item_filename("itm_0123abcd", "kurz") == "itm_0123abcd__kurz.md"
+    cut = files.item_filename("itm_0123abcd", "a" * 99 + "-bcd")
+    assert cut == "itm_0123abcd__" + "a" * 99 + ".md"
+
+
+def test_worst_case_tmp_name_of_atomic_write_fits_f_namemax(tmp_path):
+    """E3 gemessen: der engste Name ist die tmp-Datei von `atomic_write` (Name + 14 Byte), nicht
+    die Item-Datei. Echter Write auf dem Testdateisystem, nicht nur gerechnet."""
+    name = files.item_filename("itm_0123abcd", "ä".translate(files._UMLAUT_MAP) * 1000)
+    tmp_name = "." + name + "." + "x" * 8 + ".tmp"
+    assert len(tmp_name.encode("utf-8")) <= os.statvfs(tmp_path).f_namemax
+    atomic_write(tmp_path / name, "x")
+    assert (tmp_path / name).read_text() == "x"
+
+
+@pytest.mark.parametrize(
+    "name",
+    ["", "team/", "team//", "./team", "team/.", ".", "..", ".hidden", "a\0b", "_archive",
+     "_assets", "x" * 256, 5, None],
+)
+def test_is_valid_space_name_rejects_paths_and_reserved_names(name):
+    assert not files.is_valid_space_name(name)
+
+
+@pytest.mark.parametrize("name", ["team", "nikinger", "ä" * 127, "mit leerzeichen"])
+def test_is_valid_space_name_accepts_a_single_directory_name(name):
+    assert files.is_valid_space_name(name)
+
+
+def test_validate_folder_rejects_a_segment_longer_than_a_directory_name():
+    """15.5: vorher `OSError 36` beim `mkdir` (500). Abgelehnt, nicht gekürzt."""
+    with pytest.raises(ValidationError, match="zu lang"):
+        validate_folder("a" * 256)
+    assert validate_folder("a" * 255) == "a" * 255

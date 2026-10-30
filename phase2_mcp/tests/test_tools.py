@@ -584,6 +584,26 @@ def test_create_item_into_shared_space_is_allowed_for_member(tools_map, store, t
     assert counts[SPACE_B] == 1
 
 
+
+@pytest.mark.parametrize("space", [f"{SPACE_B}/", f"./{SPACE_B}", f"{SPACE_B}/."])
+def test_create_item_rejects_a_space_name_that_is_a_path(tools_map, store, tmp_path, space):
+    """P10.5 15.5 (Ultra-Review B6): `beta/` passierte `can_write` (es liest `beta//.share.yml`),
+    die Datei landete in `beta/` mit `space: beta/` — das eigene Item kam danach als
+    `<untrusted_content>` zurück. Jetzt `invalid`, keine Datei."""
+    _write_share_yml(tmp_path / SPACE_B, f"write: [{SPACE_A}]\n")
+    with _as(SPACE_A), pytest.raises(ToolError, match="invalid: .*kein gültiger Space-Name"):
+        tools_map["create_item"](type="note", title="x", space=space)
+    assert list(tmp_path.rglob("*.md")) == []
+
+
+def test_update_item_rejects_a_move_to_a_space_name_that_is_a_path(tools_map, store, tmp_path):
+    _write_share_yml(tmp_path / SPACE_B, f"write: [{SPACE_A}]\n")
+    item = store.create(SPACE_A, type="note", title="Eigenes")
+    with _as(SPACE_A), pytest.raises(ToolError, match="invalid: .*kein gültiger Space-Name"):
+        tools_map["update_item"](item.id, version=1, space=f"{SPACE_B}/")
+    assert store.get(item.id).space == SPACE_A
+
+
 # -- update_item / append_to_item ------------------------------------------------------
 
 

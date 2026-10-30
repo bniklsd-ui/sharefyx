@@ -359,9 +359,39 @@ def slugify(title: str) -> str:
     return slug or "item"
 
 
+# P10.5 15.5 (Ultra-Review B7, E3 gemessen): ext4 `f_namemax` = 255 Byte. Der engste Name ist
+# nicht die Item-Datei (`itm_xxxxxxxx__` + Slug + `.md` = Slug + 17), sondern ihre tmp-Datei aus
+# `atomic_write` (`.` + Name + `.` + 8 Zufallszeichen + `.tmp` = Name + 14) — Slug ≤ 224 Byte.
+# 100 Byte lassen Luft und sind als Dateiname noch lesbar.
+MAX_NAME_BYTES = 255
+MAX_SLUG_BYTES = 100
+
+
 def item_filename(item_id: str, slug: str) -> str:
-    """`<id>__<slug>.md` (Entscheidung F). Lookup läuft nie über diesen Namen, nur über die ID."""
-    return f"{item_id}__{slug}.md"
+    """`<id>__<slug>.md` (Entscheidung F). Lookup läuft nie über diesen Namen, nur über die ID.
+
+    Der Slug wird hier auf `MAX_SLUG_BYTES` UTF-8-Bytes gekürzt (an einer Zeichengrenze) — an
+    **einer** Stelle für alle drei Schreibwege (Write, Archiv, Papierkorb), und bewusst nicht in
+    `slugify()`, das auch Ordnersegmente baut: dort würde ein Kürzen bestehende Ordner still
+    umbenennen. Folge: ein Item mit längerem Slug bekommt beim nächsten Write den kurzen Namen."""
+    cut = slug.encode("utf-8")[:MAX_SLUG_BYTES].decode("utf-8", "ignore").rstrip("-")
+    return f"{item_id}__{cut or 'item'}.md"
+
+
+def is_valid_space_name(name: object) -> bool:
+    """Ein Space-Name ist **ein** Verzeichnisname unter `DATA_ROOT`, nie ein Pfad (Ultra-Review
+    B6: `team/`, `./team`, `team/.` landeten alle in `team/`, das Frontmatter trug den rohen
+    Namen). Abgelehnt, nicht normalisiert — wer `team/` schickt, hat sich vertippt. Eine Regel
+    für Anlegen (`acl.create_space`), Umbenennen und jeden Item-Write (`Store.create/move`)."""
+    return (
+        isinstance(name, str)
+        and bool(name)
+        and "/" not in name
+        and "\0" not in name
+        and not name.startswith(".")
+        and name not in RESERVED_DIR_NAMES
+        and len(name.encode("utf-8")) <= MAX_NAME_BYTES
+    )
 
 
 def item_path(data_root: Path, space: str, item_id: str, slug: str, folder: str = "") -> Path:
@@ -398,6 +428,10 @@ def validate_folder(folder: str) -> str:
     for raw, seg in zip(segments, normalized):
         if not seg:
             raise ValidationError(f"Ordnersegment {raw!r} ergibt keinen gültigen Namen")
+        if len(seg.encode("utf-8")) > MAX_NAME_BYTES:
+            # P10.5 15.5: vorher `OSError 36` beim `mkdir` (500). Ablehnen, nicht kürzen — ein
+            # gekürzter Ordnername wäre ein anderer Ordner.
+            raise ValidationError(f"Ordnername {raw[:40]!r}… ist zu lang (max. {MAX_NAME_BYTES} Byte)")
     return "/".join(normalized)
 
 

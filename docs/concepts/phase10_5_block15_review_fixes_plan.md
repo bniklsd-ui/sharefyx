@@ -10,7 +10,7 @@ down:
   - ../../phase1_storage/storage/store.py               # Kern: `_asset_matches()`, `rebuild_index()`, Rename-Wiederaufnahme
   - ../../phase5_ui/webui/api.py                        # REST: Typprüfung, Mitglieder-Routen
   - ../../phase2_mcp/mcpserver/tools.py                 # MCP: Space-Name, `offset`
-updated: 2026-10-30 (Schritt 15.4b gebaut — B4′ + Selbst-Austragen; E1 überholt: Deploy D nach allen Fixes; E5-Durchsicht 0 Treffer) | 2026-10-30 (Schritt 15.4 gebaut, Opus — B4 geschlossen, drei Stellen statt zwei) | 2026-10-30 (Schritt 15.3b gebaut, Opus — E5: `share_*`-Skalar = eine Freigabe, `WARNING` mit Pfad) | 2026-10-30 (E5 entschieden — `share_*`-Skalar = eine Freigabe, Schritt 15.3b) | 2026-10-30 (Schritt 15.3 gebaut, Opus — B5/B8 geschlossen: Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Fund `links: [1]`) | 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie empfohlen; Fund: doppelte `links:` = derselbe Startblocker) | 2026-10-30 (E1 Hotfix ja, E4 Opus — Nikinger) | 2026-10-30 (Entwurf + Schritt 15.1 gebaut, Claude Code — B1 geschlossen, am Code bestätigt und per Gegenlauf bewiesen)
+updated: 2026-10-30 (Schritt 15.5 gebaut, Opus — B6/B7 geschlossen; E3 gemessen: Slug ≤ 100 Byte, kein Titel-Limit) | 2026-10-30 (Schritt 15.4b gebaut — B4′ + Selbst-Austragen; E1 überholt: Deploy D nach allen Fixes; E5-Durchsicht 0 Treffer) | 2026-10-30 (Schritt 15.4 gebaut, Opus — B4 geschlossen, drei Stellen statt zwei) | 2026-10-30 (Schritt 15.3b gebaut, Opus — E5: `share_*`-Skalar = eine Freigabe, `WARNING` mit Pfad) | 2026-10-30 (E5 entschieden — `share_*`-Skalar = eine Freigabe, Schritt 15.3b) | 2026-10-30 (Schritt 15.3 gebaut, Opus — B5/B8 geschlossen: Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Fund `links: [1]`) | 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie empfohlen; Fund: doppelte `links:` = derselbe Startblocker) | 2026-10-30 (E1 Hotfix ja, E4 Opus — Nikinger) | 2026-10-30 (Entwurf + Schritt 15.1 gebaut, Claude Code — B1 geschlossen, am Code bestätigt und per Gegenlauf bewiesen)
 ---
 # P10.5 Block 15 — Die Fixes aus dem Ultra-Review
 
@@ -32,8 +32,8 @@ updated: 2026-10-30 (Schritt 15.4b gebaut — B4′ + Selbst-Austragen; E1 über
 | B8 REST ohne Typprüfung | mittel, R/C | **ja**: `body:5` schrieb vor dem Wurf, `folder:123` = `AttributeError` | **✅ 15.3** |
 | B4 Mitglieder fremder Home-Spaces | hoch, R | **ja** (2026-10-30): reproduziert, add/remove 200, `manageable: true` | **✅ 15.4** |
 | B4′ `share_*` fremder Home-Space-Items (Fund 15.4) | — (nicht im Review), C | **ja**: `_items_patch` prüft nur `can_write_item_as_human` + eigene Re-Auth; in 15.4b **reproduziert** (R): Gast setzt `share_read`/`share_write`/`visibility` auf Bobs Item ⇒ 200 | **✅ 15.4b** |
-| B6 Space-Name ungeprüft | mittel, R | offen — bei 15.5 | ⬜ |
-| B7 Titel-Länge → Dateiname | mittel, R | offen — bei 15.5 | ⬜ |
+| B6 Space-Name ungeprüft | mittel, R | **ja** (2026-10-30): reproduziert, dazu `./team` und `team/.` — alle vier landen in `team/` mit rohem Namen im Frontmatter | **✅ 15.5** |
+| B7 Titel-Länge → Dateiname | mittel, R | **ja**: reproduziert — 200 Umlaute `OSError 36`; Update auf 100 CJK: Datei am alten Namen mit `version: 2`, kein Commit | **✅ 15.5** |
 | B9 Einladungs-Token im Log | mittel, R | offen — bei 15.6 | ⬜ |
 | B10 `search()` ohne Lock | mittel, R | offen — bei 15.6 | ⬜ |
 | B11–B22 (ohne B15/B20) | mittel/niedrig | **Backlog** (Review-Empfehlung); B12 (Performance) ist kein Fix-Schnitt, sondern ein Messauftrag | ⬜ |
@@ -55,7 +55,7 @@ updated: 2026-10-30 (Schritt 15.4b gebaut — B4′ + Selbst-Austragen; E1 über
 |---|---|---|---|
 | **E1** | **B1 als Hotfix vorab live, oder mit Deploy D?** B1 steht seit 2026-08-20 im Live-Dienst (live: Release `20261023T165838…` = Deploy B, SHA `e5c834e`, am Symlink `/opt/sharefyx/current` gelesen). **Wichtig: `deploy.sh main` ist KEIN Hotfix** — `main` trägt alles seit `v3.1.6` (u. a. `rename_folder`, den Pfad hinter B2) und damit genau das, was das Review „nicht freigabefähig“ nannte. **Weg:** Branch ab `e5c834e`, nur die Code- und Testdateien des Fixes (Doku-Hunks lassen sich nicht auf den alten Stand übertragen), eigener `docs/UPDATE_LOG.md`-Eintrag und eigene Version (**Versionsstufe = Entscheidung des Nikingers**), dann `deploy.sh <ref>` — das Skript nimmt jede Git-Ref. **Bewiesen (2026-10-30, Wegwerf-Worktree auf `e5c834e`):** der Fix-Patch (Store, Files, 4 Testdateien) lässt sich sauber anwenden, die 50 Asset-Tests sind grün, ohne den Fix sind dieselben 9 Wächter rot — der Fehler steckt also auch im Live-Stand. **Empfehlung: Hotfix.** Der Deploy läuft beim Nikinger (Hard Rule 9). | **Nikinger** | ✅ 2026-10-30: **Hotfix, ja** — Branch `hotfix-b1` ab `e5c834e` vorbereitet, Deploy + Version beim Nikinger · **[2026-10-30, später] überholt (Nikinger):** **kein** Hotfix vorab — Deploy D nach **allen** Fixes, an einem Wochenende ohne Nutzung außer dem Nikinger; B1 fährt mit. `hotfix-b1` bleibt als Branch liegen (ungenutzt) |
 | **E2** | B3: eine nicht parsebare Datei wird **übersprungen + `CRITICAL` mit Pfad** (Empfehlung) statt den Neuaufbau abzubrechen. Folge: so eine Datei ist im Index unsichtbar, bis sie repariert ist — sichtbar nur im Log. | Claude Code (Empfehlung), Nikinger widerspricht, falls anders gewollt | ✅ 2026-10-30: **so gebaut** (15.2) — Widerspruch bleibt möglich |
-| **E3** | B7: Titel-Höchstlänge. Die Grenze ist ein **Schätzwert** (Dateiname ≤ 255 Byte, `itm_xxxxxxxx__` + `.md` = 17 Byte; Slug auf ≤ 100 Zeichen kürzen, Titel selbst ≤ 300 Zeichen) — bei 15.5 **gegen `os.statvfs().f_namemax`** und UTF-8-Bytes messen, nicht Zeichen zählen. | Claude Code, bei 15.5 gemessen | [VERIFY] |
+| **E3** | B7: Titel-Höchstlänge. Die Grenze ist ein **Schätzwert** (Dateiname ≤ 255 Byte, `itm_xxxxxxxx__` + `.md` = 17 Byte; Slug auf ≤ 100 Zeichen kürzen, Titel selbst ≤ 300 Zeichen) — bei 15.5 **gegen `os.statvfs().f_namemax`** und UTF-8-Bytes messen, nicht Zeichen zählen. | Claude Code, bei 15.5 gemessen | ✅ 2026-10-30 **gemessen:** `f_namemax` = 255 Byte (ext4); engster Name ist die tmp-Datei von `atomic_write` (Name + 14) ⇒ Slug ≤ 224 Byte; **gebaut: Slug ≤ 100 UTF-8-Byte** in `files.item_filename()` · **[2026-10-30, Korrektur]** **kein** Titel-Limit — der Titel erreicht den Pfad nicht mehr; ein Limit wäre eine neue Produktregel (die UI hat kein `maxlength`, ein Speichern gäbe plötzlich 422). Widerspruch des Nikingers bleibt möglich |
 | **E5** | **`share_read: fabian` (Hand-Edit, Skalar statt Liste).** Heute: gelesen als `['f','a','b','i','a','n']`, und der **erste** gewöhnliche Write schreibt diese Buchstabenliste auf die Platte (am Code bestätigt 2026-10-30: `update(status="done")` ⇒ `share_read: [f, a, b, i, a, n]`, Re-Auth sieht vorher == nachher). Optionen: **A** eine Freigabe (`["fabian"]`) · B verwerfen + Log · C Datei überspringen · D lassen. **Empfehlung A:** das Re-Auth-Gate schützt UI/API vor einer gestohlenen Sitzung, der Datei-Weg lag nie dahinter — `share_read: [fabian]` von Hand gilt schon heute sofort (Hard Rule 2). Seit 15.3 erreicht ein Skalar den Kern nur über einen Hand-Edit. | **Nikinger** | ✅ 2026-10-30: **A** — gebaut in **15.3b**: `share_read`/`share_write` in `normalize_item_fields()`, `WARNING` mit Pfad bei jeder Skalar-Koerzion; **vor Deploy D** liest der Nikinger den Live-`DATA_ROOT` read-only auf Skalar-`share_*` durch · **Durchsicht gefahren (Nikinger, 2026-10-30): 0 Treffer** im Live-`DATA_ROOT` — kein Übergang, keine Koerzion beim Deploy |
 | **E4** | **Wer baut 15.2–15.7?** Dieser Plan nennt Claude Code; eine datierte Nikinger-Entscheidung dazu gibt es nicht (Standard der Phase: opencode, 14.7 war eine ausdrückliche Ausnahme). **15.2** (Index-Neuaufbau, Dienststart) und **15.3** (Typkoerzion im Kern) berühren den Startpfad und jede Lese-/Schreibfläche — Kandidaten für Opus. | **Nikinger** | ✅ 2026-10-30: **Opus** baut 15.2–15.7 (eigene Session je Schritt) |
 | **E6** | **15.4 sperrt dem Gast auch das Selbst-Austragen** aus einem fremden Home-Space (Folge der Abweichung von P7-L/N7). Erlauben? | **Nikinger** | ✅ 2026-10-30: **ja** — gebaut in **15.4b** (mit `can_read`, kein Austragen aus unsichtbaren Spaces) · **B4′ fixen: ja** (15.4b) |
@@ -74,7 +74,7 @@ neuen Wächter müssen genau an diesem Befund rot werden · **(e)** volle Suite 
 | **15.3b ✅** | E5 | `share_read`/`share_write` in `normalize_item_fields()` (Skalar = eine Freigabe), `WARNING` mit Pfad; Docstring-Satz „bewusst nicht“ ersetzen | Hand-Edit `share_read: fabian` ⇒ `acl_of()` = `{fabian}`, Update schreibt `[fabian]`, Log trägt den Pfad |
 | **15.4 ✅** | B4 | `manages_space` statt `can_write` in beiden Mitglieder-Routen | Schreib-Gast ⇒ 403 auf add **und** remove; Eigentümer ⇒ 200 |
 | **15.4b ✅** | B4′, E6 | REST-`PATCH` von `share_read`/`share_write`/`visibility` nur mit `manages_space` auf den Item-Space; `DELETE …/members/<eigener Name>` erlaubt mit `can_read` | Gast ⇒ 403 je Feld, Datei byteweise gleich; Gast schreibt Body weiter; Team-Schreiber teilt weiter; Selbst-Austragen 200, ohne Leserecht 403 |
-| **15.5** | B6, B7 | Space-Name-Validierung an **einer** Stelle im Kern, aufgerufen von MCP- und REST-Schreibpfaden; Slug kürzen, Titel-Höchstlänge, `OSError` sauber abbilden | `space="team/"` ⇒ abgelehnt; 200 Umlaute im Titel ⇒ weder 500 noch halber Write |
+| **15.5 ✅** | B6, B7 | Space-Name-Validierung an **einer** Stelle im Kern, aufgerufen von MCP- und REST-Schreibpfaden; Slug kürzen, Titel-Höchstlänge, `OSError` sauber abbilden | `space="team/"` ⇒ abgelehnt; 200 Umlaute im Titel ⇒ weder 500 noch halber Write |
 | **15.6** | B9, B10 | Einladungs-Pfad in die Redaktion (`request_log.py`, `logging_setup.py`); `search()` überspringt eine zwischenzeitlich verschwundene Datei | Log enthält den Token nicht; Such-Threads gegen Umbenennungen ⇒ kein `FileNotFoundError` |
 | **15.7** | — | Volle Suite, `doc_health`, Update-Log-Zeile (nur Menschen-relevantes), Head-Bilanz | — |
 
@@ -328,3 +328,50 @@ was der Server nicht selbst entscheiden kann (Working style, 2026-10-22).
   Selbst-Austragen 200, `carol` bleibt · Selbst-Austragen ohne Leserecht 403.
 - **Gegenlauf, im Code neutralisiert:** Freigabe-Riegel aus ⇒ **4 rot** · Selbst-Austragen aus ⇒
   **1 rot** · `can_read`-Bedingung aus ⇒ **1 rot**.
+
+## Anmerkungen 15.5 — B6/B7 (2026-10-30, Opus)
+
+- **B6 reproduziert (tmp-`DATA_ROOT`, MCP):** `create_item(space=…)` als `write:`-Mitglied von
+  `team` mit `team/`, `team//`, `./team`, `team/.` ⇒ je **angelegt**, alle Dateien in `team/`,
+  Quittung und Frontmatter mit dem **rohen** Namen; `update_item(space="team/")` ebenso (der
+  Existenz-Check in `move()` sagt `(root / "team/").is_dir()` = wahr). `team/sub` war schon
+  `write_denied` (keine `.share.yml`).
+- **Fix B6:** `files.is_valid_space_name()` — **eine** Regel (str, nicht leer, kein `/`, kein NUL,
+  kein führender Punkt, nicht reserviert, ≤ 255 Byte), aufgerufen in `Store.create()` und
+  `Store.move()` auf das **Argument**, nicht auf `item.space` in `_write_item_file` — sonst würde
+  ein schon liegendes Item mit `space: team/` unschreibbar. `rename_space()` und
+  `acl.create_space()` hatten je eine eigene Kopie der alten Regel; beide rufen jetzt dieselbe
+  Funktion (`AclWriteError` bleibt). Abgelehnt, nicht normalisiert. Die Adapter bekommen keinen
+  eigenen Check: MCP ⇒ `invalid: …`, REST ⇒ 422 (beide über den vorhandenen
+  `ValidationError`-Weg).
+- **B7 reproduziert:** 200 Umlaute ⇒ `OSError 36` beim `mkstemp` (der Pfad im Fehler beginnt mit
+  `.itm_…` — die tmp-Datei, nicht die Item-Datei). Update auf 100 CJK ⇒ die Datei am **alten**
+  Namen mit neuem Titel und `version: 2`, Umbenennen gescheitert, kein Commit.
+- **E3 gemessen:** `os.statvfs().f_namemax` = **255** (ext4, `/home/savefyx`). Item-Datei = Slug +
+  17 Byte (`itm_xxxxxxxx__` + `.md`), tmp-Datei = Name + 14 Byte (`.` + Name + `.` + 8 + `.tmp`)
+  ⇒ Slug ≤ **224** Byte. Gebaut: **100 Byte**, an einer Zeichengrenze, ohne `-` am Ende, in
+  `files.item_filename()` — die eine Stelle, über die Write, Archiv und Papierkorb gehen. Bewusst
+  **nicht** in `slugify()`: das baut auch Ordnersegmente, ein Kürzen dort würde bestehende Ordner
+  still umbenennen. **Folge:** ein vorhandenes Item mit längerem Slug bekommt beim nächsten Write
+  den kurzen Namen (harmlos, Lookup läuft über die ID).
+- **Kein Titel-Limit** (datierte Korrektur an E3 oben): das Kürzen erfüllt das Done-when allein;
+  ein Limit wäre eine neue Produktregel ohne Anlass.
+- **Nebenbei (selbe Fehlerklasse):** ein Ordnersegment > 255 Byte ⇒ vorher `OSError 36` beim
+  `mkdir`, jetzt `ValidationError` in `validate_folder()` (abgelehnt, nicht gekürzt — ein
+  gekürzter Name wäre ein anderer Ordner; die Grenze ist die Dateisystemgrenze, kein bestehender
+  Ordner kann darüber liegen).
+- **Wächter (14 Funktionen, 40 Fälle):** `test_files.py` 6 Funktionen / 22 Fälle (Kappe an der Zeichengrenze, kurzer
+  Slug unverändert, **echter** Write des schlimmsten tmp-Namens gegen `f_namemax`, Space-Namen
+  14 abgelehnt / 4 angenommen, Ordnersegment) · `test_store.py` (create × 7 Namen inkl.
+  `../draussen` und NUL, move × 3, 200 Umlaute mit Git, Update auf 100 CJK: neuer Name, Suche,
+  genau **ein** Commit) · `test_tools.py` (create × 3, `update_item(space=)`) · `test_api.py`
+  (POST `fabian/` ⇒ 422 ohne Datei; POST 200 Umlaute ⇒ 201, PATCH 100 CJK ⇒ 200, v2).
+- **Gegenlauf, im Code neutralisiert:** Slug-Kappe aus ⇒ **6 rot** (3 Dateien-, 2 Store-, 1 REST-
+  Wächter) · Space-Prüfung in `create`/`move` aus ⇒ **15 rot** (Store 10, MCP 4, REST 1) ·
+  Ordner-Länge aus ⇒ **1 rot**. Jeweils nur die Wächter dieses Fixes.
+- **Live-Frage vor Deploy D (Nikinger, read-only, wie die E5-Durchsicht):** B6 stand seit P6
+  live offen. Der Fix heilt kein schon liegendes Item mit `space: team/` (es bleibt „fremd“ und
+  wird von `rename_space` übersprungen). Prüfung: jede `.md` unter `DATA_ROOT`, deren
+  `space:`-Zeile nicht dem obersten Verzeichnis entspricht —
+  `cd <DATA_ROOT> && find . -path ./._trash -prune -o -name '*.md' -print0 | while IFS= read -r -d '' f; do d=${f#./}; d=${d%%/*}; s=$(sed -n 's/^space: *//p' "$f" | head -1); [ "$s" = "$d" ] || echo "$f: $s"; done`
+  — 0 Zeilen ⇒ kein Übergang (eine Nicht-Item-`.md` ohne `space:` erscheint mit leerem Wert; an einer Wegwerf-Kopie mit einem `space: team/`-Item erprobt: genau diese Zeile).

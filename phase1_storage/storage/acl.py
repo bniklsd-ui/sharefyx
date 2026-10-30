@@ -278,7 +278,7 @@ def create_space(data_root: Path, name: str) -> Path:
     """Legt ein leeres Space-Verzeichnis an. Kein `history.commit()` hier — ein leeres
     Verzeichnis hat für Git nichts zu committen, der erste Item-Write erzeugt den ersten
     echten Commit für diesen Space (wie bisher in `spacectl.py`)."""
-    if "/" in name or name.startswith(".") or name in files.RESERVED_DIR_NAMES:
+    if not files.is_valid_space_name(name):
         raise AclWriteError(f"'{name}' ist kein gültiger Space-Name.")
     space_dir = data_root / name
     with _WriteLock(data_root):

@@ -682,7 +682,8 @@ class Store:
 
         **Was passiert (unter beiden Locks):**
         - Der neue Name wird nach **derselben Regel** geprüft wie beim Anlegen eines Spaces
-          (`acl.create_space()`: kein `/`, kein Punkt am Anfang, kein reservierter Name).
+          (`files.is_valid_space_name()`, seit 15.5 die eine Regel für Anlegen, Umbenennen
+          und Item-Writes).
         - **Marker** schreiben (9.4) → `os.rename(DATA_ROOT/<old>, DATA_ROOT/<new>)` (atomar,
           gleiches Dateisystem) + `fsync` des Elternverzeichnisses.
         - Jede Item-Datei unter dem neuen Verzeichnis (inkl. `_archive/`) wird mit `space: new`
@@ -702,7 +703,7 @@ class Store:
         Rechte VOR diesem Call (die Web-Fläche: `permissions.is_team_space()` +
         `permissions.manages_space()`; P10.5-M: **nur Team-Spaces**)."""
         with self._lock, self._file_write_lock():
-            if not new or "/" in new or new.startswith(".") or new in files.RESERVED_DIR_NAMES:
+            if not files.is_valid_space_name(new):
                 raise ValidationError(f"'{new}' ist kein gültiger Space-Name.")
             if old == new:
                 raise ValidationError(
@@ -1179,6 +1180,10 @@ class Store:
             reserved = _SYSTEM_MANAGED_FIELDS & fields.keys()
             if reserved:
                 raise ValidationError(f"Felder {sorted(reserved)} sind vom Store verwaltet")
+            if not files.is_valid_space_name(space):
+                # P10.5 15.5 (Ultra-Review B6): vorher schrieb `space="team/"` nach `team/`
+                # mit `space: team/` im Frontmatter — das eigene Item galt danach als fremd.
+                raise ValidationError(f"{space!r} ist kein gültiger Space-Name.")
             _check_write_types({"title": title, "body": body, **fields})
             folder = files.validate_folder(folder)
             now = self._now_fn()
@@ -1427,6 +1432,10 @@ class Store:
             old_path = self._data_root / row["path"]
             target_space = current.space
             if space is not None:
+                if not files.is_valid_space_name(space):
+                    # P10.5 15.5 (B6): `(root / "team/").is_dir()` ist wahr — die Existenzprüfung
+                    # darunter hält `team/` allein nicht auf.
+                    raise ValidationError(f"{space!r} ist kein gültiger Space-Name.")
                 # Explizite Prüfung statt `_write_item_file()`s `mkdir(parents=True)` beiläufig
                 # entscheiden zu lassen — sonst macht ein Tippfehler im Zielnamen aus Versehen
                 # einen neuen, rechtefreien Space (§4.1 Punkt 2).

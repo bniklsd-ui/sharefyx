@@ -381,6 +381,48 @@ async def test_create_item_rejects_non_string_space(full_app_items, totp_code):
     assert response.status_code == 422
 
 
+
+@pytest.mark.asyncio
+async def test_create_item_rejects_a_space_name_that_is_a_path(
+    full_app_items, item_store, tmp_path, totp_code
+):
+    """P10.5 15.5 (Ultra-Review B6): `fabian/` passierte `can_write` und schrieb nach `fabian/`
+    mit `space: fabian/` im Frontmatter. Jetzt 422 aus dem Kern, keine Datei."""
+    (tmp_path / "data" / FOREIGN_SPACE).mkdir(parents=True)
+    (tmp_path / "data" / FOREIGN_SPACE / ".share.yml").write_text(
+        f"write: [{SPACE}]\n", encoding="utf-8"
+    )
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.post(
+            "/api/v1/items",
+            json={"type": "note", "title": "Test", "space": f"{FOREIGN_SPACE}/"},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 422
+    assert list((tmp_path / "data").rglob("*.md")) == []
+
+
+@pytest.mark.asyncio
+async def test_long_titles_neither_fail_nor_half_write(full_app_items, item_store, totp_code):
+    """P10.5 15.5 (Ultra-Review B7): 200 Umlaute im Titel gaben 500 (`OSError 36`); ein Update
+    auf 100 CJK-Zeichen schrieb die Datei am alten Namen neu und scheiterte beim Umbenennen."""
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        created = await client.post(
+            "/api/v1/items", json={"type": "note", "title": "ä" * 200}, headers=_headers(csrf),
+        )
+        assert created.status_code == 201
+        patched = await client.patch(
+            f"/api/v1/items/{created.json()['id']}",
+            json={"version": 1, "title": "漢" * 100},
+            headers=_headers(csrf),
+        )
+    assert patched.status_code == 200
+    item = item_store.get(created.json()["id"])
+    assert (item.title, item.version) == ("漢" * 100, 2)
+
+
 @pytest.mark.asyncio
 async def test_create_item_uses_session_space(full_app_items, totp_code, item_store):
     async with _client(full_app_items) as client:

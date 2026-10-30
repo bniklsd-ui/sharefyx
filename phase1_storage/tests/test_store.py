@@ -1949,3 +1949,55 @@ def test_share_list_or_empty_reads_without_warning(store, tmp_path, caplog, roh,
         assert store.get(item.id).share_read == erwartet
     assert not [r for r in caplog.records if r.name == "storage.frontmatter"]
     assert store.acl_of(item.id).share_read == frozenset(erwartet)
+
+
+# -- P10.5 Block 15.5 (Ultra-Review B6/B7): eine Eingabe wird nie zum Pfad ----------------
+
+_KEINE_SPACE_NAMEN = ["team/", "team//", "./team", "team/.", "../draussen", "a\0b", ""]
+
+
+@pytest.mark.parametrize("space", _KEINE_SPACE_NAMEN)
+def test_create_rejects_a_space_name_that_is_a_path(store_git, tmp_path, space):
+    """B6: `create("team/")` schrieb nach `team/` mit `space: team/` im Frontmatter — das eigene
+    Item galt danach als fremd (`<untrusted_content>`), `rename_space` übersprang es."""
+    (tmp_path / "team").mkdir()
+    with pytest.raises(ValidationError, match="kein gültiger Space-Name"):
+        store_git.create(space, type="note", title="x")
+    assert list(tmp_path.rglob("*.md")) == []
+    assert not (tmp_path.parent / "draussen").exists()
+
+
+@pytest.mark.parametrize("space", ["team/", "./team", "team/."])
+def test_move_rejects_a_space_name_that_is_a_path(store, tmp_path, space):
+    """B6: `(root / "team/").is_dir()` ist wahr — die Existenzprüfung allein hielt es nicht auf."""
+    (tmp_path / "team").mkdir()
+    item = store.create("alpha", type="note", title="Eigenes")
+    with pytest.raises(ValidationError, match="kein gültiger Space-Name"):
+        store.move(item.id, version=1, space=space)
+    nach = store.get(item.id)
+    assert (nach.space, nach.version) == ("alpha", 1)
+    assert list((tmp_path / "team").glob("*.md")) == []
+
+
+def test_create_with_200_umlauts_in_the_title_writes_a_short_filename(store_git, tmp_path):
+    """B7: vorher `OSError 36` (REST 500, MCP `internal_error`). Der Titel bleibt ganz, nur der
+    Dateiname ist gekürzt."""
+    item = store_git.create("alpha", type="note", title="ä" * 200)
+    (pfad,) = tmp_path.glob(f"alpha/{item.id}__*.md")
+    assert pfad.name == f"{item.id}__{'ae' * 50}.md"
+    assert store_git.get(item.id).title == "ä" * 200
+    assert _git_log(tmp_path)[0].startswith("create")
+
+
+def test_update_to_a_long_title_renames_the_file_in_one_commit(store_git, tmp_path):
+    """B7, der halbe Write: vorher stand die Datei mit neuem Titel und `version: 2` am **alten**
+    Namen, das Umbenennen scheiterte, kein Commit, Index auf v1."""
+    item = store_git.create("alpha", type="note", title="kurz")
+    vorher = int(_commits(tmp_path))
+    neu = store_git.update(item.id, version=1, title="漢" * 100)
+    (pfad,) = tmp_path.glob(f"alpha/{item.id}__*.md")
+    assert pfad.name == f"{item.id}__{'漢' * 33}.md"
+    assert neu.version == 2
+    assert store_git.get(item.id).title == "漢" * 100
+    assert [s.id for s in store_git.search("漢").items] == [item.id]
+    assert int(_commits(tmp_path)) == vorher + 1
