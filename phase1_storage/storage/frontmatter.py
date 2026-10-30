@@ -12,7 +12,10 @@ import re
 
 import yaml
 
-_FRONTMATTER_RE = re.compile(r"\A---\n(.*?\n)---\n(.*)\Z", re.DOTALL)
+# P10.5 Block 15.2 (Ultra-Review B20): die drei Begrenzer duerfen auch `\r\n` tragen — eine
+# unter Windows gespeicherte Datei ist sonst "kein Frontmatter" und war (mit B3) ein Startblocker.
+# Geschrieben wird weiter nur `\n` (`serialize()`); der Body behaelt seine Zeilenenden byteweise.
+_FRONTMATTER_RE = re.compile(r"\A---\r?\n(.*?\r?\n)---\r?\n(.*)\Z", re.DOTALL)
 
 
 class FrontmatterError(ValueError):
@@ -62,7 +65,12 @@ def parse(text: str) -> tuple[dict, str]:
     if not m:
         raise FrontmatterError("kein gültiger Frontmatter-Block (führendes '---' fehlt oder unabgeschlossen)")
     raw_yaml, body = m.group(1), m.group(2)
-    fields = yaml.load(raw_yaml, Loader=_RoundTripLoader)
+    try:
+        fields = yaml.load(raw_yaml, Loader=_RoundTripLoader)
+    except yaml.YAMLError as exc:
+        # 15.2: `YAMLError` ist kein `ValueError` — ohne diese Uebersetzung lief kaputtes YAML an
+        # jedem `except ValueError` im Kern vorbei (Rebuild, Space-Umbenennung).
+        raise FrontmatterError(f"Frontmatter ist kein gültiges YAML: {exc}") from exc
     if not isinstance(fields, dict):
         raise FrontmatterError("Frontmatter-Block ist kein YAML-Mapping")
     return fields, body

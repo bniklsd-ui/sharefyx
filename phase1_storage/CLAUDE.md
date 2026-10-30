@@ -166,6 +166,7 @@ heißen wörtlich „Drei ... Erweiterungen", P6 Step 1 danach „Dritte, benann
 | 2026-10-02, P9 Block trace | `updated_by` in `Item`/`ItemSummary`, `actor: str = ""` an allen neun Store-Schreibmethoden, `history.commit(author=)`; **kein Index-Schema-Sprung** | 🟡 code-complete, Deploy `v3.1.1` steht aus |
 | 2026-10-25, P10.5 Block 11 · Format-Konvention Stufe 2 | **kein Code** in `storage/` — die Konvention (`[Text]{.rot}`, `::: {.zentriert}`) ist **Client-Seite**: `markdown.js` rendert sie, der Server speichert den Text, wie er ist (Kernprinzip: der Server interpretiert keinen Inhalt). Diese Zeile ist die **Ankündigung**, kein Eingriff — es gibt hier **keinen** neuen Contract und **keine** neue Methode | ✅ (kein Eingriff) |
 | 2026-10-30, P10.5 Block 15.1 (Ultra-Review B1) | `ASSET_ID_RE` `$` → `\Z`; private `Store._asset_matches()` — formfalsche `asset_id` ist „nicht gefunden“. Nur Verschärfung, **keine** Signaturänderung, kein neuer Contract | ✅ |
+| 2026-10-30, P10.5 Block 15.2 (Ultra-Review B2/B3/B20) | `frontmatter.parse()` akzeptiert `\r\n`-Begrenzer und übersetzt `yaml.YAMLError` in `FrontmatterError`; `rebuild_index()` überspringt eine unlesbare Datei (`CRITICAL` mit Pfad) in **einer** Transaktion; `rename_folder` legt den Elternordner an, die Wiederaufnahme verhindert den Start nie, ein liegender Marker sperrt neue Renames (`ValidationError`). **Keine** Signaturänderung, `IndexStats` unverändert. Folge: eine CRLF-Datei hat nach dem ersten Update gemischte Zeilenenden | ✅ |
 
 ---
 

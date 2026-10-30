@@ -71,3 +71,21 @@ def test_parse_rejects_missing_frontmatter():
 def test_parse_rejects_unclosed_frontmatter():
     with pytest.raises(FrontmatterError):
         parse("---\nid: itm_deadbeef\nbody ohne schliessendes delimiter\n")
+
+
+# -- P10.5 Block 15.2 (Ultra-Review B20): CRLF und kaputtes YAML ----------------------------
+
+
+def test_parse_accepts_crlf_delimiters():
+    """B20: eine unter Windows gespeicherte Datei ist Frontmatter wie jede andere. Der Body
+    behaelt seine Zeilenenden byteweise — `parse()` normalisiert nichts."""
+    fields, body = parse("---\r\nid: itm_a1b2c3d4\r\ntitle: Ä\r\n---\r\nZeile 1\r\nZeile 2\r\n")
+    assert fields == {"id": "itm_a1b2c3d4", "title": "Ä"}
+    assert body == "Zeile 1\r\nZeile 2\r\n"
+
+
+def test_parse_wraps_yaml_error_as_frontmatter_error():
+    """15.2: `yaml.YAMLError` ist kein `ValueError` — ohne Uebersetzung lief kaputtes YAML an
+    jedem `except ValueError` im Kern vorbei."""
+    with pytest.raises(FrontmatterError):
+        parse("---\ntitle: [kaputt\n---\nx")

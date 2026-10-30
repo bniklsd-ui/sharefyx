@@ -1382,7 +1382,7 @@ def test_rename_folder_refuses_existing_target_and_descendant(store, tmp_path):
     assert not (tmp_path / "alpha" / "alt" / "unter").exists()
 
 
-def test_rename_resumes_after_crash(store_git, tmp_path, monkeypatch):
+def test_rename_folder_resumes_after_crash(store_git, tmp_path, monkeypatch):
     """**9.4: Absturzsicherheit.** Der Absturz kommt **nach** dem Verzeichnis-Rename (der
     kritische Moment: das Verzeichnis ist schon gewandert, der Index noch nicht nachgezogen).
 
@@ -1578,3 +1578,192 @@ def test_rename_resumes_after_crash(tmp_path, clock, monkeypatch):
         (r["id"], r["space"], r["version"])
         for r in index_mod.all_rows(neu._conn)
     }
+
+
+# -- P10.5 Block 15.2: der Dienststart scheitert nie an Daten (Ultra-Review B2/B3/B20) -------
+#
+# Eine Datei darf **eine Datei** kosten — nie den Index und nie den Start. Die Wächter sind so
+# geschnitten, dass keiner der drei Fixes einen anderen verdeckt (Advisor 15.2): der B20-Wächter
+# prüft, dass die CRLF-Datei **indiziert** ist (nicht nur, dass der Start lebt — das schafft B3
+# allein), und B2 hat drei getrennte Wächter (Eltern anlegen · Marker weg, wenn nichts wanderte ·
+# Start trotz gescheiterter Wiederaufnahme).
+
+
+def _fremde_dateien(tmp_path):
+    """Vier Dateien, die ein Mensch (oder ein Werkzeug) in einen Space legen kann."""
+    (tmp_path / "alpha" / "README.md").write_text("# Hallo\n\nKein Frontmatter.\n", encoding="utf-8")
+    (tmp_path / "alpha" / "kaputt.md").write_text("---\ntitle: [offen\n---\nx\n", encoding="utf-8")
+    (tmp_path / "alpha" / "ohne_id.md").write_text("---\ntitle: x\n---\n", encoding="utf-8")
+    (tmp_path / "alpha" / "latin1.md").write_bytes("---\ntitle: \xe4\n---\n".encode("latin-1"))
+
+
+def test_rebuild_skips_unreadable_files_and_indexes_the_rest(store, tmp_path, caplog):
+    """B3: vorher brach der Neuaufbau an der ersten fremden `.md` ab — **nach** dem
+    committeten `DELETE`, Index leer. Jetzt: die drei Items stehen, jede fremde Datei steht mit
+    Pfad im `CRITICAL`-Log."""
+    ids = [store.create("alpha", type="task", title=t).id for t in ("a", "b", "c")]
+    _fremde_dateien(tmp_path)
+    with caplog.at_level(logging.CRITICAL, logger="storage.index"):
+        stats = store.rebuild_index()
+    assert stats.items_indexed == 3
+    assert {store.get(i).id for i in ids} == set(ids)
+    meldungen = " ".join(r.getMessage() for r in caplog.records)
+    for name in ("README.md", "kaputt.md", "ohne_id.md", "latin1.md"):
+        assert name in meldungen
+
+
+def test_rebuild_skips_a_title_sqlite_cannot_bind(store, tmp_path):
+    """B3 (die Typseite, die B5 in 15.3 eigentlich behebt): `title: [a, b]` ist ein Wert, den
+    SQLite nicht binden kann (`ProgrammingError`) — das kostet die Datei, nicht den Index."""
+    gut = store.create("alpha", type="task", title="gut")
+    schlecht = store.create("alpha", type="task", title="schlecht")
+    pfad = next((tmp_path / "alpha").glob(f"{schlecht.id}__*.md"))
+    pfad.write_text(pfad.read_text(encoding="utf-8").replace("title: schlecht", "title:\n- a\n- b"), encoding="utf-8")
+    assert store.rebuild_index().items_indexed == 1
+    assert store.get(gut.id).title == "gut"
+
+
+def test_store_starts_with_fresh_index_despite_foreign_files(tmp_path, clock):
+    """B3, der Startpfad: ein frischer Index (Schema-Sprung im Deploy) heisst `rebuild_index()`
+    in `Store.__init__` — vorher warf das, der Dienst startete nicht."""
+    store = Store(tmp_path, now_fn=clock, git=False)
+    item = store.create("alpha", type="task", title="bleibt")
+    _fremde_dateien(tmp_path)
+    (tmp_path / ".index.sqlite3").unlink()
+    neu = Store(tmp_path, now_fn=clock, git=False)
+    assert neu.get(item.id).title == "bleibt"
+
+
+def test_rebuild_keeps_old_index_on_environment_error(store, monkeypatch):
+    """B3, Transaktion: ein Fehler der **Umgebung** (hier: `OperationalError` mitten im
+    Neuaufbau) bricht ab — und der **alte** Index steht vollstaendig, statt halb geleert
+    committet zu sein (vorher committete der erste Kanten-Commit das `DELETE`)."""
+    import sqlite3
+
+    from storage import index as index_mod
+
+    ids = {store.create("alpha", type="task", title=t).id for t in ("a", "b", "c")}
+    echt = index_mod._index_one_file
+    aufrufe = {"n": 0}
+
+    def zweiter_wirft(*args):
+        aufrufe["n"] += 1
+        if aufrufe["n"] == 2:
+            raise sqlite3.OperationalError("database is locked")
+        return echt(*args)
+
+    monkeypatch.setattr(index_mod, "_index_one_file", zweiter_wirft)
+    with pytest.raises(sqlite3.OperationalError):
+        store.rebuild_index()
+    assert {r["id"] for r in index_mod.all_rows(store._conn)} == ids
+
+
+def test_rebuild_tolerates_duplicate_frontmatter_links(store, tmp_path):
+    """15.2-Fund (nicht im Review): `links: [itm_x, itm_x]` von Hand riss den Primaerschluessel
+    von `item_links` — `IntegrityError`, derselbe Startblocker wie B3. Die Kante zaehlt einmal."""
+    from storage import index as index_mod
+
+    ziel = store.create("alpha", type="task", title="ziel")
+    quelle = store.create("alpha", type="task", title="quelle")
+    pfad = next((tmp_path / "alpha").glob(f"{quelle.id}__*.md"))
+    pfad.write_text(
+        pfad.read_text(encoding="utf-8").replace("links: []", f"links:\n- {ziel.id}\n- {ziel.id}"),
+        encoding="utf-8",
+    )
+    assert store.rebuild_index().items_indexed == 2
+    kanten = [r for r in index_mod.all_links(store._conn) if r["src_id"] == quelle.id]
+    assert [(r["dst_id"], r["kind"]) for r in kanten] == [(ziel.id, "frontmatter")]
+
+
+def _als_crlf(tmp_path, item_id):
+    pfad = next((tmp_path / "alpha").glob(f"{item_id}__*.md"))
+    pfad.write_bytes(pfad.read_bytes().replace(b"\n", b"\r\n"))
+    return pfad
+
+
+def test_crlf_item_is_indexed_and_readable(tmp_path, clock):
+    """B20: die CRLF-Datei ist **im Index** und lesbar — nicht bloss „der Start lebt"
+    (das schaffte B3 allein, indem es die Datei uebersprang)."""
+    store = Store(tmp_path, now_fn=clock, git=False)
+    item = store.create("alpha", type="task", title="Windows", body="Zeile\n")
+    _als_crlf(tmp_path, item.id)
+    (tmp_path / ".index.sqlite3").unlink()
+    neu = Store(tmp_path, now_fn=clock, git=False)
+    assert neu.get(item.id).title == "Windows"
+    assert item.id in {s.id for s in neu.search(space="alpha").items}
+
+
+def test_crlf_item_survives_update(store, tmp_path):
+    """B20, Rueckweg: ein Update schreibt das Frontmatter mit `\\n` (`serialize()`), der Body
+    behaelt sein `\\r\\n` — gemischte Zeilenenden, aber die Datei bleibt lesbar und indiziert."""
+    item = store.create("alpha", type="task", title="Windows", body="Zeile\n")
+    pfad = _als_crlf(tmp_path, item.id)
+    store.rebuild_index()
+    gelesen = store.get(item.id)
+    neu = store.update(item.id, version=gelesen.version, status="done")
+    assert neu.status == "done"
+    assert store.rebuild_index().items_indexed == 1
+    assert store.get(item.id).status == "done"
+    assert pfad.read_bytes().startswith(b"---\nid: ")
+
+
+def test_rename_folder_into_missing_parent(store_git, tmp_path):
+    """B2, der Ausloeser: `projekte` → `archiv/projekte` bei fehlendem `archiv/` — ein legitimer
+    Klick eines Space-Verwalters. Vorher `FileNotFoundError` und ein liegengebliebener Marker."""
+    item = store_git.create("alpha", type="task", title="Plan", folder="projekte")
+    assert store_git.rename_folder("alpha", "projekte", "archiv/projekte") == 1
+    assert store_git.get(item.id).folder == "archiv/projekte"
+    assert not (tmp_path / ".rename-pending.json").exists()
+
+
+@pytest.mark.parametrize("art", ["folder", "space"])
+def test_rename_failing_before_anything_moved_clears_marker(store, tmp_path, monkeypatch, art):
+    """B2: scheitert der Rename, **bevor** etwas wandert, beschreibt der Marker nichts Halbes —
+    er muss weg, sonst fuehrte der naechste Start einen Rename aus, den der Aufrufer als Fehler
+    gesehen hat (und vorher: an dem er jedes Mal wieder scheiterte)."""
+    store.create("alpha", type="task", title="Plan", folder="projekte")
+
+    def kein_rename(*_a, **_k):
+        raise PermissionError("EACCES")
+
+    monkeypatch.setattr(Store, "_rename_directory", staticmethod(kein_rename))
+    with pytest.raises(PermissionError):
+        if art == "folder":
+            store.rename_folder("alpha", "projekte", "neu")
+        else:
+            store.rename_space("alpha", "beta")
+    assert not (tmp_path / ".rename-pending.json").exists()
+
+
+def test_store_starts_when_rename_resume_fails(tmp_path, clock, monkeypatch, caplog):
+    """B2, der Startpfad: die Wiederaufnahme scheitert (hier erzwungen) — der Store startet
+    trotzdem, der Index stimmt mit der Platte, der Marker **bleibt** (die einzige Spur) und steht
+    im `CRITICAL`-Log. Vorher: unter systemd eine Crash-Schleife."""
+    store = Store(tmp_path, now_fn=clock, git=False)
+    item = store.create("alpha", type="task", title="Plan", folder="alt")
+    marker = tmp_path / ".rename-pending.json"
+    marker.write_text(json.dumps({"kind": "folder", "space": "alpha", "old": "alt", "new": "neu"}))
+
+    def kaputt(*_a, **_k):
+        raise OSError("EIO")
+
+    monkeypatch.setattr(Store, "_rename_directory", staticmethod(kaputt))
+    with caplog.at_level(logging.CRITICAL, logger="storage.store"):
+        neu = Store(tmp_path, now_fn=clock, git=False)
+    assert marker.is_file()
+    assert neu.get(item.id).folder == "alt"
+    assert any("Wiederaufnahme gescheitert" in r.getMessage() for r in caplog.records)
+
+
+def test_rename_refused_while_marker_pending(store, tmp_path):
+    """15.2: solange ein Marker liegt, beginnt kein neuer Rename — er wuerde den Marker
+    ueberschreiben und damit die einzige Spur des halben Renames loeschen."""
+    store.create("alpha", type="task", title="Plan", folder="alt")
+    marker = tmp_path / ".rename-pending.json"
+    marker.write_text('{"kind": "folder", "space": "alpha", "old": "x", "new": "y"}')
+    with pytest.raises(ValidationError):
+        store.rename_folder("alpha", "alt", "neu")
+    with pytest.raises(ValidationError):
+        store.rename_space("alpha", "beta")
+    assert json.loads(marker.read_text())["old"] == "x"
+    assert (tmp_path / "alpha" / "alt").is_dir()

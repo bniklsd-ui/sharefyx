@@ -208,13 +208,24 @@ def replace_item_links(
     werden. sqlite3's autocommit + `commit()` am Ende ist hier ausreichend (single-threaded
     durch `Store._lock`).
     """
+    _replace_links_no_commit(conn, src_id, rows)
+    conn.commit()
+
+
+def _replace_links_no_commit(
+    conn: sqlite3.Connection, src_id: str, rows: list[tuple[str, str]]
+) -> None:
+    """Kern von `replace_item_links()` ohne `commit()` — `rebuild_index()` haelt den ganzen
+    Neuaufbau in **einer** Transaktion (P10.5 15.2, Ultra-Review B3).
+
+    Doppelte Paare werden entfernt (Reihenfolge bleibt): ein von Hand geschriebenes
+    `links: [itm_x, itm_x]` riss sonst den Primaerschluessel und brach den Neuaufbau ab."""
     conn.execute("DELETE FROM item_links WHERE src_id = ?", (src_id,))
     if rows:
         conn.executemany(
             "INSERT INTO item_links (src_id, dst_id, kind) VALUES (?, ?, ?)",
-            [(src_id, dst_id, kind) for (dst_id, kind) in rows],
+            [(src_id, dst_id, kind) for (dst_id, kind) in dict.fromkeys(rows)],
         )
-    conn.commit()
 
 
 def all_links(conn: sqlite3.Connection) -> list[sqlite3.Row]:
@@ -282,25 +293,65 @@ def rebuild_index(data_root: Path, conn: sqlite3.Connection) -> IndexStats:
     `row_from_file()["body_refs"]`. `DELETE FROM items` oben wird durch `DELETE FROM
     item_links` ergaenzt -- sonst bleiben stale Kanten aus dem Vorab-Stand stehen."""
     start = time.monotonic()
-    conn.execute("DELETE FROM items")
-    conn.execute("DELETE FROM item_links")
     count = 0
-    edge_count = 0
-    for space_dir in sorted(p for p in data_root.iterdir() if p.is_dir() and not p.name.startswith(".")):
-        for md_path in sorted(space_dir.rglob("*.md")):
-            row = row_from_file(data_root, md_path)
-            _upsert_no_commit(conn, row)
-            frontmatter_refs = [
-                ref for ref in json.loads(row["links_json"]) if ITEM_REF_RE.fullmatch(ref)
-            ]
-            rows = [(ref, "frontmatter") for ref in frontmatter_refs] + [
-                (ref, "body") for ref in row["body_refs"]
-            ]
-            replace_item_links(conn, row["id"], rows)
-            count += 1
-            edge_count += len(rows)
-    conn.commit()
+    skipped = 0
+    try:
+        conn.execute("DELETE FROM items")
+        conn.execute("DELETE FROM item_links")
+        for space_dir in sorted(p for p in data_root.iterdir() if p.is_dir() and not p.name.startswith(".")):
+            for md_path in sorted(space_dir.rglob("*.md")):
+                if _index_one_file(data_root, conn, md_path):
+                    count += 1
+                else:
+                    skipped += 1
+        conn.commit()
+    except BaseException:
+        # Ein Fehler der **Umgebung** (Platte voll, DB gesperrt) — nicht einer Datei: der alte
+        # Index bleibt vollstaendig stehen, statt halb geleert committet zu werden.
+        conn.rollback()
+        raise
+    if skipped:
+        logger.critical(
+            "Index-Neuaufbau: %d Datei(en) uebersprungen (Pfade oben) — %d indiziert.",
+            skipped, count,
+        )
     return IndexStats(items_indexed=count, duration_seconds=time.monotonic() - start)
+
+
+# P10.5 15.2 (Ultra-Review B3): Fehler, die eine **Datei** macht — kein Frontmatter, kaputtes
+# YAML, fehlendes Pflichtfeld, kein UTF-8, ein Wert, den SQLite nicht binden kann (`title: [a]`).
+# `ProgrammingError`/`InterfaceError`/`IntegrityError` sind `DatabaseError`-Unterklassen und
+# stehen deshalb einzeln da: ein `OperationalError` (die **Umgebung**) bricht den Neuaufbau ab.
+_FILE_ERRORS = (
+    OSError, ValueError, KeyError, TypeError,
+    sqlite3.ProgrammingError, sqlite3.InterfaceError, sqlite3.IntegrityError,
+)
+
+
+def _index_one_file(data_root: Path, conn: sqlite3.Connection, md_path: Path) -> bool:
+    """Indiziert eine Datei innerhalb eines `SAVEPOINT`. Eine Datei, die nicht lesbar ist,
+    kostet **diese eine Datei** — nie den Index und nie den Dienststart (Plan 15 §1, Satz 2).
+    Sie wird mit Pfad als `CRITICAL` geloggt und ist im Index unsichtbar, bis ein Mensch sie
+    repariert (E2). Der `SAVEPOINT` verhindert eine halbe Zeile (Item ohne seine Kanten)."""
+    conn.execute("SAVEPOINT index_file")
+    try:
+        row = row_from_file(data_root, md_path)
+        _upsert_no_commit(conn, row)
+        frontmatter_refs = [
+            ref for ref in json.loads(row["links_json"])
+            if isinstance(ref, str) and ITEM_REF_RE.fullmatch(ref)
+        ]
+        rows = [(ref, "frontmatter") for ref in frontmatter_refs] + [
+            (ref, "body") for ref in row["body_refs"]
+        ]
+        _replace_links_no_commit(conn, row["id"], rows)
+    except _FILE_ERRORS as exc:
+        conn.execute("ROLLBACK TO SAVEPOINT index_file")
+        conn.execute("RELEASE SAVEPOINT index_file")
+        logger.critical("Index-Neuaufbau: %s uebersprungen — %s: %s", md_path, type(exc).__name__, exc)
+        return False
+    conn.execute("RELEASE SAVEPOINT index_file")
+    return True
 
 
 def detect_filesystem_type(path: Path) -> str:

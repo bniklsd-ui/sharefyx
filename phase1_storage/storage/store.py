@@ -602,6 +602,7 @@ class Store:
                 )
             if not (self._data_root / space).is_dir():
                 raise ValidationError(f"Space '{space}' existiert nicht.")
+            self._refuse_while_rename_pending()
 
             self._ensure_rename_marker_ignored()
             self._write_rename_marker({
@@ -609,12 +610,17 @@ class Store:
                 "actor": actor, "started": _format_dt(self._now_fn()),
             })
             try:
+                # 15.2 (Ultra-Review B2): `archiv/projekte` bei fehlendem `archiv/` — verschachtelte
+                # Zielnamen sind erlaubt, also wird der Elternordner angelegt (wie `files.move_file()`
+                # es fuer Dateien tut). Vorher: `FileNotFoundError`, Marker blieb, jeder Start scheiterte.
+                neu_dir.parent.mkdir(parents=True, exist_ok=True)
                 self._rename_directory(alt_dir, neu_dir)
                 betroffen = self._reindex_moved_folder(space, alt, neu)
             except BaseException:
                 # Der Marker bleibt liegen: `Store.__init__` führt den Rename zu Ende. Ohne ihn
                 # waere ein Absturz mitten im Rename ein halb umbenannter Ordner ohne jede
                 # Spur — die schlimmste Variante, weil niemand merkt, dass etwas halb ist.
+                self._clear_marker_if_nothing_moved(alt_dir, neu_dir)
                 raise
             self._commit_rename(f"rename-folder {space}:{alt}→{neu}", actor)
             self._clear_rename_marker()
@@ -667,6 +673,7 @@ class Store:
                 raise ValidationError(
                     f"Space '{new}' existiert bereits — es wurde nichts bewegt."
                 )
+            self._refuse_while_rename_pending()
 
             self._ensure_rename_marker_ignored()
             self._write_rename_marker({
@@ -679,6 +686,7 @@ class Store:
                 self._move_trash_dir(old, new)
             except BaseException:
                 # Der Marker bleibt liegen: `Store.__init__` führt den Rename zu Ende (9.4).
+                self._clear_marker_if_nothing_moved(alt_dir, neu_dir)
                 raise
             self._commit_rename(f"rename-space {old}→{new}", actor)
             self._clear_rename_marker()
@@ -792,16 +800,27 @@ class Store:
             return
         kind = marker.get("kind")
         with self._lock, self._file_write_lock():
-            if kind == "folder":
-                self._resume_folder_rename(marker)
-            elif kind == "space":
-                self._resume_space_rename(marker)
-            else:
+            try:
+                if kind == "folder":
+                    self._resume_folder_rename(marker)
+                elif kind == "space":
+                    self._resume_space_rename(marker)
+                else:
+                    logger.critical(
+                        "Rename-Marker mit unbekannter Art %r — der Marker bleibt liegen, "
+                        "bis ein Mensch ihn prueft: %s", kind, marker,
+                    )
+                    return
+            except Exception:
+                # 15.2 (Ultra-Review B2): die Wiederaufnahme darf den Start **nie** verhindern —
+                # vorher war ein Fehler hier unter systemd eine Crash-Schleife. Der Marker bleibt
+                # (er ist die einzige Spur des halben Renames, `_refuse_while_rename_pending()`
+                # schuetzt ihn), der Index wird aus dem tatsaechlichen Plattenstand neu gebaut.
                 logger.critical(
-                    "Rename-Marker mit unbekannter Art %r — der Marker bleibt liegen, "
-                    "bis ein Mensch ihn prueft: %s", kind, marker,
+                    "Rename-Wiederaufnahme gescheitert — der Dienst startet trotzdem, der Marker "
+                    "bleibt liegen, bis ein Mensch ihn prueft: %s", marker, exc_info=True,
                 )
-                return
+                self.rebuild_index()
 
     def _resume_folder_rename(self, marker: dict[str, Any]) -> None:
         """Setzt einen unterbrochenen Ordner-Rename zu Ende. Idempotent: das Verzeichnis
@@ -813,6 +832,7 @@ class Store:
         alt_dir = self._data_root / space / alt
         neu_dir = self._data_root / space / neu
         if alt_dir.is_dir() and not neu_dir.exists():
+            neu_dir.parent.mkdir(parents=True, exist_ok=True)
             self._rename_directory(alt_dir, neu_dir)
         elif not neu_dir.is_dir():
             logger.critical(
@@ -893,6 +913,25 @@ class Store:
             logger.critical("Rename-Marker %s ist kein JSON-Objekt — ignoriert", path)
             return None
         return data
+
+    def _refuse_while_rename_pending(self) -> None:
+        """15.2: solange ein Marker liegt (eine gescheiterte Wiederaufnahme, siehe
+        `_resume_pending_rename()`), wird kein neuer Rename begonnen — er wuerde den Marker
+        ueberschreiben und damit die einzige Spur des halben Renames loeschen."""
+        if self._rename_marker_path().exists():
+            raise ValidationError(
+                "Ein frueheres Umbenennen ist nicht abgeschlossen (Marker "
+                f"{RENAME_MARKER} im Datenverzeichnis) — erst pruefen, dann erneut versuchen."
+            )
+
+    def _clear_marker_if_nothing_moved(self, alt_dir: Path, neu_dir: Path) -> None:
+        """15.2 (Ultra-Review B2): der Rename ist gescheitert, **bevor** etwas gewandert ist
+        (`alt` steht noch, `neu` gibt es nicht) — dann beschreibt der Marker nichts Halbes, und
+        er muss weg: sonst fuehrte der naechste Start einen Rename aus, den der Aufrufer als
+        Fehler gesehen hat. Entschieden wird am **Plattenstand**, nicht daran, welcher Aufruf
+        warf."""
+        if alt_dir.is_dir() and not neu_dir.exists():
+            self._clear_rename_marker()
 
     def _clear_rename_marker(self) -> None:
         try:
