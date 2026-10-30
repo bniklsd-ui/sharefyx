@@ -1542,6 +1542,67 @@ async def test_patch_rejects_a_non_string_assignee(full_app_items, item_store, t
     assert response.json()["error"] == "validation_failed"
 
 
+# -- P10.5 Block 15.3 (Ultra-Review B5/B8): REST prueft Typen, ein Fehler kommt nie nach dem Write
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("felder", [{"tags": [1, 2]}, {"tags": "abc"}, {"links": [1]}])
+async def test_post_rejects_non_string_tags(full_app_items, item_store, totp_code, felder):
+    """B5: `tags: [1, 2]` wurde mit 201 angenommen und vergiftete danach die Suche beider Nutzer;
+    `tags: "abc"` wurde zu drei Tags. Jetzt 422, und nichts liegt auf der Platte."""
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.post(
+            "/api/v1/items", json={"type": "task", "title": "Typfehler", **felder},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 422
+    assert response.json()["error"] == "validation_failed"
+    assert item_store.search().total == 0
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("felder", [
+    {"body": 5}, {"title": 123}, {"folder": 123}, {"tags": "abc"}, {"type": ["task"]},
+    {"share_read": 5}, {"share_write": "bob"}, {"visibility": ["human"]},
+])
+async def test_patch_rejects_wrong_types_without_writing(
+    full_app_items, item_store, totp_code, tmp_path, felder
+):
+    """B8: `title:123`/`folder:123` gaben 500; `body:5` schrieb Datei und Index, warf danach,
+    und der naechste PATCH mit Version 1 bekam 409. Jetzt 422 — Datei unveraendert, kein
+    Versionssprung, der naechste PATCH mit Version 1 geht durch."""
+    item = item_store.create(SPACE, type="task", title="Typfehler")
+    pfad = next(tmp_path.rglob(f"{item.id}__*.md"))
+    vorher = pfad.read_bytes()
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/items/{item.id}", json={"version": 1, **felder}, headers=_headers(csrf),
+        )
+        assert response.status_code == 422
+        assert response.json()["error"] == "validation_failed"
+        assert pfad.read_bytes() == vorher
+        danach = await client.patch(
+            f"/api/v1/items/{item.id}", json={"version": 1, "body": "ok"}, headers=_headers(csrf),
+        )
+    assert danach.status_code == 200
+    assert danach.json()["version"] == 2
+
+
+@pytest.mark.asyncio
+async def test_search_survives_a_hand_edited_int_tag(full_app_items, item_store, totp_code, tmp_path):
+    """B5 auf der Web-Flaeche: ein Hand-Edit `tags: [2026]` liess die Web-Suche mit 500 sterben."""
+    item = item_store.create(SPACE, type="task", title="Jahresplan")
+    pfad = next(tmp_path.rglob(f"{item.id}__*.md"))
+    pfad.write_text(pfad.read_text(encoding="utf-8").replace("tags: []", "tags: [2026]"), encoding="utf-8")
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.get("/api/v1/items?query=2026", headers=_headers(csrf))
+    assert response.status_code == 200
+    assert [r["id"] for r in response.json()["items"]] == [item.id]
+
+
 # -- P9 Step G: Löschen nach `._trash/` (Plan §9, P9-45 – P9-52) ---------------------------
 
 

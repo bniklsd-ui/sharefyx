@@ -1612,13 +1612,15 @@ def test_rebuild_skips_unreadable_files_and_indexes_the_rest(store, tmp_path, ca
         assert name in meldungen
 
 
-def test_rebuild_skips_a_title_sqlite_cannot_bind(store, tmp_path):
-    """B3 (die Typseite, die B5 in 15.3 eigentlich behebt): `title: [a, b]` ist ein Wert, den
-    SQLite nicht binden kann (`ProgrammingError`) — das kostet die Datei, nicht den Index."""
+def test_rebuild_skips_a_value_sqlite_cannot_bind(store, tmp_path):
+    """B3: `status: [a, b]` ist ein Wert, den SQLite nicht binden kann (`ProgrammingError`) — das
+    kostet die Datei, nicht den Index. **[15.3]:** hier stand bis 15.3 `title: [a, b]`; den
+    koerziert der Lesepfad jetzt (B5, `test_hand_edited_title_list_stays_visible_after_rebuild`),
+    `status` bleibt der Zeuge fuer den `ProgrammingError`-Zweig."""
     gut = store.create("alpha", type="task", title="gut")
     schlecht = store.create("alpha", type="task", title="schlecht")
     pfad = next((tmp_path / "alpha").glob(f"{schlecht.id}__*.md"))
-    pfad.write_text(pfad.read_text(encoding="utf-8").replace("title: schlecht", "title:\n- a\n- b"), encoding="utf-8")
+    pfad.write_text(pfad.read_text(encoding="utf-8").replace("status: open", "status:\n- a\n- b"), encoding="utf-8")
     assert store.rebuild_index().items_indexed == 1
     assert store.get(gut.id).title == "gut"
 
@@ -1767,3 +1769,139 @@ def test_rename_refused_while_marker_pending(store, tmp_path):
         store.rename_space("alpha", "beta")
     assert json.loads(marker.read_text())["old"] == "x"
     assert (tmp_path / "alpha" / "alt").is_dir()
+
+
+# -- P10.5 Block 15.3 (Ultra-Review B5/B8): Lesen ist nachsichtig, Schreiben ist streng -------
+
+
+def _von_hand(tmp_path, item_id, alt, neu):
+    pfad = next(tmp_path.rglob(f"{item_id}__*.md"))
+    text = pfad.read_text(encoding="utf-8")
+    assert alt in text
+    pfad.write_text(text.replace(alt, neu, 1), encoding="utf-8")
+    return pfad
+
+
+def _commits(root):
+    return subprocess.run(
+        ["git", "-C", str(root), "rev-list", "--count", "HEAD"],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+
+
+def test_hand_edited_int_tag_keeps_search_alive(store, tmp_path):
+    """B5: `tags: [2026]` von Hand — vorher starb jede Textsuche aller Nutzer mit `TypeError`,
+    weil die Suche die Tags als Strings verkettet."""
+    item = store.create("alpha", type="task", title="Jahresplan")
+    store.create("alpha", type="task", title="Anderes")
+    _von_hand(tmp_path, item.id, "tags: []", "tags: [2026]")
+    assert store.get(item.id).tags == ["2026"]
+    assert [s.id for s in store.search("2026").items] == [item.id]
+    assert store.search("anderes").total == 1
+    assert [s.id for s in store.search(tag="2026").items] == [item.id]
+
+
+def test_hand_edited_numeric_title_can_be_updated(store, tmp_path):
+    """B5: `title: 2026` von Hand — vorher brach jedes Update (`slugify()` auf einem `int`)."""
+    item = store.create("alpha", type="task", title="Hallo")
+    _von_hand(tmp_path, item.id, "title: Hallo", "title: 2026")
+    gelesen = store.get(item.id)
+    assert gelesen.title == "2026"
+    neu = store.update(item.id, version=gelesen.version, body="neu")
+    assert neu.title == "2026"
+    assert store.get(item.id).body == "neu"
+
+
+@pytest.mark.parametrize("roh, titel", [
+    ("title: [a, b]", "[a, b]"),
+    ("title:", ""),
+    ("title: true", "true"),
+    ("title: 1.0", "1.0"),
+    ("title: {a: 1}", "{a: 1}"),
+])
+def test_hand_edited_title_list_stays_visible_after_rebuild(store, tmp_path, roh, titel):
+    """B5 (Hinweis aus 15.2): ein Titel, der kein String ist, kostete beim Neuaufbau die Datei
+    (`[a, b]` → `ProgrammingError`, leer → `NOT NULL`). Jetzt bleibt das Item sichtbar, mit dem
+    Titel, wie er im YAML stand — und es laesst sich weiter schreiben."""
+    item = store.create("alpha", type="task", title="Hallo")
+    _von_hand(tmp_path, item.id, "title: Hallo", roh)
+    assert store.rebuild_index().items_indexed == 1
+    assert [s.title for s in store.search().items] == [titel]
+    gelesen = store.get(item.id)
+    assert gelesen.title == titel
+    assert store.update(item.id, version=gelesen.version, status="done").title == titel
+
+
+@pytest.mark.parametrize("roh, tags", [
+    ("tags: abc", ["abc"]),
+    ("tags: [[x]]", ["[x]"]),
+    ("tags: [{a: 1}, ~, b]", ["{a: 1}", "b"]),
+    ("tags:", []),
+])
+def test_hand_edited_tags_are_normalized(store, tmp_path, roh, tags):
+    """B5: `tags: abc` wurde zu drei Ein-Buchstaben-Tags (`list("abc")`), verschachtelte Werte
+    brachen die Suche. Nach dem Neuaufbau sehen Index und `get()` dieselbe Liste."""
+    item = store.create("alpha", type="task", title="Hallo")
+    _von_hand(tmp_path, item.id, "tags: []", roh)
+    assert store.rebuild_index().items_indexed == 1
+    assert store.get(item.id).tags == tags
+    assert store.search("hallo").total == 1
+
+
+def test_hand_edited_int_link_does_not_break_get(store, tmp_path):
+    """15.3, Fund neben B5: `links: [1]` von Hand brach `get()` und jedes Update
+    (`ITEM_REF_RE.fullmatch` auf einem `int`)."""
+    item = store.create("alpha", type="task", title="Hallo")
+    _von_hand(tmp_path, item.id, "links: []", "links: [1]")
+    gelesen = store.get(item.id)
+    assert gelesen.links == ["1"]
+    assert store.update(item.id, version=gelesen.version, status="done").links == ["1"]
+
+
+@pytest.mark.parametrize("feld, wert", [
+    ("tags", [1, 2]), ("tags", "abc"), ("links", [1]), ("title", 123), ("title", None),
+    ("body", 5), ("type", ["task"]), ("status", ["open"]), ("folder", 123), ("share_read", "bob"),
+])
+def test_update_rejects_wrong_types_before_writing(store_git, tmp_path, feld, wert):
+    """B5/B8, Schreiben ist streng: ein falscher Typ ist `ValidationError` — Datei, Version und
+    Git-Historie bleiben, wie sie waren. Vorher schrieb `body: 5` Datei und Index und warf erst
+    danach; `tags: "abc"` wurde zu drei Tags."""
+    item = store_git.create("alpha", type="task", title="Hallo")
+    pfad = next(tmp_path.rglob(f"{item.id}__*.md"))
+    vorher, commits = pfad.read_bytes(), _commits(tmp_path)
+    with pytest.raises(ValidationError):
+        store_git.update(item.id, version=1, **{feld: wert})
+    assert pfad.read_bytes() == vorher
+    assert store_git.get(item.id).version == 1
+    assert _commits(tmp_path) == commits
+
+
+@pytest.mark.parametrize("felder", [
+    {"tags": [1, 2]}, {"tags": "abc"}, {"links": "itm_00000000"}, {"title": 123}, {"body": 5},
+])
+def test_create_rejects_wrong_types(store, tmp_path, felder):
+    with pytest.raises(ValidationError):
+        store.create("alpha", **{"type": "task", "title": "Hallo", **felder})
+    assert not list(tmp_path.rglob("itm_*.md"))
+
+
+def test_link_failure_leaves_no_written_file(store_git, tmp_path, monkeypatch):
+    """B8, die strukturelle Garantie hinter der Typpruefung: was beim Schreiben noch werfen kann,
+    wirft **vor** dem Write. Hier wirft die Link-Extraktion (erzwungen) — Datei, Version und
+    Historie bleiben unveraendert, statt einer Datei auf v+1 ohne Commit."""
+    import storage.store as store_mod
+
+    item = store_git.create("alpha", type="task", title="Hallo")
+    pfad = next(tmp_path.rglob(f"{item.id}__*.md"))
+    vorher, commits = pfad.read_bytes(), _commits(tmp_path)
+
+    def kaputt(_body):
+        raise RuntimeError("Link-Extraktion")
+
+    monkeypatch.setattr(store_mod, "extract_item_refs", kaputt)
+    with pytest.raises(RuntimeError):
+        store_git.update(item.id, version=1, body="neu")
+    monkeypatch.undo()
+    assert pfad.read_bytes() == vorher
+    assert store_git.get(item.id).version == 1
+    assert _commits(tmp_path) == commits

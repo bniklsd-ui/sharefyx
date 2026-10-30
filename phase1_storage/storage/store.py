@@ -20,6 +20,7 @@ from typing import Any, Callable
 from . import files, history, index
 from .acl import ACL_FILENAME, AclDecision, AclReader
 from .errors import ConflictError, ItemNotFound, ValidationError
+from .frontmatter import normalize_item_fields
 from .frontmatter import parse as parse_frontmatter
 from .frontmatter import serialize as serialize_frontmatter
 from .linkscan import ITEM_REF_RE, extract_item_refs
@@ -132,6 +133,7 @@ def _format_dt(value: datetime) -> str:
 
 def _item_from_text(text: str, *, version_override: int | None = None, folder_override: str = "") -> Item:
     fields, body = parse_frontmatter(text)
+    fields = normalize_item_fields(fields)  # 15.3 (B5): Lesen ist nachsichtig
     extra = {k: v for k, v in fields.items() if k not in _KNOWN_FIELDS}
     return Item(
         id=fields["id"],
@@ -234,6 +236,8 @@ def _check_type_and_status(item_type: str, status: str) -> None:
     statt in jedem Adapter (CLI, MCP) neu — die CLI hielt das bisher nur über `argparse choices`
     ab, was ein zweiter Eingang (MCP) umgangen hätte.
     """
+    _require_str("type", item_type)
+    _require_str("status", status)
     allowed = valid_statuses(item_type)
     if not allowed:
         raise ValidationError(f"Unbekannter type {item_type!r} — erlaubt: {sorted(STATUS_VALUES)}")
@@ -241,6 +245,34 @@ def _check_type_and_status(item_type: str, status: str) -> None:
         raise ValidationError(
             f"Status {status!r} nicht erlaubt für type {item_type!r} — erlaubt: {sorted(allowed)}"
         )
+
+
+# P10.5 Block 15.3 (Ultra-Review B5/B8): **Schreiben ist streng** — das Gegenstueck zu
+# `frontmatter.normalize_item_fields()` (Lesen ist nachsichtig). Hier, im Kern, deckt die Pruefung
+# REST, MCP und CLI an einer Stelle; vorher nahm REST `tags: [1, 2]` mit 201 an (und vergiftete
+# danach die Suche), machte aus `tags: "abc"` drei Tags und schrieb `body: 5` auf die Platte,
+# bevor etwas warf.
+_STR_FIELDS = ("title", "body")
+_STR_LIST_FIELDS = ("tags", "links", "share_read", "share_write")
+
+
+def _require_str(name: str, value: Any) -> None:
+    if not isinstance(value, str):
+        raise ValidationError(f"'{name}' muss ein String sein, nicht {type(value).__name__}")
+
+
+def _require_str_list(name: str, value: Any) -> None:
+    if not isinstance(value, (list, tuple)) or not all(isinstance(v, str) for v in value):
+        raise ValidationError(f"'{name}' muss eine Liste von Strings sein")
+
+
+def _check_write_types(values: dict[str, Any]) -> None:
+    for name in _STR_FIELDS:
+        if name in values:
+            _require_str(name, values[name])
+    for name in _STR_LIST_FIELDS:
+        if name in values:
+            _require_str_list(name, values[name])
 
 
 def _summary(item: Item) -> ItemSummary:
@@ -435,8 +467,11 @@ class Store:
         fields["version"] = new_version
         files.atomic_write(path, serialize_frontmatter(fields, body))
 
-    def _replace_links_for_item(self, item: Item) -> None:
-        """Phase 8 Block B Step B2 (P8-M): schreibt die Kantenmenge eines Items neu.
+    def _link_rows(self, item: Item) -> list[tuple[str, str]]:
+        """Phase 8 Block B Step B2 (P8-M): die Kantenmenge eines Items.
+        **[P10.5 15.3]:** rechnet nur noch (vorher `_replace_links_for_item`, rechnete und
+        schrieb) — `_write_item_file` ruft es **vor** dem Datei-Write, damit ein Fehler hier
+        nie eine geschriebene Datei ohne Commit hinterlaesst (Ultra-Review B8).
 
         `frontmatter_refs` = `item.links`-Eintraege, die `ITEM_REF_RE.fullmatch` passieren
         (beliebige Strings im `links:`-Feld bleiben erlaubt und werden keine Kante, Plan §3
@@ -451,11 +486,10 @@ class Store:
         """
         frontmatter_refs = [ref for ref in item.links if ITEM_REF_RE.fullmatch(ref)]
         body_refs = extract_item_refs(item.body)
-        rows = (
+        return (
             [(ref, "frontmatter") for ref in frontmatter_refs]
             + [(ref, "body") for ref in body_refs]
         )
-        index.replace_item_links(self._conn, item.id, rows)
 
     def _write_item_file(
         self, item: Item, *, old_path: Path | None, op: str, actor: str = ""
@@ -464,9 +498,9 @@ class Store:
         den Index und committet (`op` benennt den Git-Commit, z.B. "create"/"update"/"append").
         Muss unter `self._lock` **und** `self._file_write_lock()` aufgerufen werden.
 
-        Phase 8 Block B Step B2 (P8-M): nach `index.upsert_item` ruft diese Methode auch
-        `_replace_links_for_item` -- damit JEDER Schreibpfad (`create`/`update`/`patch`/
-        `append`/`move`/`archive`) genau einmal pro Operation die `item_links`-Tabelle
+        Phase 8 Block B Step B2 (P8-M): nach `index.upsert_item` schreibt diese Methode auch
+        die Kanten (`_link_rows`, seit 15.3 vor dem Write gerechnet) -- damit JEDER Schreibpfad
+        (`create`/`update`/`patch`/`append`/`move`/`archive`) genau einmal pro Operation die `item_links`-Tabelle
         aktualisiert, ohne dass jede Store-Methode das selbst tun muss.
 
         `actor` (P9 Block trace) wandert nur an `_commit()` — `updated_by` steht bereits im
@@ -484,13 +518,18 @@ class Store:
         else:
             target_path = files.item_path(self._data_root, item.space, item.id, slug, folder=item.folder)
         write_path = old_path if old_path is not None else target_path
+        # P10.5 Block 15.3 (Ultra-Review B8): Text und Kanten **vor** dem Write rechnen — ein
+        # Fehler kommt nie nach `atomic_write`. Vorher schrieb `body: 5` Datei und Index und warf
+        # erst in der Link-Extraktion: kein Commit, Client sah 500, das Item stand auf v+1.
+        text = _item_to_text(item)
+        link_rows = self._link_rows(item)
         write_path.parent.mkdir(parents=True, exist_ok=True)
-        files.atomic_write(write_path, _item_to_text(item))
+        files.atomic_write(write_path, text)
         if old_path is not None and old_path != target_path:
             files.move_file(write_path, target_path)
         row = index.row_from_file(self._data_root, target_path)
         index.upsert_item(self._conn, row)
-        self._replace_links_for_item(item)
+        index.replace_item_links(self._conn, item.id, link_rows)
         self._commit(op, item.id, item.space, actor)
         return target_path
 
@@ -1136,6 +1175,7 @@ class Store:
             reserved = _SYSTEM_MANAGED_FIELDS & fields.keys()
             if reserved:
                 raise ValidationError(f"Felder {sorted(reserved)} sind vom Store verwaltet")
+            _check_write_types({"title": title, "body": body, **fields})
             folder = files.validate_folder(folder)
             now = self._now_fn()
             status = fields.pop("status", _DEFAULT_STATUS.get(type, "active"))
@@ -1205,6 +1245,7 @@ class Store:
             old_path = self._data_root / row["path"]
             updated_extra = dict(current.extra)
             known_updatable = {"type", "title", "status", "body", "due", "tags", "links"}
+            _check_write_types(changes)
             kwargs: dict[str, Any] = {}
             for key, value in changes.items():
                 if key in _SYSTEM_MANAGED_FIELDS:

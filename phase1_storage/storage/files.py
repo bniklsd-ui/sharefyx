@@ -381,6 +381,9 @@ def validate_folder(folder: str) -> str:
     der `_archive` als Ordner meint, bekommt so einen klaren Fehler statt einer stillen
     Umbenennung.
     """
+    if folder is not None and not isinstance(folder, str):
+        # P10.5 15.3 (Ultra-Review B8): vorher `AttributeError` (500) im REST-PATCH.
+        raise ValidationError(f"'folder' muss ein String sein, nicht {type(folder).__name__}")
     if not folder:
         return ""
     segments = [s for s in folder.split("/") if s]

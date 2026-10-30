@@ -13,6 +13,7 @@ import time
 from pathlib import Path
 
 from .files import folder_from_path
+from .frontmatter import normalize_item_fields
 from .frontmatter import parse as parse_frontmatter
 from .linkscan import ITEM_REF_RE, extract_item_refs
 from .models import IndexStats
@@ -246,7 +247,10 @@ def row_from_file(data_root: Path, path: Path) -> dict:
     `rebuild_index()` und `_reconcile_and_get_row()` gelesen, um `item_links` zu befuellen."""
     raw_bytes = path.read_bytes()
     text = raw_bytes.decode("utf-8")
+    # 15.3 (B5): dieselbe Normalisierung wie `store._item_from_text()` — sonst stuenden im
+    # Index andere Tags als in `get()`, und `title: [a, b]` kostete die Datei beim Neuaufbau.
     fields, body = parse_frontmatter(text)
+    fields = normalize_item_fields(fields)
     stat = path.stat()
     space = path.relative_to(data_root).parts[0]
     return {

@@ -76,6 +76,52 @@ def parse(text: str) -> tuple[dict, str]:
     return fields, body
 
 
+def inline_text(value) -> str:
+    """Ein Nicht-String-Wert als Text — so, wie er im YAML stand (`2026`, `true`, `[a, b]`).
+
+    P10.5 Block 15.3 (Ultra-Review B5): ein von Hand getippter Titel `[a, b]` war gemeint, wie
+    er da steht; `str()` machte daraus `['a', 'b']` und aus `true` ein `True`."""
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value
+    text = yaml.dump(
+        value, Dumper=_RoundTripDumper, default_flow_style=True, allow_unicode=True, width=2**31,
+    )
+    return text.removesuffix("...\n").strip()
+
+
+def _text_list(value) -> list[str]:
+    if value is None:
+        return []
+    if not isinstance(value, list):
+        # `tags: abc` meint einen Tag — `list("abc")` machte drei daraus.
+        value = [value]
+    return [inline_text(v) for v in value if v is not None]
+
+
+def normalize_item_fields(fields: dict) -> dict:
+    """Kopie von `fields`, in der `title` ein String und `tags`/`links` Listen von Strings sind.
+
+    P10.5 Block 15.3 (Ultra-Review B5): **Lesen ist nachsichtig.** Ein Hand-Edit wie
+    `tags: [2026]` oder `title: [a, b]` kostete die Textsuche aller Nutzer bzw. (seit 15.2) die
+    Datei beim Neuaufbau. Beide Lesepfade — `store._item_from_text()` und
+    `index.row_from_file()` — rufen genau diese Funktion, damit Index und `get()` nie
+    auseinanderlaufen. `parse()` selbst bleibt roh: `_write_version_only` schreibt zurück, was
+    der Mensch schrieb. Erst der nächste echte Write normalisiert die Datei (`'2026'`).
+
+    `share_read`/`share_write` sind **bewusst nicht** dabei: dieselbe Koerzion würde aus
+    `share_read: fabian` eine Freigabe machen, die heute (zufällig, fail-closed) keine ist —
+    eine Rechteerweiterung ohne Re-Auth ist eine Nikinger-Entscheidung, kein Typ-Fix."""
+    out = dict(fields)
+    if "title" in out:
+        out["title"] = inline_text(out["title"])
+    for key in ("tags", "links"):
+        if key in out:
+            out[key] = _text_list(out[key])
+    return out
+
+
 def serialize(fields: dict, body: str) -> str:
     """Kehrt `parse` um. `serialize(*parse(x)) == x`, wenn `fields`/`body` unverändert sind."""
     raw_yaml = yaml.dump(

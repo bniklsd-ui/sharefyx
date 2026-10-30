@@ -1,6 +1,6 @@
 import pytest
 
-from storage.frontmatter import FrontmatterError, parse, serialize
+from storage.frontmatter import FrontmatterError, inline_text, normalize_item_fields, parse, serialize
 
 FIXTURES = [
     pytest.param(
@@ -89,3 +89,24 @@ def test_parse_wraps_yaml_error_as_frontmatter_error():
     jedem `except ValueError` im Kern vorbei."""
     with pytest.raises(FrontmatterError):
         parse("---\ntitle: [kaputt\n---\nx")
+
+
+@pytest.mark.parametrize("wert, text", [
+    (2026, "2026"), (1.0, "1.0"), (True, "true"), (["a", "b"], "[a, b]"), ({"a": 1}, "{a: 1}"),
+    (None, ""), ("x", "x"), (["2026-08-02"], "[2026-08-02]"), (["Ä ö"], "[Ä ö]"),
+])
+def test_inline_text_reads_like_the_yaml(wert, text):
+    """15.3 (B5): ein Nicht-String wird zu dem Text, der im YAML stand — nicht zu Pythons `str()`
+    (`True`, `['a', 'b']`). Kein `...`-Dokumentende, keine Timestamp-Quotes."""
+    assert inline_text(wert) == text
+
+
+def test_normalize_item_fields_leaves_share_fields_and_input_alone():
+    """15.3: `share_read: fabian` bleibt roh (eine Koerzion waere eine Rechteerweiterung ohne
+    Re-Auth), und `parse()`s Ergebnis wird nicht veraendert — `_write_version_only` schreibt es
+    zurueck, wie der Mensch es schrieb."""
+    roh = {"title": 5, "tags": "a", "links": None, "share_read": "fabian"}
+    assert normalize_item_fields(roh) == {
+        "title": "5", "tags": ["a"], "links": [], "share_read": "fabian",
+    }
+    assert roh == {"title": 5, "tags": "a", "links": None, "share_read": "fabian"}

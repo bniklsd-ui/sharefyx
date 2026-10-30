@@ -10,7 +10,7 @@ down:
   - ../../phase1_storage/storage/store.py               # Kern: `_asset_matches()`, `rebuild_index()`, Rename-Wiederaufnahme
   - ../../phase5_ui/webui/api.py                        # REST: Typprüfung, Mitglieder-Routen
   - ../../phase2_mcp/mcpserver/tools.py                 # MCP: Space-Name, `offset`
-updated: 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie empfohlen; Fund: doppelte `links:` = derselbe Startblocker) | 2026-10-30 (E1 Hotfix ja, E4 Opus — Nikinger) | 2026-10-30 (Entwurf + Schritt 15.1 gebaut, Claude Code — B1 geschlossen, am Code bestätigt und per Gegenlauf bewiesen)
+updated: 2026-10-30 (Schritt 15.3 gebaut, Opus — B5/B8 geschlossen: Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Fund `links: [1]`) | 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie empfohlen; Fund: doppelte `links:` = derselbe Startblocker) | 2026-10-30 (E1 Hotfix ja, E4 Opus — Nikinger) | 2026-10-30 (Entwurf + Schritt 15.1 gebaut, Claude Code — B1 geschlossen, am Code bestätigt und per Gegenlauf bewiesen)
 ---
 # P10.5 Block 15 — Die Fixes aus dem Ultra-Review
 
@@ -28,8 +28,8 @@ updated: 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie
 | B2 Rename-Marker | hoch, R | **ja** (2026-10-30): reproduziert, `os.rename` ohne Elternordner, Wiederaufnahme wirft in `Store.__init__` | **✅ 15.2** |
 | B3 fremde `.md` leert Index | hoch, R | **ja**: reproduziert, 0 von 3 indiziert, frischer Start wirft `FrontmatterError` | **✅ 15.2** |
 | B20 CRLF = kein Frontmatter | niedrig, R | **ja**: reproduziert | **✅ 15.2** |
-| B5 Nicht-String-Tags/Titel | hoch, R | offen — bei 15.3 | ⬜ |
-| B8 REST ohne Typprüfung | mittel, R/C | offen — bei 15.3 | ⬜ |
+| B5 Nicht-String-Tags/Titel | hoch, R | **ja** (2026-10-30): reproduziert, 8 Hand-Edit-Fälle; `title: [a, b]`/`title:` nach dem Neuaufbau unsichtbar | **✅ 15.3** |
+| B8 REST ohne Typprüfung | mittel, R/C | **ja**: `body:5` schrieb vor dem Wurf, `folder:123` = `AttributeError` | **✅ 15.3** |
 | B4 Mitglieder fremder Home-Spaces | hoch, R | offen — bei 15.4 | ⬜ |
 | B6 Space-Name ungeprüft | mittel, R | offen — bei 15.5 | ⬜ |
 | B7 Titel-Länge → Dateiname | mittel, R | offen — bei 15.5 | ⬜ |
@@ -67,7 +67,7 @@ neuen Wächter müssen genau an diesem Befund rot werden · **(e)** volle Suite 
 |---|---|---|---|
 | **15.1 ✅** | B1, B15 | `Store._asset_matches()`: formfalsche ID ⇒ `ItemNotFound` (= „nicht gefunden", kein Orakel); `ASSET_ID_RE` auf `\Z` (`$` ließ einen Zeilenumbruch durch) | Store (get/delete × 7 ID-Formen), MCP (Traversal liest fremdes Item), Store direkt (Traversal verschiebt fremde `.share.yml`), REST (`*`), `ASSET_ID_RE` |
 | **15.2 ✅** | B2, B3, B20 | Rename: Elternordner vor `os.rename` anlegen **oder** `ValidationError`; die Wiederaufnahme beim Start fängt jeden Fehler und startet trotzdem (Marker bleibt, `CRITICAL`). `rebuild_index`: je Datei fangen, Transaktion statt Teil-`DELETE`; CRLF im Frontmatter tolerieren | Marker-Szenario (Neustart nach fehlgeschlagenem Rename), `README.md` im Space (Index zählt die übrigen), CRLF-Datei |
-| **15.3** | B5, B8 | Kern: Frontmatter-Werte beim Lesen koerzieren (Tags → `str`, Titel → `str`), sonst Datei mit Pfad ablehnen; REST: Typprüfung in POST **und** PATCH (`title`/`folder`/`body`/`tags`); Link-Extraktion **vor** dem Schreiben rechnen, damit ein Fehler nie nach dem Write kommt | Hand-Edit `tags: [2026]` ⇒ Suche lebt; REST `tags:[1,2]` ⇒ 422; `body:5` ⇒ 422 **und** Datei unverändert, kein Versionssprung |
+| **15.3 ✅** | B5, B8 | Kern: Frontmatter-Werte beim Lesen koerzieren (Tags → `str`, Titel → `str`), sonst Datei mit Pfad ablehnen; REST: Typprüfung in POST **und** PATCH (`title`/`folder`/`body`/`tags`); Link-Extraktion **vor** dem Schreiben rechnen, damit ein Fehler nie nach dem Write kommt | Hand-Edit `tags: [2026]` ⇒ Suche lebt; REST `tags:[1,2]` ⇒ 422; `body:5` ⇒ 422 **und** Datei unverändert, kein Versionssprung |
 | **15.4** | B4 | `manages_space` statt `can_write` in beiden Mitglieder-Routen | Schreib-Gast ⇒ 403 auf add **und** remove; Eigentümer ⇒ 200 |
 | **15.5** | B6, B7 | Space-Name-Validierung an **einer** Stelle im Kern, aufgerufen von MCP- und REST-Schreibpfaden; Slug kürzen, Titel-Höchstlänge, `OSError` sauber abbilden | `space="team/"` ⇒ abgelehnt; 200 Umlaute im Titel ⇒ weder 500 noch halber Write |
 | **15.6** | B9, B10 | Einladungs-Pfad in die Redaktion (`request_log.py`, `logging_setup.py`); `search()` überspringt eine zwischenzeitlich verschwundene Datei | Log enthält den Token nicht; Such-Threads gegen Umbenennungen ⇒ kein `FileNotFoundError` |
@@ -161,3 +161,47 @@ was der Server nicht selbst entscheiden kann (Working style, 2026-10-22).
   Wiederaufnahme den Elternordner-Fix): ohne `frontmatter.py` **6 rot**, ohne `index.py` **5 rot**,
   ohne `store.py` **5 rot** — jede Datei hat eigene rote Wächter, keiner verdeckt einen anderen.
 
+## Anmerkungen 15.3 — B5/B8 (2026-10-30, Opus)
+
+- **Am Code reproduziert (tmp-`DATA_ROOT`), acht Hand-Edit-Fälle, Neuaufbau ehrlich erzwungen**
+  (ein zweiter `Store()` auf demselben Index baut **nicht** neu — der erste Probelauf war dadurch
+  wertlos, Advisor-Fund): `tags: [2026]` ⇒ Textsuche `TypeError` · `title: 2026` ⇒ Update
+  `AttributeError` · `title: [a, b]` und `title:` ⇒ nach `rebuild_index()` **unsichtbar** (15.2
+  überspringt sie) · `tags: abc` ⇒ drei Tags · `tags: [[x]]` ⇒ Suche `TypeError` · **Fund:**
+  `links: [1]` ⇒ `get()` und Update `TypeError` (`ITEM_REF_RE` auf `int`). REST: `body:5` schrieb
+  Datei und Index, warf danach.
+- **Zwei Funktionen, nie eine** (Advisor): **Lesen ist nachsichtig** —
+  `frontmatter.normalize_item_fields()` macht `title` zum String und `tags`/`links` zu
+  String-Listen, aufgerufen von **beiden** Lesepfaden (`store._item_from_text()`,
+  `index.row_from_file()`), damit Index und `get()` nie auseinanderlaufen. **Schreiben ist streng**
+  — `store._check_write_types()` in `create()`/`update()` (`title`/`body` String, `tags`/`links`/
+  `share_*` String-Liste) plus `type`/`status` in `_check_type_and_status()`; REST bildet die
+  `ValidationError` schon auf 422 ab. Teilten beide eine Funktion, würde `tags: [1, 2]` über REST
+  still zu `["1", "2"]` statt 422.
+- **Koerzion = „wie es im YAML stand"** (`frontmatter.inline_text()`): `2026` → `"2026"`, `true` →
+  `"true"` (nicht `True`), `[a, b]` → `"[a, b]"` (nicht `['a', 'b']`). Ein Skalar in `tags`/`links`
+  wird **ein** Eintrag (`tags: abc` → `["abc"]`), `~` fällt weg. `parse()` bleibt roh —
+  `_write_version_only` schreibt zurück, was der Mensch schrieb.
+- **Folge (wie gemischte Zeilenenden in 15.2):** erst der nächste echte Write normalisiert die Datei
+  — aus `tags: [2026]` wird `tags: ['2026']`, aus `title: 2026` wird `title: '2026'`.
+- **Kein Fehler nach dem Write** (B8, strukturell): `_write_item_file()` rechnet Text und Kanten
+  (`_link_rows()`, vorher `_replace_links_for_item()`) **vor** `atomic_write`. Wächter erzwingt
+  einen Wurf in der Link-Extraktion: Datei, Version, Git-Historie unverändert.
+- **REST:** nur, was **vor** dem Kern gebraucht wird — `visibility` String, `share_read`/
+  `share_write` String-Liste (das Re-Auth-Gate baut daraus einen `ShareState`; `frozenset(5)` war
+  500). `files.validate_folder()` lehnt Nicht-Strings mit `ValidationError` ab (vorher
+  `AttributeError` im PATCH). Der Rest prüft der Kern.
+- **Bewusst nicht gemacht — Befund für den Nikinger:** `share_read: fabian` (Hand-Edit, ohne
+  Liste) wird heute zu `frozenset("fabian")` = Freigabe an die Spaces `f`, `a`, `b`, … — zufällig
+  **fail-closed** (Fabian sieht nichts). Dieselbe Koerzion wie bei `tags` machte daraus eine echte
+  Freigabe an `fabian` **ohne Re-Auth**. Rechteerweiterung ist keine Typfrage → unverändert
+  gelassen, als Backlog-Punkt notiert.
+- **15.2-Wächter umgezielt:** `test_rebuild_skips_a_title_sqlite_cannot_bind` prüfte, dass
+  `title: [a, b]` die Datei kostet — genau das ändert 15.3. Jetzt
+  `test_rebuild_skips_a_value_sqlite_cannot_bind` mit `status: [a, b]` (der `ProgrammingError`-Zweig
+  bleibt bezeugt).
+- **Gegenlauf je Fix, im Code neutralisiert** (ein `git stash` von `frontmatter.py` bräche nur den
+  Import — alles rot, nichts bewiesen): Normalisierung aus **8 rot** · nur Index ohne **3** · nur
+  Store-Lesen ohne **7** · Schreib-Typprüfung aus **21** · Links nach dem Write **1** ·
+  `validate_folder` ohne Typprüfung **2** · REST-Frühprüfung aus **3**. Jeder Fix hat eigene rote
+  Wächter.

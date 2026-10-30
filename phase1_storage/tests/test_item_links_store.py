@@ -1,7 +1,7 @@
 """Phase 8 Block B Step B2 (P8-M, achte P1-Contract-Oeffnung).
 
 Store-Tests fuer `item_links`-Integration: jeder Schreibpfad (create/update/patch/append/
-move/archive) ruft intern `_write_item_file` -> `_replace_links_for_item`. Hier wird der
+move/archive) ruft intern `_write_item_file` -> `_link_rows` (bis 15.3 `_replace_links_for_item`). Hier wird der
 Kreis ueber `Store.links_all()` und ueber die Endpersistenz (Rebuild) geschlossen.
 """
 from __future__ import annotations

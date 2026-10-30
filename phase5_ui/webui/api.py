@@ -1378,6 +1378,17 @@ def api_routes(
         target_space = body.get("space")
         if target_space is not None and not isinstance(target_space, str):
             raise ApiError("validation_failed", "'space' muss ein String sein.")
+        # P10.5 15.3 (Ultra-Review B8): die Typen pruefen, die **vor** dem Kern gebraucht werden
+        # — das Re-Auth-Gate unten baut aus ihnen einen `ShareState` (`frozenset(5)` war ein 500,
+        # `frozenset("bob")` drei Ein-Buchstaben-Spaces). Alles Uebrige (`title`/`body`/`tags`/
+        # `links`/`folder`/`type`/`status`) prueft der Kern und wird hier zu 422.
+        if "visibility" in body and not isinstance(body["visibility"], str):
+            raise ApiError("validation_failed", "'visibility' muss ein String sein.")
+        for key in ("share_read", "share_write"):
+            if key in body and (
+                not isinstance(body[key], list) or not all(isinstance(v, str) for v in body[key])
+            ):
+                raise ApiError("validation_failed", f"'{key}' muss eine Liste von Strings sein.")
 
         # P6-AE (Step 7b, ITEM_MOVE_PLAN.md Sec2/Sec4.3): ein Space-Wechsel verlangt space-level
         # Schreibrecht auf QUELLE UND ZIEL — strenger als der item-level Check oben, weil ein
