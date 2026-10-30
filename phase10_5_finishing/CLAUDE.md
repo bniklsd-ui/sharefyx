@@ -14,7 +14,7 @@ down:
   - MODULSTATUS_ARCHIVE.md                         # 📦 die ausführlichen Statusspalten der Blöcke 0–10, verbatim
   - ABNAHME_ARCHIVE.md                             # 📦 die geschlossenen Abnahmezeilen (P10.5-1–72), verbatim
   - FREIGABEN_ARCHIVE.md                           # 📦 die Freigaben der Phase, verbatim
-updated: 2026-10-29 (Session-Ende: Block 14 ✅; Ultra-Review-Prompt und Launch-Film-Notiz) | 2026-10-29 (Sichtung P10.5-70 ✅ — 67 ✅ · 0 ⚠️ · 7 ⬜; Block 14 fertig) | 2026-10-29 (14.7.5: P10.5-73/74 ✅ — 66 ✅ · 0 ⚠️ · 8 ⬜ von 74; Update-Log) | 2026-10-29 (14.7.3/14.7.4: Werte gesetzt, Wächter und Gegenläufe nachgezogen) | 2026-10-29 (14.7.2: Raster gemessen, Konturfehler bei krummer Zellgröße behoben — STOPP E1 + E2) | 2026-10-29 (14.7.1: die Hebel gebaut, Nullwerte = Block 14) | 2026-10-29 (14.7.0 (a)+(c): Basislinie der Form, P10.5-73/74 ⬜ — 64 ✅ · 0 ⚠️ · 10 ⬜; Plan §2.2 neu: `LOBE_SCALE`) | 2026-10-29 (14.7.0 (b): Ursache B4 = Chaos, nicht Überlauf — STOPP, Vorschlag beim Nikinger) | 2026-10-29 (Plan 14.7: kompakt + verteilt + glatt — Ausführung Claude Code, Nikinger-Entscheidung) | 2026-10-29 (14.6.4, Claude Code: Update-Log-Zeile „ein Gebilde“ statt „eigene Insel“; Vorbefund der Bilder für P10.5-70 — „geordnet“ ja, „gehirn-ähnlich“ nein) | 2026-10-28 (Block 14.6.3: die Belege neu — **P10.5-72** ✅, 64 ✅ · 0 ⚠️ · 8 ⬜) | 2026-10-28 (Block 14.6.2: der Wert steht — 160; der Wächter `koerper` beißt) | 2026-10-28 (Block 14.6.1: der Algorithmus steht, die sechs Varianten sind gemessen — der kleinste Wert mit EINER Komponente ist 160; STOPP E1) | 2026-10-28 (Block 14.6.0: die Basislinie der Karte gemessen — 5 Komponenten, 0 Furche-Zellen, 35,0 ms bei 201 Knoten) | 2026-10-28 (Plan 14.6: aus Inseln wird ein Körper — Nikinger-Entscheidung Option B, Ausführer M3.1 Flash) | 2026-10-28 (Nachzug 14.5: die Lappen-Kontur am Rasterrand war **offen** — beim Sichten der Bilder gefunden, behoben, Bilder neu; Update-Log-Zeile geschrieben) | 2026-10-28 (Block 14.5: die drei Kartenbilder — und der **gemessene** Rand-Fall aus §2.5: die Lappen-Kontur stand 3,8 px über dem Leinwandrand ⇒ `FIT_MARGIN` 40 → 56 px, jetzt 10,7 px Luft; Füllgrad 93,6 % → 91,1 %; P10.5-70 wartet auf die Sichtung) | 2026-10-27 (Block 14.4: die Startwerte gemessen — 37 Varianten, alle zehn Werte bleiben; der Gegenlauf `region` schließt die Lücke von P10.5-66; die Block-8-Probe wartet jetzt auf das richtige Ruhe-Signal) | 2026-10-27 (Block 14.35: die Beschriftungen ohne Überlappung — 0 überlappende Paare, 3 von 13 weggelassen, der Fokus bleibt; P10.5-71 ✅) | 2026-10-26 (Block 14.3: die Kamera — `fitView()`; Füllgrad 93,6 %, Versatz 0,42 px; E3: `ZOOM_MIN` bleibt 0,5; P10.5-67 ✅) | 2026-10-26 (Block 14.2: die L4 — Anker-Gravitation, Querfedern, `ALPHA_START_SEEDED`; Regionen 152/152, Stabilität Median 0,0 px, Budget 201 Knoten/2147 ms; P10.5-66/68/69 ✅) | 2026-10-26 (Block 14.1: L1–L3 — der Seed wird zum Weltgenerator; fünf Seed-Zellen grün, fünf Gegenläufe rot an genau ihrer Zelle; P10.5-65 geschlossen) | 2026-10-26 (Block 14.0: die Basislinie des Kartenlayouts — die Probe steht, die Abnahmezeilen 65–71 sind im Head; rot in Regionen/Kamera/Beschriftungen/Stabilität, grün in Determinismus/Budget; B5 widerlegt) | 2026-10-25 (Block 13: die vier Aufträge des Nikingers gebaut — Editor-Größen live, Knopfleiste nach Word, Knopffarben transparent-blau, ganze Gehirnkarte; P10.5-62/63/64 ✅, 54 ✅ · 10 ⬜) | 2026-10-25 (Block 12: Doku und Altlasten — DO-1, LG-6, AL-1/AL-3, BG-2/BG-3, Register-Bilanz per Skript; P10.5-57/58/59 ✅, 51 ✅ · 10 ⬜) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-10-30 (Ultra-Review gesichert: 22 Befunde, B1 kritisch auch live — nächster Block die Fixes) | 2026-10-29 (Session-Ende: Block 14 ✅; Ultra-Review-Prompt und Launch-Film-Notiz) | 2026-10-29 (Sichtung P10.5-70 ✅ — 67 ✅ · 0 ⚠️ · 7 ⬜; Block 14 fertig) | 2026-10-29 (14.7.5: P10.5-73/74 ✅ — 66 ✅ · 0 ⚠️ · 8 ⬜ von 74; Update-Log) | 2026-10-29 (14.7.3/14.7.4: Werte gesetzt, Wächter und Gegenläufe nachgezogen) | 2026-10-29 (14.7.2: Raster gemessen, Konturfehler bei krummer Zellgröße behoben — STOPP E1 + E2) | 2026-10-29 (14.7.1: die Hebel gebaut, Nullwerte = Block 14) | 2026-10-29 (14.7.0 (a)+(c): Basislinie der Form, P10.5-73/74 ⬜ — 64 ✅ · 0 ⚠️ · 10 ⬜; Plan §2.2 neu: `LOBE_SCALE`) | 2026-10-29 (14.7.0 (b): Ursache B4 = Chaos, nicht Überlauf — STOPP, Vorschlag beim Nikinger) | 2026-10-29 (Plan 14.7: kompakt + verteilt + glatt — Ausführung Claude Code, Nikinger-Entscheidung) | 2026-10-29 (14.6.4, Claude Code: Update-Log-Zeile „ein Gebilde“ statt „eigene Insel“; Vorbefund der Bilder für P10.5-70 — „geordnet“ ja, „gehirn-ähnlich“ nein) | 2026-10-28 (Block 14.6.3: die Belege neu — **P10.5-72** ✅, 64 ✅ · 0 ⚠️ · 8 ⬜) | 2026-10-28 (Block 14.6.2: der Wert steht — 160; der Wächter `koerper` beißt) | 2026-10-28 (Block 14.6.1: der Algorithmus steht, die sechs Varianten sind gemessen — der kleinste Wert mit EINER Komponente ist 160; STOPP E1) | 2026-10-28 (Block 14.6.0: die Basislinie der Karte gemessen — 5 Komponenten, 0 Furche-Zellen, 35,0 ms bei 201 Knoten) | 2026-10-28 (Plan 14.6: aus Inseln wird ein Körper — Nikinger-Entscheidung Option B, Ausführer M3.1 Flash) | 2026-10-28 (Nachzug 14.5: die Lappen-Kontur am Rasterrand war **offen** — beim Sichten der Bilder gefunden, behoben, Bilder neu; Update-Log-Zeile geschrieben) | 2026-10-28 (Block 14.5: die drei Kartenbilder — und der **gemessene** Rand-Fall aus §2.5: die Lappen-Kontur stand 3,8 px über dem Leinwandrand ⇒ `FIT_MARGIN` 40 → 56 px, jetzt 10,7 px Luft; Füllgrad 93,6 % → 91,1 %; P10.5-70 wartet auf die Sichtung) | 2026-10-27 (Block 14.4: die Startwerte gemessen — 37 Varianten, alle zehn Werte bleiben; der Gegenlauf `region` schließt die Lücke von P10.5-66; die Block-8-Probe wartet jetzt auf das richtige Ruhe-Signal) | 2026-10-27 (Block 14.35: die Beschriftungen ohne Überlappung — 0 überlappende Paare, 3 von 13 weggelassen, der Fokus bleibt; P10.5-71 ✅) | 2026-10-26 (Block 14.3: die Kamera — `fitView()`; Füllgrad 93,6 %, Versatz 0,42 px; E3: `ZOOM_MIN` bleibt 0,5; P10.5-67 ✅) | 2026-10-26 (Block 14.2: die L4 — Anker-Gravitation, Querfedern, `ALPHA_START_SEEDED`; Regionen 152/152, Stabilität Median 0,0 px, Budget 201 Knoten/2147 ms; P10.5-66/68/69 ✅) | 2026-10-26 (Block 14.1: L1–L3 — der Seed wird zum Weltgenerator; fünf Seed-Zellen grün, fünf Gegenläufe rot an genau ihrer Zelle; P10.5-65 geschlossen) | 2026-10-26 (Block 14.0: die Basislinie des Kartenlayouts — die Probe steht, die Abnahmezeilen 65–71 sind im Head; rot in Regionen/Kamera/Beschriftungen/Stabilität, grün in Determinismus/Budget; B5 widerlegt) | 2026-10-25 (Block 13: die vier Aufträge des Nikingers gebaut — Editor-Größen live, Knopfleiste nach Word, Knopffarben transparent-blau, ganze Gehirnkarte; P10.5-62/63/64 ✅, 54 ✅ · 10 ⬜) | 2026-10-25 (Block 12: Doku und Altlasten — DO-1, LG-6, AL-1/AL-3, BG-2/BG-3, Register-Bilanz per Skript; P10.5-57/58/59 ✅, 51 ✅ · 10 ⬜) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -190,29 +190,35 @@ stehen im Commit und im Session-Block.
 > Deploys **C** (`v3.1.7`) und **D** (`v3.1.8`, jetzt **mit** den Änderungen aus Block 13) liegen
 > beim Nikinger.
 
-## Session stopped — 2026-10-29 (Block 14 fertig — P10.5-70 abgenommen; Ultra-Review und Launch-Film notiert)
+## Session stopped — 2026-10-30 (Ultra-Review gesichert — v4.0.0 nicht freigabefähig; nächster Block: die Fixes)
 
-**Ergebnis.** **Block 14 (Kartenlayout) ist fertig.** Der Nikinger hat alle drei Kartenbilder
-abgenommen (P10.5-70 ✅, im `ABNAHME_ARCHIVE.md`). Summe **67 ✅ · 0 ⚠️ · 7 ⬜ (von 74)** — offen
-sind nur noch die Live-Zeilen (18, 22, 27, 28, 49, 60) und der Closeout (61).
+**Ergebnis.** Das Ultra-Review (Prompt 4) ist gelaufen. Es brach einmal ab (Sicherheitsfilter
+`[cyber]` von Fable 5.1), der Nikinger hat dieselbe Session fortgesetzt — **kein** zweites
+Ultra-Review verbraucht. Der Bericht lag nur im Container der Review-Session; er steht jetzt
+**verbatim** in `docs/concepts/phase10_5_ultra_review_v4.0.0.md` (📕).
 
-**Diese Session (2026-10-29, Claude Code):** 14.6.4 (Update-Log, Vorbefund „Seestern"), Plan
-und Bau von **Block 14.7** (`docs/concepts/phase10_5_block14_7_plan.md`): Ursache der
-Stabilitätsbrüche gemessen (Chaos, nicht Überlauf), Hexgitter + `LOBE_SCALE` 1,5 + Glättung 2,
-**Fund im Produktcode behoben** (die Kontur zerfiel bei krummer Zellgröße), zwei Gegenläufe
-ehrlicher neu gebaut. Solidität 0,497 → 0,830, Punktabstand 25,1 → 35,95 px.
+**Urteil des Reviews: v4.0.0 ist so nicht freigabefähig.** 22 Befunde: **1 kritisch, 4 hoch,
+7 mittel, 10 niedrig**. Der Kern (Versionierung, atomare Writes, OAuth/TOTP, CSRF, Sanitizer)
+ist laut Review solide; die Lücken liegen an den Rändern.
 
-**Neu notiert:** **Prompt 4 — Ultra-Review** in `docs/PROMPTS.md` (zehn Kategorien, Befunde mit
-Datei:Zeile, Schweregrad, Szenario, Gewissheit) und die **Notiz zum Launch-Film**
-(`docs/concepts/phase10_5_launch_film_plan.md`: Auftrag wörtlich, Material aus dem Update-Log,
-sieben offene Fragen — der Nikinger klärt sie separat; externe Werkzeuge erlaubt).
+**Dringend — B1 (kritisch) betrifft auch die laufende Version.** Am Code bestätigt
+(Claude Code, 2026-10-30): `phase1_storage/storage/store.py:1483` und `:1501` setzen die
+`asset_id` ungeprüft in `Path.glob()` ein; `files.ASSET_ID_RE` existiert und wird nur beim
+Hochladen geprüft (Z. 1461). Der Code steht seit **2026-08-20** — also auch im Live-Dienst. Über
+MCP `get_item_asset`/`delete_asset` liest bzw. verschiebt ein angemeldeter Principal Dateien
+außerhalb seines Space (laut Review reproduziert: fremde Items, `.share.yml`, Auth-DB-WAL).
+Beide Nutzer sind vertrauenswürdig, das mildert das Risiko, behebt es nicht.
 
-**Offen benannt:** die `computeLobes()`-Zeit rauscht nah an der 50-ms-Grenze (40–63 ms).
+**Nächster Block — Fixes vor Deploy D (Reihenfolge des Reviews):**
+1. **B1** `asset_id` validieren (Store, MCP-Tool, REST-Route) + Gegenlauf-Test. **Entscheidung
+   des Nikingers:** B1 als **Hotfix** vorab auf die Live-Version, oder mit Deploy D?
+2. **B2 + B3** der Dienststart darf nie an Daten scheitern (Rename-Marker, fremde `.md`, CRLF B20).
+3. **B5 + B8** Typkoerzion im Kern, Typprüfung in REST.
+4. **B4** `manages_space` in den Mitglieder-Routen.
+5. **B6, B7, B9, B10** im selben Schnitt; B11–B22 Backlog.
+Plan dafür zuerst (Muster der Block-14-Pläne, je Befund Wächter + Gegenlauf), dann Bau.
 
-**Nächster Schritt (in dieser Reihenfolge):**
-1. **Ultra-Review** — der Nikinger startet es mit Prompt 4 (`/code-review ultra`; ein Agent kann
-   es nicht selbst auslösen). Befunde danach als eigener Block.
-2. **Launch-Film** — die sieben Fragen der Notiz klären, dann Plan und Umsetzung.
-3. **Deploy D** (`v4.0.0`, mit Block 13 + 14) — am Deploy-Tag setzt Claude Code die oberste
-   Überschrift in `docs/UPDATE_LOG.md` auf das Datum (Gate in `deploy.sh`); `deploy.sh` und
-   `health_gate.sh` fährt der Nikinger.
+**Danach:** Launch-Film (Notiz `docs/concepts/phase10_5_launch_film_plan.md`, Fragen offen),
+dann Deploy D `v4.0.0`.
+
+**Tests.** volle Suite **1659** grün, `doc_health` 0. Kein Produktcode geändert.
