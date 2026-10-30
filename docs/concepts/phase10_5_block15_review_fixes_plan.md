@@ -10,7 +10,7 @@ down:
   - ../../phase1_storage/storage/store.py               # Kern: `_asset_matches()`, `rebuild_index()`, Rename-Wiederaufnahme
   - ../../phase5_ui/webui/api.py                        # REST: Typprüfung, Mitglieder-Routen
   - ../../phase2_mcp/mcpserver/tools.py                 # MCP: Space-Name, `offset`
-updated: 2026-10-30 (Schritt 15.3b gebaut, Opus — E5: `share_*`-Skalar = eine Freigabe, `WARNING` mit Pfad) | 2026-10-30 (E5 entschieden — `share_*`-Skalar = eine Freigabe, Schritt 15.3b) | 2026-10-30 (Schritt 15.3 gebaut, Opus — B5/B8 geschlossen: Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Fund `links: [1]`) | 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie empfohlen; Fund: doppelte `links:` = derselbe Startblocker) | 2026-10-30 (E1 Hotfix ja, E4 Opus — Nikinger) | 2026-10-30 (Entwurf + Schritt 15.1 gebaut, Claude Code — B1 geschlossen, am Code bestätigt und per Gegenlauf bewiesen)
+updated: 2026-10-30 (Schritt 15.4 gebaut, Opus — B4 geschlossen, drei Stellen statt zwei) | 2026-10-30 (Schritt 15.3b gebaut, Opus — E5: `share_*`-Skalar = eine Freigabe, `WARNING` mit Pfad) | 2026-10-30 (E5 entschieden — `share_*`-Skalar = eine Freigabe, Schritt 15.3b) | 2026-10-30 (Schritt 15.3 gebaut, Opus — B5/B8 geschlossen: Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Fund `links: [1]`) | 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie empfohlen; Fund: doppelte `links:` = derselbe Startblocker) | 2026-10-30 (E1 Hotfix ja, E4 Opus — Nikinger) | 2026-10-30 (Entwurf + Schritt 15.1 gebaut, Claude Code — B1 geschlossen, am Code bestätigt und per Gegenlauf bewiesen)
 ---
 # P10.5 Block 15 — Die Fixes aus dem Ultra-Review
 
@@ -30,7 +30,8 @@ updated: 2026-10-30 (Schritt 15.3b gebaut, Opus — E5: `share_*`-Skalar = eine 
 | B20 CRLF = kein Frontmatter | niedrig, R | **ja**: reproduziert | **✅ 15.2** |
 | B5 Nicht-String-Tags/Titel | hoch, R | **ja** (2026-10-30): reproduziert, 8 Hand-Edit-Fälle; `title: [a, b]`/`title:` nach dem Neuaufbau unsichtbar | **✅ 15.3** |
 | B8 REST ohne Typprüfung | mittel, R/C | **ja**: `body:5` schrieb vor dem Wurf, `folder:123` = `AttributeError` | **✅ 15.3** |
-| B4 Mitglieder fremder Home-Spaces | hoch, R | offen — bei 15.4 | ⬜ |
+| B4 Mitglieder fremder Home-Spaces | hoch, R | **ja** (2026-10-30): reproduziert, add/remove 200, `manageable: true` | **✅ 15.4** |
+| B4′ `share_*` fremder Home-Space-Items (Fund 15.4) | — (nicht im Review), C | **ja**: `_items_patch` prüft nur `can_write_item_as_human` + eigene Re-Auth | ⬜ Nikinger |
 | B6 Space-Name ungeprüft | mittel, R | offen — bei 15.5 | ⬜ |
 | B7 Titel-Länge → Dateiname | mittel, R | offen — bei 15.5 | ⬜ |
 | B9 Einladungs-Token im Log | mittel, R | offen — bei 15.6 | ⬜ |
@@ -70,7 +71,7 @@ neuen Wächter müssen genau an diesem Befund rot werden · **(e)** volle Suite 
 | **15.2 ✅** | B2, B3, B20 | Rename: Elternordner vor `os.rename` anlegen **oder** `ValidationError`; die Wiederaufnahme beim Start fängt jeden Fehler und startet trotzdem (Marker bleibt, `CRITICAL`). `rebuild_index`: je Datei fangen, Transaktion statt Teil-`DELETE`; CRLF im Frontmatter tolerieren | Marker-Szenario (Neustart nach fehlgeschlagenem Rename), `README.md` im Space (Index zählt die übrigen), CRLF-Datei |
 | **15.3 ✅** | B5, B8 | Kern: Frontmatter-Werte beim Lesen koerzieren (Tags → `str`, Titel → `str`), sonst Datei mit Pfad ablehnen; REST: Typprüfung in POST **und** PATCH (`title`/`folder`/`body`/`tags`); Link-Extraktion **vor** dem Schreiben rechnen, damit ein Fehler nie nach dem Write kommt | Hand-Edit `tags: [2026]` ⇒ Suche lebt; REST `tags:[1,2]` ⇒ 422; `body:5` ⇒ 422 **und** Datei unverändert, kein Versionssprung |
 | **15.3b ✅** | E5 | `share_read`/`share_write` in `normalize_item_fields()` (Skalar = eine Freigabe), `WARNING` mit Pfad; Docstring-Satz „bewusst nicht“ ersetzen | Hand-Edit `share_read: fabian` ⇒ `acl_of()` = `{fabian}`, Update schreibt `[fabian]`, Log trägt den Pfad |
-| **15.4** | B4 | `manages_space` statt `can_write` in beiden Mitglieder-Routen | Schreib-Gast ⇒ 403 auf add **und** remove; Eigentümer ⇒ 200 |
+| **15.4 ✅** | B4 | `manages_space` statt `can_write` in beiden Mitglieder-Routen | Schreib-Gast ⇒ 403 auf add **und** remove; Eigentümer ⇒ 200 |
 | **15.5** | B6, B7 | Space-Name-Validierung an **einer** Stelle im Kern, aufgerufen von MCP- und REST-Schreibpfaden; Slug kürzen, Titel-Höchstlänge, `OSError` sauber abbilden | `space="team/"` ⇒ abgelehnt; 200 Umlaute im Titel ⇒ weder 500 noch halber Write |
 | **15.6** | B9, B10 | Einladungs-Pfad in die Redaktion (`request_log.py`, `logging_setup.py`); `search()` überspringt eine zwischenzeitlich verschwundene Datei | Log enthält den Token nicht; Such-Threads gegen Umbenennungen ⇒ kein `FileNotFoundError` |
 | **15.7** | — | Volle Suite, `doc_health`, Update-Log-Zeile (nur Menschen-relevantes), Head-Bilanz | — |
@@ -255,3 +256,43 @@ was der Server nicht selbst entscheiden kann (Working style, 2026-10-22).
   Blockliste (`share_read:` + `- x`-Zeilen), nicht leer, nicht `~`, nicht `._trash/`. **Harmloser
   Fehltreffer:** `share_read: null` (liest sich als keine Freigabe). Jeder echte Treffer: von Hand
   auf `[name]` umschreiben, **vor** dem Deploy.
+
+## Anmerkungen 15.4 — B4 (2026-10-30, Opus)
+
+- **Am Code reproduziert (In-Process-App, tmp-`DATA_ROOT`, tmp-`auth.sqlite3`):** `bob` ist
+  Principal, `bob/.share.yml` = `write: [niklas]`, `read: [carol]`. Als `niklas`: `POST
+  /api/v1/spaces/bob/members {mallory, write}` mit Re-Auth ⇒ **200** (Datei geändert), `DELETE
+  …/members/carol` ⇒ **200**, `GET …/members` ⇒ `manageable: true` (und `orphans` befüllt).
+- **Drei Stellen, nicht zwei:** der Plan nannte die beiden Schreib-Routen; `manageable` im GET ist
+  dieselbe Frage (es schaltet den Verwalter-Hinweis `orphans` frei) — Advisor-Hinweis, mitgenommen.
+  `_spaces_delete` behält `can_write`: ein Home-Space wird dort schon vorher abgewiesen, und in
+  einem Team-Space ist `can_write` == `manages_space`.
+- **Warum `manages_space` und keine neue Prüfung:** die Funktion trägt genau diese Regel schon für
+  Ordner (P10-I) und Verschieben/Löschen (P9-K): eigener Space immer, Team-Space mit space-level
+  `write:`, fremder Home-Space nie. Eine zweite Formulierung derselben Regel würde auseinanderlaufen.
+  Fehlertext jetzt „Keine Verwaltungsrechte für diesen Space.“ (kein Test, kein JS prüfte den alten).
+- **Wächter (4):** Gast add ⇒ 403 + Datei byteweise gleich · Gast remove ⇒ 403 + Datei gleich ·
+  Gast GET ⇒ `manageable: false`, `orphans: []` · Team-Space `write:` ⇒ add/remove 200
+  (Regressionsschutz, grün mit und ohne Fix). Eigentümer ⇒ 200 deckten die P7-Tests schon.
+- **Gegenlauf:** `api.py` per `git stash` entfernt ⇒ genau die drei Gast-Wächter rot, 23 grün.
+- **Datierte Abweichung von P7-L / N7 (gelockt, `phase7_spaces_admin_plan.md` §0.3/§0.4) —
+  durch den Nikinger-Auftrag vom 2026-10-30** („`manages_space` statt `can_write` in beiden
+  Mitglieder-Routen“): P7-L sagte „verwalten darf, wer im Ziel-Space `write:` hat“. Das gilt ab
+  15.4 nur noch für **Team-Spaces** und den eigenen; in einem **fremden Home-Space** ist `write:`
+  Gastrecht. Die Regel P7-L entstand vor dem Home-Space-Begriff (P10-I, Block 2). **Folge, die man
+  merken muss:** ein Gast kann sich aus einem fremden Home-Space **nicht mehr selbst austragen**
+  (vorher ja — als Nebenprodukt von N7; §0.4 Punkt 1 nannte die Selbstaussperrung eine
+  hingenommene Kehrseite, kein Recht). Rückweg: der Eigentümer, oder `spacectl.py remove-member`.
+  **Offene Frage an den Nikinger:** soll `DELETE …/members/<eigener Name>` für den Gast erlaubt
+  bleiben (verengt nur den eigenen Zugriff)? Eine Zeile plus Wächter — nicht gebaut, weil der
+  Auftrag „beide Routen“ lautete.
+- **Fund (nicht im Review, am Code gelesen — C, nicht reproduziert): dieselbe Frage eine Ebene
+  tiefer.** `PATCH /api/v1/items/{id}` mit `share_read`/`share_write`/`visibility` prüft für ein
+  Item in einem fremden Home-Space nur `can_write_item_as_human()` und die **eigene** Re-Auth des
+  Gasts — `folder` hat dort einen Eigentümer-Riegel, `share_*` nicht. Ein Schreib-Gast in Bobs
+  Home-Space kann damit Bobs Items an `mallory` freigeben. MCP ist nicht betroffen (`share_*` über
+  kein Werkzeug änderbar). **Kein Fix in 15.4** (außerhalb des Auftrags) — Kandidat für 15.5/15.6
+  oder Backlog, Entscheidung beim Nikinger.
+- **UI-Rest, nicht gebaut:** `spaces.js :: selectSpace()` zeigt die Knöpfe unabhängig von
+  `manageable` — ein Gast klickt und bekommt jetzt die 403-Meldung. Backlog (UI-Schnitt), kein
+  Rechte-Befund mehr.

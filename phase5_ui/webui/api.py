@@ -842,7 +842,10 @@ def api_routes(
         if not permissions.can_read(session.space, space):
             raise ApiError("forbidden", "Keine Leserechte für diesen Space.")
         grant = store.acl_reader.grants_for_space(space)
-        manageable = permissions.can_write(session.space, space)
+        # P10.5 Block 15.4 (Ultra-Review B4): verwalten, nicht nur schreiben — in einem fremden
+        # Home-Space ist `write:` Gastrecht (wie bei Ordnern, P10-I), die Rechteliste bleibt beim
+        # Eigentuemer. Dieselbe Pruefung in POST und DELETE unten.
+        manageable = permissions.manages_space(session.space, space)
         # Tippfehler-Fänger, nicht "wer referenziert MICH" (das ist `spacectl.py check`s/C4s
         # Job, `acl.spaces_referencing()`) — Advisor-Fund: der Plan-Satz nannte die falsche
         # Funktion für die beschriebene Semantik ("Namen ohne zugehörigen Space" ==
@@ -873,8 +876,8 @@ def api_routes(
             raise ApiError("not_found", "Nicht gefunden.")
         await _require_csrf_json(request, session)
         space = request.path_params["space"]
-        if not permissions.can_write(session.space, space):
-            raise ApiError("forbidden", "Keine Schreibrechte für diesen Space.")
+        if not permissions.manages_space(session.space, space):  # 15.4 (B4), siehe GET
+            raise ApiError("forbidden", "Keine Verwaltungsrechte für diesen Space.")
         body = await _json_body(request)
         name = body.get("name")
         if not isinstance(name, str) or not name:
@@ -894,8 +897,8 @@ def api_routes(
             raise ApiError("not_found", "Nicht gefunden.")
         await _require_csrf_json(request, session)
         space = request.path_params["space"]
-        if not permissions.can_write(session.space, space):
-            raise ApiError("forbidden", "Keine Schreibrechte für diesen Space.")
+        if not permissions.manages_space(session.space, space):  # 15.4 (B4), siehe GET
+            raise ApiError("forbidden", "Keine Verwaltungsrechte für diesen Space.")
         name = request.path_params["name"]
         # Kein `require_space_reauth()`-Aufruf hier — Rücknahme braucht kein Re-Auth (P7-N).
         acl.remove_member(store.data_root, space, name)

@@ -392,3 +392,91 @@ async def test_remove_member_without_write_grant_is_forbidden(app, item_store, t
             "/api/v1/spaces/fremd/members/fabian", headers=_headers(csrf),
         )
     assert response.status_code == 403
+
+
+# -- P10.5 Block 15.4 (Ultra-Review B4): Mitglieder eines fremden Home-Space -----------------
+#
+# Bob gibt `niklas` `write:` auf seinen Home-Space. Das macht `niklas` dort zum Schreib-Gast,
+# nicht zum Verwalter: Ordner anlegen und Loeschen sind dort schon 403 (P10-I, P9-K), die
+# Rechteliste des Eigentuemers zu aendern war es nicht — die Routen fragten `can_write`.
+
+
+@pytest.fixture
+def bob_home(item_store, auth_store, dek):
+    """Ein zweiter **Home**-Space (`bob` ist Principal), in dem `niklas` Schreib-Gast ist."""
+    auth_store.upsert_user(
+        "bob",
+        password_hash=passwords.hash_password("bob password"),
+        totp_secret_enc=seal(b"JBSWY3DPEHPK3PXP", key=dek, aad=b"bob"),
+        totp_alg="SHA1",
+        totp_confirmed_at=None,
+        status="active",
+    )
+    (item_store.data_root / "bob").mkdir()
+    (item_store.data_root / "bob" / ".share.yml").write_text(
+        f"write: [{SPACE}]\nread: [carol]\n", encoding="utf-8",
+    )
+    return item_store.data_root / "bob" / ".share.yml"
+
+
+@pytest.mark.asyncio
+async def test_write_guest_cannot_add_members_to_a_foreign_home_space(app, bob_home, totp_code, clock):
+    """B4: vorher 200, und `mallory` stand mit Schreibrecht in Bobs `.share.yml`."""
+    vorher = bob_home.read_bytes()
+    async with _client(app) as client:
+        csrf = await _login(client, totp_code)
+        clock.advance(31)
+        response = await client.post(
+            "/api/v1/spaces/bob/members",
+            json={"name": "mallory", "write": True, "password": PASSWORD, "totp": totp_code()},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 403
+    assert response.json()["error"] == "forbidden"
+    assert bob_home.read_bytes() == vorher
+
+
+@pytest.mark.asyncio
+async def test_write_guest_cannot_remove_members_of_a_foreign_home_space(app, bob_home, totp_code):
+    """B4: vorher 200 — ein Gast nahm dem Eigentuemer seine Leser (oder sich selbst Mitstreiter)."""
+    vorher = bob_home.read_bytes()
+    async with _client(app) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.delete("/api/v1/spaces/bob/members/carol", headers=_headers(csrf))
+    assert response.status_code == 403
+    assert response.json()["error"] == "forbidden"
+    assert bob_home.read_bytes() == vorher
+
+
+@pytest.mark.asyncio
+async def test_write_guest_sees_a_foreign_home_space_as_not_manageable(app, bob_home, totp_code):
+    """B4: `manageable` steuert die Knoepfe im Dialog — vorher `true`, und `orphans` (nur fuer
+    Verwalter) ging mit. Lesen der Mitgliederliste bleibt erlaubt (`can_read`)."""
+    async with _client(app) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.get("/api/v1/spaces/bob/members", headers=_headers(csrf))
+    assert response.status_code == 200
+    body = response.json()
+    assert body["home"] is True
+    assert body["manageable"] is False
+    assert body["orphans"] == []
+
+
+@pytest.mark.asyncio
+async def test_write_member_still_manages_a_team_space(app, item_store, totp_code, clock):
+    """B4, Gegenprobe: in einem **Team**-Space bleibt `write:` Verwalterrecht — der Fix darf
+    nur fremde Home-Spaces sperren (`manages_space`: Team-Space + space-level `write:`)."""
+    (item_store.data_root / "team").mkdir()
+    (item_store.data_root / "team" / ".share.yml").write_text(f"write: [{SPACE}]\n", encoding="utf-8")
+    async with _client(app) as client:
+        csrf = await _login(client, totp_code)
+        clock.advance(31)
+        added = await client.post(
+            "/api/v1/spaces/team/members",
+            json={"name": "fabian", "password": PASSWORD, "totp": totp_code()},
+            headers=_headers(csrf),
+        )
+        removed = await client.delete("/api/v1/spaces/team/members/fabian", headers=_headers(csrf))
+    assert added.status_code == 200
+    assert removed.status_code == 200
+    assert _share_yml(item_store.data_root, "team") == {"write": [SPACE]}
