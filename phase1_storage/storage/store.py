@@ -131,9 +131,12 @@ def _format_dt(value: datetime) -> str:
     return value.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def _item_from_text(text: str, *, version_override: int | None = None, folder_override: str = "") -> Item:
+def _item_from_text(
+    text: str, *, version_override: int | None = None, folder_override: str = "", source=None,
+) -> Item:
     fields, body = parse_frontmatter(text)
-    fields = normalize_item_fields(fields)  # 15.3 (B5): Lesen ist nachsichtig
+    # 15.3 (B5): Lesen ist nachsichtig · 15.3b (E5): `source` nennt die Datei in der Warnung
+    fields = normalize_item_fields(fields, source=source)
     extra = {k: v for k, v in fields.items() if k not in _KNOWN_FIELDS}
     return Item(
         id=fields["id"],
@@ -396,6 +399,7 @@ class Store:
             path.read_text(encoding="utf-8"),
             version_override=row["version"],
             folder_override=files.folder_from_path(self._data_root, row["space"], path),
+            source=path,
         )
 
     def _reconcile_and_get_row(self, item_id: str, *, repair_drift: bool = True) -> sqlite3.Row:
@@ -750,7 +754,7 @@ class Store:
             if path.name.startswith("."):
                 continue
             try:
-                item = _item_from_text(path.read_text(encoding="utf-8"))
+                item = _item_from_text(path.read_text(encoding="utf-8"), source=path)
             except (OSError, ValueError, KeyError) as exc:
                 # Eine kaputte Datei darf den Rename nicht abbrechen — aber sie wird **nicht**
                 # stillschweigend übergangen: `logger.critical`, und der Index zählt sie nicht.

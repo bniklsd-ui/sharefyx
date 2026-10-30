@@ -10,7 +10,7 @@ down:
   - ../../phase1_storage/storage/store.py               # Kern: `_asset_matches()`, `rebuild_index()`, Rename-Wiederaufnahme
   - ../../phase5_ui/webui/api.py                        # REST: Typprüfung, Mitglieder-Routen
   - ../../phase2_mcp/mcpserver/tools.py                 # MCP: Space-Name, `offset`
-updated: 2026-10-30 (E5 entschieden — `share_*`-Skalar = eine Freigabe, Schritt 15.3b) | 2026-10-30 (Schritt 15.3 gebaut, Opus — B5/B8 geschlossen: Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Fund `links: [1]`) | 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie empfohlen; Fund: doppelte `links:` = derselbe Startblocker) | 2026-10-30 (E1 Hotfix ja, E4 Opus — Nikinger) | 2026-10-30 (Entwurf + Schritt 15.1 gebaut, Claude Code — B1 geschlossen, am Code bestätigt und per Gegenlauf bewiesen)
+updated: 2026-10-30 (Schritt 15.3b gebaut, Opus — E5: `share_*`-Skalar = eine Freigabe, `WARNING` mit Pfad) | 2026-10-30 (E5 entschieden — `share_*`-Skalar = eine Freigabe, Schritt 15.3b) | 2026-10-30 (Schritt 15.3 gebaut, Opus — B5/B8 geschlossen: Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Fund `links: [1]`) | 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie empfohlen; Fund: doppelte `links:` = derselbe Startblocker) | 2026-10-30 (E1 Hotfix ja, E4 Opus — Nikinger) | 2026-10-30 (Entwurf + Schritt 15.1 gebaut, Claude Code — B1 geschlossen, am Code bestätigt und per Gegenlauf bewiesen)
 ---
 # P10.5 Block 15 — Die Fixes aus dem Ultra-Review
 
@@ -69,7 +69,7 @@ neuen Wächter müssen genau an diesem Befund rot werden · **(e)** volle Suite 
 | **15.1 ✅** | B1, B15 | `Store._asset_matches()`: formfalsche ID ⇒ `ItemNotFound` (= „nicht gefunden", kein Orakel); `ASSET_ID_RE` auf `\Z` (`$` ließ einen Zeilenumbruch durch) | Store (get/delete × 7 ID-Formen), MCP (Traversal liest fremdes Item), Store direkt (Traversal verschiebt fremde `.share.yml`), REST (`*`), `ASSET_ID_RE` |
 | **15.2 ✅** | B2, B3, B20 | Rename: Elternordner vor `os.rename` anlegen **oder** `ValidationError`; die Wiederaufnahme beim Start fängt jeden Fehler und startet trotzdem (Marker bleibt, `CRITICAL`). `rebuild_index`: je Datei fangen, Transaktion statt Teil-`DELETE`; CRLF im Frontmatter tolerieren | Marker-Szenario (Neustart nach fehlgeschlagenem Rename), `README.md` im Space (Index zählt die übrigen), CRLF-Datei |
 | **15.3 ✅** | B5, B8 | Kern: Frontmatter-Werte beim Lesen koerzieren (Tags → `str`, Titel → `str`), sonst Datei mit Pfad ablehnen; REST: Typprüfung in POST **und** PATCH (`title`/`folder`/`body`/`tags`); Link-Extraktion **vor** dem Schreiben rechnen, damit ein Fehler nie nach dem Write kommt | Hand-Edit `tags: [2026]` ⇒ Suche lebt; REST `tags:[1,2]` ⇒ 422; `body:5` ⇒ 422 **und** Datei unverändert, kein Versionssprung |
-| **15.3b** | E5 | `share_read`/`share_write` in `normalize_item_fields()` (Skalar = eine Freigabe), `WARNING` mit Pfad; Docstring-Satz „bewusst nicht“ ersetzen | Hand-Edit `share_read: fabian` ⇒ `acl_of()` = `{fabian}`, Update schreibt `[fabian]`, Log trägt den Pfad |
+| **15.3b ✅** | E5 | `share_read`/`share_write` in `normalize_item_fields()` (Skalar = eine Freigabe), `WARNING` mit Pfad; Docstring-Satz „bewusst nicht“ ersetzen | Hand-Edit `share_read: fabian` ⇒ `acl_of()` = `{fabian}`, Update schreibt `[fabian]`, Log trägt den Pfad |
 | **15.4** | B4 | `manages_space` statt `can_write` in beiden Mitglieder-Routen | Schreib-Gast ⇒ 403 auf add **und** remove; Eigentümer ⇒ 200 |
 | **15.5** | B6, B7 | Space-Name-Validierung an **einer** Stelle im Kern, aufgerufen von MCP- und REST-Schreibpfaden; Slug kürzen, Titel-Höchstlänge, `OSError` sauber abbilden | `space="team/"` ⇒ abgelehnt; 200 Umlaute im Titel ⇒ weder 500 noch halber Write |
 | **15.6** | B9, B10 | Einladungs-Pfad in die Redaktion (`request_log.py`, `logging_setup.py`); `search()` überspringt eine zwischenzeitlich verschwundene Datei | Log enthält den Token nicht; Such-Threads gegen Umbenennungen ⇒ kein `FileNotFoundError` |
@@ -209,3 +209,49 @@ was der Server nicht selbst entscheiden kann (Working style, 2026-10-22).
   Store-Lesen ohne **7** · Schreib-Typprüfung aus **21** · Links nach dem Write **1** ·
   `validate_folder` ohne Typprüfung **2** · REST-Frühprüfung aus **3**. Jeder Fix hat eigene rote
   Wächter.
+
+## Anmerkungen 15.3b — E5 (2026-10-30, Opus)
+
+- **Am Code nachvollzogen, vor dem Fix:** `normalize_item_fields()` liess `share_read`/`share_write`
+  roh durch; `_item_from_text()` machte daraus `list("fabian")`, `row_from_file()` schrieb
+  `json.dumps("fabian")` = `'"fabian"'` in den Index, `acl_of()` las `frozenset("fabian")` — sechs
+  Ein-Buchstaben-Freigaben auf **beiden** Lesepfaden.
+- **Bauform:** `share_read`/`share_write` laufen durch dasselbe `_text_list()` wie `tags`/`links`
+  (Skalar = ein Eintrag, `~`/leer = keine Freigabe, Elemente wie im YAML). Neu:
+  `normalize_item_fields(fields, *, source=None)` — `source` steht **nur** in der Warnung;
+  `index.row_from_file()` und `store._item_from_text()` (beide Aufrufer: `_row_to_item`, die
+  Space-Umbenennung) reichen den Pfad. `WARNING` nur beim **Skalar** (die Rechteerweiterung), nicht
+  bei der Listenform und nicht bei leerem Feld. Logger `storage.frontmatter`.
+- **Warum `WARNING` bei jedem Lesen, nicht einmal:** die Warnung hört von selbst auf, sobald der
+  nächste Write die Datei in Listenform bringt (`share_read:\n- fabian`) — ein „schon gemeldet“-
+  Zustand wäre neuer Zustand im dummen Server, für einen Fall, den es nur per Hand-Edit gibt.
+- **Übergang beim Deploy (am Code gelesen, nicht gemessen):** `acl_of()` liest **nur den Index**
+  und gleicht nicht ab; der Dienststart baut den Index nur bei Schema-Sprung neu, und 15.3b
+  ändert `INDEX_SCHEMA_VERSION` nicht. Eine **vor** Deploy D geschriebene Indexzeile mit
+  `'"fabian"'` gibt deshalb weiter die Buchstaben (fail-closed), während `get()` schon
+  `["fabian"]` zeigt — bis die Datei sich ändert (Abgleich in `_reconcile_and_get_row`) oder
+  `rebuild_index()` läuft. **Folge für die Durchsicht vor Deploy D:** ein Treffer wird am besten
+  **vor** dem Deploy von Hand in Listenform gebracht — dann gibt es keine Koerzion und keinen
+  Übergang.
+- **Wächter (5 neu + 1 umgezielt):** `test_store.py` — `share_read`/`share_write` je: Hand-Edit Skalar ⇒ `WARNING`
+  mit Pfad und Feldname, `acl_of()` = `{fabian}`, `get()` = `["fabian"]`, Update schreibt
+  `- fabian`, `acl_of()` danach unverändert; Listenform / leer / `~` ⇒ keine Warnung (3, reiner
+  Regressionsschutz — laufen auch ohne Fix grün). `test_frontmatter.py` — der alte Wächter
+  „`share_*` bleibt roh“ ist **umgezielt** auf die neue Regel (exakter Warnungstext, Eingabe
+  unverändert).
+- **Gegenlauf, im Code neutralisiert** (wie 15.3): `share_*` aus der Schleife ⇒ **3 rot** (beide
+  Store-Wächter + Frontmatter) · Warnung stummgeschaltet, Koerzion bleibt ⇒ **3 rot** · Pfad im
+  Index-Lesepfad nicht gereicht ⇒ **2 rot** (Warnung beim Neuaufbau) · Pfad in `_row_to_item` nicht
+  gereicht ⇒ **2 rot** (Warnung bei `get()` — der Weg, auf dem sie im Betrieb fällt, Advisor-Fund).
+- **Sichtbarkeit im Betrieb, am Code gelesen:** `SPACE_LOG_LEVEL=INFO` (Unit `sharefyx-mcp.service`),
+  `configure_logging()` setzt den Root-Logger darauf — ein `WARNING` erreicht das Journal.
+  `deploy.sh` und die Unit rufen kein `rebuild_index()` (gegrept) — der Übergang oben gilt.
+  **Folge (kein Blocker):** `search()` liest jede Datei, ein unbehobener Skalar warnt also bei jeder
+  Suche und jedem `/overview`-Poll — gewollt laut E5, und gegenstandslos, wenn Treffer vor dem Deploy
+  von Hand behoben werden.
+- **Durchsicht vor Deploy D — der Befehl (Nikinger, read-only, nicht aus dieser Session gefahren):**
+  `grep -rnE --include='*.md' --exclude-dir='.*' '^share_(read|write):[[:space:]]*[^[:space:][~#]' /home/savefyx/savefyx-data`
+  Trifft jeden Skalar (ohne oder mit Anführungszeichen), nicht die Listenform `[…]`, nicht die
+  Blockliste (`share_read:` + `- x`-Zeilen), nicht leer, nicht `~`, nicht `._trash/`. **Harmloser
+  Fehltreffer:** `share_read: null` (liest sich als keine Freigabe). Jeder echte Treffer: von Hand
+  auf `[name]` umschreiben, **vor** dem Deploy.

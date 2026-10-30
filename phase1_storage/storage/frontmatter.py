@@ -8,9 +8,12 @@ dünner Parser über PyYAML.
 """
 from __future__ import annotations
 
+import logging
 import re
 
 import yaml
+
+logger = logging.getLogger(__name__)
 
 # P10.5 Block 15.2 (Ultra-Review B20): die drei Begrenzer duerfen auch `\r\n` tragen — eine
 # unter Windows gespeicherte Datei ist sonst "kein Frontmatter" und war (mit B3) ein Startblocker.
@@ -100,8 +103,9 @@ def _text_list(value) -> list[str]:
     return [inline_text(v) for v in value if v is not None]
 
 
-def normalize_item_fields(fields: dict) -> dict:
-    """Kopie von `fields`, in der `title` ein String und `tags`/`links` Listen von Strings sind.
+def normalize_item_fields(fields: dict, *, source=None) -> dict:
+    """Kopie von `fields`, in der `title` ein String und `tags`/`links`/`share_read`/
+    `share_write` Listen von Strings sind. `source` (Dateipfad) steht nur in der Warnung.
 
     P10.5 Block 15.3 (Ultra-Review B5): **Lesen ist nachsichtig.** Ein Hand-Edit wie
     `tags: [2026]` oder `title: [a, b]` kostete die Textsuche aller Nutzer bzw. (seit 15.2) die
@@ -110,14 +114,21 @@ def normalize_item_fields(fields: dict) -> dict:
     auseinanderlaufen. `parse()` selbst bleibt roh: `_write_version_only` schreibt zurück, was
     der Mensch schrieb. Erst der nächste echte Write normalisiert die Datei (`'2026'`).
 
-    `share_read`/`share_write` sind **bewusst nicht** dabei: dieselbe Koerzion würde aus
-    `share_read: fabian` eine Freigabe machen, die heute (zufällig, fail-closed) keine ist —
-    eine Rechteerweiterung ohne Re-Auth ist eine Nikinger-Entscheidung, kein Typ-Fix."""
+    P10.5 Block 15.3b (E5 = A, Nikinger 2026-10-30): `share_read: fabian` (Skalar statt Liste)
+    ist **eine** Freigabe an `fabian` — vorher sechs an `f`, `a`, `b`, …, und der erste Write
+    schrieb diese Buchstabenliste auf die Platte. Weil das eine Rechteerweiterung ist, die am
+    Re-Auth-Gate vorbeiläuft (der Datei-Weg lag nie dahinter), meldet jede solche Koerzion ein
+    `WARNING` mit Pfad — bis der nächste Write die Datei in Listenform bringt."""
     out = dict(fields)
     if "title" in out:
         out["title"] = inline_text(out["title"])
-    for key in ("tags", "links"):
+    for key in ("tags", "links", "share_read", "share_write"):
         if key in out:
+            if key.startswith("share_") and out[key] is not None and not isinstance(out[key], list):
+                logger.warning(
+                    "%s: `%s: %s` ist keine Liste — gelesen als eine Freigabe an %r.",
+                    source or "<ohne Pfad>", key, inline_text(out[key]), inline_text(out[key]),
+                )
             out[key] = _text_list(out[key])
     return out
 

@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-10-30 (Session-Ende 15.3: E5) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-10-30 (Block 15.3b: E5 gebaut) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -59,9 +59,9 @@ updated: 2026-10-30 (Session-Ende 15.3: E5) | ältere Einträge: docs/INDEX_UPDA
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing; Plan siehe unten)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **37495 B** · Head: Modulstatus, Deploys, Abnahme (70 ✅ · 9 ⬜)
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **37291 B** · Head: Modulstatus, Deploys, Abnahme (70 ✅ · 9 ⬜)
 - [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **40372 B** · die **geschlossenen** Abnahmezeilen, verbatim
-- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **186431 B** · Session-Blöcke, verbatim
+- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **188760 B** · Session-Blöcke, verbatim
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · Startaufträge Block 7 und 9, verbatim
 - [phase10_5_finishing/FREIGABEN_ARCHIVE.md](../phase10_5_finishing/FREIGABEN_ARCHIVE.md) — 📦 **3.577 B** · die Freigaben der Phase, verbatim aus dem Head
 - [phase10_5_finishing/MODULSTATUS_ARCHIVE.md](../phase10_5_finishing/MODULSTATUS_ARCHIVE.md) — 📦 **8.581 B** · Statusspalten 0–10
@@ -70,7 +70,7 @@ updated: 2026-10-30 (Session-Ende 15.3: E5) | ältere Einträge: docs/INDEX_UPDA
 - [docs/concepts/phase10_5_block14_6_plan.md](./concepts/phase10_5_block14_6_plan.md) — 📗 **27332 B** · Plan 14.6
 - [docs/concepts/phase10_5_block14_7_plan.md](./concepts/phase10_5_block14_7_plan.md) — 📗 **29756 B** · Plan 14.7 (Karte kompakt)
 - [docs/concepts/phase10_5_launch_film_plan.md](./concepts/phase10_5_launch_film_plan.md) — 📗 **3338 B** · Notiz: Launch-Film v4.0.0, offene Fragen
-- [docs/concepts/phase10_5_block15_review_fixes_plan.md](./concepts/phase10_5_block15_review_fixes_plan.md) — 📗 **21313 B** · Block 15: Review-Fixes B1–B10
+- [docs/concepts/phase10_5_block15_review_fixes_plan.md](./concepts/phase10_5_block15_review_fixes_plan.md) — 📗 **25351 B** · Block 15: Review-Fixes B1–B10
 - [docs/concepts/phase10_5_ultra_review_v4.0.0.md](./concepts/phase10_5_ultra_review_v4.0.0.md) — 📕 **19192 B** · Ultra-Review v4.0.0: 22 Befunde, B1 kritisch
 - [phase10_5_finishing/UPDATES_ARCHIVE.md](../phase10_5_finishing/UPDATES_ARCHIVE.md) — 📦 **16320 B** · ältere `updated:`-Fäden des Heads, verbatim
 

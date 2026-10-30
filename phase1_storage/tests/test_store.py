@@ -1905,3 +1905,47 @@ def test_link_failure_leaves_no_written_file(store_git, tmp_path, monkeypatch):
     assert pfad.read_bytes() == vorher
     assert store_git.get(item.id).version == 1
     assert _commits(tmp_path) == commits
+
+
+# -- P10.5 Block 15.3b (E5 = A): ein `share_*`-Skalar von Hand ist eine Freigabe ------------
+
+
+@pytest.mark.parametrize("feld", ["share_read", "share_write"])
+def test_hand_edited_scalar_share_is_one_grant(store, tmp_path, caplog, feld):
+    """E5 = A (Nikinger, 2026-10-30): `share_read: fabian` von Hand ist **eine** Freigabe an
+    `fabian`. Vorher: sechs Freigaben an `f`, `a`, `b`, … — in `acl_of()` (aus dem Index) wie in
+    `get()` —, und der erste gewoehnliche Write schrieb die Buchstabenliste auf die Platte.
+    Jede Koerzion meldet ein `WARNING` mit Pfad: die Rechteerweiterung lief am Re-Auth-Gate
+    vorbei, also muss sie im Log stehen."""
+    item = store.create("alpha", type="task", title="Hallo")
+    pfad = _von_hand(tmp_path, item.id, "links: []", f"links: []\n{feld}: fabian")
+    with caplog.at_level(logging.WARNING, logger="storage.frontmatter"):
+        assert store.rebuild_index().items_indexed == 1
+    assert any(str(pfad) in r.getMessage() and feld in r.getMessage() for r in caplog.records)
+    assert getattr(store.acl_of(item.id), feld) == frozenset({"fabian"})
+    # Im Betrieb warnt `get()`/`search()` (der Start baut den Index nicht neu) — der Pfad muss
+    # auch auf diesem Weg (`_row_to_item`) in der Meldung stehen.
+    caplog.clear()
+    with caplog.at_level(logging.WARNING, logger="storage.frontmatter"):
+        gelesen = store.get(item.id)
+    assert any(str(pfad) in r.getMessage() for r in caplog.records)
+    assert getattr(gelesen, feld) == ["fabian"]
+    store.update(item.id, version=gelesen.version, status="done")
+    assert f"{feld}:\n- fabian\n" in pfad.read_text(encoding="utf-8")
+    assert getattr(store.acl_of(item.id), feld) == frozenset({"fabian"})
+
+
+@pytest.mark.parametrize("roh, erwartet", [
+    ("share_read: [fabian]", ["fabian"]),
+    ("share_read:", []),
+    ("share_read: ~", []),
+])
+def test_share_list_or_empty_reads_without_warning(store, tmp_path, caplog, roh, erwartet):
+    """15.3b: nur der Skalar warnt — die Listenform und ein leeres Feld sind kein Befund."""
+    item = store.create("alpha", type="task", title="Hallo")
+    _von_hand(tmp_path, item.id, "links: []", f"links: []\n{roh}")
+    with caplog.at_level(logging.WARNING, logger="storage.frontmatter"):
+        store.rebuild_index()
+        assert store.get(item.id).share_read == erwartet
+    assert not [r for r in caplog.records if r.name == "storage.frontmatter"]
+    assert store.acl_of(item.id).share_read == frozenset(erwartet)

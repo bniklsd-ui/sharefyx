@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 
 from storage.frontmatter import FrontmatterError, inline_text, normalize_item_fields, parse, serialize
@@ -101,12 +103,16 @@ def test_inline_text_reads_like_the_yaml(wert, text):
     assert inline_text(wert) == text
 
 
-def test_normalize_item_fields_leaves_share_fields_and_input_alone():
-    """15.3: `share_read: fabian` bleibt roh (eine Koerzion waere eine Rechteerweiterung ohne
-    Re-Auth), und `parse()`s Ergebnis wird nicht veraendert — `_write_version_only` schreibt es
-    zurueck, wie der Mensch es schrieb."""
-    roh = {"title": 5, "tags": "a", "links": None, "share_read": "fabian"}
-    assert normalize_item_fields(roh) == {
-        "title": "5", "tags": ["a"], "links": [], "share_read": "fabian",
-    }
-    assert roh == {"title": 5, "tags": "a", "links": None, "share_read": "fabian"}
+def test_normalize_item_fields_coerces_share_fields_and_leaves_input_alone(caplog):
+    """15.3b (E5 = A): `share_read: fabian` ist **eine** Freigabe (vorher roh durchgereicht —
+    `frozenset("fabian")` = sechs Buchstaben), mit `WARNING` samt Pfad. `parse()`s Ergebnis wird
+    nicht veraendert — `_write_version_only` schreibt es zurueck, wie der Mensch es schrieb."""
+    roh = {"title": 5, "tags": "a", "links": None, "share_read": "fabian", "share_write": None}
+    with caplog.at_level(logging.WARNING, logger="storage.frontmatter"):
+        assert normalize_item_fields(roh, source="alpha/itm_x.md") == {
+            "title": "5", "tags": ["a"], "links": [], "share_read": ["fabian"], "share_write": [],
+        }
+    assert [r.getMessage() for r in caplog.records] == [
+        "alpha/itm_x.md: `share_read: fabian` ist keine Liste — gelesen als eine Freigabe an 'fabian'.",
+    ]
+    assert roh == {"title": 5, "tags": "a", "links": None, "share_read": "fabian", "share_write": None}

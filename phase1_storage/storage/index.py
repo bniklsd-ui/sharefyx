@@ -250,7 +250,7 @@ def row_from_file(data_root: Path, path: Path) -> dict:
     # 15.3 (B5): dieselbe Normalisierung wie `store._item_from_text()` — sonst stuenden im
     # Index andere Tags als in `get()`, und `title: [a, b]` kostete die Datei beim Neuaufbau.
     fields, body = parse_frontmatter(text)
-    fields = normalize_item_fields(fields)
+    fields = normalize_item_fields(fields, source=path)
     stat = path.stat()
     space = path.relative_to(data_root).parts[0]
     return {
