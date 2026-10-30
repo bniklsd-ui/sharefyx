@@ -11,7 +11,7 @@ down:
   - ENTSCHEIDUNGEN_ARCHIVE.md               # 📦 §12 Entscheidungsliste D-1–D-18, verbatim (2026-10-22 gewandert)
   - REGISTER_ARCHIVE.md                    # 📦 die geschlossenen Zeilen, verbatim (2026-10-24 gewandert)
   - UPDATES_ARCHIVE.md                      # 📦 die älteren `updated:`-Fäden dieses Registers, verbatim (2026-10-24 rotiert)
-updated: 2026-10-25 (B13: drei neue Zeilen — UI-8 die Editor-Größen, UI-9 die Knopfleiste nach Word, UI-10 die Knopffarben; Bilanz 49 P10.5-Zeilen: 43 ✅ · 6 ⬜) | 2026-10-25 (B12: das P10.5-Register trägt an jeder P10.5-Zeile einen Marker; Bilanz per register_bilanz.py — 42 ✅ · 4 ⬜) | 2026-10-24 (B11.4 ✅ — die Live-Darstellung steht; V211 gemessen: `visibility: hidden`; die **geschlossenen** Zeilen sind ins L3-Archiv gewandert, das Register trägt wieder 10.440 B Luft) | 2026-10-24 (B11.3 ✅ — der Live-Editor steht: ein Text, eine Quelle, kein Moduswechsel) | ältere Einträge: phase10_inventory/UPDATES_ARCHIVE.md
+updated: 2026-10-30 (Planungssession „Ultra“: zwei neue Zeilen — BG-4 die 22 Befunde des Ultra-Reviews → Block 15, UI-11 der Launch-Film → Block 16) | 2026-10-25 (B13: drei neue Zeilen — UI-8 die Editor-Größen, UI-9 die Knopfleiste nach Word, UI-10 die Knopffarben; Bilanz 49 P10.5-Zeilen: 43 ✅ · 6 ⬜) | 2026-10-25 (B12: das P10.5-Register trägt an jeder P10.5-Zeile einen Marker; Bilanz per register_bilanz.py — 42 ✅ · 4 ⬜) | 2026-10-24 (B11.4 ✅ — die Live-Darstellung steht; V211 gemessen: `visibility: hidden`; die **geschlossenen** Zeilen sind ins L3-Archiv gewandert, das Register trägt wieder 10.440 B Luft) | 2026-10-24 (B11.3 ✅ — der Live-Editor steht: ein Text, eine Quelle, kein Moduswechsel) | ältere Einträge: phase10_inventory/UPDATES_ARCHIVE.md
 ---
 # Phase 10 — Baustellenregister
 
@@ -109,6 +109,7 @@ P10 Step 2) · Wissen (kein Bau, nur festgehalten) · erledigt (mit Beleg). „E
 | UI-8 | **Die Größe wirkt im Live-Editor** (`klein`/`groß`) | Nikinger 2026-10-25 | die Stufen der Format-Konvention (ED-3) wirkten **nur in der Vorschau**; im CM5-Editor sprang die Zeilenhöhe — die Ursache ist gemessen: CM5 rechnet `defaultTextHeight` **einmal** (aus 50 Zeilen), eine Prozent-`line-height` im Span macht die Zeile höher als die berechnete | S | — | nein | ✅ 10-62 (B13.1) · P10.5 |
 | UI-9 | **Die Knopfleiste nach Word** (Reihenfolge 1:1, gleiche Knöpfe, Gruppen mit Trennern) | Nikinger 2026-10-25 | die Leiste trug die HTML-Entity-Zeichen `</>`, `•`, `—` als Icons (Verbotsliste §0.3 Punkt 1) und eine eigene Anordnung; die nötigen Icons fehlten im Sprite (nur `chevron-left` war handgepflegt, ohne Quelldatei) | M | — | nein | ✅ 10-63 (B13.2) · P10.5 |
 | UI-10 | **Die Knopffarben**: das blaue, halbtransparente Design für alle Knöpfe | Nikinger 2026-10-25 | `--btn-std-fill` war **deckend** (P9-Entscheidung 2026-10-01), während die Rail-Auswahl (`--select-fill`) halbtransparent ist; mit der helleren Fläche fiel die Vorsichtfarbe `#F06A6E` im Hover auf 3,59:1 (unter AA) | S | — | nein | ✅ 10-64 (B13.3) · P10.5 |
+| UI-11 | **Launch-Film „Sharefyx 4.0“** — ≈ 40 s, Deutsch, mit Code gerendert; beim ersten Start im Vollbild, Wiederaufruf im Update-Log (löst ROADMAP P10.6 ab) | Nikinger 2026-10-26/29, Antworten B1–B8 2026-10-30 | Plan `docs/concepts/phase10_5_launch_film_plan.md`: Playwright-Frames + ffmpeg, Rückfall Remotion; Medien außerhalb von Git, In-App über `media_dir` | M | — | B1–B8 beantwortet 2026-10-30, Budget eine Woche | ⬜ 10-89–92 (B16) |
 
 ## 7 Rechte und Spaces (RE)
 
@@ -129,6 +130,7 @@ P10 Step 2) · Wissen (kein Bau, nur festgehalten) · erledigt (mit Beleg). „E
 | BG-1 | Space-Liste bleibt leer, wenn „Spaces verwalten" vor `loadOverview()` geöffnet wird | P9 Block R | → 📦 `REGISTER_ARCHIVE.md` | S | — | nein | ✅ 10-8 (B2.5) |
 | BG-2 | P9-124 ⚠️ — Konfliktkopie im Browser nie gefahren | Matrix | → 📦 `REGISTER_ARCHIVE.md` | S | S | nein | ✅ B12 (2026-10-25) · P10 (M5 ✅) → P10.5 |
 | BG-3 | P9-127 ⚠️ — Enter nur für vier von elf Overlays im Browser belegt | Matrix | → 📦 `REGISTER_ARCHIVE.md` | S | — | nein | ✅ B12 (2026-10-25) · P10 (M5 ✅) |
+| BG-4 | **Ultra-Review v4.0.0** — 22 Befunde B1–B22 (1 kritisch: B1 Pfad-Traversal über `asset_id`, 4 hoch, 7 mittel, 10 niedrig) | Review 2026-10-30 (Prompt 4), 📕 `docs/concepts/phase10_5_ultra_review_v4.0.0.md` | jeder Anker gegen `2d45e66` verifiziert; B1 am Live-Stand `e5c834e` byteweise identisch → Hotfix `v3.1.7` vorab | L | S, R, A | Nikinger 2026-10-30: alle 22 fixen, B1 als Hotfix, P1-Öffnung 16, `phase4_auth`-Eingriff B21 frei | ⬜ 10-75–88 (B15; Plan `docs/concepts/phase10_5_block15_ultra_plan.md`) |
 
 ## 9 Ledger — je ein Urteil (LG)
 

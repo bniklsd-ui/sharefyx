@@ -248,7 +248,10 @@ def test_the_modulstatus_short_rows_and_the_archive_agree():
 #: Die Bloecke, die der Modulstatus **alle** tragen muss (Plan §0.2: „eine Zeile je Block
 #: 0–12/Z mit Status-Spalte" — **Block 13** kam am 2026-10-25 als datierter Nachtrag dazu:
 #: die vier Auftraege des Nikingers).
-ERWARTETE_BLOECKE = [str(n) for n in range(0, 14)] + ["Z"]
+#: **[2026-10-30, Planungssession „Ultra"]** Block 14 (Kartenlayout, 2026-10-26), Block 15 (Hotfix + die
+#: 22 Befunde des Ultra-Reviews) und Block 16 (Launch-Film) sind dazugekommen — der Modulstatus trägt
+#: jetzt 0–16 und Z.
+ERWARTETE_BLOECKE = [str(n) for n in range(0, 17)] + ["Z"]
 
 
 def test_the_modulstatus_carries_every_block():
