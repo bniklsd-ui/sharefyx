@@ -1,0 +1,31 @@
+{
+  "cells": {
+    "gast_formular": {
+      "ok": true,
+      "hinzufuegen_versteckt": true
+    },
+    "gast_knoepfe": {
+      "ok": true,
+      "zeilen": {
+        "alpha": true,
+        "carol": false
+      }
+    },
+    "team_verwalten": {
+      "ok": true,
+      "hinzufuegen_sichtbar": true,
+      "zeilen": {
+        "alpha": true,
+        "carol": true
+      }
+    },
+    "austragen": {
+      "ok": true,
+      "toast": true,
+      "detail_zu": true,
+      "beta_zeilen": 0,
+      "share_yml": "read:\n- carol\n"
+    }
+  },
+  "alle_gruen": true
+}

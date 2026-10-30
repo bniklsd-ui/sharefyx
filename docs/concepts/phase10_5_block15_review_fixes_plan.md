@@ -10,7 +10,7 @@ down:
   - ../../phase1_storage/storage/store.py               # Kern: `_asset_matches()`, `rebuild_index()`, Rename-Wiederaufnahme
   - ../../phase5_ui/webui/api.py                        # REST: Typprüfung, Mitglieder-Routen
   - ../../phase2_mcp/mcpserver/tools.py                 # MCP: Space-Name, `offset`
-updated: 2026-10-30 (Schritt 15.5 gebaut, Opus — B6/B7 geschlossen; E3 gemessen: Slug ≤ 100 Byte, kein Titel-Limit) | 2026-10-30 (Schritt 15.4b gebaut — B4′ + Selbst-Austragen; E1 überholt: Deploy D nach allen Fixes; E5-Durchsicht 0 Treffer) | 2026-10-30 (Schritt 15.4 gebaut, Opus — B4 geschlossen, drei Stellen statt zwei) | 2026-10-30 (Schritt 15.3b gebaut, Opus — E5: `share_*`-Skalar = eine Freigabe, `WARNING` mit Pfad) | 2026-10-30 (E5 entschieden — `share_*`-Skalar = eine Freigabe, Schritt 15.3b) | 2026-10-30 (Schritt 15.3 gebaut, Opus — B5/B8 geschlossen: Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Fund `links: [1]`) | 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie empfohlen; Fund: doppelte `links:` = derselbe Startblocker) | 2026-10-30 (E1 Hotfix ja, E4 Opus — Nikinger) | 2026-10-30 (Entwurf + Schritt 15.1 gebaut, Claude Code — B1 geschlossen, am Code bestätigt und per Gegenlauf bewiesen)
+updated: 2026-10-30 (Schritt 15.5b — UI-Rest aus 15.4: Verwalten-Knöpfe nur bei `manageable`) | 2026-10-30 (Schritt 15.5 gebaut, Opus — B6/B7 geschlossen; E3 gemessen: Slug ≤ 100 Byte, kein Titel-Limit) | 2026-10-30 (Schritt 15.4b gebaut — B4′ + Selbst-Austragen; E1 überholt: Deploy D nach allen Fixes; E5-Durchsicht 0 Treffer) | 2026-10-30 (Schritt 15.4 gebaut, Opus — B4 geschlossen, drei Stellen statt zwei) | 2026-10-30 (Schritt 15.3b gebaut, Opus — E5: `share_*`-Skalar = eine Freigabe, `WARNING` mit Pfad) | 2026-10-30 (E5 entschieden — `share_*`-Skalar = eine Freigabe, Schritt 15.3b) | 2026-10-30 (Schritt 15.3 gebaut, Opus — B5/B8 geschlossen: Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Fund `links: [1]`) | 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie empfohlen; Fund: doppelte `links:` = derselbe Startblocker) | 2026-10-30 (E1 Hotfix ja, E4 Opus — Nikinger) | 2026-10-30 (Entwurf + Schritt 15.1 gebaut, Claude Code — B1 geschlossen, am Code bestätigt und per Gegenlauf bewiesen)
 ---
 # P10.5 Block 15 — Die Fixes aus dem Ultra-Review
 
@@ -75,6 +75,7 @@ neuen Wächter müssen genau an diesem Befund rot werden · **(e)** volle Suite 
 | **15.4 ✅** | B4 | `manages_space` statt `can_write` in beiden Mitglieder-Routen | Schreib-Gast ⇒ 403 auf add **und** remove; Eigentümer ⇒ 200 |
 | **15.4b ✅** | B4′, E6 | REST-`PATCH` von `share_read`/`share_write`/`visibility` nur mit `manages_space` auf den Item-Space; `DELETE …/members/<eigener Name>` erlaubt mit `can_read` | Gast ⇒ 403 je Feld, Datei byteweise gleich; Gast schreibt Body weiter; Team-Schreiber teilt weiter; Selbst-Austragen 200, ohne Leserecht 403 |
 | **15.5 ✅** | B6, B7 | Space-Name-Validierung an **einer** Stelle im Kern, aufgerufen von MCP- und REST-Schreibpfaden; Slug kürzen, Titel-Höchstlänge, `OSError` sauber abbilden | `space="team/"` ⇒ abgelehnt; 200 Umlaute im Titel ⇒ weder 500 noch halber Write |
+| **15.5b ✅** | UI-Rest 15.4 | `spaces.js`: Hinzufügen und „Entfernen“ nur bei `manageable`; der eigene Name behält „Entfernen“ (E6), danach zurück zur Liste | Browser-Probe an der Wegwerf-Instanz |
 | **15.6** | B9, B10 | Einladungs-Pfad in die Redaktion (`request_log.py`, `logging_setup.py`); `search()` überspringt eine zwischenzeitlich verschwundene Datei | Log enthält den Token nicht; Such-Threads gegen Umbenennungen ⇒ kein `FileNotFoundError` |
 | **15.7** | — | Volle Suite, `doc_health`, Update-Log-Zeile (nur Menschen-relevantes), Head-Bilanz | — |
 
@@ -375,3 +376,19 @@ was der Server nicht selbst entscheiden kann (Working style, 2026-10-22).
   `space:`-Zeile nicht dem obersten Verzeichnis entspricht —
   `cd <DATA_ROOT> && find . -path ./._trash -prune -o -name '*.md' -print0 | while IFS= read -r -d '' f; do d=${f#./}; d=${d%%/*}; s=$(sed -n 's/^space: *//p' "$f" | head -1); [ "$s" = "$d" ] || echo "$f: $s"; done`
   — 0 Zeilen ⇒ kein Übergang (eine Nicht-Item-`.md` ohne `space:` erscheint mit leerem Wert; an einer Wegwerf-Kopie mit einem `space: team/`-Item erprobt: genau diese Zeile).
+
+## Anmerkungen 15.5b — UI-Rest aus 15.4 (2026-10-30, Opus)
+
+- **Auftrag:** Backlog aus 15.4, vom Nikinger an Claude Code übergeben („your call?“). Entschieden:
+  **vor Deploy D bauen** — Deploy D liefert B4 aus; ohne diesen Schnitt sähe ein Schreib-Gast im
+  fremden Home-Space Knöpfe, die mit „Keine Verwaltungsrechte“ scheitern.
+- **Gebaut (`spaces.js`, `app.html`):** das Hinzufügen-Formular (`#space-member-add`) und jeder
+  „Entfernen“-Knopf nur bei `manageable` aus `GET …/members` (seit 15.4 dieselbe Frage wie der
+  Server); der **eigene** Name behält „Entfernen“ (E6). **Fund beim Bauen:** nach dem
+  Selbst-Austragen lud der Dialog die Mitgliederliste neu — ohne Leserecht 403, das Panel blieb mit
+  Fehlermeldung offen. Jetzt: Toast „Ausgetragen · <space>“, zurück zur Liste, `loadOverview()`.
+- **Beleg:** `probes/p105_b15_5b_gast_knoepfe_probe.py` (Wegwerf 8799, PID-Datei) — Fix **4/4
+  grün**; Gegenlauf mit dem alten `spaces.js`/`app.html` **3 rot** (`gast_formular`,
+  `gast_knoepfe`, `austragen`), `team_verwalten` grün in beiden (Regressionszelle). **Erster
+  Gegenlauf war zahnlos:** die Zelle maß den neuen Container, den das alte Markup nicht hat (fehlt
+  = „versteckt“) — auf den Knopf umgezielt, der in beiden existiert, und beide Läufe neu gefahren.

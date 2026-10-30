@@ -27,6 +27,7 @@ var spaceMemberListEl;
 var spaceMemberNameInputEl;
 var spaceMemberWriteSelectEl;
 var spaceMemberAddSubmitEl;
+var spaceMemberAddEl;
 var spaceMemberReauthFieldsEl;
 var spaceMemberReauthPasswordEl;
 var spaceMemberReauthTotpEl;
@@ -112,9 +113,13 @@ function selectSpace(name) {
     // Umbenennen ist nur fuer Team-Spaces (P10.5-M) -- ein Home-Space traegt den Namen
     // seines Principals; der Server weist ihn ohnehin ab, der Knopf wird nicht angeboten.
     spaceRenameOpenEl.hidden = info.home;
+    // P10.5 15.5b: Hinzufügen/Entfernen nur, wer den Space verwaltet (`manageable`, seit 15.4
+    // dieselbe Frage wie im Server) -- ein Schreib-Gast im fremden Home-Space sah die Knöpfe
+    // und bekam 403. Den eigenen Namen darf er weiter entfernen (E6, Selbst-Austragen).
+    spaceMemberAddEl.hidden = !info.manageable;
     spaceMemberListEl.textContent = "";
-    info.write.forEach(function (member) { spaceMemberListEl.appendChild(memberRow(name, member, true)); });
-    info.read.forEach(function (member) { spaceMemberListEl.appendChild(memberRow(name, member, false)); });
+    info.write.forEach(function (member) { spaceMemberListEl.appendChild(memberRow(name, member, true, info.manageable)); });
+    info.read.forEach(function (member) { spaceMemberListEl.appendChild(memberRow(name, member, false, info.manageable)); });
     // C2s eigene Begründung für `orphans`: "der Render-Hinweis fürs Frontend" (Tippfehler-
     // Fänger gegen bekannte Space-Verzeichnisse, nur bei `manageable` überhaupt befüllt) --
     // ignoriert zu lassen würde das Feld ohne jeden Konsumenten seines einzigen Zwecks lassen.
@@ -132,15 +137,23 @@ function selectSpace(name) {
   });
 }
 
-function memberRow(space, name, canWrite) {
+function memberRow(space, name, canWrite, manageable) {
   var row = el("li", "space-member-row");
   row.appendChild(el("span", null, name + (canWrite ? " (schreiben)" : " (lesen)")));
+  if (!manageable && name !== state.ownSpace) return row;
   var removeButton = el("button", "btn", "Entfernen");
   removeButton.type = "button";
   removeButton.addEventListener("click", function () {
     api("/spaces/" + encodeURIComponent(space) + "/members/" + encodeURIComponent(name), {
       method: "DELETE",
     }).then(function () {
+      if (!manageable) {
+        // Selbst-Austragen (E6): danach fehlt meist das Leserecht -- `selectSpace()` bekäme
+        // 403. Zurück zur Liste; `loadOverview()` zeichnet sie über `sfx:overview-loaded` neu.
+        closeFrom("space-detail");
+        toast("Ausgetragen · " + space);
+        return loadOverview();
+      }
       toast("Mitglied entfernt · " + name);
       return selectSpace(space);
     }).catch(function (err) {
@@ -247,6 +260,7 @@ export function init() {
   spaceMemberNameInputEl = document.getElementById("space-member-name-input");
   spaceMemberWriteSelectEl = document.getElementById("space-member-write-select");
   spaceMemberAddSubmitEl = document.getElementById("space-member-add-submit");
+  spaceMemberAddEl = document.getElementById("space-member-add");
   spaceMemberReauthFieldsEl = document.getElementById("space-member-reauth-fields");
   spaceMemberReauthPasswordEl = document.getElementById("space-member-reauth-password");
   spaceMemberReauthTotpEl = document.getElementById("space-member-reauth-totp");

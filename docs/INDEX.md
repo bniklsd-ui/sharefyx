@@ -59,7 +59,7 @@ updated: 2026-10-30 (Block 15.5) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing; Plan siehe unten)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **38771 B** · Head: Modulstatus, Deploys, Abnahme (71 ✅ · 8 ⬜)
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **39689 B** · Head: Modulstatus, Deploys, Abnahme (71 ✅ · 8 ⬜)
 - [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **41075 B** · die **geschlossenen** Abnahmezeilen, verbatim
 - [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **192803 B** · Session-Blöcke, verbatim
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · Startaufträge Block 7 und 9, verbatim
@@ -70,7 +70,7 @@ updated: 2026-10-30 (Block 15.5) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE
 - [docs/concepts/phase10_5_block14_6_plan.md](./concepts/phase10_5_block14_6_plan.md) — 📗 **27332 B** · Plan 14.6
 - [docs/concepts/phase10_5_block14_7_plan.md](./concepts/phase10_5_block14_7_plan.md) — 📗 **29756 B** · Plan 14.7 (Karte kompakt)
 - [docs/concepts/phase10_5_launch_film_plan.md](./concepts/phase10_5_launch_film_plan.md) — 📗 **3338 B** · Notiz: Launch-Film v4.0.0, offene Fragen
-- [docs/concepts/phase10_5_block15_review_fixes_plan.md](./concepts/phase10_5_block15_review_fixes_plan.md) — 📗 **37805 B** · Block 15: Review-Fixes B1–B10
+- [docs/concepts/phase10_5_block15_review_fixes_plan.md](./concepts/phase10_5_block15_review_fixes_plan.md) — 📗 **39430 B** · Block 15: Review-Fixes B1–B10
 - [docs/concepts/phase10_5_ultra_review_v4.0.0.md](./concepts/phase10_5_ultra_review_v4.0.0.md) — 📕 **19192 B** · Ultra-Review v4.0.0: 22 Befunde, B1 kritisch
 - [phase10_5_finishing/UPDATES_ARCHIVE.md](../phase10_5_finishing/UPDATES_ARCHIVE.md) — 📦 **16320 B** · ältere `updated:`-Fäden des Heads, verbatim
 
