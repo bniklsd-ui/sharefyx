@@ -897,9 +897,13 @@ def api_routes(
             raise ApiError("not_found", "Nicht gefunden.")
         await _require_csrf_json(request, session)
         space = request.path_params["space"]
-        if not permissions.manages_space(session.space, space):  # 15.4 (B4), siehe GET
-            raise ApiError("forbidden", "Keine Verwaltungsrechte für diesen Space.")
         name = request.path_params["name"]
+        # 15.4 (B4), siehe GET — plus 15.4b (Nikinger 2026-10-30): sich **selbst** austragen darf
+        # jeder, der den Space sieht; das verengt nur den eigenen Zugriff, dem Eigentuemer geht
+        # nichts verloren. `can_read` haelt das Austragen aus unsichtbaren Spaces heraus.
+        self_removal = name == session.space and permissions.can_read(session.space, space)
+        if not (self_removal or permissions.manages_space(session.space, space)):
+            raise ApiError("forbidden", "Keine Verwaltungsrechte für diesen Space.")
         # Kein `require_space_reauth()`-Aufruf hier — Rücknahme braucht kein Re-Auth (P7-N).
         acl.remove_member(store.data_root, space, name)
         return JSONResponse(
@@ -1439,6 +1443,18 @@ def api_routes(
                 "forbidden",
                 "folder ist nur vom Eigentümer-Space änderbar — ein geteilter Schreibzugriff "
                 "erlaubt keine Verschiebung in einen anderen Ordner.",
+            )
+
+        # P10.5 Block 15.4b (Fund B4′, dieselbe Frage wie B4 eine Ebene tiefer): die Freigaben
+        # eines Items sind die Rechteliste seines Space — aendern darf sie nur, wer den Space
+        # verwaltet (`manages_space`: eigener Space, Team-Space mit space-level `write:`). Vorher
+        # genuegte Schreibrecht aufs Item plus die **eigene** Re-Auth: ein Gast in einem fremden
+        # Home-Space gab dessen Items weiter. Die UI bot das nie an (P9-BP: Freigeben nur im
+        # eigenen Space); MCP kann `share_*`/`visibility` gar nicht aendern.
+        if (any(key in body for key in ("share_read", "share_write", "visibility"))
+                and not permissions.manages_space(session.space, acl.space)):
+            raise ApiError(
+                "forbidden", "Freigaben eines Items ändert nur, wer seinen Space verwaltet.",
             )
 
         # Re-Auth-Gate (Step 7 Commit 5a, P6-N) — MUSS vor `store.update()`/`store.move()`

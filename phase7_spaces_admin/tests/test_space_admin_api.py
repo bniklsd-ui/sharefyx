@@ -480,3 +480,102 @@ async def test_write_member_still_manages_a_team_space(app, item_store, totp_cod
     assert added.status_code == 200
     assert removed.status_code == 200
     assert _share_yml(item_store.data_root, "team") == {"write": [SPACE]}
+
+
+@pytest.mark.asyncio
+async def test_guest_may_remove_only_themselves_from_a_foreign_home_space(app, bob_home, totp_code):
+    """15.4b (Nikinger 2026-10-30): ein Gast darf sich selbst austragen — das verengt nur den
+    eigenen Zugriff, dem Eigentuemer geht nichts verloren. Mit 15.4 allein war das 403."""
+    async with _client(app) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.delete(f"/api/v1/spaces/bob/members/{SPACE}", headers=_headers(csrf))
+    assert response.status_code == 200
+    assert _share_yml(bob_home.parent.parent, "bob") == {"read": ["carol"]}
+
+
+@pytest.mark.asyncio
+async def test_self_removal_needs_at_least_read_access(app, item_store, totp_code):
+    """15.4b: das Selbst-Austragen ist kein Weg in Spaces, die man gar nicht sieht."""
+    (item_store.data_root / "fremd").mkdir()
+    async with _client(app) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.delete(f"/api/v1/spaces/fremd/members/{SPACE}", headers=_headers(csrf))
+    assert response.status_code == 403
+
+
+# -- P10.5 Block 15.4b (Fund B4′): Freigaben fremder Home-Space-Items --------------------------
+#
+# Dieselbe B4-Frage eine Ebene tiefer: `share_read`/`share_write`/`visibility` eines Items in
+# Bobs Home-Space sind Bobs Rechteliste. Vorher genuegte Schreibrecht auf das Item plus die
+# **eigene** Re-Auth des Gasts.
+
+
+@pytest.mark.parametrize("feld, wert", [
+    ("share_read", ["mallory"]), ("share_write", ["mallory"]), ("visibility", "human"),
+])
+@pytest.mark.asyncio
+async def test_write_guest_cannot_change_sharing_of_a_foreign_home_item(
+    app, item_store, bob_home, totp_code, clock, feld, wert,
+):
+    item = item_store.create("bob", type="note", title="Bobs Notiz")
+    pfad = next((item_store.data_root / "bob").rglob(f"{item.id}__*.md"))
+    vorher = pfad.read_bytes()
+    async with _client(app) as client:
+        csrf = await _login(client, totp_code)
+        clock.advance(31)
+        response = await client.patch(
+            f"/api/v1/items/{item.id}",
+            json={"version": item.version, feld: wert, "password": PASSWORD, "totp": totp_code()},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 403
+    assert response.json()["error"] == "forbidden"
+    assert pfad.read_bytes() == vorher
+
+
+@pytest.mark.asyncio
+async def test_write_guest_still_edits_a_foreign_home_item(app, item_store, bob_home, totp_code):
+    """15.4b, Gegenprobe: der Riegel trifft nur die Freigabefelder — Schreiben bleibt erlaubt."""
+    item = item_store.create("bob", type="note", title="Bobs Notiz")
+    async with _client(app) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/items/{item.id}", json={"version": item.version, "body": "neu"},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 200
+    assert item_store.get(item.id).body == "neu"
+
+
+@pytest.mark.asyncio
+async def test_team_writer_still_changes_sharing_in_a_team_space(app, item_store, totp_code, clock):
+    """15.4b, Gegenprobe: im Team-Space ist ein space-level Schreiber Verwalter (`manages_space`)."""
+    (item_store.data_root / "team").mkdir()
+    (item_store.data_root / "team" / ".share.yml").write_text(f"write: [{SPACE}]\n", encoding="utf-8")
+    item = item_store.create("team", type="note", title="Teamnotiz")
+    async with _client(app) as client:
+        csrf = await _login(client, totp_code)
+        clock.advance(31)
+        response = await client.patch(
+            f"/api/v1/items/{item.id}",
+            json={"version": item.version, "share_read": ["fabian"],
+                  "password": PASSWORD, "totp": totp_code()},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 200
+    assert item_store.get(item.id).share_read == ["fabian"]
+
+
+@pytest.mark.asyncio
+async def test_write_guest_cannot_revoke_a_share_on_a_foreign_home_item(app, item_store, bob_home, totp_code):
+    """15.4b: der gefaehrlichere Fall — Verengen braucht nie Re-Auth, also nahm ein Gast vorher
+    Bobs Freigabe an `carol` **ohne jede Anmeldedaten** zurueck."""
+    item = item_store.create("bob", type="note", title="Bobs Notiz", share_read=["carol"])
+    async with _client(app) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.patch(
+            f"/api/v1/items/{item.id}", json={"version": item.version, "share_read": []},
+            headers=_headers(csrf),
+        )
+    assert response.status_code == 403
+    assert item_store.get(item.id).share_read == ["carol"]

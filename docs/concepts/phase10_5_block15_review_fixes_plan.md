@@ -10,7 +10,7 @@ down:
   - ../../phase1_storage/storage/store.py               # Kern: `_asset_matches()`, `rebuild_index()`, Rename-Wiederaufnahme
   - ../../phase5_ui/webui/api.py                        # REST: Typprüfung, Mitglieder-Routen
   - ../../phase2_mcp/mcpserver/tools.py                 # MCP: Space-Name, `offset`
-updated: 2026-10-30 (Schritt 15.4 gebaut, Opus — B4 geschlossen, drei Stellen statt zwei) | 2026-10-30 (Schritt 15.3b gebaut, Opus — E5: `share_*`-Skalar = eine Freigabe, `WARNING` mit Pfad) | 2026-10-30 (E5 entschieden — `share_*`-Skalar = eine Freigabe, Schritt 15.3b) | 2026-10-30 (Schritt 15.3 gebaut, Opus — B5/B8 geschlossen: Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Fund `links: [1]`) | 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie empfohlen; Fund: doppelte `links:` = derselbe Startblocker) | 2026-10-30 (E1 Hotfix ja, E4 Opus — Nikinger) | 2026-10-30 (Entwurf + Schritt 15.1 gebaut, Claude Code — B1 geschlossen, am Code bestätigt und per Gegenlauf bewiesen)
+updated: 2026-10-30 (Schritt 15.4b gebaut — B4′ + Selbst-Austragen; E1 überholt: Deploy D nach allen Fixes; E5-Durchsicht 0 Treffer) | 2026-10-30 (Schritt 15.4 gebaut, Opus — B4 geschlossen, drei Stellen statt zwei) | 2026-10-30 (Schritt 15.3b gebaut, Opus — E5: `share_*`-Skalar = eine Freigabe, `WARNING` mit Pfad) | 2026-10-30 (E5 entschieden — `share_*`-Skalar = eine Freigabe, Schritt 15.3b) | 2026-10-30 (Schritt 15.3 gebaut, Opus — B5/B8 geschlossen: Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Fund `links: [1]`) | 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie empfohlen; Fund: doppelte `links:` = derselbe Startblocker) | 2026-10-30 (E1 Hotfix ja, E4 Opus — Nikinger) | 2026-10-30 (Entwurf + Schritt 15.1 gebaut, Claude Code — B1 geschlossen, am Code bestätigt und per Gegenlauf bewiesen)
 ---
 # P10.5 Block 15 — Die Fixes aus dem Ultra-Review
 
@@ -31,7 +31,7 @@ updated: 2026-10-30 (Schritt 15.4 gebaut, Opus — B4 geschlossen, drei Stellen 
 | B5 Nicht-String-Tags/Titel | hoch, R | **ja** (2026-10-30): reproduziert, 8 Hand-Edit-Fälle; `title: [a, b]`/`title:` nach dem Neuaufbau unsichtbar | **✅ 15.3** |
 | B8 REST ohne Typprüfung | mittel, R/C | **ja**: `body:5` schrieb vor dem Wurf, `folder:123` = `AttributeError` | **✅ 15.3** |
 | B4 Mitglieder fremder Home-Spaces | hoch, R | **ja** (2026-10-30): reproduziert, add/remove 200, `manageable: true` | **✅ 15.4** |
-| B4′ `share_*` fremder Home-Space-Items (Fund 15.4) | — (nicht im Review), C | **ja**: `_items_patch` prüft nur `can_write_item_as_human` + eigene Re-Auth | ⬜ Nikinger |
+| B4′ `share_*` fremder Home-Space-Items (Fund 15.4) | — (nicht im Review), C | **ja**: `_items_patch` prüft nur `can_write_item_as_human` + eigene Re-Auth; in 15.4b **reproduziert** (R): Gast setzt `share_read`/`share_write`/`visibility` auf Bobs Item ⇒ 200 | **✅ 15.4b** |
 | B6 Space-Name ungeprüft | mittel, R | offen — bei 15.5 | ⬜ |
 | B7 Titel-Länge → Dateiname | mittel, R | offen — bei 15.5 | ⬜ |
 | B9 Einladungs-Token im Log | mittel, R | offen — bei 15.6 | ⬜ |
@@ -53,11 +53,12 @@ updated: 2026-10-30 (Schritt 15.4 gebaut, Opus — B4 geschlossen, drei Stellen 
 
 | # | Entscheidung | Wer | Stand |
 |---|---|---|---|
-| **E1** | **B1 als Hotfix vorab live, oder mit Deploy D?** B1 steht seit 2026-08-20 im Live-Dienst (live: Release `20261023T165838…` = Deploy B, SHA `e5c834e`, am Symlink `/opt/sharefyx/current` gelesen). **Wichtig: `deploy.sh main` ist KEIN Hotfix** — `main` trägt alles seit `v3.1.6` (u. a. `rename_folder`, den Pfad hinter B2) und damit genau das, was das Review „nicht freigabefähig“ nannte. **Weg:** Branch ab `e5c834e`, nur die Code- und Testdateien des Fixes (Doku-Hunks lassen sich nicht auf den alten Stand übertragen), eigener `docs/UPDATE_LOG.md`-Eintrag und eigene Version (**Versionsstufe = Entscheidung des Nikingers**), dann `deploy.sh <ref>` — das Skript nimmt jede Git-Ref. **Bewiesen (2026-10-30, Wegwerf-Worktree auf `e5c834e`):** der Fix-Patch (Store, Files, 4 Testdateien) lässt sich sauber anwenden, die 50 Asset-Tests sind grün, ohne den Fix sind dieselben 9 Wächter rot — der Fehler steckt also auch im Live-Stand. **Empfehlung: Hotfix.** Der Deploy läuft beim Nikinger (Hard Rule 9). | **Nikinger** | ✅ 2026-10-30: **Hotfix, ja** — Branch `hotfix-b1` ab `e5c834e` vorbereitet, Deploy + Version beim Nikinger |
+| **E1** | **B1 als Hotfix vorab live, oder mit Deploy D?** B1 steht seit 2026-08-20 im Live-Dienst (live: Release `20261023T165838…` = Deploy B, SHA `e5c834e`, am Symlink `/opt/sharefyx/current` gelesen). **Wichtig: `deploy.sh main` ist KEIN Hotfix** — `main` trägt alles seit `v3.1.6` (u. a. `rename_folder`, den Pfad hinter B2) und damit genau das, was das Review „nicht freigabefähig“ nannte. **Weg:** Branch ab `e5c834e`, nur die Code- und Testdateien des Fixes (Doku-Hunks lassen sich nicht auf den alten Stand übertragen), eigener `docs/UPDATE_LOG.md`-Eintrag und eigene Version (**Versionsstufe = Entscheidung des Nikingers**), dann `deploy.sh <ref>` — das Skript nimmt jede Git-Ref. **Bewiesen (2026-10-30, Wegwerf-Worktree auf `e5c834e`):** der Fix-Patch (Store, Files, 4 Testdateien) lässt sich sauber anwenden, die 50 Asset-Tests sind grün, ohne den Fix sind dieselben 9 Wächter rot — der Fehler steckt also auch im Live-Stand. **Empfehlung: Hotfix.** Der Deploy läuft beim Nikinger (Hard Rule 9). | **Nikinger** | ✅ 2026-10-30: **Hotfix, ja** — Branch `hotfix-b1` ab `e5c834e` vorbereitet, Deploy + Version beim Nikinger · **[2026-10-30, später] überholt (Nikinger):** **kein** Hotfix vorab — Deploy D nach **allen** Fixes, an einem Wochenende ohne Nutzung außer dem Nikinger; B1 fährt mit. `hotfix-b1` bleibt als Branch liegen (ungenutzt) |
 | **E2** | B3: eine nicht parsebare Datei wird **übersprungen + `CRITICAL` mit Pfad** (Empfehlung) statt den Neuaufbau abzubrechen. Folge: so eine Datei ist im Index unsichtbar, bis sie repariert ist — sichtbar nur im Log. | Claude Code (Empfehlung), Nikinger widerspricht, falls anders gewollt | ✅ 2026-10-30: **so gebaut** (15.2) — Widerspruch bleibt möglich |
 | **E3** | B7: Titel-Höchstlänge. Die Grenze ist ein **Schätzwert** (Dateiname ≤ 255 Byte, `itm_xxxxxxxx__` + `.md` = 17 Byte; Slug auf ≤ 100 Zeichen kürzen, Titel selbst ≤ 300 Zeichen) — bei 15.5 **gegen `os.statvfs().f_namemax`** und UTF-8-Bytes messen, nicht Zeichen zählen. | Claude Code, bei 15.5 gemessen | [VERIFY] |
-| **E5** | **`share_read: fabian` (Hand-Edit, Skalar statt Liste).** Heute: gelesen als `['f','a','b','i','a','n']`, und der **erste** gewöhnliche Write schreibt diese Buchstabenliste auf die Platte (am Code bestätigt 2026-10-30: `update(status="done")` ⇒ `share_read: [f, a, b, i, a, n]`, Re-Auth sieht vorher == nachher). Optionen: **A** eine Freigabe (`["fabian"]`) · B verwerfen + Log · C Datei überspringen · D lassen. **Empfehlung A:** das Re-Auth-Gate schützt UI/API vor einer gestohlenen Sitzung, der Datei-Weg lag nie dahinter — `share_read: [fabian]` von Hand gilt schon heute sofort (Hard Rule 2). Seit 15.3 erreicht ein Skalar den Kern nur über einen Hand-Edit. | **Nikinger** | ✅ 2026-10-30: **A** — gebaut in **15.3b**: `share_read`/`share_write` in `normalize_item_fields()`, `WARNING` mit Pfad bei jeder Skalar-Koerzion; **vor Deploy D** liest der Nikinger den Live-`DATA_ROOT` read-only auf Skalar-`share_*` durch |
+| **E5** | **`share_read: fabian` (Hand-Edit, Skalar statt Liste).** Heute: gelesen als `['f','a','b','i','a','n']`, und der **erste** gewöhnliche Write schreibt diese Buchstabenliste auf die Platte (am Code bestätigt 2026-10-30: `update(status="done")` ⇒ `share_read: [f, a, b, i, a, n]`, Re-Auth sieht vorher == nachher). Optionen: **A** eine Freigabe (`["fabian"]`) · B verwerfen + Log · C Datei überspringen · D lassen. **Empfehlung A:** das Re-Auth-Gate schützt UI/API vor einer gestohlenen Sitzung, der Datei-Weg lag nie dahinter — `share_read: [fabian]` von Hand gilt schon heute sofort (Hard Rule 2). Seit 15.3 erreicht ein Skalar den Kern nur über einen Hand-Edit. | **Nikinger** | ✅ 2026-10-30: **A** — gebaut in **15.3b**: `share_read`/`share_write` in `normalize_item_fields()`, `WARNING` mit Pfad bei jeder Skalar-Koerzion; **vor Deploy D** liest der Nikinger den Live-`DATA_ROOT` read-only auf Skalar-`share_*` durch · **Durchsicht gefahren (Nikinger, 2026-10-30): 0 Treffer** im Live-`DATA_ROOT` — kein Übergang, keine Koerzion beim Deploy |
 | **E4** | **Wer baut 15.2–15.7?** Dieser Plan nennt Claude Code; eine datierte Nikinger-Entscheidung dazu gibt es nicht (Standard der Phase: opencode, 14.7 war eine ausdrückliche Ausnahme). **15.2** (Index-Neuaufbau, Dienststart) und **15.3** (Typkoerzion im Kern) berühren den Startpfad und jede Lese-/Schreibfläche — Kandidaten für Opus. | **Nikinger** | ✅ 2026-10-30: **Opus** baut 15.2–15.7 (eigene Session je Schritt) |
+| **E6** | **15.4 sperrt dem Gast auch das Selbst-Austragen** aus einem fremden Home-Space (Folge der Abweichung von P7-L/N7). Erlauben? | **Nikinger** | ✅ 2026-10-30: **ja** — gebaut in **15.4b** (mit `can_read`, kein Austragen aus unsichtbaren Spaces) · **B4′ fixen: ja** (15.4b) |
 
 ## §3 Schritte — je Schritt ein Commit, Head im selben Commit (Hard Rule 8)
 
@@ -72,6 +73,7 @@ neuen Wächter müssen genau an diesem Befund rot werden · **(e)** volle Suite 
 | **15.3 ✅** | B5, B8 | Kern: Frontmatter-Werte beim Lesen koerzieren (Tags → `str`, Titel → `str`), sonst Datei mit Pfad ablehnen; REST: Typprüfung in POST **und** PATCH (`title`/`folder`/`body`/`tags`); Link-Extraktion **vor** dem Schreiben rechnen, damit ein Fehler nie nach dem Write kommt | Hand-Edit `tags: [2026]` ⇒ Suche lebt; REST `tags:[1,2]` ⇒ 422; `body:5` ⇒ 422 **und** Datei unverändert, kein Versionssprung |
 | **15.3b ✅** | E5 | `share_read`/`share_write` in `normalize_item_fields()` (Skalar = eine Freigabe), `WARNING` mit Pfad; Docstring-Satz „bewusst nicht“ ersetzen | Hand-Edit `share_read: fabian` ⇒ `acl_of()` = `{fabian}`, Update schreibt `[fabian]`, Log trägt den Pfad |
 | **15.4 ✅** | B4 | `manages_space` statt `can_write` in beiden Mitglieder-Routen | Schreib-Gast ⇒ 403 auf add **und** remove; Eigentümer ⇒ 200 |
+| **15.4b ✅** | B4′, E6 | REST-`PATCH` von `share_read`/`share_write`/`visibility` nur mit `manages_space` auf den Item-Space; `DELETE …/members/<eigener Name>` erlaubt mit `can_read` | Gast ⇒ 403 je Feld, Datei byteweise gleich; Gast schreibt Body weiter; Team-Schreiber teilt weiter; Selbst-Austragen 200, ohne Leserecht 403 |
 | **15.5** | B6, B7 | Space-Name-Validierung an **einer** Stelle im Kern, aufgerufen von MCP- und REST-Schreibpfaden; Slug kürzen, Titel-Höchstlänge, `OSError` sauber abbilden | `space="team/"` ⇒ abgelehnt; 200 Umlaute im Titel ⇒ weder 500 noch halber Write |
 | **15.6** | B9, B10 | Einladungs-Pfad in die Redaktion (`request_log.py`, `logging_setup.py`); `search()` überspringt eine zwischenzeitlich verschwundene Datei | Log enthält den Token nicht; Such-Threads gegen Umbenennungen ⇒ kein `FileNotFoundError` |
 | **15.7** | — | Volle Suite, `doc_health`, Update-Log-Zeile (nur Menschen-relevantes), Head-Bilanz | — |
@@ -296,3 +298,33 @@ was der Server nicht selbst entscheiden kann (Working style, 2026-10-22).
 - **UI-Rest, nicht gebaut:** `spaces.js :: selectSpace()` zeigt die Knöpfe unabhängig von
   `manageable` — ein Gast klickt und bekommt jetzt die 403-Meldung. Backlog (UI-Schnitt), kein
   Rechte-Befund mehr.
+
+## Anmerkungen 15.4b — B4′ + E6 (2026-10-30, Opus)
+
+- **B4′ reproduziert (In-Process-App):** `niklas` mit `write:` in Bobs Home-Space, `PATCH` auf
+  Bobs Item mit `share_read: [mallory]` / `share_write: [mallory]` / `visibility: human` und der
+  **eigenen** Re-Auth ⇒ je **200**. (Erster Anlauf mit `visibility: shared` war 422 — kein gültiger
+  Wert, `VISIBILITY_VALUES` = `private`/`human`; Test korrigiert, kein Befund.)
+- **Fix:** ein Riegel in `_items_patch` vor dem Re-Auth-Gate — eines der drei Freigabefelder im Body
+  und kein `manages_space(session.space, acl.space)` ⇒ 403. Gleiche Form wie der `folder`-Riegel
+  darüber (Feld im Body, nicht „Wert geändert“): kein UI-Pfad schickt die Felder für fremde Items
+  (P9-BP: der Freigeben-Knopf erscheint nur im eigenen Space), also trifft er keinen legitimen
+  Aufruf. **Folge über B4′ hinaus:** auch ein Item-`share_write`-Halter kann die Freigaben eines
+  fremden Items nicht mehr ändern — derselbe Grund (Rechteliste des Eigentümers).
+- **E6 (Selbst-Austragen):** `DELETE …/members/<name>` ist erlaubt, wenn `name ==
+  session.space` **und** `can_read` — das verengt nur den eigenen Zugriff. Ohne `can_read` wäre
+  es ein (wirkungsloser, weil No-op) Weg in unsichtbare Spaces; der Wächter hält das fest.
+- **Datenschutz-Einordnung (Nikinger-Frage, keine Rechtsberatung):** eine EU-Vorschrift, die
+  genau diesen Knopf verlangt, ist mir nicht bekannt. Er passt zum Gedanken „Datenschutz durch
+  Technikgestaltung“ — das ist eine Einordnung, nicht der Grund der Änderung (der Grund ist E6).
+- **Anlegen ist nicht betroffen (am Code gelesen):** `_items_post` reicht nur
+  `status`/`due`/`tags`/`links`/`format`/`folder`/`assignee` an den Kern; `share_*`/`visibility` im
+  POST-Body fallen still weg. MCP `create_item` hat keine solchen Parameter.
+- **Wächter (8 neu, `phase7_spaces_admin/tests/test_space_admin_api.py`):** Gast ändert
+  `share_read`/`share_write`/`visibility` ⇒ 403, Datei byteweise gleich (3) · Gast **nimmt** Bobs
+  Freigabe an `carol` zurück, ohne Anmeldedaten ⇒ 403 (der gefährlichere Fall: Verengen braucht
+  keine Re-Auth — vorher 200, Advisor-Hinweis) · Gast schreibt den
+  Body weiter (Regressionsschutz) · Team-Schreiber teilt weiter (Regressionsschutz) ·
+  Selbst-Austragen 200, `carol` bleibt · Selbst-Austragen ohne Leserecht 403.
+- **Gegenlauf, im Code neutralisiert:** Freigabe-Riegel aus ⇒ **4 rot** · Selbst-Austragen aus ⇒
+  **1 rot** · `can_read`-Bedingung aus ⇒ **1 rot**.
