@@ -2001,3 +2001,22 @@ def test_update_to_a_long_title_renames_the_file_in_one_commit(store_git, tmp_pa
     assert store_git.get(item.id).title == "漢" * 100
     assert [s.id for s in store_git.search("漢").items] == [item.id]
     assert int(_commits(tmp_path)) == vorher + 1
+
+
+def test_title_limit_is_256_characters_on_create(store, tmp_path):
+    """15.5, E3 (Nikinger: 256): Zeichen, nicht Byte — der Titel erreicht den Pfad nicht mehr."""
+    assert store.create("alpha", type="note", title="漢" * 256).title == "漢" * 256
+    with pytest.raises(ValidationError, match="höchstens 256"):
+        store.create("alpha", type="note", title="x" * 257)
+    assert len(list(tmp_path.rglob("*.md"))) == 1
+
+
+def test_title_limit_on_update_only_bites_a_changed_title(store, tmp_path):
+    item = store.create("alpha", type="note", title="kurz")
+    with pytest.raises(ValidationError, match="höchstens 256"):
+        store.update(item.id, version=1, title="x" * 257)
+    assert store.get(item.id).version == 1
+    # Von Hand verlängert: die UI schickt den Titel bei jedem Speichern mit — das muss gehen.
+    _von_hand(tmp_path, item.id, "title: kurz", "title: " + "y" * 300)
+    neu = store.update(item.id, version=store.get(item.id).version, title="y" * 300, body="neu")
+    assert neu.body == "neu"

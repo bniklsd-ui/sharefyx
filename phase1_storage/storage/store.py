@@ -269,6 +269,19 @@ def _require_str_list(name: str, value: Any) -> None:
         raise ValidationError(f"'{name}' muss eine Liste von Strings sein")
 
 
+# P10.5 15.5 (E3, Nikinger 2026-10-30: 256): der Titel erreicht den Pfad nicht mehr (der Slug ist in
+# `files.item_filename()` gekürzt) — das Limit ist eine Produktregel, in **Zeichen**. Live gemessen:
+# längster Titel 89 Zeichen bei 263 Items.
+MAX_TITLE_CHARS = 256
+
+
+def _check_title_length(title: str) -> None:
+    if len(title) > MAX_TITLE_CHARS:
+        raise ValidationError(
+            f"Der Titel ist {len(title)} Zeichen lang — erlaubt sind höchstens {MAX_TITLE_CHARS}."
+        )
+
+
 def _check_write_types(values: dict[str, Any]) -> None:
     for name in _STR_FIELDS:
         if name in values:
@@ -1185,6 +1198,7 @@ class Store:
                 # mit `space: team/` im Frontmatter — das eigene Item galt danach als fremd.
                 raise ValidationError(f"{space!r} ist kein gültiger Space-Name.")
             _check_write_types({"title": title, "body": body, **fields})
+            _check_title_length(title)
             folder = files.validate_folder(folder)
             now = self._now_fn()
             status = fields.pop("status", _DEFAULT_STATUS.get(type, "active"))
@@ -1255,6 +1269,10 @@ class Store:
             updated_extra = dict(current.extra)
             known_updatable = {"type", "title", "status", "body", "due", "tags", "links"}
             _check_write_types(changes)
+            if "title" in changes and changes["title"] != current.title:
+                # Nur ein **geänderter** Titel: die UI schickt ihn bei jedem Speichern mit, ein
+                # von Hand verlängerter Titel bliebe sonst unspeicherbar.
+                _check_title_length(changes["title"])
             kwargs: dict[str, Any] = {}
             for key, value in changes.items():
                 if key in _SYSTEM_MANAGED_FIELDS:

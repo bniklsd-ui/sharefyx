@@ -194,7 +194,7 @@
          diesem Fall kein Schreib-Bedienelement im DOM auffindbar ist. -->
     <div id="detail-editor" hidden>
       <header class="editor__head">
-        <input type="text" class="editor__title-input" id="field-title" placeholder="Titel" aria-label="Titel">
+        <input type="text" class="editor__title-input" id="field-title" maxlength="256" placeholder="Titel" aria-label="Titel">
         <div class="editor__head-actions">
           <span class="editor__version tnum" id="editor-version"></span>
           <!-- Meldung des Nikingers: "Archivieren" lag direkt neben dem "×" -- ein Fehlklick war
@@ -389,7 +389,7 @@
       <select class="input" id="create-type"></select>
     </label>
     <label>Titel
-      <input type="text" class="input" id="create-title-input">
+      <input type="text" class="input" id="create-title-input" maxlength="256">
     </label>
     <div class="overlay__actions">
       <button type="button" class="btn-primary" id="create-submit">Anlegen</button>

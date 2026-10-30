@@ -423,6 +423,19 @@ async def test_long_titles_neither_fail_nor_half_write(full_app_items, item_stor
     assert (item.title, item.version) == ("漢" * 100, 2)
 
 
+
+@pytest.mark.asyncio
+async def test_create_item_rejects_a_title_over_256_characters(full_app_items, item_store, totp_code):
+    """15.5, E3 (Nikinger: 256) — 422, keine Datei."""
+    async with _client(full_app_items) as client:
+        csrf = await _login(client, totp_code)
+        response = await client.post(
+            "/api/v1/items", json={"type": "note", "title": "x" * 257}, headers=_headers(csrf),
+        )
+    assert response.status_code == 422
+    assert "256" in response.text
+
+
 @pytest.mark.asyncio
 async def test_create_item_uses_session_space(full_app_items, totp_code, item_store):
     async with _client(full_app_items) as client:
