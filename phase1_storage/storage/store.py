@@ -1127,6 +1127,21 @@ class Store:
         with self._lock:
             rows = index.all_rows(self._conn)
 
+        def read(row: sqlite3.Row) -> Item | None:
+            # P10.5 15.6 (Fund B3′): eine von Hand kaputt editierte Datei (YAML, Kodierung,
+            # Rechte) fehlt in der Suche, statt sie für alle zu sprengen — dieselbe Menge wie
+            # `index._FILE_ERRORS` beim Neuaufbau, und wie dort mit `CRITICAL` und Pfad.
+            try:
+                return self._row_to_item(row)
+            except FileNotFoundError:
+                raise
+            except (OSError, ValueError, KeyError, TypeError) as exc:
+                # `exc.__class__`, nicht `type(exc)`: `type` ist hier der Filter-Parameter.
+                logger.critical(
+                    "Suche: %s uebersprungen — %s: %s", row["path"], exc.__class__.__name__, exc
+                )
+                return None
+
         items = []
         for r in rows:
             # P10.5 15.6 (Ultra-Review B10): die Dateien werden **nach** dem Lock gelesen — ein
@@ -1135,16 +1150,16 @@ class Store:
             # Das Lock über alle Lesezugriffe zu halten, sperrte jeden Writer für eine ganze
             # Suche — und eine von Hand gelöschte Datei hält sich ohnehin an kein Lock.
             try:
-                items.append(self._row_to_item(r))
+                item = read(r)
             except FileNotFoundError:
                 with self._lock:
                     fresh = index.get_item_row(self._conn, r["id"])
-                    if fresh is None:
-                        continue
                     try:
-                        items.append(self._row_to_item(fresh))
+                        item = read(fresh) if fresh is not None else None
                     except FileNotFoundError:
-                        continue
+                        item = None
+            if item is not None:
+                items.append(item)
 
         def matches(item: Item) -> bool:
             if space is not None and item.space != space:

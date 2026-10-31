@@ -2105,3 +2105,27 @@ def test_search_threads_against_renames_and_trash_raise_nothing(store):
         sys.setswitchinterval(altes_intervall)
     assert fehler == []
     assert {s.id for s in store.search().items} == {i.id for i in items[:10]}
+
+
+@pytest.mark.parametrize(
+    "kaputt",
+    [
+        lambda pfad: pfad.write_text(
+            pfad.read_text(encoding="utf-8").replace("title: kaputt", "title: [unclosed", 1),
+            encoding="utf-8",
+        ),
+        lambda pfad: pfad.write_bytes(pfad.read_bytes().replace(b"kaputt", b"kap\xfctt")),
+    ],
+    ids=["yaml", "latin-1"],
+)
+def test_search_skips_a_hand_broken_file_and_says_where(store, tmp_path, caplog, kaputt):
+    """Fund B3′ (15.6): vorher `FrontmatterError` bzw. `UnicodeDecodeError` aus **jeder**
+    `search()` — eine Datei sprengte die Suche für alle, bis jemand sie reparierte."""
+    item = store.create("alpha", type="note", title="kaputt")
+    heil = store.create("alpha", type="note", title="heil")
+    kaputt(next(tmp_path.rglob(f"{item.id}__*.md")))
+    with caplog.at_level(logging.CRITICAL, logger="storage.store"):
+        result = store.search()
+    assert [s.id for s in result.items] == [heil.id]
+    assert result.total == 1
+    assert any(item.id in r.getMessage() and r.levelno == logging.CRITICAL for r in caplog.records)

@@ -11,7 +11,7 @@ down:
   - ../../phase1_storage/storage/store.py               # Kern: `_asset_matches()`, `rebuild_index()`, Rename-Wiederaufnahme
   - ../../phase5_ui/webui/api.py                        # REST: Typprüfung, Mitglieder-Routen
   - ../../phase2_mcp/mcpserver/tools.py                 # MCP: Space-Name, `offset`
-updated: 2026-10-31 (Schritt 15.6 — B9/B10 geschlossen; Fund B3′ beim Nikinger; Anmerkungen 15.1–15.3b → Anhang) | 2026-10-30 (Schritt 15.5c — E3: Titel ≤ 256 Zeichen, Nikinger; Live-Durchsicht B6 0 Treffer) | 2026-10-30 (Schritt 15.5b — UI-Rest aus 15.4: Verwalten-Knöpfe nur bei `manageable`) | 2026-10-30 (Schritt 15.5 gebaut, Opus — B6/B7 geschlossen; E3 gemessen: Slug ≤ 100 Byte, kein Titel-Limit) | 2026-10-30 (Schritt 15.4b gebaut — B4′ + Selbst-Austragen; E1 überholt: Deploy D nach allen Fixes; E5-Durchsicht 0 Treffer) | 2026-10-30 (Schritt 15.4 gebaut, Opus — B4 geschlossen, drei Stellen statt zwei) | 2026-10-30 (Schritt 15.3b gebaut, Opus — E5: `share_*`-Skalar = eine Freigabe, `WARNING` mit Pfad) | 2026-10-30 (E5 entschieden — `share_*`-Skalar = eine Freigabe, Schritt 15.3b) | 2026-10-30 (Schritt 15.3 gebaut, Opus — B5/B8 geschlossen: Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Fund `links: [1]`) | 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie empfohlen; Fund: doppelte `links:` = derselbe Startblocker) | 2026-10-30 (E1 Hotfix ja, E4 Opus — Nikinger) | 2026-10-30 (Entwurf + Schritt 15.1 gebaut, Claude Code — B1 geschlossen, am Code bestätigt und per Gegenlauf bewiesen)
+updated: 2026-10-31 (Schritt 15.6b — Fund B3′ gebaut: kaputte Datei fehlt in der Suche statt sie zu sprengen) | 2026-10-31 (Schritt 15.6 — B9/B10 geschlossen; Fund B3′ beim Nikinger; Anmerkungen 15.1–15.3b → Anhang) | 2026-10-30 (Schritt 15.5c — E3: Titel ≤ 256 Zeichen, Nikinger; Live-Durchsicht B6 0 Treffer) | 2026-10-30 (Schritt 15.5b — UI-Rest aus 15.4: Verwalten-Knöpfe nur bei `manageable`) | 2026-10-30 (Schritt 15.5 gebaut, Opus — B6/B7 geschlossen; E3 gemessen: Slug ≤ 100 Byte, kein Titel-Limit) | 2026-10-30 (Schritt 15.4b gebaut — B4′ + Selbst-Austragen; E1 überholt: Deploy D nach allen Fixes; E5-Durchsicht 0 Treffer) | 2026-10-30 (Schritt 15.4 gebaut, Opus — B4 geschlossen, drei Stellen statt zwei) | 2026-10-30 (Schritt 15.3b gebaut, Opus — E5: `share_*`-Skalar = eine Freigabe, `WARNING` mit Pfad) | 2026-10-30 (E5 entschieden — `share_*`-Skalar = eine Freigabe, Schritt 15.3b) | 2026-10-30 (Schritt 15.3 gebaut, Opus — B5/B8 geschlossen: Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Fund `links: [1]`) | 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie empfohlen; Fund: doppelte `links:` = derselbe Startblocker) | 2026-10-30 (E1 Hotfix ja, E4 Opus — Nikinger) | 2026-10-30 (Entwurf + Schritt 15.1 gebaut, Claude Code — B1 geschlossen, am Code bestätigt und per Gegenlauf bewiesen)
 ---
 # P10.5 Block 15 — Die Fixes aus dem Ultra-Review
 
@@ -37,7 +37,7 @@ updated: 2026-10-31 (Schritt 15.6 — B9/B10 geschlossen; Fund B3′ beim Niking
 | B7 Titel-Länge → Dateiname | mittel, R | **ja**: reproduziert — 200 Umlaute `OSError 36`; Update auf 100 CJK: Datei am alten Namen mit `version: 2`, kein Commit | **✅ 15.5** |
 | B9 Einladungs-Token im Log | mittel, R | **ja** (2026-10-31): reproduziert, GET **und** POST `/ui/invite/<token>` im Klartext; `_TOKEN_SEGMENT_RE` kannte nur `/mcp/` | **✅ 15.6** |
 | B10 `search()` ohne Lock | mittel, R | **ja**: reproduziert, 3 Such-Threads gegen 300 Titel-Updates ⇒ **15** `FileNotFoundError` — nur mit `sys.setswitchinterval(1e-6)`, beim Standard **0** | **✅ 15.6** |
-| B3′ kaputtes YAML in einer indizierten Datei (Fund 15.6) | — (nicht im Review), R | **ja**: Hand-Edit `title: [unclosed` ⇒ `search()` wirft `FrontmatterError` — die **ganze** Suche fällt, nicht nur die eine Zeile; `get()` der Datei ebenso | ⬜ **Nikinger** — außerhalb 15.6 |
+| B3′ kaputtes YAML in einer indizierten Datei (Fund 15.6) | — (nicht im Review), R | **ja**: Hand-Edit `title: [unclosed` ⇒ `search()` wirft `FrontmatterError` — die **ganze** Suche fällt, nicht nur die eine Zeile; `get()` der Datei ebenso | **✅ 15.6b** (Nikinger 2026-10-31: „fix it before deploy“) |
 | B11–B22 (ohne B15/B20) | mittel/niedrig | **Backlog** (Review-Empfehlung); B12 (Performance) ist kein Fix-Schnitt, sondern ein Messauftrag | ⬜ |
 
 ## §1 Das Prinzip — zwei Sätze
@@ -79,6 +79,7 @@ neuen Wächter müssen genau an diesem Befund rot werden · **(e)** volle Suite 
 | **15.5 ✅** | B6, B7 | Space-Name-Validierung an **einer** Stelle im Kern, aufgerufen von MCP- und REST-Schreibpfaden; Slug kürzen, Titel-Höchstlänge, `OSError` sauber abbilden | `space="team/"` ⇒ abgelehnt; 200 Umlaute im Titel ⇒ weder 500 noch halber Write |
 | **15.5b ✅** | UI-Rest 15.4 | `spaces.js`: Hinzufügen und „Entfernen“ nur bei `manageable`; der eigene Name behält „Entfernen“ (E6), danach zurück zur Liste | Browser-Probe an der Wegwerf-Instanz |
 | **15.6 ✅** | B9, B10 | Einladungs-Pfad in die Redaktion (`request_log.py`, `logging_setup.py`); `search()` überspringt eine zwischenzeitlich verschwundene Datei | Log enthält den Token nicht; Such-Threads gegen Umbenennungen ⇒ kein `FileNotFoundError` |
+| **15.6b ✅** | B3′ | `search()` überspringt eine unlesbare Datei (`OSError`/`ValueError`/`KeyError`/`TypeError`, wie `index._FILE_ERRORS`) mit `CRITICAL` und Pfad | Hand-Edit kaputtes YAML **und** Latin-1-Byte ⇒ Suche liefert die übrigen Items, Log nennt die Datei |
 | **15.7** | — | Volle Suite, `doc_health`, Update-Log-Zeile (nur Menschen-relevantes), Head-Bilanz | — |
 
 ## §4 Abnahme — neue Zeilen P10.5-75 bis P10.5-79
@@ -282,3 +283,10 @@ was der Server nicht selbst entscheiden kann (Working style, 2026-10-22).
   Datei repariert ist. 15.2 hat das für den **Neuaufbau** gelöst, nicht für den laufenden Betrieb.
   Entscheidung beim Nikinger: vor Deploy D (je Zeile überspringen + `CRITICAL` mit Pfad, wie
   `rebuild_index()`) oder Backlog.
+- **15.6b gebaut (2026-10-31, Nikinger: vor dem Deploy):** `search()` liest jede Zeile über
+  `read()` — unlesbar (dieselbe Fehlermenge wie `index._FILE_ERRORS`) ⇒ `CRITICAL` mit Pfad, Zeile
+  fehlt in Seite und `total`; `FileNotFoundError` geht weiter an den B10-Weg. **Fund beim Bauen:**
+  `type(exc).__name__` rief `None` auf — `type` ist in `search()` der Filter-Parameter; jetzt
+  `exc.__class__`. `get()` der kaputten Datei wirft weiter (betrifft nur das eine Item).
+  Wächter: `test_search_skips_a_hand_broken_file_and_says_where` (YAML, Latin-1); Gegenlauf
+  (Fehlermenge leer) **2 rot**, die B10-Wächter bleiben grün.
