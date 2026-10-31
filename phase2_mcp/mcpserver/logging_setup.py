@@ -8,7 +8,10 @@ import logging
 import re
 import sys
 
-_TOKEN_SEGMENT_RE = re.compile(r"(/mcp/)[^\s\"'/]+")
+# P10.5 15.6 (Ultra-Review B9): auch `/ui/invite/<token>` — ein Einmal-Geheimnis, mit dem jeder
+# Journal-Leser die Einladung einlöst. Ein Muster für beide Verbraucher (`AccessLogASGI` und den
+# Filter unten), damit die zwei Redaktionen nie auseinanderlaufen.
+_TOKEN_SEGMENT_RE = re.compile(r"(/mcp/|/ui/invite/)[^\s\"'/]+")
 
 # P4 Step 6b (Plan §4): Verteidigung in der Tiefe für OAuth-Geheimnisse. Praktisch redundant zur
 # eigentlichen Sicherung — `OAuthLogASGI`/`log_event()`s Feld-Whitelist lassen Passwort, TOTP-

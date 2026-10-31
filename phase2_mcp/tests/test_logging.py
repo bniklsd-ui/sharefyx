@@ -31,6 +31,19 @@ def test_scrubbing_filter_redacts_token_in_dict_message():
     assert record.msg["ms"] == 1
 
 
+def test_scrubbing_filter_redacts_invite_token_in_dict_message():
+    """P10.5 15.6 (B9): der Filter ist die zweite Verteidigung — derselbe Einladungs-Pfad, der
+    an `AccessLogASGI` vorbei als Dict-Wert durch `log_event()` liefe."""
+    record = logging.LogRecord(
+        name="test", level=logging.INFO, pathname=__file__, lineno=1,
+        msg={"ev": "http", "path": "/ui/invite/Qm9zZXNHZWhlaW1uaXM"}, args=(), exc_info=None,
+    )
+
+    TokenScrubbingFilter().filter(record)
+
+    assert record.msg["path"] == "/ui/invite/<redacted>"
+
+
 def test_scrubbing_filter_redacts_ua_field_in_dict_message():
     """P6 Step 2: `ua` ist das erste externe, frei wählbare Feld auf dem Request-Log — derselbe
     dict-Wert-Scrub, der `path` in `test_scrubbing_filter_redacts_token_in_dict_message` trifft,

@@ -313,6 +313,29 @@ async def test_http_event_redacts_token_segment(request_log_handler):
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("method", ["GET", "POST"])
+async def test_http_event_redacts_invite_token(request_log_handler, auth_store, method):
+    """P10.5 15.6 (Ultra-Review B9): `/ui/invite/<token>` stand im Klartext in der
+    `ev="http"`-Zeile — ein Einmal-Geheimnis, mit dem jeder Journal-Leser die Einladung
+    einlöst. Der Token kommt aus dem echten Generator, nicht aus einem Literal."""
+    token = auth_store.create_invite(space="alpha", purpose="initial", ttl_s=3600)
+
+    async def fake_app(scope, receive, send):
+        await send({"type": "http.response.start", "status": 200, "headers": []})
+        await send({"type": "http.response.body", "body": b""})
+
+    wrapped = AccessLogASGI(fake_app)
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=wrapped), base_url="http://testserver"
+    ) as client:
+        await client.request(method, f"/ui/invite/{token}")
+
+    http_events = [r.msg for r in request_log_handler.records if r.msg.get("ev") == "http"]
+    assert [e["path"] for e in http_events] == ["/ui/invite/<redacted>"]
+    assert token not in _records_as_text(request_log_handler)
+
+
+@pytest.mark.asyncio
 async def test_http_event_logs_401_status(request_log_handler):
     async def unauthorized_app(scope, receive, send):
         await send({"type": "http.response.start", "status": 401, "headers": []})

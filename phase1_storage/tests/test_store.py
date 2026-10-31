@@ -3,6 +3,7 @@ import logging
 import os
 import shutil
 import subprocess
+import sys
 import threading
 from dataclasses import asdict
 from datetime import date, datetime, timedelta, timezone
@@ -2020,3 +2021,87 @@ def test_title_limit_on_update_only_bites_a_changed_title(store, tmp_path):
     _von_hand(tmp_path, item.id, "title: kurz", "title: " + "y" * 300)
     neu = store.update(item.id, version=store.get(item.id).version, title="y" * 300, body="neu")
     assert neu.body == "neu"
+
+
+def _search_after_a_stale_index_read(store, monkeypatch, action):
+    """B10 deterministisch: `search()` liest die Indexzeilen, **danach** läuft `action` — genau
+    das Fenster, in dem ein paralleler Writer die Datei umbenennt oder verschiebt."""
+    from storage import store as store_mod
+
+    echt = store_mod.index.all_rows
+    erledigt = []
+
+    def all_rows(conn):
+        rows = echt(conn)
+        if not erledigt:
+            erledigt.append(True)
+            action()
+        return rows
+
+    monkeypatch.setattr(store_mod.index, "all_rows", all_rows)
+    return store.search()
+
+
+def test_search_survives_a_rename_after_the_index_read(store, monkeypatch):
+    """B10: vorher `FileNotFoundError` — das umbenannte Item ist weiter da, mit neuem Titel."""
+    item = store.create("alpha", type="note", title="alt")
+    store.create("alpha", type="note", title="daneben")
+    result = _search_after_a_stale_index_read(
+        store, monkeypatch, lambda: store.update(item.id, version=1, title="neu")
+    )
+    titel = {s.id: s.title for s in result.items}
+    assert titel[item.id] == "neu"
+    assert result.total == 2
+
+
+def test_search_drops_an_item_trashed_after_the_index_read(store, monkeypatch):
+    item = store.create("alpha", type="note", title="weg")
+    bleibt = store.create("alpha", type="note", title="bleibt")
+    result = _search_after_a_stale_index_read(
+        store, monkeypatch, lambda: store.trash(item.id, version=1)
+    )
+    assert [s.id for s in result.items] == [bleibt.id]
+    assert result.total == 1
+
+
+def test_search_drops_a_file_deleted_by_hand_after_the_index_read(store, monkeypatch, tmp_path):
+    """Von Hand gelöscht, Index nicht nachgezogen: die neu geholte Zeile zeigt ins Leere."""
+    item = store.create("alpha", type="note", title="weg")
+    (pfad,) = tmp_path.glob(f"alpha/{item.id}__*.md")
+    result = _search_after_a_stale_index_read(store, monkeypatch, pfad.unlink)
+    assert result.items == [] and result.total == 0
+
+
+def test_search_threads_against_renames_and_trash_raise_nothing(store):
+    """B10 wie im Review: drei Such-Threads gegen 300 Titel-Updates und Papierkorb-Züge. Das
+    kurze Umschaltintervall macht das Fenster sichtbar (ohne es: 0 Treffer auch ohne Fix); die
+    Updates laufen reihum über alle Items, damit die Lage im `ORDER BY id` keine Rolle spielt."""
+    items = [store.create("alpha", type="note", title=f"Item {i}") for i in range(20)]
+    versionen = {i.id: i.version for i in items}
+    fehler, stopp = [], threading.Event()
+
+    def leser():
+        while not stopp.is_set():
+            try:
+                store.search()
+            except Exception as exc:  # noqa: BLE001 - genau das ist der Befund
+                fehler.append(exc)
+
+    altes_intervall = sys.getswitchinterval()
+    sys.setswitchinterval(1e-6)
+    threads = [threading.Thread(target=leser) for _ in range(3)]
+    try:
+        for t in threads:
+            t.start()
+        for i in range(300):
+            ziel = items[i % 10].id
+            versionen[ziel] = store.update(ziel, version=versionen[ziel], title=f"Titel {i}").version
+            if i % 30 == 0:
+                store.trash(items[10 + i // 30].id, version=1)
+    finally:
+        stopp.set()
+        for t in threads:
+            t.join()
+        sys.setswitchinterval(altes_intervall)
+    assert fehler == []
+    assert {s.id for s in store.search().items} == {i.id for i in items[:10]}

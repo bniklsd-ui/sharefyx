@@ -7,10 +7,11 @@ up: ../../phase10_5_finishing/CLAUDE.md
 down:
   - phase10_5_ultra_review_v4.0.0.md                    # 📕 der Bericht, verbatim — die Befunde B1–B22
   - phase10_5_block14_7_plan.md                         # 📗 Muster dieses Plans (Schritte, Tor, Anmerkungen)
+  - phase10_5_block15_review_fixes_plan_anhang.md      # 📦 die Anmerkungen 15.1–15.3b, verbatim
   - ../../phase1_storage/storage/store.py               # Kern: `_asset_matches()`, `rebuild_index()`, Rename-Wiederaufnahme
   - ../../phase5_ui/webui/api.py                        # REST: Typprüfung, Mitglieder-Routen
   - ../../phase2_mcp/mcpserver/tools.py                 # MCP: Space-Name, `offset`
-updated: 2026-10-30 (Schritt 15.5c — E3: Titel ≤ 256 Zeichen, Nikinger; Live-Durchsicht B6 0 Treffer) | 2026-10-30 (Schritt 15.5b — UI-Rest aus 15.4: Verwalten-Knöpfe nur bei `manageable`) | 2026-10-30 (Schritt 15.5 gebaut, Opus — B6/B7 geschlossen; E3 gemessen: Slug ≤ 100 Byte, kein Titel-Limit) | 2026-10-30 (Schritt 15.4b gebaut — B4′ + Selbst-Austragen; E1 überholt: Deploy D nach allen Fixes; E5-Durchsicht 0 Treffer) | 2026-10-30 (Schritt 15.4 gebaut, Opus — B4 geschlossen, drei Stellen statt zwei) | 2026-10-30 (Schritt 15.3b gebaut, Opus — E5: `share_*`-Skalar = eine Freigabe, `WARNING` mit Pfad) | 2026-10-30 (E5 entschieden — `share_*`-Skalar = eine Freigabe, Schritt 15.3b) | 2026-10-30 (Schritt 15.3 gebaut, Opus — B5/B8 geschlossen: Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Fund `links: [1]`) | 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie empfohlen; Fund: doppelte `links:` = derselbe Startblocker) | 2026-10-30 (E1 Hotfix ja, E4 Opus — Nikinger) | 2026-10-30 (Entwurf + Schritt 15.1 gebaut, Claude Code — B1 geschlossen, am Code bestätigt und per Gegenlauf bewiesen)
+updated: 2026-10-31 (Schritt 15.6 — B9/B10 geschlossen; Fund B3′ beim Nikinger; Anmerkungen 15.1–15.3b → Anhang) | 2026-10-30 (Schritt 15.5c — E3: Titel ≤ 256 Zeichen, Nikinger; Live-Durchsicht B6 0 Treffer) | 2026-10-30 (Schritt 15.5b — UI-Rest aus 15.4: Verwalten-Knöpfe nur bei `manageable`) | 2026-10-30 (Schritt 15.5 gebaut, Opus — B6/B7 geschlossen; E3 gemessen: Slug ≤ 100 Byte, kein Titel-Limit) | 2026-10-30 (Schritt 15.4b gebaut — B4′ + Selbst-Austragen; E1 überholt: Deploy D nach allen Fixes; E5-Durchsicht 0 Treffer) | 2026-10-30 (Schritt 15.4 gebaut, Opus — B4 geschlossen, drei Stellen statt zwei) | 2026-10-30 (Schritt 15.3b gebaut, Opus — E5: `share_*`-Skalar = eine Freigabe, `WARNING` mit Pfad) | 2026-10-30 (E5 entschieden — `share_*`-Skalar = eine Freigabe, Schritt 15.3b) | 2026-10-30 (Schritt 15.3 gebaut, Opus — B5/B8 geschlossen: Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Fund `links: [1]`) | 2026-10-30 (Schritt 15.2 gebaut, Opus — B2/B3/B20 geschlossen, E2 wie empfohlen; Fund: doppelte `links:` = derselbe Startblocker) | 2026-10-30 (E1 Hotfix ja, E4 Opus — Nikinger) | 2026-10-30 (Entwurf + Schritt 15.1 gebaut, Claude Code — B1 geschlossen, am Code bestätigt und per Gegenlauf bewiesen)
 ---
 # P10.5 Block 15 — Die Fixes aus dem Ultra-Review
 
@@ -34,8 +35,9 @@ updated: 2026-10-30 (Schritt 15.5c — E3: Titel ≤ 256 Zeichen, Nikinger; Live
 | B4′ `share_*` fremder Home-Space-Items (Fund 15.4) | — (nicht im Review), C | **ja**: `_items_patch` prüft nur `can_write_item_as_human` + eigene Re-Auth; in 15.4b **reproduziert** (R): Gast setzt `share_read`/`share_write`/`visibility` auf Bobs Item ⇒ 200 | **✅ 15.4b** |
 | B6 Space-Name ungeprüft | mittel, R | **ja** (2026-10-30): reproduziert, dazu `./team` und `team/.` — alle vier landen in `team/` mit rohem Namen im Frontmatter | **✅ 15.5** |
 | B7 Titel-Länge → Dateiname | mittel, R | **ja**: reproduziert — 200 Umlaute `OSError 36`; Update auf 100 CJK: Datei am alten Namen mit `version: 2`, kein Commit | **✅ 15.5** |
-| B9 Einladungs-Token im Log | mittel, R | offen — bei 15.6 | ⬜ |
-| B10 `search()` ohne Lock | mittel, R | offen — bei 15.6 | ⬜ |
+| B9 Einladungs-Token im Log | mittel, R | **ja** (2026-10-31): reproduziert, GET **und** POST `/ui/invite/<token>` im Klartext; `_TOKEN_SEGMENT_RE` kannte nur `/mcp/` | **✅ 15.6** |
+| B10 `search()` ohne Lock | mittel, R | **ja**: reproduziert, 3 Such-Threads gegen 300 Titel-Updates ⇒ **15** `FileNotFoundError` — nur mit `sys.setswitchinterval(1e-6)`, beim Standard **0** | **✅ 15.6** |
+| B3′ kaputtes YAML in einer indizierten Datei (Fund 15.6) | — (nicht im Review), R | **ja**: Hand-Edit `title: [unclosed` ⇒ `search()` wirft `FrontmatterError` — die **ganze** Suche fällt, nicht nur die eine Zeile; `get()` der Datei ebenso | ⬜ **Nikinger** — außerhalb 15.6 |
 | B11–B22 (ohne B15/B20) | mittel/niedrig | **Backlog** (Review-Empfehlung); B12 (Performance) ist kein Fix-Schnitt, sondern ein Messauftrag | ⬜ |
 
 ## §1 Das Prinzip — zwei Sätze
@@ -76,7 +78,7 @@ neuen Wächter müssen genau an diesem Befund rot werden · **(e)** volle Suite 
 | **15.4b ✅** | B4′, E6 | REST-`PATCH` von `share_read`/`share_write`/`visibility` nur mit `manages_space` auf den Item-Space; `DELETE …/members/<eigener Name>` erlaubt mit `can_read` | Gast ⇒ 403 je Feld, Datei byteweise gleich; Gast schreibt Body weiter; Team-Schreiber teilt weiter; Selbst-Austragen 200, ohne Leserecht 403 |
 | **15.5 ✅** | B6, B7 | Space-Name-Validierung an **einer** Stelle im Kern, aufgerufen von MCP- und REST-Schreibpfaden; Slug kürzen, Titel-Höchstlänge, `OSError` sauber abbilden | `space="team/"` ⇒ abgelehnt; 200 Umlaute im Titel ⇒ weder 500 noch halber Write |
 | **15.5b ✅** | UI-Rest 15.4 | `spaces.js`: Hinzufügen und „Entfernen“ nur bei `manageable`; der eigene Name behält „Entfernen“ (E6), danach zurück zur Liste | Browser-Probe an der Wegwerf-Instanz |
-| **15.6** | B9, B10 | Einladungs-Pfad in die Redaktion (`request_log.py`, `logging_setup.py`); `search()` überspringt eine zwischenzeitlich verschwundene Datei | Log enthält den Token nicht; Such-Threads gegen Umbenennungen ⇒ kein `FileNotFoundError` |
+| **15.6 ✅** | B9, B10 | Einladungs-Pfad in die Redaktion (`request_log.py`, `logging_setup.py`); `search()` überspringt eine zwischenzeitlich verschwundene Datei | Log enthält den Token nicht; Such-Threads gegen Umbenennungen ⇒ kein `FileNotFoundError` |
 | **15.7** | — | Volle Suite, `doc_health`, Update-Log-Zeile (nur Menschen-relevantes), Head-Bilanz | — |
 
 ## §4 Abnahme — neue Zeilen P10.5-75 bis P10.5-79
@@ -101,164 +103,16 @@ was der Server nicht selbst entscheiden kann (Working style, 2026-10-22).
 - **Kein Deploy.** Weder Hotfix noch Deploy D laufen aus dieser Session (Hard Rule 9).
 
 ## Anmerkungen 15.1 — B1 (2026-10-30, Claude Code)
-
-- **Reichweite, am Code gelesen (korrigiert nach dem Advisor-Hinweis):** über **MCP** ist B1 ein reiner
-  **Lese**-Befund (`get_item_asset`) — **kein** MCP-Werkzeug ruft `delete_asset` auf; das **Verschieben**
-  ist nur über den Store/CLI erreichbar, über REST nur als Wildcard (`*`), weil die Route kein `/`
-  trägt. Kritisch bleibt es: die Auth-DB-Dateien und fremde Items sind lesbar.
-- **Am Code bestätigt:** `get_asset`/`delete_asset` bauten `target_dir.glob(f"{asset_id}.*")`;
-  `ASSET_ID_RE` wurde nur in `files.asset_path()` (Upload) und `list_assets()` angewandt. Die
-  MCP-Zweige ohne Schreibrecht filtern über `list_assets()` — dort ging die ID nie in einen Pfad.
-- **Warum der Fix im Store sitzt, nicht in Tool und Route:** MCP und REST rufen beide
-  `store.get_asset`/`delete_asset`; eine Prüfung im Kern deckt beide **und** `space_cli`, eine im
-  Adapter nur den einen. Die Route kann nach Starlettes Dekodierung kein `/` tragen, aber `*` —
-  das war B15.
-- **Warum „nicht gefunden" statt `ValidationError`:** die Adapter bilden `ItemNotFound` aus
-  `get_asset` schon auf `asset_not_found`/404 ab. Eine formfalsche ID unterscheidbar zu machen von
-  einer unbekannten hätte einen neuen Fehlerpfad **und** ein Orakel gebraucht, ohne einem
-  ehrlichen Client zu helfen.
-- **`$` → `\Z`:** `re.match(r"^ast_[0-9a-f]{8}$", "ast_01234567\n")` trifft — der Zeilenumbruch
-  ginge in Glob und Dateinamen. `ITEM_ID_RE` hat dieselbe Form (`$`); dort erreicht eine ID den
-  Pfad erst **nach** dem Index-Lookup, deshalb nicht Teil von B1 — als Härtung in 15.5 mitnehmen.
-- **Gegenlauf (Fix per `git stash` entfernt):** 9 Wächter rot — Store ×6 (`../../../bob/.share`,
-  `*`, `ast_*` je get/delete), MCP ×1 (Traversal liest fremdes Item), Store direkt ×1 (verschiebt fremde
-  `.share.yml`), REST ×1 (`*` ⇒ 200 statt 404). Die übrigen Formen (`ast_0123456?`, leerer
-  String, Traversal auf eine nicht existierende Datei) laufen **auch ohne Fix** durch, weil dort
-  schlicht nichts passt — sie sind Regressionsschutz, kein Beweis; der Beweis sind die neun.
+> **Verbatim verschoben** nach `phase10_5_block15_review_fixes_plan_anhang.md` (`scripts/move_sections.py`) — dort unter derselben Überschrift.
 
 ## Anmerkungen 15.2 — B2/B3/B20 (2026-10-30, Opus)
-
-- **Am Code reproduziert (tmp-`DATA_ROOT`), alle drei:** B2 `rename_folder("alice", "projekte",
-  "archiv/projekte")` ⇒ `FileNotFoundError`, Marker bleibt, `Store()` wirft erneut · B3
-  `alice/README.md` ⇒ `rebuild_index()` wirft `FrontmatterError`, **0** Zeilen im Index, frischer
-  Start wirft · B20 `parse("---\r\n…")` ⇒ `FrontmatterError`.
-- **Fund (nicht im Review): `links: [itm_x, itm_x]`** von Hand riss den Primärschlüssel von
-  `item_links` (`IntegrityError`) — derselbe Startblocker wie B3. Fix an der einen Stelle, die
-  Kanten schreibt (`index._replace_links_no_commit()`: Paare dedupliziert).
-- **Fund: `yaml.YAMLError` ist kein `ValueError`.** Kaputtes YAML lief an jedem `except ValueError`
-  im Kern vorbei — auch an dem in `_rewrite_space_frontmatter`. `parse()` übersetzt jetzt in
-  `FrontmatterError`; damit greift jeder bestehende Fänger.
-- **Fund: ein Wächter lief nie.** `test_rename_resumes_after_crash` stand **zweimal** in
-  `phase1_storage/tests/test_store.py` (Ordner Z. 1385, Space Z. 1535) — die zweite Definition
-  verdeckte die erste, der Ordner-Wiederaufnahme-Test war seit Block 9 nie gelaufen. Umbenannt in
-  `test_rename_folder_resumes_after_crash`, gegen den **unveränderten** Code grün (kein versteckter
-  Fehler). AST-Suche über alle Testdateien: **keine** weitere Doppelung.
-- **B3, Bauform:** je Datei ein `SAVEPOINT` (keine halbe Zeile: Item ohne Kanten), der ganze
-  Neuaufbau **eine** Transaktion (vorher committete `replace_item_links()` das `DELETE` beim ersten
-  Item). **Datei-Fehler** (`OSError`, `ValueError`, `KeyError`, `TypeError`, `sqlite3.ProgrammingError`
-  /`InterfaceError`/`IntegrityError` — gemessen: `title: [a]` wirft `ProgrammingError`, eine
-  `DatabaseError`-Unterklasse) kosten die Datei, `CRITICAL` mit Pfad; **Umgebungs-Fehler**
-  (`OperationalError`) rollen zurück, der alte Index steht vollständig. `IndexStats` bleibt
-  unverändert (P1-Contract) — die Zahl der übersprungenen Dateien steht im Log.
-- **B2, Bauform:** Elternordner wird angelegt (wie `files.move_file()` es für Dateien tut; die Option
-  „`ValidationError`" hätte einen legitimen Klick verboten). Scheitert der Rename, **bevor** etwas
-  wanderte (am **Plattenstand** entschieden: `alt` steht, `neu` fehlt), wird der Marker gelöscht —
-  sonst führte der nächste Start einen Rename aus, den der Aufrufer als Fehler sah. Die
-  Wiederaufnahme fängt jeden Fehler: `CRITICAL`, Marker bleibt, Index aus der Platte neu, Start geht
-  weiter. **Neu dadurch (Advisor):** ein liegender Marker bei laufendem Dienst — deshalb lehnen
-  `rename_folder`/`rename_space` mit `ValidationError` ab, solange er liegt (sonst überschriebe der
-  nächste Rename die einzige Spur). Rest: ein so angelegter, danach leerer Elternordner bleibt liegen
-  (unsichtbar, Ordner leiten sich aus Items ab).
-- **B20, Bauform:** die drei Begrenzer akzeptieren `\r?\n`; `parse()` gibt dieselbe Form zurück
-  (P1-Contract). Ein Update schreibt das Frontmatter mit `\n`, der Body behält `\r\n` — **gemischte
-  Zeilenenden** nach dem ersten Schreiben, Datei bleibt lesbar (Wächter `test_crlf_item_survives_update`).
-  Ein UTF-8-BOM ist **nicht** abgedeckt (eigene Fehlerklasse, kostet jetzt nur die Datei).
-- **Gegenlauf, je Quelldatei einzeln** (Advisor: sonst verdeckt B3 den B20-Fix und die
-  Wiederaufnahme den Elternordner-Fix): ohne `frontmatter.py` **6 rot**, ohne `index.py` **5 rot**,
-  ohne `store.py` **5 rot** — jede Datei hat eigene rote Wächter, keiner verdeckt einen anderen.
+> **Verbatim verschoben** nach `phase10_5_block15_review_fixes_plan_anhang.md` (`scripts/move_sections.py`) — dort unter derselben Überschrift.
 
 ## Anmerkungen 15.3 — B5/B8 (2026-10-30, Opus)
-
-- **Am Code reproduziert (tmp-`DATA_ROOT`), acht Hand-Edit-Fälle, Neuaufbau ehrlich erzwungen**
-  (ein zweiter `Store()` auf demselben Index baut **nicht** neu — der erste Probelauf war dadurch
-  wertlos, Advisor-Fund): `tags: [2026]` ⇒ Textsuche `TypeError` · `title: 2026` ⇒ Update
-  `AttributeError` · `title: [a, b]` und `title:` ⇒ nach `rebuild_index()` **unsichtbar** (15.2
-  überspringt sie) · `tags: abc` ⇒ drei Tags · `tags: [[x]]` ⇒ Suche `TypeError` · **Fund:**
-  `links: [1]` ⇒ `get()` und Update `TypeError` (`ITEM_REF_RE` auf `int`). REST: `body:5` schrieb
-  Datei und Index, warf danach.
-- **Zwei Funktionen, nie eine** (Advisor): **Lesen ist nachsichtig** —
-  `frontmatter.normalize_item_fields()` macht `title` zum String und `tags`/`links` zu
-  String-Listen, aufgerufen von **beiden** Lesepfaden (`store._item_from_text()`,
-  `index.row_from_file()`), damit Index und `get()` nie auseinanderlaufen. **Schreiben ist streng**
-  — `store._check_write_types()` in `create()`/`update()` (`title`/`body` String, `tags`/`links`/
-  `share_*` String-Liste) plus `type`/`status` in `_check_type_and_status()`; REST bildet die
-  `ValidationError` schon auf 422 ab. Teilten beide eine Funktion, würde `tags: [1, 2]` über REST
-  still zu `["1", "2"]` statt 422.
-- **Koerzion = „wie es im YAML stand"** (`frontmatter.inline_text()`): `2026` → `"2026"`, `true` →
-  `"true"` (nicht `True`), `[a, b]` → `"[a, b]"` (nicht `['a', 'b']`). Ein Skalar in `tags`/`links`
-  wird **ein** Eintrag (`tags: abc` → `["abc"]`), `~` fällt weg. `parse()` bleibt roh —
-  `_write_version_only` schreibt zurück, was der Mensch schrieb.
-- **Folge (wie gemischte Zeilenenden in 15.2):** erst der nächste echte Write normalisiert die Datei
-  — aus `tags: [2026]` wird `tags: ['2026']`, aus `title: 2026` wird `title: '2026'`.
-- **Kein Fehler nach dem Write** (B8, strukturell): `_write_item_file()` rechnet Text und Kanten
-  (`_link_rows()`, vorher `_replace_links_for_item()`) **vor** `atomic_write`. Wächter erzwingt
-  einen Wurf in der Link-Extraktion: Datei, Version, Git-Historie unverändert.
-- **REST:** nur, was **vor** dem Kern gebraucht wird — `visibility` String, `share_read`/
-  `share_write` String-Liste (das Re-Auth-Gate baut daraus einen `ShareState`; `frozenset(5)` war
-  500). `files.validate_folder()` lehnt Nicht-Strings mit `ValidationError` ab (vorher
-  `AttributeError` im PATCH). Der Rest prüft der Kern.
-- **Bewusst nicht gemacht — Befund für den Nikinger:** `share_read: fabian` (Hand-Edit, ohne
-  Liste) wird heute zu `frozenset("fabian")` = Freigabe an die Spaces `f`, `a`, `b`, … — zufällig
-  **fail-closed** (Fabian sieht nichts). Dieselbe Koerzion wie bei `tags` machte daraus eine echte
-  Freigabe an `fabian` **ohne Re-Auth**. Rechteerweiterung ist keine Typfrage → in 15.3 unverändert
-  gelassen. **[Korrektur, gleicher Tag]:** „unverändert" stimmte nur für den Zugriff — der erste
-  gewöhnliche Write schreibt die Buchstabenliste auf die Platte (am Code bestätigt). Entschieden
-  als **E5 = A**, gebaut in 15.3b.
-- **15.2-Wächter umgezielt:** `test_rebuild_skips_a_title_sqlite_cannot_bind` prüfte, dass
-  `title: [a, b]` die Datei kostet — genau das ändert 15.3. Jetzt
-  `test_rebuild_skips_a_value_sqlite_cannot_bind` mit `status: [a, b]` (der `ProgrammingError`-Zweig
-  bleibt bezeugt).
-- **Gegenlauf je Fix, im Code neutralisiert** (ein `git stash` von `frontmatter.py` bräche nur den
-  Import — alles rot, nichts bewiesen): Normalisierung aus **8 rot** · nur Index ohne **3** · nur
-  Store-Lesen ohne **7** · Schreib-Typprüfung aus **21** · Links nach dem Write **1** ·
-  `validate_folder` ohne Typprüfung **2** · REST-Frühprüfung aus **3**. Jeder Fix hat eigene rote
-  Wächter.
+> **Verbatim verschoben** nach `phase10_5_block15_review_fixes_plan_anhang.md` (`scripts/move_sections.py`) — dort unter derselben Überschrift.
 
 ## Anmerkungen 15.3b — E5 (2026-10-30, Opus)
-
-- **Am Code nachvollzogen, vor dem Fix:** `normalize_item_fields()` liess `share_read`/`share_write`
-  roh durch; `_item_from_text()` machte daraus `list("fabian")`, `row_from_file()` schrieb
-  `json.dumps("fabian")` = `'"fabian"'` in den Index, `acl_of()` las `frozenset("fabian")` — sechs
-  Ein-Buchstaben-Freigaben auf **beiden** Lesepfaden.
-- **Bauform:** `share_read`/`share_write` laufen durch dasselbe `_text_list()` wie `tags`/`links`
-  (Skalar = ein Eintrag, `~`/leer = keine Freigabe, Elemente wie im YAML). Neu:
-  `normalize_item_fields(fields, *, source=None)` — `source` steht **nur** in der Warnung;
-  `index.row_from_file()` und `store._item_from_text()` (beide Aufrufer: `_row_to_item`, die
-  Space-Umbenennung) reichen den Pfad. `WARNING` nur beim **Skalar** (die Rechteerweiterung), nicht
-  bei der Listenform und nicht bei leerem Feld. Logger `storage.frontmatter`.
-- **Warum `WARNING` bei jedem Lesen, nicht einmal:** die Warnung hört von selbst auf, sobald der
-  nächste Write die Datei in Listenform bringt (`share_read:\n- fabian`) — ein „schon gemeldet“-
-  Zustand wäre neuer Zustand im dummen Server, für einen Fall, den es nur per Hand-Edit gibt.
-- **Übergang beim Deploy (am Code gelesen, nicht gemessen):** `acl_of()` liest **nur den Index**
-  und gleicht nicht ab; der Dienststart baut den Index nur bei Schema-Sprung neu, und 15.3b
-  ändert `INDEX_SCHEMA_VERSION` nicht. Eine **vor** Deploy D geschriebene Indexzeile mit
-  `'"fabian"'` gibt deshalb weiter die Buchstaben (fail-closed), während `get()` schon
-  `["fabian"]` zeigt — bis die Datei sich ändert (Abgleich in `_reconcile_and_get_row`) oder
-  `rebuild_index()` läuft. **Folge für die Durchsicht vor Deploy D:** ein Treffer wird am besten
-  **vor** dem Deploy von Hand in Listenform gebracht — dann gibt es keine Koerzion und keinen
-  Übergang.
-- **Wächter (5 neu + 1 umgezielt):** `test_store.py` — `share_read`/`share_write` je: Hand-Edit Skalar ⇒ `WARNING`
-  mit Pfad und Feldname, `acl_of()` = `{fabian}`, `get()` = `["fabian"]`, Update schreibt
-  `- fabian`, `acl_of()` danach unverändert; Listenform / leer / `~` ⇒ keine Warnung (3, reiner
-  Regressionsschutz — laufen auch ohne Fix grün). `test_frontmatter.py` — der alte Wächter
-  „`share_*` bleibt roh“ ist **umgezielt** auf die neue Regel (exakter Warnungstext, Eingabe
-  unverändert).
-- **Gegenlauf, im Code neutralisiert** (wie 15.3): `share_*` aus der Schleife ⇒ **3 rot** (beide
-  Store-Wächter + Frontmatter) · Warnung stummgeschaltet, Koerzion bleibt ⇒ **3 rot** · Pfad im
-  Index-Lesepfad nicht gereicht ⇒ **2 rot** (Warnung beim Neuaufbau) · Pfad in `_row_to_item` nicht
-  gereicht ⇒ **2 rot** (Warnung bei `get()` — der Weg, auf dem sie im Betrieb fällt, Advisor-Fund).
-- **Sichtbarkeit im Betrieb, am Code gelesen:** `SPACE_LOG_LEVEL=INFO` (Unit `sharefyx-mcp.service`),
-  `configure_logging()` setzt den Root-Logger darauf — ein `WARNING` erreicht das Journal.
-  `deploy.sh` und die Unit rufen kein `rebuild_index()` (gegrept) — der Übergang oben gilt.
-  **Folge (kein Blocker):** `search()` liest jede Datei, ein unbehobener Skalar warnt also bei jeder
-  Suche und jedem `/overview`-Poll — gewollt laut E5, und gegenstandslos, wenn Treffer vor dem Deploy
-  von Hand behoben werden.
-- **Durchsicht vor Deploy D — der Befehl (Nikinger, read-only, nicht aus dieser Session gefahren):**
-  `grep -rnE --include='*.md' --exclude-dir='.*' '^share_(read|write):[[:space:]]*[^[:space:][~#]' /home/savefyx/savefyx-data`
-  Trifft jeden Skalar (ohne oder mit Anführungszeichen), nicht die Listenform `[…]`, nicht die
-  Blockliste (`share_read:` + `- x`-Zeilen), nicht leer, nicht `~`, nicht `._trash/`. **Harmloser
-  Fehltreffer:** `share_read: null` (liest sich als keine Freigabe). Jeder echte Treffer: von Hand
-  auf `[name]` umschreiben, **vor** dem Deploy.
+> **Verbatim verschoben** nach `phase10_5_block15_review_fixes_plan_anhang.md` (`scripts/move_sections.py`) — dort unter derselben Überschrift.
 
 ## Anmerkungen 15.4 — B4 (2026-10-30, Opus)
 
@@ -396,3 +250,35 @@ was der Server nicht selbst entscheiden kann (Working style, 2026-10-22).
   `gast_knoepfe`, `austragen`), `team_verwalten` grün in beiden (Regressionszelle). **Erster
   Gegenlauf war zahnlos:** die Zelle maß den neuen Container, den das alte Markup nicht hat (fehlt
   = „versteckt“) — auf den Knopf umgezielt, der in beiden existiert, und beide Läufe neu gefahren.
+
+## Anmerkungen 15.6 — B9/B10 (2026-10-31, Opus)
+
+- **B9 gebaut (`logging_setup.py`):** `_TOKEN_SEGMENT_RE` = `(/mcp/|/ui/invite/)…` — **ein** Muster
+  für beide Verbraucher (`AccessLogASGI` redigiert den Pfad direkt, `TokenScrubbingFilter` über
+  `_SECRET_PATTERNS`). Gegengelesen, ob es weitere Lecks gibt: `routes_auth.py` und
+  `peek_invite`/`consume_invite` loggen nichts (der Store speichert nur den Hash), es gibt keinen
+  CSP-Report-Endpunkt, keine Zeile mit `request.url`; die übrigen Pfadparameter
+  (`family_id`, `item_id`, `space`) sind keine Einlöse-Geheimnisse.
+- **B10 gebaut (`Store.search()`):** `FileNotFoundError` je Zeile ⇒ die Zeile **unter dem Lock**
+  neu holen und einmal neu lesen; keine Zeile (Papierkorb) oder Datei weiter weg (von Hand
+  gelöscht) ⇒ überspringen. **Abweichung vom Wortlaut §3 („überspringen“), bewusst:** reines
+  Überspringen ließe ein umbenanntes, also **existierendes** Item aus Seite und `total` fallen — ein
+  Agent hielte es für gelöscht. Das Lock über alle Lesezugriffe zu halten, sperrte jeden Writer
+  für die Dauer einer Suche; gefangen wird nur `FileNotFoundError`, kein `OSError`, kein
+  `FrontmatterError`. Kein Adapter liest Item-Dateien selbst (gegengelesen: `phase2_mcp`,
+  `phase5_ui`).
+- **Wächter:** B9 — `test_request_log.py :: test_http_event_redacts_invite_token` (GET/POST, Token
+  aus `create_invite()`, ganzer Logpuffer), `test_logging.py ::
+  test_scrubbing_filter_redacts_invite_token_in_dict_message`. B10 — drei **deterministische**
+  (`index.all_rows` gepatcht: nach dem Index-Read läuft Umbenennen / `trash` / Löschen von Hand)
+  und **ein** Thread-Wächter wie im Review (3 Leser, 300 Updates reihum über 10 Items, 10
+  Papierkorb-Züge, Umschaltintervall `1e-6`, ~5–7 s).
+- **Gegenlauf:** B9 ohne Fix **3 rot** (GET, POST, Filter). B10 ohne Fix: die drei
+  deterministischen **3/3 rot**; der Thread-Wächter in der ersten Fassung (ein Ziel-Item) nur **2
+  von 3** rot — zahnlos genug, um umgebaut zu werden (Updates reihum, damit die Lage im
+  `ORDER BY id` keine Rolle spielt), danach **5 von 5** rot.
+- **Fund B3′ (Advisor-Probe, nicht gebaut):** eine indizierte Datei, von Hand zu ungültigem YAML
+  editiert, lässt **jede** `search()` mit `FrontmatterError` scheitern — für alle Nutzer, bis die
+  Datei repariert ist. 15.2 hat das für den **Neuaufbau** gelöst, nicht für den laufenden Betrieb.
+  Entscheidung beim Nikinger: vor Deploy D (je Zeile überspringen + `CRITICAL` mit Pfad, wie
+  `rebuild_index()`) oder Backlog.

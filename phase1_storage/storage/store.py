@@ -1127,7 +1127,24 @@ class Store:
         with self._lock:
             rows = index.all_rows(self._conn)
 
-        items = [self._row_to_item(r) for r in rows]
+        items = []
+        for r in rows:
+            # P10.5 15.6 (Ultra-Review B10): die Dateien werden **nach** dem Lock gelesen — ein
+            # paralleles Titel-Update benennt die Datei um, `trash()` verschiebt sie. Dann die
+            # Zeile unter dem Lock neu holen: umbenannt ⇒ neuer Pfad, gelöscht ⇒ keine Zeile.
+            # Das Lock über alle Lesezugriffe zu halten, sperrte jeden Writer für eine ganze
+            # Suche — und eine von Hand gelöschte Datei hält sich ohnehin an kein Lock.
+            try:
+                items.append(self._row_to_item(r))
+            except FileNotFoundError:
+                with self._lock:
+                    fresh = index.get_item_row(self._conn, r["id"])
+                    if fresh is None:
+                        continue
+                    try:
+                        items.append(self._row_to_item(fresh))
+                    except FileNotFoundError:
+                        continue
 
         def matches(item: Item) -> bool:
             if space is not None and item.space != space:
