@@ -17,6 +17,9 @@
 - In den Einstellungen bleibt der geöffnete Space in der Liste markiert, solange sein Fenster offen ist.
 - Die Verknüpfungskarte zeigt auf Wunsch die ganze Karte auf einmal (Zoom bis 50 %).
 - Die Verknüpfungskarte ist kompakter: die Spaces liegen eng um deinen eigenen Space, die Notizen darin sind weiter verteilt, und die Umrisse sind rund statt treppig. Die Karte passt sich beim Öffnen selbst ins Fenster ein. Beim ersten Öffnen ergeben dieselben Notizen immer dasselbe Bild, und Beschriftungen überdecken sich nicht mehr.
+- Die Mitglieder eines persönlichen Space verwaltet nur noch dessen Besitzer. Gäste sehen in „Spaces verwalten“ deshalb keine Knöpfe zum Hinzufügen oder Entfernen mehr — sich selbst austragen können sie weiterhin.
+- Ein Titel ist höchstens 256 Zeichen lang. Das Titelfeld nimmt nicht mehr an, und die KI-Verbindung bekommt bei einem längeren Titel eine klare Fehlermeldung.
+- Eine direkt in der Datei kaputt bearbeitete Notiz legt die Suche nicht mehr für alle lahm — sie fehlt in den Treffern, bis sie repariert ist.
 
 ## 2026-10-24
 - Die Verknüpfungskarte hat einen neuen Look: Die Verbindungen laufen als Bahnen zwischen runden Zellen, und jeder Space bekommt einen eigenen Bereich.
