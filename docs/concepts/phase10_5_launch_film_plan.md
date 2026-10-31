@@ -6,7 +6,7 @@ detail: L2
 up: ../../phase10_5_finishing/CLAUDE.md
 down:
   - ../UPDATE_LOG.md   # die Quelle der Feature-Liste (Blöcke 2026-10-23 bis 2026-10-26)
-updated: 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
+updated: 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
 ---
 # Launch-Film — Sharefyx v4.0.0 (Plan Block 16)
 
@@ -21,7 +21,13 @@ updated: 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: An
 > and try to incorporate the v4.0.0 in the film e.g by zooming out and Ording all scenes at once so
 > that they resemble the 4 or something creative.“
 
-**Stand:** Plan, **nicht** begonnen — der Nikinger gibt ihn frei, dann 16.0. **Zeit:** der Film
+> **Freigabe + Nachtrag (Nikinger, 2026-11-01, wörtlich):** „Approved. of course, once the ‚4' is
+> roughly formed, you need to add some morph / transition in order to ‚make' it into real text,
+> you know — i´d also suggest ‚transforming' the old UI into the new one, but only if it fits the
+> rest of the movie. I generally like the ‚creative' vision of Opus, so if you have something
+> better in mind, im all for it. ill watch the whole video as review.“
+
+**Stand:** **freigegeben 2026-11-01**, 16.0 läuft. **Zeit:** der Film
 soll an **diesem Wochenende** fertig werden, **vor** Deploy D (QA). **Risiko, benannt:** damit liegt
 der Film auf dem Weg zu Deploy D — deshalb Probe zuerst, Standbild vor jedem Volllauf und eine
 **Minimalfassung** (§5, 16.5), damit Politur den Deploy nie aufhält. Ob D notfalls ohne Film fährt,
@@ -40,7 +46,10 @@ entscheidet der Nikinger, nicht dieser Plan.
 | Q7 | KI-Szene | „was am besten passt“ | echter Lauf an der Wegwerf-Instanz, **aufgezeichnet und wiedergegeben** (§3.2) |
 | QA | Film vor Deploy D? | „Film ist dieses Wochenende fertig, passt“ | Reihenfolge bleibt; Risiko oben |
 | QB | Materialliste | „**ganz** neu“ | §2 |
-| QC | Wer baut? | **Claude Code** (Opus) | Sichtung Standbilder beim Nikinger |
+| QC | Wer baut? | **Claude Code** (Opus) | Standbilder prüft Claude Code selbst (16.2) |
+| N1 | (2026-11-01) die grobe 4 → echte Schrift | Morph Pflicht | §3.5 „Finale“ |
+| N2 | (2026-11-01) alte UI → neue UI | „nur wenn es passt“ | passt: der Film erzählt **3 → 4** (§3.5) |
+| N3 | (2026-11-01) Sichtung | **der ganze Film** | eine Abnahme am Ende (16.5), keine Zwischen-Sichtung |
 
 **Vorbild „Fable 5.5“ (vom Nikinger genannt) — unverifiziert.** Eine offizielle Veröffentlichung
 oder Benchmarks fanden sich am 2026-10-31 **nicht**; im Umlauf sind Community-Clips, deren Herkunft
@@ -126,6 +135,20 @@ Die 4 braucht ≈ 16–18 Kacheln; 12 Szenen + Zwischenzustände (z. B. S2 vorhe
 **Ob eine 4 aus 16:9-Kacheln bei 1080p lesbar ist, entscheidet ein Standbild (16.2) — vor jedem
 Volllauf.** Texttafeln sind Vorschläge; der Wortlaut ist Sache der Sichtung.
 
+**Finale (N1) — von Kacheln zu Schrift.** Sobald die Kacheln die 4 grob bilden, zerfallen sie in
+Punkte (dieselbe Punktsprache wie die Karte); die Punkte fliegen auf Stichproben **innerhalb** der
+gesetzten Glyphe „4.0.0“ (Text in eine Offscreen-Leinwand gerendert, Punkte daraus gezogen,
+fester Seed), verdichten sich, und die Glyphe blendet als **echte Schrift** voll auf. Alles aus
+`frame` berechnet, kein Zufall zur Laufzeit.
+
+**3 → 4 (N2) — der Film erzählt den Versionssprung.** Anfang: die Leiste zeigt die **alte**
+Versionsangabe (`v3.1.6`, live seit 2026-10-23), die Ziffern rollen auf `v4.0.0`. In der Fahrt
+kommen **drei** Kacheln im alten Aussehen an — Editor (Textfeld + „Rohtext“), Knopfleiste, Karte
+(vor C2) — und ein Lichtstreif zieht darüber und hinterlässt die neue UI. Nur drei, damit der
+Rhythmus nicht kippt. Die alte UI stammt aus einer zweiten Wegwerf-Instanz aus einem
+`git worktree` auf **`e5c834e`** (Deploy B, `v3.1.6`) mit **denselben** Saatdaten; der Worktree liegt
+außerhalb des Repos und wird danach entfernt.
+
 ## §4 Datenschutz-Checkliste (Q6) — vor jedem Volllauf abhaken
 
 - Principals, Spaces, Notizen: **erfunden und neutral** (keine echten Personen; die Leiste zeigt
@@ -145,11 +168,11 @@ File-Keyring, Umgebung ohne `SHAREFYX_*`/`SFX_*`, Stopp nur über die PID-Datei 
 
 | Schritt | Inhalt | Fertig, wenn |
 |---|---|---|
-| **16.0** Probe | `film-venv` (Playwright vorhanden, `imageio-ffmpeg`, numpy); Bühne mit zwei Platzhalter-Kacheln + einem echten UI-Standbild; 2 s rendern, **zweimal** | `libx264` vorhanden · beide Läufe **byteweise gleiche** Frame-Hashes · Sekunden je Frame gemessen · Platte: keine Frame-Dateien |
+| **16.0 ✅** Probe | `film-venv` (Playwright vorhanden, `imageio-ffmpeg`, numpy); Bühne mit zwei Platzhalter-Kacheln + einem echten UI-Standbild; 2 s rendern, **zweimal** | `libx264` vorhanden · beide Läufe **byteweise gleiche** Frame-Hashes · Sekunden je Frame gemessen · Platte: keine Frame-Dateien |
 | **16.1** Aufnahmen | Saatdaten (§4), Wegwerf-Instanz, Playwright nimmt S1–S12 auf (2×, Bildfolgen für Tippen/Karte); KI-Lauf aufzeichnen + bereinigen | alle Kacheln als Bilder da · Checkliste §4 Punkte 1–4 ✓ |
-| **16.2** Standbilder | drei Schlüsselbilder: Anfang (Leiste), mitten in der Fahrt, **die 4.0.0** | **Sichtung Nikinger** — vorher kein Volllauf |
+| **16.2** Standbilder | drei Schlüsselbilder: Anfang (Leiste), mitten in der Fahrt, **die 4.0.0** (Kacheln und Schrift) | Claude Code prüft (Lesbarkeit der 4 bei 1080p) — vorher kein Volllauf (N3) |
 | **16.3** Zeitleiste | volle `frame → Zustand`-Funktion, Easing, Texttafeln; Wächter: Determinismus (zwei Läufe, Hash) + Kacheln der 4 im Bild | pytest grün · Vorschau (niedrige Auflösung) ansehbar |
-| **16.4** Ton | Ton-Skript, Marken aus der Zeitleiste | WAV deterministisch (Hash) · **Sichtung Nikinger** |
+| **16.4** Ton | Ton-Skript, Marken aus der Zeitleiste | WAV deterministisch (Hash) |
 | **16.5** Render | Volllauf §3.3, MP4 nach `~/sharefyx-film/`, SHA-256 in den Commit; **Minimalfassung** als Rückfall: die 4-Fahrt mit 8 Kacheln, ohne KI-Szene und ohne Ton, 40 s | Kriterien §6 · Freigabe Nikinger |
 
 ## §6 Kriterien (planintern — Abnahmezeilen P10.5-80 ff. nur, wenn der Nikinger sie will)
@@ -161,8 +184,24 @@ File-Keyring, Umgebung ohne `SHAREFYX_*`/`SFX_*`, Stopp nur über die PID-Datei 
 | L3 | Länge 40–60 s |
 | L4 | Checkliste §4 vollständig ✓ |
 | L5 | jede gezeigte Funktion existiert in HEAD an der Wegwerf-Instanz |
-| L6 | Standbilder (16.2) und Film (16.5) vom Nikinger abgenommen |
+| L6 | der ganze Film (16.5) vom Nikinger abgenommen (N3) |
 | L7 | Quelle im Repo, pytest grün; MP4 außerhalb, SHA-256 notiert |
 
 **Herkunft:** der Nikinger erinnert eine frühere Session zum Film. Im Repo, im Memory und im
 Sharefyx-Space fand sich am 2026-10-29 **nichts** — falls es sie gibt, ist sie die bessere Quelle.
+
+## Anmerkungen 16.0 — Probe (2026-11-01, Opus)
+
+- **Gebaut:** `film/stage.js` (reine Funktionen: Easing, `phase()`, PRNG mulberry32, Kamera,
+  Körnung), `film/probe.html` (2 s, zwei Platzhalter + ein echtes UI-Bild), `film/render.py`
+  (HTTP nur auf 127.0.0.1, drei Wurzeln `/film` `/static` `/still`, sonst nichts; CDP-Aufnahme →
+  `image2pipe` → ffmpeg). Werkzeug-venv `~/.claude-code-tools/film-venv` (Playwright 1.62.0 —
+  dieselbe Version wie `e2e-venv`, nutzt dessen Chromium —, `imageio-ffmpeg` 7.0.2 mit `libx264`).
+- **Fund:** `device_scale_factor=2` am Kontext reicht **nicht** — `Page.captureScreenshot` liefert
+  trotzdem 1920 × 1080. **`clip.scale = 2`** rastert neu (3840 × 2160); im Augenvergleich so scharf
+  wie `--force-device-scale-factor=2`, ein hochgerechnetes 1×-Bild ist sichtbar weich.
+- **Gemessen (2×):** zwei Läufe ⇒ **gleiche Bild-Hashes und byteweise gleiche MP4**
+  (`84c60a9a…`); **0,36 s je Bild** ⇒ Volllauf 54 s ≈ **19 min**; keine Frame-Dateien auf der Platte.
+  Beleg `probes/p105_b16_0_probe.json`.
+- **Wächter:** `tests/test_film_stage.py` (9: PRNG, `phase`, Kamera, Pfadschutz des
+  Render-Servers); Gegenlauf (PRNG → `Math.random`, Pfadschutz entfernt) **4 rot**.

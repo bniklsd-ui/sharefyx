@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Launch-Film — Probe 16.0</title>
+<style>
+  @font-face { font-family: "Plex"; src: url("/static/fonts/IBMPlexSans-subset.6c21979f.woff2") format("woff2"); font-weight: 380 620; }
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #000; }
+  #world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .tile { position: absolute; width: 1600px; height: 1000px; border-radius: 28px; overflow: hidden;
+          background: #0b0f17; box-shadow: 0 40px 120px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06); }
+  .tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ph { display: flex; align-items: center; justify-content: center; font: 500 120px "Plex"; color: #3E8DF3; }
+  #card { position: absolute; left: 0; right: 0; bottom: 120px; text-align: center; font: 500 64px "Plex";
+          color: #f2f4f8; letter-spacing: -0.01em; }
+  #grain { position: absolute; inset: 0; width: 1920px; height: 1080px; mix-blend-mode: soft-light; opacity: .5; }
+</style>
+</head>
+<body>
+<div id="world">
+  <div class="tile ph" id="a" style="left:0; top:0">Szene A</div>
+  <div class="tile" id="real" style="left:2000px; top:600px"><img src="/still/karte.png" alt=""></div>
+  <div class="tile ph" id="b" style="left:4000px; top:1200px">Szene B</div>
+</div>
+<div id="card"></div>
+<canvas id="grain" width="960" height="540"></canvas>
+<script type="module">
+  import { cameraTransform, phase, lerp, drawGrain } from "/film/stage.js";
+  // Probe: 2 s (120 Bilder) — die Kamera gleitet A → echte Karte → B, Tafel blendet ein.
+  const STOPS = [[800, 500, 0.9], [2800, 1100, 1.05], [4800, 1700, 0.9]];
+  window.renderFrame = (n) => {
+    const t1 = phase(n, 0, 60), t2 = phase(n, 60, 120);
+    const [p, q, t] = n < 60 ? [STOPS[0], STOPS[1], t1] : [STOPS[1], STOPS[2], t2];
+    const zoomDip = 1 - 0.25 * Math.sin(Math.PI * t);  // beim Gleiten kurz heraus, wie eine Fahrt
+    document.getElementById("world").style.transform =
+      cameraTransform(lerp(p[0], q[0], t), lerp(p[1], q[1], t), lerp(p[2], q[2], t) * zoomDip * 0.55);
+    const card = document.getElementById("card");
+    card.textContent = "Alles verbunden.";
+    card.style.opacity = String(phase(n, 30, 70));
+    drawGrain(document.getElementById("grain"), n);
+  };
+  window.stageReady = Promise.all([document.fonts.load('500 64px "Plex"'), document.fonts.ready,
+    ...[...document.images].map((i) => i.decode())]).then(() => true);
+</script>
+</body>
+</html>

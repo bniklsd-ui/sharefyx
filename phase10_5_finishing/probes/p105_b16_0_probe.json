@@ -1,0 +1,17 @@
+{
+  "schritt": "16.0",
+  "datum": "2026-11-01",
+  "werkzeug": {"venv": "~/.claude-code-tools/film-venv", "playwright": "1.62.0", "ffmpeg": "7.0.2-static (imageio-ffmpeg)", "libx264": true},
+  "buehne": "phase10_5_finishing/film/probe.html (2 Platzhalter-Kacheln + 1 echtes UI-Bild, 120 Bilder = 2 s)",
+  "aufnahme_1x_fund": "CDP Page.captureScreenshot liefert bei device_scale_factor=2 am Kontext trotzdem 1920x1080 — verworfen",
+  "aufnahme_2x": {"weg": "CDP clip.scale = 2 (3840x2160, neu gerastert; Augenvergleich gegen hochgerechnetes 1x: scharf)", "s_je_bild": [0.3551, 0.3605]},
+  "determinismus_2x": {
+    "lauf1": {"frames_sha256": "04f6cef3b83e1d51af176df7fa3ccef1a2eeaf8c4b14a253bf6227d64816b031", "mp4_sha256": "84c60a9a7c1045e17b1d049613c1a2af1fdaf3e0b269da6e7d103402649ae5e1"},
+    "lauf2": {"frames_sha256": "04f6cef3b83e1d51af176df7fa3ccef1a2eeaf8c4b14a253bf6227d64816b031", "mp4_sha256": "84c60a9a7c1045e17b1d049613c1a2af1fdaf3e0b269da6e7d103402649ae5e1"},
+    "gleich": true
+  },
+  "encode": {"aufloesung": "1920x1080", "fps": 60, "codec": "h264 High, yuv420p", "crf": 17, "preset": "slow", "bitrate_kbps_probe": 5781},
+  "platte": "keine Frame-Dateien (image2pipe); frei auf / vor 16.0: 7.6 GB",
+  "hochrechnung": "54 s x 60 fps = 3240 Bilder x 0.36 s = ca. 19 min je Volllauf",
+  "waechter": {"datei": "phase10_5_finishing/tests/test_film_stage.py", "gruen": 9, "gegenlauf_rot": 4}
+}
