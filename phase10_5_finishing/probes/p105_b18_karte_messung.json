@@ -1,0 +1,579 @@
+{
+ "konstanten": {
+  "FIT_MARGIN": 56.0,
+  "ZOOM_MIN": 0.5,
+  "REGION_GAP": 40.0,
+  "REGION_ITEM_STEP": 22.0,
+  "REGION_PAD": 30.0,
+  "TAG_CLIQUE_LIMIT": 15.0
+ },
+ "zustaende": {
+  "aus": {
+   "simulation": {
+    "frames": 129,
+    "dauer_ms": 2127.0,
+    "intervall_mittel_ms": 16.6171875,
+    "intervall_max_ms": 17.900000005960464
+   },
+   "draw": {
+    "draw_ms": 3.7,
+    "draw_nur_kanten_ms": 0.6166666666666667,
+    "hub": "itm_00000065",
+    "draw_hover_ms": 3.796666666865349,
+    "ringe_ms": 0.0033333331346511843,
+    "kraefte_ms": 0.2599999994039536,
+    "kanten": {
+     "explicit": 93,
+     "implicit": 0
+    }
+   },
+   "geometrie": {
+    "luecke_zum_naechsten_fremden_knoten_px": {
+     "alpha": 21.407496420857388,
+     "beta": 21.407496420857388,
+     "gamma": 25.365002831503862,
+     "delta": 31.394816829428464,
+     "epsilon": 101.66100658229715
+    },
+    "luecke_zum_naechsten_fremden_umriss_px": {
+     "alpha": 17.512264477644422,
+     "beta": 20.827369054106445,
+     "gamma": 24.260716587936347,
+     "delta": 23.926530960122907,
+     "epsilon": 63.20618489946826
+    },
+    "ausreisser_umriss_luecke_px": 63.20618489946826,
+    "ausreisser_umriss_luecke_in_region_gap": 1.5801546224867065,
+    "weiteste_knoten": [
+     {
+      "id": "itm_0000004c",
+      "space": "alpha",
+      "deg": 0,
+      "abstand_vom_median_px": 972.8
+     },
+     {
+      "id": "itm_0000002f",
+      "space": "alpha",
+      "deg": 0,
+      "abstand_vom_median_px": 946.1
+     },
+     {
+      "id": "itm_00000101",
+      "space": "delta",
+      "deg": 0,
+      "abstand_vom_median_px": 900.3
+     }
+    ],
+    "zoom_ohne_die_3_weitesten_nachgerechnet": 0.6888201379726333,
+    "welt_ohne_die_3_weitesten_px": [
+     1534.293331866923,
+     1405.9697962840169
+    ],
+    "ausreisser_luecke_px": 101.66100658229715,
+    "ausreisser_luecke_in_region_gap": 2.5415251645574286,
+    "zoom_anzeige": 0.6,
+    "zoom_aus_fitview_nachgerechnet": 0.6022385225046496,
+    "zoom_ohne_ausreisser_nachgerechnet": 0.6022385225046496,
+    "welt_mit_ausreisser_px": [
+     1534.293331866923,
+     1650.3831095789885
+    ],
+    "welt_ohne_ausreisser_px": [
+     1534.293331866923,
+     1650.3831095789885
+    ],
+    "regionen": {
+     "order": [
+      "alpha",
+      "delta",
+      "beta",
+      "gamma",
+      "epsilon"
+     ],
+     "spaces": {
+      "alpha": {
+       "x": 567,
+       "y": 530.6875,
+       "radius": 250
+      },
+      "delta": {
+       "x": 208.8524541717456,
+       "y": 934.8289794563884,
+       "radius": 154.45079348883237
+      },
+      "beta": {
+       "x": 925.1475458282541,
+       "y": 126.5460205436114,
+       "radius": 226.7739820199815
+      },
+      "gamma": {
+       "x": 37.92943915361366,
+       "y": 422.59336673787436,
+       "radius": 185.56349186104046
+      },
+      "epsilon": {
+       "x": 1096.0705608463863,
+       "y": 638.7816332621253,
+       "radius": 52
+      }
+     }
+    }
+   },
+   "kanten_gegenrechnung": {
+    "seite_implizit": 0,
+    "saat_implizit": 0,
+    "seite_explizit": 93,
+    "saat_explizit": 93,
+    "ok": true
+   }
+  },
+  "tags": {
+   "simulation": {
+    "frames": 129,
+    "dauer_ms": 8385.70000000298,
+    "intervall_mittel_ms": 65.51328125002328,
+    "intervall_max_ms": 147.30000001192093
+   },
+   "draw": {
+    "draw_ms": 43.50666666676601,
+    "draw_nur_kanten_ms": 42.38333333333333,
+    "hub": "itm_00000001",
+    "draw_hover_ms": 43.53666666696469,
+    "ringe_ms": 0.01999999980131785,
+    "kraefte_ms": 0.3,
+    "kanten": {
+     "explicit": 93,
+     "implicit": 1598
+    }
+   },
+   "geometrie": {
+    "luecke_zum_naechsten_fremden_knoten_px": {
+     "alpha": 15.715568140272074,
+     "beta": 15.152823016730876,
+     "gamma": 15.152823016730876,
+     "delta": 16.43757820099776,
+     "epsilon": 39.80848380612437
+    },
+    "luecke_zum_naechsten_fremden_umriss_px": {
+     "alpha": 26.237801369565897,
+     "beta": 27.414132859629124,
+     "gamma": 28.136999217129656,
+     "delta": 23.392647485735687,
+     "epsilon": 31.993436943771194
+    },
+    "ausreisser_umriss_luecke_px": 31.993436943771194,
+    "ausreisser_umriss_luecke_in_region_gap": 0.7998359235942798,
+    "weiteste_knoten": [
+     {
+      "id": "itm_000000c8",
+      "space": "gamma",
+      "deg": 11,
+      "abstand_vom_median_px": 2789.8
+     },
+     {
+      "id": "itm_00000028",
+      "space": "alpha",
+      "deg": 11,
+      "abstand_vom_median_px": 2759.1
+     },
+     {
+      "id": "itm_000000e5",
+      "space": "gamma",
+      "deg": 12,
+      "abstand_vom_median_px": 2756.8
+     }
+    ],
+    "zoom_ohne_die_3_weitesten_nachgerechnet": 0.5,
+    "welt_ohne_die_3_weitesten_px": [
+     1827.9704960449956,
+     4315.014829293987
+    ],
+    "ausreisser_luecke_px": 39.80848380612437,
+    "ausreisser_luecke_in_region_gap": 0.9952120951531093,
+    "zoom_anzeige": 0.5,
+    "zoom_aus_fitview_nachgerechnet": 0.5,
+    "zoom_ohne_ausreisser_nachgerechnet": 0.5,
+    "welt_mit_ausreisser_px": [
+     1875.767865704983,
+     4344.492978979502
+    ],
+    "welt_ohne_ausreisser_px": [
+     1875.767865704983,
+     4344.492978979502
+    ],
+    "regionen": {
+     "order": [
+      "alpha",
+      "delta",
+      "beta",
+      "gamma",
+      "epsilon"
+     ],
+     "spaces": {
+      "alpha": {
+       "x": 567,
+       "y": 530.6875,
+       "radius": 250
+      },
+      "delta": {
+       "x": 208.8524541717456,
+       "y": 934.8289794563884,
+       "radius": 154.45079348883237
+      },
+      "beta": {
+       "x": 925.1475458282541,
+       "y": 126.5460205436114,
+       "radius": 226.7739820199815
+      },
+      "gamma": {
+       "x": 37.92943915361366,
+       "y": 422.59336673787436,
+       "radius": 185.56349186104046
+      },
+      "epsilon": {
+       "x": 1096.0705608463863,
+       "y": 638.7816332621253,
+       "radius": 52
+      }
+     }
+    }
+   },
+   "kanten_gegenrechnung": {
+    "seite_implizit": 1598,
+    "saat_implizit": 1598,
+    "seite_explizit": 93,
+    "saat_explizit": 93,
+    "ok": true
+   }
+  },
+  "ordner": {
+   "simulation": {
+    "frames": 129,
+    "dauer_ms": 41025.79999999702,
+    "intervall_mittel_ms": 320.5140624999767,
+    "intervall_max_ms": 1473.2999999970198
+   },
+   "draw": {
+    "draw_ms": 183.94666666636866,
+    "draw_nur_kanten_ms": 180.64666666636865,
+    "hub": "itm_00000001",
+    "draw_hover_ms": 184.44666666636866,
+    "ringe_ms": 0.09333333323399226,
+    "kraefte_ms": 0.4600000023841858,
+    "kanten": {
+     "explicit": 93,
+     "implicit": 5728
+    }
+   },
+   "geometrie": {
+    "luecke_zum_naechsten_fremden_knoten_px": {
+     "alpha": 58.5907979668721,
+     "beta": 150.55017427536217,
+     "gamma": 91.4423081685054,
+     "delta": 58.5907979668721,
+     "epsilon": 243.61080764143165
+    },
+    "luecke_zum_naechsten_fremden_umriss_px": {
+     "alpha": 42.20234090760984,
+     "beta": 82.31188737466475,
+     "gamma": 57.9997126865689,
+     "delta": 33.984285743046826,
+     "epsilon": 128.62257099962207
+    },
+    "ausreisser_umriss_luecke_px": 128.62257099962207,
+    "ausreisser_umriss_luecke_in_region_gap": 3.2155642749905518,
+    "weiteste_knoten": [
+     {
+      "id": "itm_00000101",
+      "space": "delta",
+      "deg": 0,
+      "abstand_vom_median_px": 942.8
+     },
+     {
+      "id": "itm_00000102",
+      "space": "delta",
+      "deg": 0,
+      "abstand_vom_median_px": 923.5
+     },
+     {
+      "id": "itm_00000104",
+      "space": "delta",
+      "deg": 1,
+      "abstand_vom_median_px": 879.8
+     }
+    ],
+    "zoom_ohne_die_3_weitesten_nachgerechnet": 0.7149959179694795,
+    "welt_ohne_die_3_weitesten_px": [
+     1474.023040831411,
+     1350.9963775277322
+    ],
+    "ausreisser_luecke_px": 243.61080764143165,
+    "ausreisser_luecke_in_region_gap": 6.090270191035791,
+    "zoom_anzeige": 0.7,
+    "zoom_aus_fitview_nachgerechnet": 0.7027060253319142,
+    "zoom_ohne_ausreisser_nachgerechnet": 0.7027060253319142,
+    "welt_mit_ausreisser_px": [
+     1474.023040831411,
+     1398.41112746781
+    ],
+    "welt_ohne_ausreisser_px": [
+     1474.023040831411,
+     1398.41112746781
+    ],
+    "regionen": {
+     "order": [
+      "alpha",
+      "delta",
+      "beta",
+      "gamma",
+      "epsilon"
+     ],
+     "spaces": {
+      "alpha": {
+       "x": 567,
+       "y": 530.6875,
+       "radius": 250
+      },
+      "delta": {
+       "x": 208.8524541717456,
+       "y": 934.8289794563884,
+       "radius": 154.45079348883237
+      },
+      "beta": {
+       "x": 925.1475458282541,
+       "y": 126.5460205436114,
+       "radius": 226.7739820199815
+      },
+      "gamma": {
+       "x": 37.92943915361366,
+       "y": 422.59336673787436,
+       "radius": 185.56349186104046
+      },
+      "epsilon": {
+       "x": 1096.0705608463863,
+       "y": 638.7816332621253,
+       "radius": 52
+      }
+     }
+    }
+   },
+   "kanten_gegenrechnung": {
+    "seite_implizit": 5728,
+    "saat_implizit": 5728,
+    "seite_explizit": 93,
+    "saat_explizit": 93,
+    "ok": true
+   }
+  },
+  "beide": {
+   "simulation": {
+    "frames": 129,
+    "dauer_ms": 55552.90000000596,
+    "intervall_mittel_ms": 434.00703125004657,
+    "intervall_max_ms": 847.3999999910593
+   },
+   "draw": {
+    "draw_ms": 309.03666666646797,
+    "draw_nur_kanten_ms": 303.90333333313464,
+    "hub": "itm_00000001",
+    "draw_hover_ms": 309.720000000298,
+    "ringe_ms": 0.08666666646798452,
+    "kraefte_ms": 0.4800000011920929,
+    "kanten": {
+     "explicit": 93,
+     "implicit": 7326
+    }
+   },
+   "geometrie": {
+    "luecke_zum_naechsten_fremden_knoten_px": {
+     "alpha": 3.947269084521228,
+     "beta": 5.898298239655809,
+     "gamma": 3.947269084521228,
+     "delta": 5.670195227438853,
+     "epsilon": 23.16350590504633
+    },
+    "luecke_zum_naechsten_fremden_umriss_px": {
+     "alpha": 8.299314481891667,
+     "beta": 7.812997086203279,
+     "gamma": 10.165621859066201,
+     "delta": 9.32060328266559,
+     "epsilon": 18.727636565218717
+    },
+    "ausreisser_umriss_luecke_px": 18.727636565218717,
+    "ausreisser_umriss_luecke_in_region_gap": 0.46819091413046793,
+    "weiteste_knoten": [
+     {
+      "id": "itm_000000e2",
+      "space": "gamma",
+      "deg": 12,
+      "abstand_vom_median_px": 451.3
+     },
+     {
+      "id": "itm_000000a2",
+      "space": "beta",
+      "deg": 13,
+      "abstand_vom_median_px": 356.4
+     },
+     {
+      "id": "itm_0000005f",
+      "space": "alpha",
+      "deg": 13,
+      "abstand_vom_median_px": 356.3
+     }
+    ],
+    "zoom_ohne_die_3_weitesten_nachgerechnet": 1.0,
+    "welt_ohne_die_3_weitesten_px": [
+     571.4983152878947,
+     482.3292577572488
+    ],
+    "ausreisser_luecke_px": 23.16350590504633,
+    "ausreisser_luecke_in_region_gap": 0.5790876476261582,
+    "zoom_anzeige": 1,
+    "zoom_aus_fitview_nachgerechnet": 1.0,
+    "zoom_ohne_ausreisser_nachgerechnet": 1.0,
+    "welt_mit_ausreisser_px": [
+     718.3096251947246,
+     482.3292577572488
+    ],
+    "welt_ohne_ausreisser_px": [
+     718.3096251947246,
+     482.3292577572488
+    ],
+    "regionen": {
+     "order": [
+      "alpha",
+      "delta",
+      "beta",
+      "gamma",
+      "epsilon"
+     ],
+     "spaces": {
+      "alpha": {
+       "x": 567,
+       "y": 530.6875,
+       "radius": 250
+      },
+      "delta": {
+       "x": 208.8524541717456,
+       "y": 934.8289794563884,
+       "radius": 154.45079348883237
+      },
+      "beta": {
+       "x": 925.1475458282541,
+       "y": 126.5460205436114,
+       "radius": 226.7739820199815
+      },
+      "gamma": {
+       "x": 37.92943915361366,
+       "y": 422.59336673787436,
+       "radius": 185.56349186104046
+      },
+      "epsilon": {
+       "x": 1096.0705608463863,
+       "y": 638.7816332621253,
+       "radius": 52
+      }
+     }
+    }
+   },
+   "kanten_gegenrechnung": {
+    "seite_implizit": 7326,
+    "saat_implizit": 7326,
+    "seite_explizit": 93,
+    "saat_explizit": 93,
+    "ok": true
+   }
+  }
+ },
+ "browser": {
+  "version": "151.0.7922.34",
+  "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36",
+  "viewport": "1920x1200",
+  "kopfloser_chromium": true
+ },
+ "pinned_beim_start": 0,
+ "knoten": 263,
+ "tags_spur": {
+  "ticks": 129,
+  "erster_tick_ueber_1500px_vom_ursprung": 5,
+  "alpha_dort": 0.42936701284999995,
+  "knoten_dort": "itm_00000050",
+  "schnellster_tick": 5,
+  "hoechste_geschwindigkeit_px_pro_tick": 28104.11379381049,
+  "weitester_abstand_vom_ursprung_am_ende_px": 2952.9988028090447,
+  "abstand_je_10_ticks": [
+   1249,
+   30867,
+   9756,
+   5087,
+   3546,
+   3137,
+   3059,
+   3084,
+   2981,
+   2953,
+   2953,
+   2954,
+   2953
+  ],
+  "geschwindigkeit_je_10_ticks": [
+   177.6,
+   6895.9,
+   3417.1,
+   1190.4,
+   1317.7,
+   275.4,
+   719.2,
+   184.0,
+   200.3,
+   94.7,
+   70.7,
+   63.7,
+   59.4
+  ]
+ },
+ "fehler_in_der_seite": [],
+ "saat": {
+  "spaces": {
+   "alpha": 100,
+   "beta": 80,
+   "gamma": 50,
+   "delta": 32,
+   "epsilon": 1
+  },
+  "items": 263,
+  "grosse_ordner": {
+   "alpha": [
+    "projekt-a",
+    80
+   ],
+   "beta": [
+    "projekt-b",
+    60
+   ],
+   "gamma": [
+    "projekt-c",
+    40
+   ],
+   "delta": [
+    "ordner-d",
+    12
+   ]
+  },
+  "tag_pool": 40,
+  "erwartet": {
+   "explizit": 93,
+   "tag_kanten": 1603,
+   "ordner_kanten": 5776,
+   "tags_gesamt": 40,
+   "tags_ueber_limit": 0,
+   "tag_max_knoten": 14,
+   "implizit": {
+    "aus": 0,
+    "tags": 1598,
+    "ordner": 5728,
+    "beide": 7326
+   }
+  }
+ }
+}

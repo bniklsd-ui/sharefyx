@@ -14,7 +14,7 @@ down:
   - MODULSTATUS_ARCHIVE.md                         # 📦 die ausführlichen Statusspalten der Blöcke 0–10, verbatim
   - ABNAHME_ARCHIVE.md                             # 📦 die geschlossenen Abnahmezeilen (P10.5-1–72), verbatim
   - FREIGABEN_ARCHIVE.md                           # 📦 die Freigaben der Phase, verbatim
-updated: 2026-11-01 (Live-Sichtung: Film ✅; Block 18 geplant) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-11-01 (Block 18.0 gemessen: Kosten = Kantenzeichnen, N1 Schleuder-Fund; STOPP vor 18.1/18.2) | 2026-11-01 (Live-Sichtung: Film ✅; Block 18 geplant) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -45,7 +45,7 @@ updated: 2026-11-01 (Live-Sichtung: Film ✅; Block 18 geplant) | ältere Eintr�
 | 15 | Fixes aus dem Ultra-Review B1–B10 — Plan `docs/concepts/phase10_5_block15_review_fixes_plan.md` | Claude Code | D | ✅ 2026-10-31 — **15.1 ✅** B1/B15 (`asset_id` nie roh zum Pfad: `Store._asset_matches()`, `\Z`; 9 Wächter, Gegenlauf 9 rot; P10.5-75 ✅) · **15.2 ✅** B2/B3/B20 (Dienststart scheitert nie an Daten: Rebuild je Datei + eine Transaktion, Elternordner, Wiederaufnahme fängt; Gegenlauf 6/5/5 rot; P10.5-76 ✅) · **15.3 ✅** B5/B8 (Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Gegenlauf je Fix rot; P10.5-77 ✅) · **15.3b ✅** E5 (`share_*`-Skalar = eine Freigabe, `WARNING` mit Pfad; Gegenlauf 3/3/2 rot) · **15.4 ✅** B4 (`manages_space` in GET/POST/DELETE der Mitglieder-Routen; Gegenlauf 3 rot; P10.5-78 ✅) · **15.4b ✅** B4′ (`share_*`/`visibility` fremder Home-Space-Items nur mit `manages_space`) + E6 (Selbst-Austragen) · **15.5 ✅** B6/B7 (`files.is_valid_space_name()` in `create`/`move`/`rename_space`/`acl.create_space`; Slug ≤ 100 UTF-8-Byte in `item_filename()`, E3 gemessen: `f_namemax` 255, tmp-Name + 14; Gegenlauf 6/15/1 rot) · **15.5b ✅** UI-Rest 15.4 (Hinzufügen/Entfernen nur bei `manageable`, eigener Name bleibt; Browser-Probe 4/4, Gegenlauf 3 rot) · **15.5c ✅** E3: Titel ≤ 256 Zeichen (Kern + `maxlength`; Gegenlauf 3 + 1 rot) · **15.6 ✅** B9/B10 (`/ui/invite/<token>` redigiert — ein Muster für beide Log-Verbraucher; `search()` holt eine verschwundene Datei unter dem Lock neu, sonst überspringen; Gegenlauf 3 + 3 rot, Thread-Wächter 5/5) · **15.6b ✅** Fund B3′ (kaputte Datei fehlt in der Suche, `CRITICAL` mit Pfad, statt sie für alle zu sprengen; Gegenlauf 2 rot) · **15.7 ✅** Update-Log (3 Zeilen), Suite 1811, P10.5-79 ✅ · **E1 überholt (2026-10-30): kein Hotfix, Deploy D nach allen Fixes am Wochenende** · E4: Opus** |
 | 16 | Launch-Film v4.0.0 (Nikinger 2026-10-29/31) — Plan `docs/concepts/phase10_5_launch_film_plan.md` | Claude Code (Sichtung Nikinger) | vor D | ✅ 2026-11-01 — Plan freigegeben (+ N1 Morph zur Schrift, N2 3 → 4, N3 Sichtung = ganzer Film) · **16.0 ✅** Probe: 2× über `clip.scale`, zwei Läufe byteweise gleich, 0,36 s/Bild, `libx264` da · **Fund 16.1 ✅** Ordner-Menü „Umbenennen“ öffnete nie den Dialog (seit 9.2, `tree.js` Capture-Listener) — behoben, Probe 4/4, Gegenlauf 3 rot · **16.1 ✅** Aufnahmen neu/alt + echter MCP-Lauf (S9) · **16.2 ✅** Bühne `film.js`/`film.html`, die 4 aus 13 Kacheln bei 1080p lesbar, Morph zu „4.0.0“ · **16.3 ✅** Vorschau gesichtet, Schräge/Rand/Tafel nachgeschärft · **16.4 ✅** Ton im Code (`ton.py`, deterministisch) · **16.5 ✅** Film gerendert (55 s, 1080p60, Ton) · **Sichtung 1 (Nikinger): „not bad“, drei Wünsche** ⇒ Runde 2 **16.6–16.9** (Plan §7: Urknall-Auftakt, blaues Raster, 3D-Kacheln + animierter Text, schneller) · **16.6 ✅** Urknall-Auftakt · **16.7 ✅** Raster · **16.8 ✅** 3D + Text · **16.9 ✅** Volllauf 2 (48,4 s) · **Sichtung 2 ✅** (abgenommen) |
 | 17 | Film in die App (Nikinger 2026-11-01) — Plan `docs/concepts/phase10_5_block17_film_app_plan.md` | Claude Code | D | ✅ 2026-11-01 — Startbild beim Erststart (E2), Klick ⇒ Ton + Vollbild, Wiedersehen im Update-Log; `media-src 'self'`, `.mp4` über `FileResponse` (206); Probe 10/10 (Chrome), 4 Gegenläufe rot |
-| 18 | Live-Funde nach D: Karte träge (Tags/Ordner), Ausreißer, Editor-Farben — Plan `docs/concepts/phase10_5_block18_live_fixes_plan.md` | eigene Session | v4.0.1 | ⬜ geplant, E1–E4 beantwortet |
+| 18 | Live-Funde nach D: Karte träge (Tags/Ordner), Ausreißer, Editor-Farben — Plan `docs/concepts/phase10_5_block18_live_fixes_plan.md` | eigene Session | v4.0.1 | 🔄 2026-11-01 — **18.0 ✅** gemessen (`probes/p105_b18_karte_messung.py`): `draw()` 3,7 → 43 → 184 → **309 ms** (aus/Tags/Ordner/beide), 98 % davon `drawEdges()`; K3/K4 widerlegt; **Fund N1:** im Tag-Zustand schleudert die Simulation Knoten bis 30.867 px weg · **STOPP:** 18.1/18.2 brauchen Nikinger-Entscheidung (Session-Block) |
 | Z | Closeout P10.5 (Handover, Grafik, Rotationen) | Claude Code + Nikinger | — | ⬜ |
 
 > **Die ausführlichen Statusspalten der Blöcke 0–10 stehen verbatim in
@@ -193,31 +193,19 @@ stehen im Commit und im Session-Block.
 > Deploys **C** (`v3.1.7`) und **D** (`v3.1.8`, jetzt **mit** den Änderungen aus Block 13) liegen
 > beim Nikinger.
 
-## Session stopped — 2026-11-01 (Block 17: Film in die App ✅ — Deploy D vorbereitet, `deploy.sh` beim Nikinger)
+## Session stopped — 2026-11-01 (Block 18.0: die träge Karte und der Ausreißer gemessen — STOPP vor 18.1/18.2)
 
-**Ergebnis.** Der Launch-Film läuft in der App: beim ersten Start in einem Browser ein **Startbild**
-(„▶ Film ansehen" / „Überspringen"), der Klick spielt **mit Ton im echten Vollbild**; im Update-Log
-steht „▶ Film zu v4.0.0". Plan + Ergebnis: `docs/concepts/phase10_5_block17_film_app_plan.md` (§6).
+**Ergebnis.** Die Karte ist träge, weil **das Zeichnen der Kanten** (`drawEdges()`, ein `stroke()` je Kante, gestrichelt 4–5 × teurer) 98 % von
+`draw()` kostet: 3,7 / 43 / 184 / **309 ms** je Bild (aus / Tags / Ordner / beide) auf 263 Items, die Simulation (129 Bilder) damit **2 / 8 / 41 / 56 s**.
+`neighborRings()` (0,1 ms) und `applyForces()` (0,5 ms) sind **nicht** die Kosten. **Neuer Fund N1:** im Tag-Zustand schleudert die Simulation einzelne Knoten
+(Geschwindigkeit 28.104 px/Bild im 5. Bild, bis 30.867 px weg, Ruhelage ≈ 2.950 px) — Welt 1.876 × 4.344 px, Zoom klemmt auf 50 %: das ist der
+Ausreißer, den A1/A2/A3 **nicht** erklären. Beleg: `probes/p105_b18_karte_messung.{py,json}`; Plan §5. Gegenrechnung der Kanten (Saat ↔ Seite) in allen vier Zuständen ✅.
+Grenzen: kopfloses Chromium (Software-Rasterung) — nur vorher/nachher vergleichbar; Tag-/Verknüpfungsdichte der Saat geschätzt (Nikinger: „ungefähr 5 Spaces", Rest Plan-Maß).
 
-| Auftrag | Umsetzung |
-|---|---|
-| Video nur beim Abspielen laden | `<video data-src … preload="none">`, `src` erst im Klick; Probe P2: 0 Anfragen ohne Klick |
-| „Gesehen" pro Browser, nichts am Server | `localStorage["sfx:film:gesehen"] = "4.0.0"`; privates Fenster ⇒ kein Startbild |
-| Video in der CSP erlauben | `media-src 'self'` (`webui/security.py`); `.mp4` → `video/mp4` über `FileResponse` (Range → 206, `immutable`) |
-| Browser-Test an Wegwerf-Instanz | `probes/p105_b17_film_probe.py`, Google Chrome (Playwrights Chromium kann kein H.264), **10/10**; Gegenläufe G1–G4 je rot |
+**Entscheidungen, die jetzt beim Nikinger liegen** (ohne sie wird 18.1/18.2 größer als geplant):
+1. **Tags:** auch für Tags ein Stern (oder `TAG_CLIQUE_LIMIT` senken)? Der Ordner-Stern allein lässt „Tags an" bei 42 ms (> 16 ms-Ziel).
+2. **N1 in 18.2 aufnehmen?** Eingriff in die Kräfte (Schrittgrenze/Federstärke je Grad) ändert die Physik aus Block 14 (Wächter P10.5-65/68) — Scope-Änderung.
+3. **A3:** einmal „Layout zurücksetzen" im Live-Browser — bleibt der Einzelpunkt weit draußen? (nur `localStorage`; die Wegwerf-Instanz kann es nicht zeigen).
 
-**Entscheidungen des Nikingers:** E1 r2 unverändert in git (25,7 MB) · E2 Startbild statt stummem
-Autoplay (Browser sperren Ton ohne Klick; der Anmelde-Klick überlebt die Weiterleitung nicht).
-
-**Deploy D vorbereitet:** Update-Log `## 2026-10-26` → **`## 2026-11-01`** + Filmzeile; Badge `v4.0.0`;
-volle Suite **1842 grün** (426 s), `doc_health` 0, `ui_budget` 6/6 (Erstaufruf 232,3 KB gzip). **Nächster
-Schritt (Nikinger, Hard Rule 9):** `deploy.sh main`, dann
-`health_gate.sh --expected-version=v4.0.0 --require-todays-update-log --expected-sha=<SHA>` — **am
-2026-11-01**; an einem anderen Tag erst die oberste Überschrift umdatieren. Live zu sehen: das
-Startbild über die echte Adresse (Caddy reicht die CSP durch, Plan F9).
-
-**Nachtrag, Deploy D live:** Startbild abgenommen; Gate 9/9 (Werte: Deploy-Tabelle); Film live gesehen ✅ (Nikinger).
-
-**Für ältere Playwright-Proben:** gegen eine frische Instanz zeigt die UI zuerst das Startbild —
-`add_init_script` mit `localStorage.setItem('sfx:film:gesehen','4.0.0')` (auch `film/capture.py`).
-**Nächste Session: Block 18** (Plan oben, E1–E4 entschieden). `move_sections.py`-`StopIteration`: ein schon vorhandener gleicher Zeiger im Head (z. B. `STARTUPTRAG_ARCHIVE.md`) verbraucht die Blöcke der Gegenprobe.
+**Nächste Session:** nach den Antworten **18.1** (Stern, gebündelte Kanten, Strichelung messen), **18.2**, **18.5** (P10.5-18/49 als Wegwerf-Probe), **18.4** (Update-Log, Suite, `v4.0.1`).
+Tests: keine Produktcode-Änderung ⇒ Suite nicht gelaufen (nur Probe, JSON und `.md`).

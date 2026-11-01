@@ -1,0 +1,508 @@
+#!/usr/bin/env python3
+"""P10.5 Block 18, Schritt 18.0 — die **Basislinie** der trägen Karte und des Ausreißers.
+
+Plan: `docs/concepts/phase10_5_block18_live_fixes_plan.md` (§2 Befunde K1–K4/A1–A3, §3 Schritt 18.0,
+§5 die Tabelle, die diese Probe füllt). Nikinger 2026-11-01: „die Karte ist **sehr träge**, sobald
+Ordner und/oder Tags an sind · ein oder wenige Punkte liegen **weit weg**".
+
+**Diese Probe misst, sie schaltet nichts ab.** Sie baut nichts im Produktcode um: das Messpflaster
+(`GRAPH_PATCH_EXTRA`, Muster `p105_b14_layout_probe.py`) hängt eine Hilfsschnittstelle an eine
+**Kopie** von `graph.js`; der Arbeitsbaum bleibt unberührt.
+
+**Wegwerf-Instanz** (Root-`CLAUDE.md`, Working style): eigener Port, tmp-`DATA_ROOT`, tmp-
+`auth.sqlite3`, TLS, bereinigte Umgebung, Stopp nur über die PID-Datei (Hard Rule 9). Server, Konto und
+Stopp kommen aus der Block-14-Probe (`p105_b14_layout_probe.py`, als Modul geladen — **eine** Quelle
+für die Wegwerf-Mechanik, keine Kopie); der Browser-Teil nutzt deren Hilfen (`login`, `settle`,
+`RAF_PROBE`, …) als **Textauszug** und hängt sein eigenes `main()` an.
+
+**Die Saat (Nikinger 2026-11-01: „ungefähr 5" Spaces, Plan-Maß für Ordner/Tags, Items 263 laut
+Durchsicht vom 2026-10-30):** 5 Spaces mit 100/80/50/32/**1** Items = 263; drei große Ordner mit
+80/60/40 Items (+ ein kleiner mit 12); ~40 Tags mit 3–15 Knoten (Tags über 15 erzeugen keine Kanten —
+`TAG_CLIQUE_LIMIT`); Verknüpfungen: jedes 4. Item auf das nächste im Space, jedes 10. quer. Der Ein-Item-
+Space `epsilon` hat **keine** Verknüpfung (der schlimmste Fall: keine Kante zieht ihn heran). **Annahmen
+(nicht vom Nikinger gemessen):** Tag-Verteilung und Verknüpfungsdichte — die Zahlen stehen im Beleg.
+
+**Warum die Kantenzahlen im Beleg gegengerechnet werden:** ein Messhaken, der `implicitEdges.length`
+liest, beweist nichts, solange man nicht weiß, was *herauskommen müsste*. Die Probe spiegelt
+`buildTagEdges`/`buildFolderEdges` in Python **aus der Saat** (nicht aus der Seite) und vergleicht.
+
+Aufruf:   `.venv/bin/python phase10_5_finishing/probes/p105_b18_karte_messung.py`
+Ergebnis: `phase10_5_finishing/probes/p105_b18_karte_messung.json`
+"""
+from __future__ import annotations
+
+import importlib.util
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+HIER = Path(__file__).resolve().parent
+RESULT = HIER / "p105_b18_karte_messung.json"
+
+# -- die Block-14-Probe als Modul laden (ohne ihre Kommandozeile zu erben) ------------------------
+_argv = sys.argv
+sys.argv = [_argv[0]]
+_spec = importlib.util.spec_from_file_location("p105_b14_layout_probe", HIER / "p105_b14_layout_probe.py")
+b14 = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(b14)
+sys.argv = _argv
+
+REPO_ROOT = b14.REPO_ROOT
+
+# -- die Saat ---------------------------------------------------------------------------------
+SPACES = ["alpha", "beta", "gamma", "delta", "epsilon"]          # alpha = der eigene Space (Login)
+ANZAHL = {"alpha": 100, "beta": 80, "gamma": 50, "delta": 32, "epsilon": 1}
+GROSSER_ORDNER = {"alpha": ("projekt-a", 80), "beta": ("projekt-b", 60),
+                  "gamma": ("projekt-c", 40), "delta": ("ordner-d", 12)}
+TAG_POOL = 40
+TAG_CLIQUE_LIMIT = 15           # graph.js :: TAG_CLIQUE_LIMIT -- die Probe prueft, dass die Konstante so steht
+
+
+def spec() -> list[dict]:
+    """Die Saat als Liste -- **eine** Quelle fuer das Anlegen und fuer die Gegenrechnung."""
+    items = []
+    g = 0
+    for sp in SPACES:
+        ordner, ordner_n = GROSSER_ORDNER.get(sp, ("", 0))
+        for i in range(ANZAHL[sp]):
+            tags = ["tag-%02d" % (g % TAG_POOL)]
+            if g % 2 == 0:
+                tags.append("tag-%02d" % ((g * 7 + 3) % TAG_POOL))
+            tags = sorted(set(tags))
+            items.append({"k": g, "space": sp, "i": i, "folder": ordner if i < ordner_n else "",
+                          "tags": tags, "links": []})
+            g += 1
+    index = {(it["space"], it["i"]): it["k"] for it in items}
+    for it in items:
+        n = ANZAHL[it["space"]]
+        if n > 1 and it["i"] % 4 == 0:
+            it["links"].append(index[(it["space"], (it["i"] + 1) % n)])
+        if it["space"] != "epsilon" and it["i"] % 10 == 0:
+            nxt = SPACES[(SPACES.index(it["space"]) + 1) % (len(SPACES) - 1)]   # nie epsilon
+            it["links"].append(index[(nxt, it["i"] % ANZAHL[nxt])])
+    return items
+
+
+def erwartet(items: list[dict]) -> dict:
+    """Spiegel von `buildTagEdges`/`buildFolderEdges`/`rebuildImplicitEdges` -- aus der Saat."""
+    def key(a, b):
+        return (a, b) if a < b else (b, a)
+
+    explizit = {key(it["k"], z) for it in items for z in it["links"] if z != it["k"]}
+    je_tag: dict = {}
+    for it in items:
+        for t in it["tags"]:
+            je_tag.setdefault(t, []).append(it["k"])
+    tag_kanten, gesehen = [], set()
+    for t, ids in je_tag.items():
+        if len(ids) > TAG_CLIQUE_LIMIT:
+            continue
+        for a in range(len(ids)):
+            for b in range(a + 1, len(ids)):
+                k = key(ids[a], ids[b])
+                if k in gesehen:
+                    continue
+                gesehen.add(k)
+                tag_kanten.append(k)
+    je_ordner: dict = {}
+    for it in items:
+        if it["folder"]:
+            je_ordner.setdefault((it["space"], it["folder"]), []).append(it["k"])
+    ordner_kanten = [key(ids[a], ids[b]) for ids in je_ordner.values() if len(ids) >= 2
+                     for a in range(len(ids)) for b in range(a + 1, len(ids))]
+
+    def implizit(*listen):
+        out = [k for liste in listen for k in liste]
+        return len([k for k in out if k not in explizit])
+
+    return {
+        "explizit": len(explizit),
+        "tag_kanten": len(tag_kanten),
+        "ordner_kanten": len(ordner_kanten),
+        "tags_gesamt": len(je_tag),
+        "tags_ueber_limit": len([t for t, ids in je_tag.items() if len(ids) > TAG_CLIQUE_LIMIT]),
+        "tag_max_knoten": max(len(v) for v in je_tag.values()),
+        "implizit": {"aus": 0, "tags": implizit(tag_kanten), "ordner": implizit(ordner_kanten),
+                     "beide": implizit(tag_kanten, ordner_kanten)},
+    }
+
+
+def seed(items: list[dict]) -> None:
+    """Die Saat auf die Platte (Muster `p105_b14_layout_probe.py :: _seed`, feste IDs, feste Uhr)."""
+    import shutil
+    shutil.rmtree(b14.DATA_ROOT, ignore_errors=True)
+    b14.DATA_ROOT.mkdir(parents=True, exist_ok=True)
+    code = (
+        "import sys, json; sys.path.insert(0, 'phase1_storage')\n"
+        "from pathlib import Path\n"
+        "from datetime import datetime, timezone\n"
+        "import storage.files as sfiles\n"
+        "from storage.store import Store\n"
+        "from storage.acl import create_space, add_member\n"
+        "_z = [0]\n"
+        "def _feste_id():\n"
+        "    _z[0] += 1\n"
+        "    return 'itm_%08x' % _z[0]\n"
+        "sfiles.generate_id = _feste_id\n"
+        f"root = Path({str(b14.DATA_ROOT)!r})\n"
+        f"spaces = {SPACES!r}\n"
+        f"items = json.loads({json.dumps(json.dumps(items))})\n"
+        "for sp in spaces: create_space(root, sp)\n"
+        "for sp in spaces[1:]: add_member(root, sp, 'alpha', write=True)\n"
+        "s = Store(root, git=False,\n"
+        "          now_fn=lambda: datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc))\n"
+        "ids = {}\n"
+        "for it in items:\n"
+        "    kw = dict(type='task' if it['k'] % 3 == 0 else 'note',\n"
+        "              title='%s %03d' % (it['space'].title(), it['i'] + 1), tags=it['tags'])\n"
+        "    if kw['type'] == 'task': kw['status'] = 'open'\n"
+        "    if it['folder']: kw['folder'] = it['folder']\n"
+        "    ids[it['k']] = s.create(it['space'], **kw).id\n"
+        "for it in items:\n"
+        "    if it['links']:\n"
+        "        s.update(ids[it['k']], version=1, links=[ids[z] for z in dict.fromkeys(it['links'])])\n"
+        "s.rebuild_index()\n"
+        "print('geseedet:', len(ids))\n"
+    )
+    subprocess.run([".venv/bin/python", "-c", code], check=True, cwd=str(REPO_ROOT),
+                   env={**b14._saubere_umgebung(), "PYTHONPATH": str(REPO_ROOT / "phase1_storage")})
+
+
+# -- das Messpflaster ---------------------------------------------------------------------------
+# Haengt eine Hilfsschnittstelle an eine **Kopie** von `graph.js` (Anker: die erste Zeile von
+# `fitView()`, eindeutig). Der Patch aendert **keine** Regel -- er legt nur offen, was die Karte
+# im Inneren hat, und ruft vorhandene Funktionen auf.
+PFLASTER_ANKER = "function fitView() {\n"
+PFLASTER = """globalThis.__sfx18 = {
+  draw: function () { draw(); },
+  setHover: function (id) { hoverId = id; },
+  flush: function () { return ctx.getImageData(0, 0, 1, 1).data[0]; },
+  edges: function () { return {explicit: explicitEdges.length, implicit: implicitEdges.length}; },
+  hub: function () {
+    var best = null;
+    for (var i = 0; i < nodes.length; i++) if (!best || nodes[i].deg > best.deg) best = nodes[i];
+    return best ? best.id : null;
+  },
+  forces: function () { applyForces(1e-9); },   // alpha ~ 0: rechnet alles, bewegt (fast) nichts
+  rings: function (id) { return neighborRings(id, explicitEdges.concat(implicitEdges)); },
+  edgesOnly: function () {
+    ctx.save(); ctx.translate(panX, panY); ctx.scale(zoom, zoom);
+    drawEdges(explicitEdges.concat(implicitEdges), null, visibleNodes());
+    ctx.restore();
+  },
+  positions: function () {
+    return nodes.map(function (n) { return [n.id, n.x, n.y, n.space, n.deg]; });
+  },
+  regions: function () {
+    if (!spaceRegions) return null;
+    var out = {};
+    Object.keys(spaceRegions.spaces).forEach(function (k) {
+      var s = spaceRegions.spaces[k];
+      out[k] = {x: s.x, y: s.y, radius: s.radius};
+    });
+    return {order: spaceRegions.order, spaces: out};
+  },
+  lobes: function () {
+    if (!lobeCache) return null;
+    return lobeCache.lobes.map(function (l) { return {space: l.space, outer: l.outer}; });
+  },
+  view: function () { return {zoom: zoom, panX: panX, panY: panY, cssWidth: cssWidth, cssHeight: cssHeight}; },
+};
+globalThis.__sfx18trace = [];
+var __integrate18 = integrate;
+integrate = function (alpha) {      // Messpflaster: ruft die echte Funktion, notiert danach nur mit
+  __integrate18(alpha);
+  var mv = 0, far = 0, fid = null;
+  for (var i = 0; i < nodes.length; i++) {
+    var n = nodes[i];
+    var s = Math.sqrt(n.vx * n.vx + n.vy * n.vy);
+    if (s > mv) mv = s;
+    var d = Math.sqrt(n.x * n.x + n.y * n.y);
+    if (d > far) { far = d; fid = n.id; }
+  }
+  globalThis.__sfx18trace.push([alpha, mv, far, fid]);
+};
+function fitView() {
+"""
+
+
+# -- der Browser-Teil -----------------------------------------------------------------------------
+BROWSER_MAIN = r'''
+
+# ===== Block 18, Schritt 18.0: die Messung (haengt an den Hilfen der Block-14-Probe) ==============
+
+ZEIT = r"""(n) => {
+  const h = globalThis.__sfx18;
+  const out = {};
+  // **Pro Bild ein Flush** (`getImageData`): jedes `draw()` beginnt mit `clearRect` -- ohne Flush
+  // verwirft Chromium die noch nicht gerasterten Befehle der vorigen Bilder, und die Messung
+  // zaehlt nur das letzte (gemessen: 9,9 ms ohne, siehe Beleg-Vorlauf). Der Flush erzwingt das
+  // Rastern, wie es ein sichtbares Bild braucht.
+  const zeit = (f) => { f(); h.flush(); const t0 = performance.now();
+                        for (let i = 0; i < n; i++) { f(); h.flush(); }
+                        return (performance.now() - t0) / n; };
+  h.setHover(null);
+  out.draw_ms = zeit(() => h.draw());
+  out.draw_nur_kanten_ms = zeit(() => h.edgesOnly());
+  const hub = h.hub();
+  out.hub = hub;
+  h.setHover(hub);
+  out.draw_hover_ms = zeit(() => h.draw());
+  const t0 = performance.now();
+  for (let i = 0; i < n; i++) h.rings(hub);
+  out.ringe_ms = (performance.now() - t0) / n;
+  h.setHover(null);
+  const tf = performance.now();
+  for (let i = 0; i < 5; i++) h.forces();
+  out.kraefte_ms = (performance.now() - tf) / 5;
+  h.draw();
+  out.kanten = h.edges();
+  return out;
+}"""
+
+ZUSTAND = r"""(a) => {
+  const set = (id, v) => { const el = document.getElementById(id);
+                           if (el.checked !== v) { el.checked = v; el.dispatchEvent(new Event('change', {bubbles: true})); } };
+  set('overview-graph-toggle-tags', a.tags);
+  set('overview-graph-toggle-folders', a.ordner);
+}"""
+
+
+def zustand(page, tags, ordner):
+    page.evaluate(ZUSTAND, {"tags": tags, "ordner": ordner})
+    page.wait_for_timeout(200)
+
+
+def simulation(page):
+    """'Layout zuruecksetzen' -> die Simulation laeuft neu; Dauer = erster bis letzter Frame."""
+    page.evaluate("() => { window.__rafLog.count = 0; window.__rafLog.stamps.length = 0; }")
+    page.click("#overview-graph-reset-layout")
+    settle(page)
+    st = page.evaluate("() => window.__rafLog.stamps")
+    ivs = [b - a for a, b in zip(st, st[1:])]
+    return {"frames": len(st), "dauer_ms": (st[-1] - st[0]) if len(st) > 1 else 0.0,
+            "intervall_mittel_ms": (sum(ivs) / len(ivs)) if ivs else 0.0,
+            "intervall_max_ms": max(ivs) if ivs else 0.0}
+
+
+def geometrie(page, fit_margin, zoom_min, region_gap):
+    """Wo steht jeder Space, wie weit draussen sitzt der kleinste, was macht er mit dem Zoom?"""
+    pos = page.evaluate("() => globalThis.__sfx18.positions()")
+    ansicht = page.evaluate("() => globalThis.__sfx18.view()")
+    zoom_readout = page.evaluate(ZOOM)
+    je_raum = {}
+    for nid, x, y, sp, deg in pos:
+        je_raum.setdefault(sp, []).append((nid, x, y))
+
+    def abstand(p, q):
+        return ((p[1] - q[1]) ** 2 + (p[2] - q[2]) ** 2) ** 0.5
+
+    luecke = {}   # kleinster Knotenabstand zu irgendeinem Knoten eines anderen Space
+    for sp, liste in je_raum.items():
+        best = None
+        for p in liste:
+            for sp2, liste2 in je_raum.items():
+                if sp2 == sp:
+                    continue
+                for q in liste2:
+                    d = abstand(p, q)
+                    if best is None or d < best:
+                        best = d
+        luecke[sp] = best
+
+    def zoom_fuer(punkte):
+        xs = [p[1] for p in punkte]
+        ys = [p[2] for p in punkte]
+        bw = (max(xs) - min(xs)) + fit_margin * 2
+        bh = (max(ys) - min(ys)) + fit_margin * 2
+        z = min(ansicht["cssWidth"] / bw, ansicht["cssHeight"] / bh)
+        return max(zoom_min, min(1.0, z)), (max(xs) - min(xs), max(ys) - min(ys))
+
+    alle = [p for liste in je_raum.values() for p in liste]
+    ohne = [p for sp, liste in je_raum.items() if sp != "epsilon" for p in liste]
+    z_alle, box_alle = zoom_fuer(alle)
+    z_ohne, box_ohne = zoom_fuer(ohne)
+    # die drei am weitesten vom Median-Mittelpunkt entfernten Knoten (A2: ein Ausreisser
+    # druckt den Zoom) und der Zoom, den die Karte OHNE sie haette
+    xs_s = sorted(p[1] for p in alle)
+    ys_s = sorted(p[2] for p in alle)
+    mx, my = xs_s[len(xs_s) // 2], ys_s[len(ys_s) // 2]
+    deg = {n[0]: n[4] for n in pos}
+    raum_von = {n[0]: n[3] for n in pos}
+    fern = sorted(alle, key=lambda p: -abstand(p, (None, mx, my)))
+    weiteste = [{"id": p[0], "space": raum_von[p[0]], "deg": deg[p[0]],
+                 "abstand_vom_median_px": round(abstand(p, (None, mx, my)), 1)} for p in fern[:3]]
+    z_ohne3, box_ohne3 = zoom_fuer(fern[3:])
+    # Abstand zum naechsten **Umriss** eines anderen Space (der Massstab von Plan 18.2)
+    lobes = page.evaluate("() => globalThis.__sfx18.lobes()") or []
+    je_umriss = {}
+    for l in lobes:
+        # `outer` ist ein Ring [[x, y], ...] **oder** eine Liste von Ringen -- beides flachdruecken
+        ringe = l["outer"] if l["outer"] and isinstance(l["outer"][0][0], list) else [l["outer"]]
+        for ring in ringe:
+            je_umriss.setdefault(l["space"], []).extend(ring)
+    umriss_luecke = {}
+    for sp, liste in je_raum.items():
+        best = None
+        for p in liste:
+            for sp2, kontur in je_umriss.items():
+                if sp2 == sp:
+                    continue
+                for q in kontur:
+                    d = ((p[1] - q[0]) ** 2 + (p[2] - q[1]) ** 2) ** 0.5
+                    if best is None or d < best:
+                        best = d
+        umriss_luecke[sp] = best
+    return {
+        "luecke_zum_naechsten_fremden_knoten_px": luecke,
+        "luecke_zum_naechsten_fremden_umriss_px": umriss_luecke,
+        "ausreisser_umriss_luecke_px": umriss_luecke.get("epsilon"),
+        "ausreisser_umriss_luecke_in_region_gap": (umriss_luecke.get("epsilon") or 0) / region_gap,
+        "weiteste_knoten": weiteste,
+        "zoom_ohne_die_3_weitesten_nachgerechnet": z_ohne3,
+        "welt_ohne_die_3_weitesten_px": box_ohne3,
+        "ausreisser_luecke_px": luecke.get("epsilon"),
+        "ausreisser_luecke_in_region_gap": (luecke.get("epsilon") or 0) / region_gap,
+        "zoom_anzeige": zoom_readout,
+        "zoom_aus_fitview_nachgerechnet": z_alle,
+        "zoom_ohne_ausreisser_nachgerechnet": z_ohne,
+        "welt_mit_ausreisser_px": box_alle,
+        "welt_ohne_ausreisser_px": box_ohne,
+        "regionen": page.evaluate("() => globalThis.__sfx18.regions()"),
+    }
+
+
+def main():
+    fehler = []
+    text = (Path(AUFTRAG["repo_root"]) / "phase5_ui/webui/static/js/graph.js").read_text(encoding="utf-8")
+    konst = {n: float(re.search(r"^const %s = ([0-9.]+);" % n, text, re.M).group(1))
+             for n in ("FIT_MARGIN", "ZOOM_MIN", "REGION_GAP", "REGION_ITEM_STEP", "REGION_PAD", "TAG_CLIQUE_LIMIT")}
+    out = {"konstanten": konst, "zustaende": {}}
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        ctx = browser.new_context(viewport={"width": 1920, "height": 1200}, ignore_https_errors=True)
+        page = ctx.new_page()
+        page.add_init_script("localStorage.setItem('sfx:film:gesehen','4.0.0')")
+        page.add_init_script(RAF_PROBE)
+        page.on("pageerror", lambda e: fehler.append(str(e)))
+        login(page)
+        out["browser"] = {"version": browser.version, "user_agent": page.evaluate("() => navigator.userAgent"),
+                          "viewport": "1920x1200", "kopfloser_chromium": True}
+        # Basislauf: leere Ablage, alles aus -> der Ausreisser-Zustand der Wegwerf-Instanz (A1)
+        lauf = frischer_lauf(page)
+        out["pinned_beim_start"] = lauf["pinned_beim_start"]
+        out["knoten"] = len(lauf["grafik"]["nodes"])
+        zustaende = [("aus", False, False), ("tags", True, False), ("ordner", False, True), ("beide", True, True)]
+        for name, tags, ordner in zustaende:
+            zustand(page, tags, ordner)
+            sim = simulation(page)
+            page.wait_for_timeout(400)
+            messung = page.evaluate(ZEIT, AUFTRAG["n_bilder"])
+            geo = geometrie(page, konst["FIT_MARGIN"], konst["ZOOM_MIN"], konst["REGION_GAP"])
+            out["zustaende"][name] = {"simulation": sim, "draw": messung, "geometrie": geo}
+            if AUFTRAG.get("bilder_dir"):
+                page.locator("#overview-graph-canvas").screenshot(
+                    path=str(Path(AUFTRAG["bilder_dir"]) / ("b18_0_%s.png" % name)))
+        # Spur der Simulation im Tag-Zustand: wann und wie wird ein Knoten weggeschleudert?
+        zustand(page, True, False)
+        page.evaluate("() => { globalThis.__sfx18trace.length = 0; }")
+        simulation(page)
+        spur = page.evaluate("() => globalThis.__sfx18trace")
+        erste = next((i for i, s in enumerate(spur) if s[2] > 1500), None)
+        schnellste = max(range(len(spur)), key=lambda i: spur[i][1]) if spur else None
+        out["tags_spur"] = {
+            "ticks": len(spur),
+            "erster_tick_ueber_1500px_vom_ursprung": erste,
+            "alpha_dort": spur[erste][0] if erste is not None else None,
+            "knoten_dort": spur[erste][3] if erste is not None else None,
+            "schnellster_tick": schnellste,
+            "hoechste_geschwindigkeit_px_pro_tick": spur[schnellste][1] if spur else None,
+            "weitester_abstand_vom_ursprung_am_ende_px": spur[-1][2] if spur else None,
+            "abstand_je_10_ticks": [round(spur[i][2]) for i in range(0, len(spur), 10)],
+            "geschwindigkeit_je_10_ticks": [round(spur[i][1], 1) for i in range(0, len(spur), 10)],
+        }
+        # A3-Gegenprobe: 'Layout zuruecksetzen' auf der frischen Instanz aendert die Karte nicht
+        # (es gibt dort keine gemerkte Ablage) -- die Ursache A3 laesst sich hier NICHT zeigen.
+        out["fehler_in_der_seite"] = fehler
+        browser.close()
+    Path(AUFTRAG["result"]).write_text(json.dumps(out, indent=1, ensure_ascii=False), encoding="utf-8")
+    print(json.dumps({z: {"edges": v["draw"]["kanten"], "draw_ms": round(v["draw"]["draw_ms"], 2),
+                          "draw_hover_ms": round(v["draw"]["draw_hover_ms"], 2),
+                          "kanten_ms": round(v["draw"]["draw_nur_kanten_ms"], 2),
+                          "kraefte_ms": round(v["draw"]["kraefte_ms"], 2),
+                          "ringe_ms": round(v["draw"]["ringe_ms"], 2),
+                          "sim_ms": round(v["simulation"]["dauer_ms"]),
+                          "frames": v["simulation"]["frames"],
+                          "ausreisser_px": round(v["geometrie"]["ausreisser_luecke_px"] or 0),
+                          "ausreisser_umriss_px": round(v["geometrie"]["ausreisser_umriss_luecke_px"] or 0),
+                          "welt": [round(x) for x in v["geometrie"]["welt_mit_ausreisser_px"]],
+                          "welt_ohne3": [round(x) for x in v["geometrie"]["welt_ohne_die_3_weitesten_px"]],
+                          "weiteste": v["geometrie"]["weiteste_knoten"][0],
+                          "zoom": v["geometrie"]["zoom_anzeige"]}
+                      for z, v in out["zustaende"].items()}, indent=1))
+    return 1 if fehler else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+'''
+
+
+def browser_skript() -> str:
+    """Die Hilfen der Block-14-Probe (alles vor ihrem `main()`) + das eigene `main()`."""
+    kopf = b14.BROWSER_SKILL.split("\ndef main():\n", 1)[0]
+    return kopf + BROWSER_MAIN
+
+
+def main() -> int:
+    items = spec()
+    soll = erwartet(items)
+    if soll["tags_ueber_limit"]:
+        print("WARNUNG: %d Tags ueber dem Limit -- die Saat bildet sie nicht ab" % soll["tags_ueber_limit"],
+              file=sys.stderr)
+    b14.PORT = b14._freier_port()
+    b14.BASE = "https://127.0.0.1:%d" % b14.PORT
+    creds = b14._setup()
+    seed(items)
+    b14.GRAPH_PATCH_EXTRA[PFLASTER_ANKER] = PFLASTER
+    resultat = HIER / ("p105_b18_karte_messung.json")
+    try:
+        b14._serve()
+        auftrag = {
+            "base": b14.BASE, "space": b14.SPACE, "password": creds["password"], "secret": creds["secret"],
+            "repo_root": str(REPO_ROOT), "auth_db": str(b14.AUTH_DB), "result": str(resultat),
+            "wachser_space": "epsilon", "extra_items": 0, "pid": b14.PID, "spaces": SPACES,
+            "n_bilder": 30, "bilder_dir": str(b14.WEGWERF_ROOT),
+        }
+        b14.AUFTRAG_DATEI.write_text(json.dumps(auftrag), encoding="utf-8")
+        skript = b14.WEGWERF_ROOT / ("browser18_%d.py" % b14.PID)
+        skript.write_text(browser_skript(), encoding="utf-8")
+        e2e = Path.home() / ".claude-code-tools/e2e-venv/bin/python"
+        proc = subprocess.run([str(e2e), str(skript), str(b14.AUFTRAG_DATEI)], cwd=str(REPO_ROOT),
+                              capture_output=True, text=True, timeout=1500)
+        print(proc.stdout.strip()[-8000:])
+        if proc.returncode != 0:
+            print(proc.stderr.strip()[-6000:], file=sys.stderr)
+            return 1
+    finally:
+        b14._stop()          # jeder Ausgang stoppt den Wegwerf-Server -- ueber die PID-Datei
+    beleg = json.loads(resultat.read_text(encoding="utf-8"))
+    beleg["saat"] = {"spaces": ANZAHL, "items": len(items), "grosse_ordner": GROSSER_ORDNER,
+                     "tag_pool": TAG_POOL, "erwartet": soll}
+    for name, z in beleg["zustaende"].items():
+        z["kanten_gegenrechnung"] = {"seite_implizit": z["draw"]["kanten"]["implicit"],
+                                      "saat_implizit": soll["implizit"][name],
+                                      "seite_explizit": z["draw"]["kanten"]["explicit"],
+                                      "saat_explizit": soll["explizit"],
+                                      "ok": z["draw"]["kanten"]["implicit"] == soll["implizit"][name]
+                                      and z["draw"]["kanten"]["explicit"] == soll["explizit"]}
+    resultat.write_text(json.dumps(beleg, indent=1, ensure_ascii=False), encoding="utf-8")
+    print("Gegenrechnung der Kanten:",
+          {n: z["kanten_gegenrechnung"]["ok"] for n, z in beleg["zustaende"].items()})
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
