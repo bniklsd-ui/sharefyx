@@ -157,6 +157,20 @@ export function markePose(n, cam, s1, geo) {
            s: Math.exp(lerp(Math.log(gs), Math.log(cam.z), t)), rot: lerp(0, s1.rot, t) };
 }
 
+// Das Raster im Hintergrund (16.7, Sichtung 1: „Schwarz wirkt unfertig“): eine Ebene **hinter**
+// der Welt — sie zieht mit der halben Kamera (Parallaxe). Damit es beim Herauszoomen nicht zu Brei
+// wird, hält es die Dichte: der Abstand auf dem Bild bleibt in [80, 160) px; die feinen Linien
+// blenden mit `fein` ein, an jeder Stufe ist der Übergang stetig (vorher: alle 160 px voll, danach:
+// alle 160 px voll, feine bei 0).
+export const RASTER_PARALLAXE = 0.5, RASTER_WELT = 200, RASTER_MIN = 80;
+export function raster(cam) {
+  const roh = RASTER_WELT * RASTER_PARALLAXE * cam.z, L = Math.log2(roh / RASTER_MIN), k = Math.floor(L);
+  const abstand = roh / 2 ** k;
+  // Bildposition des Weltursprungs der Ebene — Linie m liegt bei ursprung + m * abstand.
+  const zg = RASTER_PARALLAXE * cam.z;
+  return { abstand, fein: L - k, ux: W / 2 - cam.cx * zg, uy: H / 2 - cam.cy * zg };
+}
+
 // Der ganze Zustand eines Bildes — nur Daten.
 export function zustand(n, geo) {
   const cam = kamera(n, geo);
@@ -203,5 +217,11 @@ export function zustand(n, geo) {
     pose: markePose(n, cam, s1, geo),
   };
   const ende = phase(n, ENDE[0] + 30, ENDE[0] + 110);
-  return { n, cam, kacheln, tafel, auftakt, marke, zerfall, flug, schrift, ende };
+  // Das Raster erscheint mit dem Knall (eine Welle läuft von der Mitte nach außen) und tritt im
+  // Morph zurück, damit die Punkte der 4.0.0 sauber stehen.
+  const nachKnall = n - A.knall;
+  const rasterZ = { ...raster(cam),
+    deck: phase(n, A.knall + 10, A.knall + 90) * (1 - 0.75 * phase(n, MORPH[0], MORPH[0] + 60)),
+    welle: nachKnall >= 0 && nachKnall < 120 ? { r: nachKnall * 26, deck: 1 - nachKnall / 120 } : null };
+  return { raster: rasterZ, n, cam, kacheln, tafel, auftakt, marke, zerfall, flug, schrift, ende };
 }

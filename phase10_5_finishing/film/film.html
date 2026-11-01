@@ -7,6 +7,10 @@
   @font-face { font-family: "IBM Plex Sans Var"; src: url("/static/fonts/IBMPlexSans-subset.6c21979f.woff2") format("woff2"); font-weight: 380 620; }
   @font-face { font-family: "IBM Plex Mono"; src: url("/static/fonts/IBMPlexMono-subset.a8d5dfa6.woff2") format("woff2"); font-weight: 400; }
   html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #000; }
+  #raster { position: absolute; inset: 0; width: 1920px; height: 1080px; }
+  /* Vignette: die Ränder dunkler, der Blick bleibt in der Mitte. */
+  #vignette { position: absolute; inset: 0; pointer-events: none;
+              background: radial-gradient(ellipse 75% 70% at 50% 48%, rgba(0,0,0,0) 55%, rgba(0,0,0,.6) 100%); }
   #world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
   .tile { position: absolute; width: 1600px; height: 1000px; border-radius: 18px; overflow: hidden;
           background: #000; box-shadow: 0 30px 90px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.07);
@@ -42,7 +46,9 @@
 </style>
 </head>
 <body>
+<canvas id="raster" width="1920" height="1080"></canvas>
 <div id="world"></div>
+<div id="vignette"></div>
 <canvas id="punkte" width="1920" height="1080"></canvas>
 <div class="marke" id="marke"><img src="/static/logo.svg" alt="">harefyx<span class="version"><span>v3.1.6</span><span>v4.0.0</span></span></div>
 <div id="glyphe">4.0.0</div>
@@ -217,6 +223,41 @@
   }
 
   const FARBEN = ["#3E8DF3", "#2EB8A6", "#7FB6FF", "#E9EDF2"];
+  // Das Raster (16.7): Linien im Blau der Knöpfe (`--btn-std` #3E8DF3), sehr leise. Die Welle des
+  // Knalls ist dasselbe Raster heller, auf einen Ring maskiert.
+  const RASTER_DECK = 0.14, rasterWelle = document.createElement("canvas");
+  rasterWelle.width = 1920; rasterWelle.height = 1080;
+  function rasterLinien(g, r, deck) {
+    const zeichne = (alpha, nurFein) => {
+      if (alpha <= 0.002) return;
+      g.strokeStyle = `rgba(62,141,243,${alpha})`; g.lineWidth = 1; g.beginPath();
+      for (const [u, max, quer] of [[r.ux, 1920, false], [r.uy, 1080, true]]) {
+        const m0 = Math.ceil(-u / r.abstand), m1 = Math.floor((max - u) / r.abstand);
+        for (let m = m0; m <= m1; m++) {
+          if ((Math.abs(m) % 2 === 1) !== nurFein) continue;
+          const p = Math.round(u + m * r.abstand) + 0.5;
+          if (quer) { g.moveTo(0, p); g.lineTo(1920, p); } else { g.moveTo(p, 0); g.lineTo(p, 1080); }
+        }
+      }
+      g.stroke();
+    };
+    zeichne(deck, false);
+    zeichne(deck * r.fein, true);
+  }
+  function rasterZeichnen(r) {
+    const g = document.getElementById("raster").getContext("2d");
+    g.clearRect(0, 0, 1920, 1080);
+    rasterLinien(g, r, RASTER_DECK * r.deck);
+    if (r.welle) {
+      const w = rasterWelle.getContext("2d");
+      w.globalCompositeOperation = "source-over"; w.clearRect(0, 0, 1920, 1080);
+      rasterLinien(w, r, 0.6 * r.welle.deck);
+      const ring = w.createRadialGradient(960, 520, Math.max(0, r.welle.r - 140), 960, 520, r.welle.r + 20);
+      ring.addColorStop(0, "rgba(0,0,0,0)"); ring.addColorStop(0.8, "rgba(0,0,0,1)"); ring.addColorStop(1, "rgba(0,0,0,0)");
+      w.globalCompositeOperation = "destination-in"; w.fillStyle = ring; w.fillRect(0, 0, 1920, 1080);
+      g.drawImage(rasterWelle, 0, 0);
+    }
+  }
   // Eine Zeichenart für alle Punkte des Films (Auftakt und Finale): `lage(i)` → [x, y, Radius].
   function punkteZeichnen(pc, anzahl, deck, lage) {
     pc.globalAlpha = deck;
@@ -237,6 +278,7 @@
   }
   window.renderFrame = async (n) => {
     const z = zustand(n, geo);
+    rasterZeichnen(z.raster);
     world.style.transform = cameraTransform(z.cam.cx, z.cam.cy, z.cam.z);
     const warten = [];
     z.kacheln.forEach((s, i) => {

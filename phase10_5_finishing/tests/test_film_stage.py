@@ -138,3 +138,30 @@ def test_opening_mark_lands_on_the_rail_of_the_first_tile():
                             " return [z.marke.pose, z.cam, f.welt2bild(z.cam, ...f.kachelPunkt(s1, 0, 8))]; })()")
     assert pose["s"] == pytest.approx(cam["z"])
     assert (pose["x"], pose["y"]) == (pytest.approx(ziel[0]), pytest.approx(ziel[1]))
+
+
+# --- Block 16.7: das Raster ----------------------------------------------------------------------
+
+@pytest.mark.skipif(NODE is None, reason="node fehlt")
+def test_grid_keeps_its_density_through_every_zoom():
+    """Vom Halt (z 0,85) bis zur großen 4 (z ≈ 0,07): der Abstand auf dem Bild bleibt in [80, 160)
+    px — beim Herauszoomen wird das Raster nicht zu Brei."""
+    abst = _film("Array.from({length: f.FRAMES}, (_, n) => f.zustand(n, geo).raster.abstand)")
+    assert all(80 <= a < 160 for a in abst), (min(abst), max(abst))
+
+
+@pytest.mark.skipif(NODE is None, reason="node fehlt")
+def test_grid_moves_slower_than_the_tiles():
+    """Parallaxe: zwischen zwei Halten wandert der Ursprung des Rasters halb so weit wie die Welt."""
+    (a, ca), (b, cb) = _film("[f.HALTE[1][0], f.HALTE[2][0]].map(n => { const z = f.zustand(n, geo);"
+                             " return [z.raster, z.cam]; })")
+    welt = (cb["cx"] - ca["cx"]) * ca["z"]
+    assert welt != 0
+    assert (b["ux"] - a["ux"]) / -welt == pytest.approx(0.5)
+
+
+@pytest.mark.skipif(NODE is None, reason="node fehlt")
+def test_grid_appears_with_the_bang_and_steps_back_for_the_glyph():
+    vor, nach, ende = _film("[f.AUFTAKT.knall - 1, f.HALTE[0][0], f.FRAMES - 1]"
+                            ".map(n => f.zustand(n, geo).raster.deck)")
+    assert vor == 0 and nach == 1 and ende == pytest.approx(0.25)
