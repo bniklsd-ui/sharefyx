@@ -6,7 +6,7 @@ detail: L2
 up: ../../phase10_5_finishing/CLAUDE.md
 down:
   - ../UPDATE_LOG.md   # die Quelle der Feature-Liste (Blöcke 2026-10-23 bis 2026-10-26)
-updated: 2026-11-01 (Schritt 16.9 ✅ — Volllauf 2, 48,4 s; Sichtung 2 beim Nikinger) | 2026-11-01 (Schritt 16.8 ✅ — 3D-Kacheln, Text am Streif, 48,4 s) | 2026-11-01 (Schritt 16.7 ✅ — blaues Raster, Parallaxe, Vignette) | 2026-11-01 (Schritt 16.6 ✅ — Urknall-Auftakt, Zeitleiste relativ) | 2026-11-01 (§7 Sichtung 1 wörtlich + Runde 2: Urknall, Raster, 3D + Text, schneller) | 2026-11-01 (Schritt 16.5 🔄 — Volllauf fertig, Sichtung offen) | 2026-11-01 (Schritte 16.3/16.4 ✅ — Vorschau, Feinschliff, Ton) | 2026-11-01 (Schritt 16.2 ✅ — Bühne, Schlüsselbilder selbst geprüft) | 2026-11-01 (Schritt 16.1 ✅ — Aufnahmen, Funde: Ordner-Menü, clip.scale > 2) | 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
+updated: 2026-11-01 (§8 Sichtung 2: abgenommen — Block 16 ✅; Einbindung in die App + Deploy D nächste Session) | 2026-11-01 (Schritt 16.9 ✅ — Volllauf 2, 48,4 s; Sichtung 2 beim Nikinger) | 2026-11-01 (Schritt 16.8 ✅ — 3D-Kacheln, Text am Streif, 48,4 s) | 2026-11-01 (Schritt 16.7 ✅ — blaues Raster, Parallaxe, Vignette) | 2026-11-01 (Schritt 16.6 ✅ — Urknall-Auftakt, Zeitleiste relativ) | 2026-11-01 (§7 Sichtung 1 wörtlich + Runde 2: Urknall, Raster, 3D + Text, schneller) | 2026-11-01 (Schritt 16.5 🔄 — Volllauf fertig, Sichtung offen) | 2026-11-01 (Schritte 16.3/16.4 ✅ — Vorschau, Feinschliff, Ton) | 2026-11-01 (Schritt 16.2 ✅ — Bühne, Schlüsselbilder selbst geprüft) | 2026-11-01 (Schritt 16.1 ✅ — Aufnahmen, Funde: Ordner-Menü, clip.scale > 2) | 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
 ---
 # Launch-Film — Sharefyx v4.0.0 (Plan Block 16)
 
@@ -184,7 +184,7 @@ File-Keyring, Umgebung ohne `SHAREFYX_*`/`SFX_*`, Stopp nur über die PID-Datei 
 | L3 | Länge 40–60 s |
 | L4 | Checkliste §4 vollständig ✓ |
 | L5 | jede gezeigte Funktion existiert in HEAD an der Wegwerf-Instanz |
-| L6 | der ganze Film vom Nikinger abgenommen (N3) — Sichtung 1 (2026-11-01): „nicht schlecht“, drei Wünsche ⇒ Runde 2 (§7) |
+| L6 | der ganze Film vom Nikinger abgenommen (N3) — Sichtung 1 (2026-11-01): „nicht schlecht“, drei Wünsche ⇒ Runde 2 (§7) · **✅ Sichtung 2 (2026-11-01): abgenommen** (§8) |
 | L7 | Quelle im Repo, pytest grün; MP4 außerhalb, SHA-256 notiert |
 
 **Herkunft:** der Nikinger erinnert eine frühere Session zum Film. Im Repo, im Memory und im
@@ -388,5 +388,20 @@ Zeitleiste automatisch). Neue Aufnahmen nur, wenn eine Szene sie braucht (z. B. 
   Bild-Hashkette `85de2c41…`; 0,47 s/Bild (≈ 23 min). Kontaktbögen des fertigen MP4 (alle 1,5 s)
   selbst gesichtet.
 - **Kriterien:** L1 ✅ · L2 ✅ (Zahlen; Banding-Urteil Sichtung) · L3 ✅ 48,4 s · L4 ✅ (s. o.) ·
-  L5 ✅ (dieselben Aufnahmen von HEAD/v3.1.6) · L6 ⬜ **Sichtung 2 beim Nikinger (N3)** · L7 ✅.
+  L5 ✅ (dieselben Aufnahmen von HEAD/v3.1.6) · L6 ✅ (Sichtung 2, §8) · L7 ✅.
+
+## §8 Sichtung 2 (Nikinger, 2026-11-01) — abgenommen
+
+> **Wörtlich:** „Nice, that is really great, i like the style. Note any learnings from that, since
+> well maybe do that again. Lets now deploy!“
+
+**Block 16 ✅** — L1–L7 erfüllt. Die Lehren stehen wiederverwendbar in
+[`launch_film_learnings.md`](./launch_film_learnings.md).
+
+**Entscheidung zu Deploy D (Nikinger, 2026-11-01, auf Rückfrage):** der Vermerk vom 2026-10-26
+(ROADMAP P10.6) wollte den Film **beim ersten Start im Vollbild** und **im Update-Log wieder
+aufrufbar** — Block 16 baute nur die MP4. Antwort, wörtlich: „enable film first - but next Session.
+This session only the rest. Deploy therefore also next Session.“ ⇒ **nächste Session:** Einbindung
+in die App (eigener Plan nötig: Video-Datei ≈ 25 MB, Erststart-Merker, CSP für Medien,
+`ui_budget`-Ausnahme, Wegwerf-Probe), **danach** Deploy D.
 

@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-11-01 (Block 16.9, Session-Ende) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-11-01 (Block 16 ✅, Film-Lehren) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -31,12 +31,13 @@ updated: 2026-11-01 (Block 16.9, Session-Ende) | ältere Einträge: docs/INDEX_U
 - [docs/INDEX.md](./INDEX.md) — 🔗 **diese Karte** (L0) · **37.930 B — unter dem 40-KiB-Softcap** (V145 ✅) · die Karten-Chronik steht in `docs/INDEX_ENTRIES_ARCHIVE.md` · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [CLAUDE.md](../CLAUDE.md) — 📗 **37.409 B** (vor der Rotation 114.771 B) · Wurzel-Regelwerk: Kernprinzip der dumme Server, **neun Hard Rules**, Working style, Doku-Hygiene und **Current state** (Session-Bloecke, newest-first, **kein** Ein-Block-Limit — P9-A). **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [README.md](../README.md) — 📗 ~7KB · human overview + machine setup (venv, keyring, run, smoke test); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
-- [ROADMAP.md](../ROADMAP.md) — 📗 **26.882 B** · Phasen 1–10.5, Scope, Status (LG-6: Phase 8.5 → `ROADMAP_ARCHIVE.md`) · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [ROADMAP.md](../ROADMAP.md) — 📗 **27.213 B** · Phasen 1–10.5, Scope, Status (LG-6: Phase 8.5 → `ROADMAP_ARCHIVE.md`) · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/ROADMAP_ARCHIVE.md](./ROADMAP_ARCHIVE.md) — 📦 **11.544 B** · abgeschlossene Roadmap-Abschnitte, verbatim
 - [docs/ROADMAP_UPDATES_ARCHIVE.md](./ROADMAP_UPDATES_ARCHIVE.md) — 📦 **14.371 B** · L3: `updated:`-Kette von `ROADMAP.md`, verbatim (2026-10-07)
 - [docs/DOC_LAYERS_CONVENTION.md](./DOC_LAYERS_CONVENTION.md) — 📗 ~5KB · Doc-Layers-Spec (v1, 2026-07-06) · **byte-identische Kopie aus dem Trading-Bot-Repo — nicht projektspezifisch anpassen, sonst divergieren zwei Kopien derselben Regel**
 - [docs/concepts/sichtpruefung_automation_conventions.md](./concepts/sichtpruefung_automation_conventions.md) — 📗 **21.765 B** · Konventionen der Sichtprüfungs-Automatisierung · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/concepts/sichtpruefung_automation_tooling.md](./concepts/sichtpruefung_automation_tooling.md) — 📗 ~26KB · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [docs/concepts/launch_film_learnings.md](./concepts/launch_film_learnings.md) — 📗 **6249 B** · Rezept + Lehren des Launch-Films v4.0.0 (Stil, den der Nikinger abnahm; Fallen) — zuerst lesen vor jedem neuen Film
 - [docs/PROMPTS.md](./PROMPTS.md) — 📗 ~25KB · vier Workflow-Prompts (Session-Start, Kickoff, Abschluss, Ultra-Review); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 
 ## Phase 10 — ✅ abgeschlossen 2026-10-20 (Bestandsaufnahme, kein Produktcode; Plan P10.5)
@@ -59,7 +60,7 @@ updated: 2026-11-01 (Block 16.9, Session-Ende) | ältere Einträge: docs/INDEX_U
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing; Plan siehe unten)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **39142 B** · Head: Modulstatus, Deploys, Abnahme (72 ✅ · 7 ⬜)
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **40113 B** · Head: Modulstatus, Deploys, Abnahme (72 ✅ · 7 ⬜)
 - [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **41958 B** · die **geschlossenen** Abnahmezeilen, verbatim
 - [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **203092 B** · Session-Blöcke, verbatim
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · Startaufträge Block 7 und 9, verbatim
@@ -69,11 +70,11 @@ updated: 2026-11-01 (Block 16.9, Session-Ende) | ältere Einträge: docs/INDEX_U
 - [docs/concepts/phase10_5_block14_kartenlayout_plan_anhang.md](./concepts/phase10_5_block14_kartenlayout_plan_anhang.md) — 📦 **20525 B** · Anhang Block 14
 - [docs/concepts/phase10_5_block14_6_plan.md](./concepts/phase10_5_block14_6_plan.md) — 📗 **27332 B** · Plan 14.6
 - [docs/concepts/phase10_5_block14_7_plan.md](./concepts/phase10_5_block14_7_plan.md) — 📗 **29756 B** · Plan 14.7 (Karte kompakt)
-- [docs/concepts/phase10_5_launch_film_plan.md](./concepts/phase10_5_launch_film_plan.md) — 📗 **33130 B** · Plan Block 16: Launch-Film v4.0.0
+- [docs/concepts/phase10_5_launch_film_plan.md](./concepts/phase10_5_launch_film_plan.md) — 📗 **34170 B** · Plan Block 16: Launch-Film v4.0.0
 - [docs/concepts/phase10_5_block15_review_fixes_plan.md](./concepts/phase10_5_block15_review_fixes_plan.md) — 📗 **31775 B** · Block 15: Review-Fixes B1–B10 (✅)
 - [docs/concepts/phase10_5_block15_review_fixes_plan_anhang.md](./concepts/phase10_5_block15_review_fixes_plan_anhang.md) — 📦 **14534 B** · Anhang Block 15: Anmerkungen 15.1–15.3b
 - [docs/concepts/phase10_5_ultra_review_v4.0.0.md](./concepts/phase10_5_ultra_review_v4.0.0.md) — 📕 **19192 B** · Ultra-Review v4.0.0: 22 Befunde, B1 kritisch
-- [phase10_5_finishing/UPDATES_ARCHIVE.md](../phase10_5_finishing/UPDATES_ARCHIVE.md) — 📦 **18387 B** · ältere `updated:`-Fäden des Heads, verbatim
+- [phase10_5_finishing/UPDATES_ARCHIVE.md](../phase10_5_finishing/UPDATES_ARCHIVE.md) — 📦 **18517 B** · ältere `updated:`-Fäden des Heads, verbatim
 
 ## Phase 8.6 — ✅ abgeschlossen 2026-09-19 (UI-Politur, live `v3.0.2`; zwei Pläne)
 
@@ -121,7 +122,7 @@ updated: 2026-11-01 (Block 16.9, Session-Ende) | ältere Einträge: docs/INDEX_U
 - [docs/concepts/phase9_hardening_block_feedback_plan.md](./concepts/phase9_hardening_block_feedback_plan.md) — 📕 **36.457 B** · Mini-Plan: Nutzer-Rückmeldung 2026-10-07, B1–B8 + E1a gebaut und als `v3.1.4` live; E2/E3 → P10
 - [docs/concepts/phase9_hardening_uebersicht.svg](./concepts/phase9_hardening_uebersicht.svg) — 📕 ~17KB · Phase-9-Übersichtsgrafik 1080×1080 (Closeout 2026-10-08, gerendert und angesehen): Steps, Blöcke, Ausführer-Band mit Open-Test
 - [docs/concepts/PHASE9_CLOSEOUT_HANDOVER.md](./concepts/PHASE9_CLOSEOUT_HANDOVER.md) — 📕 **15.583 B** · Abschluss-Handover P9 → P10: Status, Delta, Posten für P10 (§4), [VERIFY]-Bilanz, Open-Test MiniMax M3/M3.1
-- [docs/concepts/p8x_ui_polish_notes.md](./concepts/p8x_ui_polish_notes.md) — 🟡 ~40KB · **Inhaltsquelle** der P8.6-Planung, zehn Abschnitte §1–§10 + Anhang §A–§E (Spaces-Layout, Obsidian-Map, Ordner-Zaehler, Edit-in-Place, Layering-Politik, Settings-Rename, De-AI-Lauf 2, Tags, Feedback-Button, §10 = neun Nikinger-Punkte vom 2026-09-09). **Bewusst kein Plan-Doc** — der Plan ist `phase8_6_ui_polish_plan.md`; welche Abschnitte P8.6 uebernimmt und welche nach P9 gehen, steht dort in §0.4. **§B: die Mobile-Haelfte der Aussenkante ist aufgehoben** (Nikinger 2026-09-09), Realtime bleibt draussen. 40.866 B — knapp unter dem Softcap. · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [docs/concepts/p8x_ui_polish_notes.md](./concepts/p8x_ui_polish_notes.md) — 🟡 ~40KB · Inhaltsquelle der P8.6-Planung (§1–§10, Anhang §A–§E; bewusst kein Plan-Doc) · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 ## Phase 8 — ✅ abgeschlossen 2026-09-08 (UI-Neuanstrich v3, Verknüpfungs-Graph)
 
 - [phase8_ui_graph/CLAUDE.md](../phase8_ui_graph/CLAUDE.md) — 📗 **34.327 B** (DO-1: „C0“ verbatim in `SESSIONS_ARCHIVE.md`) · Phase-8-Head, alle Bloecke ✅, Abnahmestand **26 ✅ · 0 🟡 · 0 ⬜**, trägt die **Selection/Choice-Konvention v3** (fünfte Kategorie Vorsicht) · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
@@ -198,7 +199,7 @@ doppelt hier gelistet.)*
 ## Project-wide session log (Wurzel-Current-State-Archiv)
 
 - [docs/INDEX_ENTRIES_ARCHIVE.md](./INDEX_ENTRIES_ARCHIVE.md) — 📦 **46.456 B** · L3-Archiv der **datierten Nachträge aus den Einträgen dieser Karte**, verbatim, ein Abschnitt je Karte in der Reihenfolge der Karte (nicht newest-first). **Regel:** eine Kartenzeile bekommt **keinen** datierten Nachtrag mehr (`test_no_entry_line_carries_a_dated_addendum_any_more`) — die Karte ist **Stand**, das Archiv ist **Chronik**
-- [docs/INDEX_KURZUNG_ARCHIVE.md](./INDEX_KURZUNG_ARCHIVE.md) — 📦 **11.961 B** · L3-Archiv der aus der Karte gekürzten Texte — die acht Abschnittsköpfe und fünf Kartenzeilen-Chroniken, verbatim (die letzten zwei am 2026-10-24, DO-2-Luft); die Karte trägt wieder Stand, dieses Archiv die Chronik des Kürzens
+- [docs/INDEX_KURZUNG_ARCHIVE.md](./INDEX_KURZUNG_ARCHIVE.md) — 📦 **13018 B** · L3-Archiv der aus der Karte gekürzten Texte — die acht Abschnittsköpfe und sechs Kartenzeilen-Chroniken, verbatim (zuletzt 2026-11-01, P10.5-2-Luft); die Karte trägt wieder Stand, dieses Archiv die Chronik des Kürzens
 
 - [docs/INDEX_UPDATES_ARCHIVE.md](./INDEX_UPDATES_ARCHIVE.md) — 📦 **26.463 B** · L3-Archiv der `updated:`-Kette **dieser** Datei, verbatim, newest-first (erste Rotation 2026-09-19); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/PROJECT_SESSION_LOG.md](./PROJECT_SESSION_LOG.md) — 📦 **268.563 B** (vor der 24-Block-Rotation 101.450 B) · L3-Archiv der historischen `[YYYY-MM-DD]`-Session-Bloecke aus `CLAUDE.md` §Current state, newest-first, plus §Frontmatter-Archiv (die `updated:`-Kette der Wurzel-`CLAUDE.md`, 28 Eintraege, verbatim seit 2026-09-13). Wer die Chronik einer alten Phase sucht, faengt hier an, nicht im Wurzel-Head
