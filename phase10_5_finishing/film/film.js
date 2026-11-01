@@ -14,39 +14,58 @@ import { W, H, clamp, lerp, easeInOut, phase, prng } from "./stage.js";
 
 export const FPS = 60;
 export const TILE_W = 1600, TILE_H = 1000, CELL_W = 1800, CELL_H = 1200;
-export const Z_KACHEL = 0.85; // eine Kachel füllt das Bild, unten bleibt Platz für die Tafel
+// 16.8 (Sichtung 1: „wie eine Diashow“): die Kachel füllt das Bild nicht mehr — sie steht auf
+// einer Seite (≈ 60 % der Breite), leicht im Raum gedreht, und rückt während des Halts heran; die
+// andere Seite trägt den Text der Szene.
+export const Z_KACHEL = 0.72;
+export const SEITE_PX = 300; // Abstand der Kachelmitte von der Bildmitte; −1 = Kachel links
 
 // Die Zeitleiste ist **relativ**: je Kachel ein Halt und die Fahrt danach (in Bildern); alle
 // Ereignisse einer Kachel (Streif, Bildfolge, Wechsel, Terminal) zählen ab ihrem Halt. Wer eine
 // Dauer ändert, verschiebt nichts von Hand — `HALTE` und die absoluten Marken folgen.
 // Kacheln: Zelle [Spalte, Zeile], Bild (neu), optional alt (Lichtstreif), Bildfolge, Wechsel.
+// `text`: Titel + eine Zeile, erscheint mit dem Streif (jede Kachel hat einen — bei den drei alten
+// macht er die UI neu, bei den anderen ist er nur Licht). `fokus`: Kachelpunkt, auf den die Kamera
+// im Halt heranfährt (Suche: die Treffer, 16.8 (d); gemessen an den Aufnahmen, Anmerkungen 16.8).
 const FAHRT = [
-  { id: "s1", halt: 110, reise: 60, zelle: [2, 0], bild: "neu/s1__uebersicht", alt: "alt/s1__uebersicht", streif: [20, 90] },
-  { id: "s2", halt: 240, reise: 60, zelle: [1, 1], folge: { prefix: "neu/s2__t", n: 107, von: 20, bis: 200 } },
-  { id: "s3", halt: 100, reise: 60, zelle: [0.6, 2], bild: "neu/s3__kaestchen", alt: "alt/s2__fertig", streif: [10, 80] },
-  { id: "s4", halt: 120, reise: 60, zelle: [0.2, 3], bild: "neu/s4__rot", danach: { bild: "neu/s4__gross", ab: 65 } },
-  { id: "s5", halt: 150, reise: 50, zelle: [0, 4], bild: "neu/s5__ganz", alt: "alt/s5__ganz", streif: [20, 110], karte: true },
-  { id: "s5b", halt: 100, reise: 50, zelle: [1, 4], bild: "neu/s5__suche", karte: true },
-  { id: "s6", halt: 100, reise: 50, zelle: [2, 4], bild: "neu/s6__in_arbeit", karte: true },
-  { id: "s7", halt: 120, reise: 80, zelle: [3, 4], bild: "neu/s7__dialog", danach: { bild: "neu/s7__danach", ab: 65 } },
-  { id: "s8", halt: 100, reise: 60, zelle: [2, 1], bild: "neu/s8__zugewiesen" },
-  { id: "s9", halt: 300, reise: 60, zelle: [2, 2], terminal: { von: 20, bis: 280 } },
-  { id: "s10", halt: 100, reise: 60, zelle: [2, 3], bild: "neu/s10__laedt", danach: { bild: "neu/s10__geladen", ab: 55 } },
-  { id: "s11", halt: 100, reise: 60, zelle: [2, 5], bild: "neu/s11__suche" },
-  { id: "s12", halt: 80, reise: 0, zelle: [2, 6], bild: "neu/s12__fehlerseite" },
-];
-// Der Auftakt (16.6, Sichtung 1: „wie ein Urknall“): ein Lichtpunkt auf Schwarz, der Knall, die
+  { id: "s1", halt: 130, reise: 45, zelle: [2, 0], bild: "neu/s1__uebersicht", alt: "alt/s1__uebersicht", streif: [20, 85], kippVon: 70,
+    text: ["Sharefyx 4.0.0", "Neu, von der Leiste bis zur Karte."] },
+  { id: "s2", halt: 150, reise: 45, zelle: [1, 1], folge: { prefix: "neu/s2__t", n: 107, von: 10, bis: 135 },
+    text: ["Schreiben, wie es aussieht.", "Markdown formt sich beim Tippen."] },
+  { id: "s3", halt: 100, reise: 45, zelle: [0.6, 2], bild: "neu/s3__kaestchen", alt: "alt/s2__fertig", streif: [8, 60],
+    text: ["Abhaken im Text.", "Ein Klick speichert — mit Version."] },
+  { id: "s4", halt: 110, reise: 45, zelle: [0.2, 3], bild: "neu/s4__rot", danach: { bild: "neu/s4__gross", ab: 55 },
+    text: ["Farbe und Größe.", "Direkt im Text, mit einer klaren Knopfleiste."] },
+  { id: "s5", halt: 115, reise: 40, zelle: [0, 4], bild: "neu/s5__ganz", alt: "alt/s5__ganz", streif: [10, 75], karte: true,
+    text: ["Alles verbunden.", "Die Karte als ein Gebilde — jeder Space ein Bereich."] },
+  { id: "s5b", halt: 120, reise: 40, zelle: [1, 4], bild: "neu/s5__suche", karte: true, fokus: { x: 1106, y: 400, zoom: 1.8 },
+    text: ["Suchen in der Karte.", "Die Treffer leuchten auf."] },
+  { id: "s6", halt: 95, reise: 40, zelle: [2, 4], bild: "neu/s6__in_arbeit", karte: true,
+    text: ["Was gerade läuft.", "Aufgaben „In Arbeit“ hervorgehoben."] },
+  { id: "s7", halt: 105, reise: 55, zelle: [3, 4], bild: "neu/s7__dialog", danach: { bild: "neu/s7__danach", ab: 55 },
+    text: ["Ordner umbenennen.", "Die Notizen ziehen mit."] },
+  { id: "s8", halt: 95, reise: 45, zelle: [2, 1], bild: "neu/s8__zugewiesen",
+    text: ["Filter „Zugewiesen“.", "Sehen, wer woran arbeitet."] },
+  { id: "s9", halt: 200, reise: 45, zelle: [2, 2], terminal: { von: 10, bis: 185 },
+    text: ["Für Menschen und Maschinen.", "Drei Notizen, ein Aufruf — jede mit eigener Version."] },
+  { id: "s10", halt: 95, reise: 45, zelle: [2, 3], bild: "neu/s10__laedt", danach: { bild: "neu/s10__geladen", ab: 45 },
+    text: ["Schneller.", "Die Übersicht in einem Durchgang."] },
+  { id: "s11", halt: 120, reise: 45, zelle: [2, 5], bild: "neu/s11__suche", fokus: { x: 483, y: 200, zoom: 1.8 },
+    text: ["Robuster.", "Eine kaputte Notiz legt die Suche nicht lahm."] },
+  { id: "s12", halt: 95, reise: 0, zelle: [2, 6], bild: "neu/s12__fehlerseite",
+    text: ["Bis ins Detail.", "Eigene Fehlerseite, der Tab-Titel folgt der Ansicht."] },
+];// Der Auftakt (16.6, Sichtung 1: „wie ein Urknall“): ein Lichtpunkt auf Schwarz, der Knall, die
 // Punkte fliegen auseinander und sammeln sich zur **ganzen** Marke (Zeichen, Name, Version) in der
 // Bildmitte — dieselbe Punktsprache wie das Finale. Die Ziffern rollen 3.1.6 → 4.0.0, dann landet
 // die Marke in der Leiste der ersten Kachel (alte UI); der Streif macht sie neu.
 export const AUFTAKT = {
-  funke: [10, 46],     // der Punkt glimmt auf
-  knall: 46,           // Blitz, Punkte fliegen auseinander
-  flug: [46, 112],     // Ausdehnung (ease-out)
-  sammeln: [96, 178],  // zu den Zielpunkten der Marke
-  marke: [160, 192],   // die gesetzte Marke blendet auf, die Punkte ab
-  rolle: [198, 240],   // 3.1.6 → 4.0.0
-  landen: [252, 322],  // die Marke fliegt in die Leiste von s1, die Kacheln blenden auf
+  funke: [10, 40],     // der Punkt glimmt auf
+  knall: 40,           // Blitz, Punkte fliegen auseinander
+  flug: [40, 100],     // Ausdehnung (ease-out)
+  sammeln: [86, 160],  // zu den Zielpunkten der Marke
+  marke: [146, 176],   // die gesetzte Marke blendet auf, die Punkte ab
+  rolle: [182, 220],   // 3.1.6 → 4.0.0
+  landen: [230, 290],  // die Marke fliegt in die Leiste von s1, die Kacheln blenden auf
 };
 export const MARKE_GROSS = 7; // Maßstab der Marke in der Bildmitte (Name + Version ≈ 900 px breit)
 const START = AUFTAKT.landen[1]; // Bild, an dem der erste Halt beginnt
@@ -56,30 +75,25 @@ export const HALTE = [];
 export const KACHELN = [];
 {
   let an = START;
-  for (const f of FAHRT) {
+  FAHRT.forEach((f, i) => {
     const { halt, reise, ...k } = f;
-    if (k.streif) k.streif = k.streif.map((x) => an + x);
+    k.seite = i % 2 === 0 ? -1 : 1;
+    k.streif = (k.streif || [8, 55]).map((x) => an + x);
+    k.kipp = [an + (k.kippVon ?? -40), an + halt];
+    delete k.kippVon;
     if (k.folge) k.folge = { ...k.folge, von: an + k.folge.von, bis: an + k.folge.bis };
     if (k.danach) k.danach = { ...k.danach, ab: an + k.danach.ab };
     if (k.terminal) k.terminal = { von: an + k.terminal.von, bis: an + k.terminal.bis };
     HALTE.push([an, an + halt, k.id]);
     KACHELN.push(k);
     an += halt + reise;
-  }
+  });
 }
 const FAHRT_ENDE = HALTE[HALTE.length - 1][1];
-export const ZOOM_AUS = [FAHRT_ENDE, FAHRT_ENDE + 180]; // heraus zur großen 4, dabei ordnen
-export const MORPH = [ZOOM_AUS[1] + 60, ZOOM_AUS[1] + 260]; // Kacheln → Punkte → Glyphe
-export const FRAMES = MORPH[1] + 240;
+export const ZOOM_AUS = [FAHRT_ENDE, FAHRT_ENDE + 140]; // heraus zur großen 4, dabei ordnen
+export const MORPH = [ZOOM_AUS[1] + 40, ZOOM_AUS[1] + 220]; // Kacheln → Punkte → Glyphe
+export const FRAMES = MORPH[1] + 190;
 export const ENDE = [MORPH[1], FRAMES];   // Schrift steht, Endtafel
-
-const TD = HALTE[1][0] - 360; // die Tafeln standen absolut; sie folgen dem Halt von s2
-export const TAFELN = [
-  [330, 760, "Schreiben, wie es aussieht."],
-  [800, 1640, "Alles verbunden."],
-  [1840, 2180, "Für Menschen und Maschinen."],
-  [2200, 2620, "Schneller. Robuster."],
-].map(([a, b, t]) => [a + TD, b + TD, t]);
 
 export function kachel(id) { return KACHELN.find((k) => k.id === id); }
 
@@ -96,9 +110,28 @@ export function versatz(k, i) {
 // Der Umriss der Kachel-4 in Weltkoordinaten.
 export const VIER_BOX = { x: 0, y: 0, w: 3 * CELL_W + TILE_W, h: 6 * CELL_H + TILE_H };
 
+// Halt: die Kachel (mit ihrem Versatz) steht auf ihrer Seite, mittig in der Höhe.
 function kameraHalt(id) {
-  const [cx, cy] = mitte(kachel(id));
-  return { cx, cy, z: Z_KACHEL };
+  const i = KACHELN.findIndex((k) => k.id === id), k = KACHELN[i], v = versatz(k, i), [mx, my] = mitte(k);
+  return { cx: mx + v.dx - (k.seite * SEITE_PX) / Z_KACHEL, cy: my + v.dy, z: Z_KACHEL };
+}
+
+// Heranfahren auf den Fokus (Suche): der Fokuspunkt wandert vom Bild seiner Kachel auf den Ankerpunkt
+// der Seite, der Zoom steigt auf `fokus.zoom` (Schärfe: die Aufnahme ist 2× — z ≤ 2 auf dem Bild).
+export function fokusFortschritt(n, k) {
+  const [an, ab] = HALTE.find((h) => h[2] === k.id);
+  return k.fokus ? phase(n, an + 30, ab + 10) : 0;
+}
+function kameraFokus(n, id, cam) {
+  const i = KACHELN.findIndex((k) => k.id === id), k = KACHELN[i];
+  const e = fokusFortschritt(n, k);
+  if (!e) return cam;
+  const v = versatz(k, i);
+  const s = { x: k.zelle[0] * CELL_W + v.dx, y: k.zelle[1] * CELL_H + v.dy, rot: v.rot };
+  const [px, py] = kachelPunkt(s, k.fokus.x, k.fokus.y), [p0x, p0y] = welt2bild(cam, px, py);
+  const ax = W / 2 + k.seite * SEITE_PX, ay = H / 2;
+  const z = cam.z * lerp(1, k.fokus.zoom, e);
+  return { z, cx: px - (lerp(p0x, ax, e) - W / 2) / z, cy: py - (lerp(p0y, ay, e) - H / 2) / z };
 }
 
 // Die Kamera als reine Funktion. `geo.ziel` = Kamera, unter der die Kachel-4 auf der Glyphe „4“
@@ -111,10 +144,10 @@ export function kamera(n, geo) {
   }
   for (let i = 0; i < HALTE.length; i++) {
     const [an, ab, id] = HALTE[i];
-    if (n >= an && n < ab) return kameraHalt(id);
+    if (n >= an && n < ab) return kameraFokus(n, id, kameraHalt(id));
     const naechster = HALTE[i + 1];
     if (naechster && n >= ab && n < naechster[0]) {
-      const a = kameraHalt(id), b = kameraHalt(naechster[2]);
+      const a = kameraFokus(ab, id, kameraHalt(id)), b = kameraHalt(naechster[2]);
       const t = phase(n, ab, naechster[0]);
       const dip = 1 - 0.38 * Math.sin(Math.PI * t);
       return { cx: lerp(a.cx, b.cx, t), cy: lerp(a.cy, b.cy, t), z: lerp(a.z, b.z, t) * dip };
@@ -122,7 +155,7 @@ export function kamera(n, geo) {
   }
   // Heraus zur **großen** 4 (Mitte, 88 % der Bildhöhe) — dort ordnen sich die Kacheln; im
   // Morph gleitet die Kamera dann auf die Lage der Glyphe „4“ (`geo.ziel`).
-  const letzter = kameraHalt(HALTE[HALTE.length - 1][2]);
+  const letzter = kameraFokus(ZOOM_AUS[0], HALTE[HALTE.length - 1][2], kameraHalt(HALTE[HALTE.length - 1][2]));
   const gross = { cx: VIER_BOX.w / 2, cy: VIER_BOX.h / 2, z: (0.88 * H) / VIER_BOX.h };
   if (n < MORPH[0]) {
     const t = phase(n, ZOOM_AUS[0], ZOOM_AUS[1]);
@@ -171,6 +204,27 @@ export function raster(cam) {
   return { abstand, fein: L - k, ux: W / 2 - cam.cx * zg, uy: H / 2 - cam.cy * zg };
 }
 
+// Der Text einer Szene (16.8 (b)): Titel und Zeile Wort für Wort, gekoppelt an den Streif — jedes
+// Wort erscheint, wenn der Streif „bei ihm“ ist (Titel zuerst, die Zeile folgt), und steigt dabei
+// 14 px auf. Er geht mit der Abfahrt. Nur Daten: Wörter, Deckkraft, Versatz, Seite.
+export function textZustand(n) {
+  for (let i = 0; i < KACHELN.length; i++) {
+    const k = KACHELN[i], [an, ab] = HALTE[i];
+    if (!k.text || n < k.streif[0] || n >= ab + 30) continue;
+    const dauer = k.streif[1] - k.streif[0], aus = phase(n, ab - 5, ab + 25);
+    const woerter = [];
+    k.text.forEach((zeile, z) => zeile.split(" ").forEach((wort) => woerter.push({ wort, zeile: z })));
+    woerter.forEach((w, j) => {
+      const ein = clamp((n - k.streif[0] - (j / woerter.length) * dauer * 0.9 - (w.zeile ? 6 : 0)) / 18);
+      w.deck = easeInOut(ein) * (1 - aus);
+      w.dy = (1 - easeInOut(ein)) * 14 - aus * 10;
+      w.glanz = Math.sin(Math.PI * ein) * (1 - aus); // ein kurzes Aufleuchten beim Erscheinen
+    });
+    return { id: k.id, seite: -k.seite, woerter, schleier: fokusFortschritt(n, k) * (1 - aus) };
+  }
+  return null;
+}
+
 // Der ganze Zustand eines Bildes — nur Daten.
 export function zustand(n, geo) {
   const cam = kamera(n, geo);
@@ -180,15 +234,24 @@ export function zustand(n, geo) {
   const zerfall = phase(n, MORPH[0], MORPH[0] + 70);         // Kacheln blenden in Punkte über
   const flug = phase(n, MORPH[0] + 30, MORPH[1]);            // Punkte fliegen zur Glyphe
   const schrift = phase(n, MORPH[1] - 40, MORPH[1] + 40);    // gesetzte Schrift blendet auf
+  // Wer gerade spielt: um ihren Halt herum ist eine Kachel „aktiv“; die übrigen treten auf 35 %
+  // zurück — der Blick bleibt bei der Szene, und die Nachbarn liegen nicht unter dem Text (16.8,
+  // Vorschau: sie ragten in die Textseite). In der Fahrt sind alle wieder hell.
+  const aktiv = HALTE.map(([an, ab]) => phase(n, an - 30, an + 10) * (1 - phase(n, ab - 10, ab + 30)));
   const kacheln = KACHELN.map((k, i) => {
     const v = versatz(k, i);
+    const andere = Math.max(0, ...aktiv.filter((_, j) => j !== i));
+    const zurueck = 1 - 0.65 * andere * (1 - aktiv[i]);
     const f = 1 - ordnen;
+    // Im Raum: um den Halt herum dreht sich die Kachel leicht zur Textseite und rückt heran; die
+    // Drehung driftet während des Halts zurück (die Aufnahme „lebt“). Außerhalb flach.
+    const w = phase(n, k.kipp[0], k.kipp[0] + 50) * (1 - phase(n, k.kipp[1] - 10, k.kipp[1] + 40));
+    const t = clamp((n - k.kipp[0]) / (k.kipp[1] - k.kipp[0]));
+    const ruhig = 1 - 0.7 * fokusFortschritt(n, k); // beim Heranfahren auf den Fokus wird sie flacher
+    const kipp = { ry: -k.seite * lerp(13, 6, t) * w * ruhig, rx: lerp(5, 2, t) * w * ruhig, push: 1 + 0.06 * t * w };
     const s = { id: k.id, x: k.zelle[0] * CELL_W + v.dx * f, y: k.zelle[1] * CELL_H + v.dy * f,
-                rot: v.rot * f, deckkraft: (1 - zerfall) * einblend, rand: ordnen, bild: k.bild, alt: k.alt || null, streif: 1 };
-    if (k.alt) {
-      // 0 = ganz alt, 1 = ganz neu; der Streif läuft von links nach rechts.
-      s.streif = easeInOut(clamp((n - k.streif[0]) / (k.streif[1] - k.streif[0])));
-    }
+                rot: v.rot * f * (1 - 0.8 * w), deckkraft: (1 - zerfall) * einblend * zurueck, rand: ordnen, bild: k.bild, alt: k.alt || null,
+                kipp, streif: easeInOut(clamp((n - k.streif[0]) / (k.streif[1] - k.streif[0]))) };
     if (k.folge) {
       const t = clamp((n - k.folge.von) / (k.folge.bis - k.folge.von));
       s.bild = k.folge.prefix + String(Math.round(t * (k.folge.n - 1))).padStart(3, "0");
@@ -197,8 +260,7 @@ export function zustand(n, geo) {
     if (k.terminal) s.terminal = clamp((n - k.terminal.von) / (k.terminal.bis - k.terminal.von));
     return s;
   });
-  const tafel = TAFELN.map(([a, b, text]) => ({ text, deck: Math.min(phase(n, a, a + 40), 1 - phase(n, b - 40, b)) }))
-    .filter((t) => t.deck > 0)[0] || null;
+  const text = textZustand(n);
   // Der Auftakt: Funke, Knall, Punkte (Ausdehnung, Sammeln), die gesetzte Marke, die Ziffernrolle.
   // Gelandet bleibt die Marke (mit dem Hintergrund der Leiste) über der alten Aufnahme, bis der
   // Streif von s1 sie überholt — darunter steht dann dieselbe Marke in der neuen UI.
@@ -223,5 +285,5 @@ export function zustand(n, geo) {
   const rasterZ = { ...raster(cam),
     deck: phase(n, A.knall + 10, A.knall + 90) * (1 - 0.75 * phase(n, MORPH[0], MORPH[0] + 60)),
     welle: nachKnall >= 0 && nachKnall < 120 ? { r: nachKnall * 26, deck: 1 - nachKnall / 120 } : null };
-  return { raster: rasterZ, n, cam, kacheln, tafel, auftakt, marke, zerfall, flug, schrift, ende };
+  return { raster: rasterZ, n, cam, kacheln, text, auftakt, marke, zerfall, flug, schrift, ende };
 }

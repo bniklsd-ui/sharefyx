@@ -83,15 +83,37 @@ def _film(expr: str):
 
 @pytest.mark.skipif(NODE is None, reason="node fehlt")
 def test_film_state_is_a_pure_function_of_the_frame():
-    a, b = _film("[0, 1].map(() => [0, 500, 1175, 2840, 2950, 3299].map(n => f.zustand(n, geo)))")
+    a, b = _film("[0, 1].map(() => [0, 60, 500, 1175, 1240, 2600, 2800, f.FRAMES - 1].map(n => f.zustand(n, geo)))")
     assert a == b
 
 
 @pytest.mark.skipif(NODE is None, reason="node fehlt")
-def test_camera_rests_on_each_tile_while_it_holds():
-    rows = _film("f.HALTE.map(([an, ab, id]) => [f.kamera(Math.floor((an + ab) / 2), geo), f.mitte(f.kachel(id))])")
-    for cam, (cx, cy) in rows[1:]:  # der erste Halt endet im Zoom aus der Marke
-        assert (cam["cx"], cam["cy"], cam["z"]) == (cx, cy, 0.85)
+def test_camera_rests_while_a_tile_holds_and_puts_it_on_its_side():
+    """16.8: im Halt steht die Kamera still (ohne Fokus); die Kachel steht mit ihrer Mitte auf ihrer
+    Seite (960 ± 300, 540) und liegt — gedreht, gekippt, herangerückt — ganz im Bild."""
+    rows = _film("f.HALTE.map(([an, ab, id]) => { const k = f.kachel(id), m = Math.floor((an + ab) / 2);"
+                 " const z = f.zustand(m, geo), s = z.kacheln.find(t => t.id === id);"
+                 " return [id, !!k.fokus, k.seite, f.kamera(an, geo), f.kamera(ab - 1, geo), z.cam,"
+                 " f.welt2bild(z.cam, s.x + f.TILE_W / 2, s.y + f.TILE_H / 2), s.kipp.push]; })")
+    for kid, fokus, seite, cam_an, cam_ab, cam, (mx, my), push in rows:
+        if fokus:
+            continue
+        assert cam_an == cam_ab == cam, kid
+        assert (mx, my) == (pytest.approx(960 + seite * 300), pytest.approx(540)), kid
+        # Rand: halbe Kachel × Zoom × Heranrücken × 1,09 (Perspektive, die nahe Kante wächst)
+        hw, hh = 800 * cam["z"] * push * 1.09, 500 * cam["z"] * push * 1.09
+        assert mx - hw >= 0 and mx + hw <= 1920 and my - hh >= 0 and my + hh <= 1080, kid
+
+
+@pytest.mark.skipif(NODE is None, reason="node fehlt")
+def test_focus_push_stays_sharp():
+    """Heranfahren nur so weit, wie die 2×-Aufnahme trägt: Bild-Zoom × Heranrücken ≤ 2."""
+    zs = _film("f.KACHELN.filter(k => k.fokus).map(k => { const [an, ab] = f.HALTE.find(h => h[2] === k.id);"
+               " return Array.from({length: ab - an}, (_, j) => { const z = f.zustand(an + j, geo);"
+               " return z.cam.z * z.kacheln.find(t => t.id === k.id).kipp.push; }); })")
+    assert len(zs) == 2
+    assert all(max(z) <= 2.0 for z in zs)
+    assert all(max(z) >= 1.2 for z in zs)  # das Heranfahren ist wirklich da
 
 
 @pytest.mark.skipif(NODE is None, reason="node fehlt")
@@ -101,6 +123,8 @@ def test_tiles_snap_into_the_four_before_the_morph():
     raster = _film("f.KACHELN.map(k => [k.zelle[0] * f.CELL_W, k.zelle[1] * f.CELL_H])")
     assert any((t["x"], t["y"]) != tuple(r) for t, r in zip(fahrt, raster))
     assert all((t["x"], t["y"], t["rot"]) == (r[0], r[1], 0) for t, r in zip(geordnet, raster))
+    # 16.8: die 4 bildet sich aus **flachen** Kacheln — keine Kippung, kein Heranrücken übrig
+    assert all(t["kipp"] == {"ry": 0, "rx": 0, "push": 1} for t in geordnet)
     zellen = {tuple(z) for z in _film("f.KACHELN.map(k => k.zelle)")}
     assert len(zellen) == 13  # 3 schräg + 4 quer + 6 senkrecht (die Kreuzung zählt einmal)
 
@@ -165,3 +189,68 @@ def test_grid_appears_with_the_bang_and_steps_back_for_the_glyph():
     vor, nach, ende = _film("[f.AUFTAKT.knall - 1, f.HALTE[0][0], f.FRAMES - 1]"
                             ".map(n => f.zustand(n, geo).raster.deck)")
     assert vor == 0 and nach == 1 and ende == pytest.approx(0.25)
+
+
+# --- Block 16.8: Bewegung, Text, Tempo ------------------------------------------------------------
+
+@pytest.mark.skipif(NODE is None, reason="node fehlt")
+def test_every_scene_writes_its_text_with_the_sweep_on_the_free_side():
+    rows = _film("f.KACHELN.map((k, i) => { const [an, ab] = f.HALTE[i];"
+                 " return [k.id, k.seite, !!k.text, f.textZustand(k.streif[0] - 1), f.textZustand(ab - 6),"
+                 " f.textZustand(ab + 30)]; })")
+    for kid, seite, hat_text, vorher, voll, danach in rows:
+        assert hat_text, kid
+        assert vorher is None or vorher["id"] != kid, kid  # erst mit dem Streif
+        assert voll["id"] == kid and voll["seite"] == -seite, kid
+        assert all(w["deck"] == pytest.approx(1, abs=0.02) for w in voll["woerter"]), kid
+        assert danach is None or danach["id"] != kid, kid
+
+
+@pytest.mark.skipif(NODE is None, reason="node fehlt")
+def test_film_is_faster_and_within_length():
+    """16.8 (c): schneller als Fassung 1 (55 s), Kriterium L3 (40–60 s)."""
+    sekunden = _film("f.FRAMES / f.FPS")
+    assert 40 <= sekunden <= 50
+
+
+_FILM_VENV = Path.home() / ".claude-code-tools" / "film-venv" / "bin" / "python"
+_FONTS = FILM_DIR.parents[1] / "phase5_ui" / "webui" / "static" / "fonts"
+
+
+@pytest.mark.skipif(NODE is None or not _FILM_VENV.exists(), reason="node oder film-venv (fontTools) fehlt")
+def test_film_texts_are_in_the_font_subsets():
+    """Die Schriften sind Teilsätze — ein fehlendes Zeichen fiele **lautlos** auf eine Systemschrift
+    zurück. Jeder Text des Films steht im Teilsatz der Sans, jede Terminalzeile in dem der Mono."""
+    import re
+
+    sans = "".join(_film("f.KACHELN.flatMap(k => k.text)")) + "harefyx v3.1.6 v4.0.0 4.0.0"
+    html = (FILM_DIR / "film.html").read_text(encoding="utf-8")
+    term = html[html.index("function terminalZeilen"):html.index("const geo = {}")]
+    mono = "".join(re.findall(r'"([^"]*)"', term)) + "".join(re.findall(r"'([^']*)'", term))
+    lauf = Path.home() / "sharefyx-film" / "daten" / "ki_lauf.json"
+    if lauf.exists():  # die Namen und Titel aus dem echten Lauf
+        mono += lauf.read_text(encoding="utf-8")
+    script = ("import json, sys; from fontTools.ttLib import TTFont\n"
+              "a = json.load(sys.stdin); out = {}\n"
+              "for name, text in a.items():\n"
+              "    cm = TTFont(name).getBestCmap()\n"
+              "    out[name] = sorted({c for c in text if c not in '\\n' and ord(c) not in cm})\n"
+              "print(json.dumps(out))")
+    fonts = {str(_FONTS / "IBMPlexSans-subset.6c21979f.woff2"): sans,
+             str(_FONTS / "IBMPlexMono-subset.a8d5dfa6.woff2"): mono}
+    out = subprocess.run([str(_FILM_VENV), "-I", "-c", script], input=json.dumps(fonts),
+                         capture_output=True, text=True, check=True, timeout=60)
+    fehlt = json.loads(out.stdout)
+    assert all(v == [] for v in fehlt.values()), fehlt
+
+
+@pytest.mark.skipif(NODE is None, reason="node fehlt")
+def test_only_the_playing_tile_is_bright_while_it_holds():
+    """Vorschau 16.8: Nachbarkacheln ragten in die Textseite. Im Halt steht die aktive Kachel voll da,
+    alle anderen auf ≤ 35 %; vor dem Morph (Fahrt vorbei) sind wieder alle hell."""
+    rows = _film("f.HALTE.map(([an, ab, id]) => [id, f.zustand(Math.floor((an + ab) / 2), geo).kacheln"
+                 ".map(t => [t.id, t.deckkraft])])")
+    for kid, kacheln in rows:
+        for tid, deck in kacheln:
+            assert deck == pytest.approx(1) if tid == kid else deck <= 0.36, (kid, tid, deck)
+    assert all(t["deckkraft"] == 1 for t in _film("f.zustand(f.MORPH[0], geo).kacheln"))

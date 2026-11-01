@@ -6,7 +6,7 @@ detail: L2
 up: ../../phase10_5_finishing/CLAUDE.md
 down:
   - ../UPDATE_LOG.md   # die Quelle der Feature-Liste (Blöcke 2026-10-23 bis 2026-10-26)
-updated: 2026-11-01 (Schritt 16.7 ✅ — blaues Raster, Parallaxe, Vignette) | 2026-11-01 (Schritt 16.6 ✅ — Urknall-Auftakt, Zeitleiste relativ) | 2026-11-01 (§7 Sichtung 1 wörtlich + Runde 2: Urknall, Raster, 3D + Text, schneller) | 2026-11-01 (Schritt 16.5 🔄 — Volllauf fertig, Sichtung offen) | 2026-11-01 (Schritte 16.3/16.4 ✅ — Vorschau, Feinschliff, Ton) | 2026-11-01 (Schritt 16.2 ✅ — Bühne, Schlüsselbilder selbst geprüft) | 2026-11-01 (Schritt 16.1 ✅ — Aufnahmen, Funde: Ordner-Menü, clip.scale > 2) | 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
+updated: 2026-11-01 (Schritt 16.8 ✅ — 3D-Kacheln, Text am Streif, 48,4 s) | 2026-11-01 (Schritt 16.7 ✅ — blaues Raster, Parallaxe, Vignette) | 2026-11-01 (Schritt 16.6 ✅ — Urknall-Auftakt, Zeitleiste relativ) | 2026-11-01 (§7 Sichtung 1 wörtlich + Runde 2: Urknall, Raster, 3D + Text, schneller) | 2026-11-01 (Schritt 16.5 🔄 — Volllauf fertig, Sichtung offen) | 2026-11-01 (Schritte 16.3/16.4 ✅ — Vorschau, Feinschliff, Ton) | 2026-11-01 (Schritt 16.2 ✅ — Bühne, Schlüsselbilder selbst geprüft) | 2026-11-01 (Schritt 16.1 ✅ — Aufnahmen, Funde: Ordner-Menü, clip.scale > 2) | 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
 ---
 # Launch-Film — Sharefyx v4.0.0 (Plan Block 16)
 
@@ -299,7 +299,7 @@ ein Auftakt.
 |---|---|---|
 | **16.6 ✅** Auftakt | Ersetzt den Zoom aus der Marke: ein **Urknall** — ein Lichtpunkt auf Schwarz, der in die Punktwolke aufbricht (dieselbe Punktsprache wie das Finale: der Film beginnt mit Punkten, die auseinanderfliegen, und endet mit Punkten, die „4.0.0“ bilden); die Punkte ordnen sich zur Marke / zur ersten Kachel. Alternative „sich öffnendes Auge“ nur, falls der Urknall im Standbild nicht trägt. Die Ziffernrolle `v3.1.6` → `v4.0.0` bleibt, aber **ganz** im Bild (Name + Version, nicht angeschnitten) | drei Standbilder des Auftakts selbst geprüft; nichts angeschnitten |
 | **16.7 ✅** Hintergrund | dezentes blaues Raster (Linien ≈ `rgba(62,141,243,.06–.08)`, Weltkoordinaten ⇒ es zieht mit der Kamera, Parallaxe), Vignette; die Körnung bleibt | Standbild Fahrt + große 4: Raster sichtbar, nicht laut |
-| **16.8** Bewegung + Text | (a) die Kachel füllt das Bild nicht mehr: kleiner (≈ 60–65 % Breite), im Raum leicht **3D-gedreht** (`perspective` + `rotateY/rotateX`, driftet während des Halts, Push-in) — die Aufnahmen „leben“; (b) der freie Platz trägt je Szene einen **kurzen animierten Text** (Titel + eine Zeile, Wort für Wort / Zeile für Zeile eingeblendet), gekoppelt an den **Lichtstreif** (Text erscheint mit dem Streif); die Unterzeilen-Tafeln entfallen oder werden zu diesen Texten; (c) **schneller**: Halte ≈ −25 %, Film ≈ 42–48 s; (d) die Szenen, deren Effekt nicht ankommt, gezielt zeigen (Suche: Treffer heranzoomen; S5b ggf. streichen) | Vorschau ganz gesichtet; jede Szene hat ihren Text; Länge 40–60 s |
+| **16.8 ✅** Bewegung + Text | (a) die Kachel füllt das Bild nicht mehr: kleiner (≈ 60–65 % Breite), im Raum leicht **3D-gedreht** (`perspective` + `rotateY/rotateX`, driftet während des Halts, Push-in) — die Aufnahmen „leben“; (b) der freie Platz trägt je Szene einen **kurzen animierten Text** (Titel + eine Zeile, Wort für Wort / Zeile für Zeile eingeblendet), gekoppelt an den **Lichtstreif** (Text erscheint mit dem Streif); die Unterzeilen-Tafeln entfallen oder werden zu diesen Texten; (c) **schneller**: Halte ≈ −25 %, Film ≈ 42–48 s; (d) die Szenen, deren Effekt nicht ankommt, gezielt zeigen (Suche: Treffer heranzoomen; S5b ggf. streichen) | Vorschau ganz gesichtet; jede Szene hat ihren Text; Länge 40–60 s |
 | **16.9** Volllauf 2 | Volllauf wie 16.5 (+ „Einträge“ statt „Eintraege“ prüfen: hat der Mono-Teilsatz `ä`?) | **Sichtung 2** beim Nikinger |
 
 **Leitplanken bleiben:** jedes Bild eine Funktion seiner Nummer (`film.js` rein, Wächter), echte
@@ -340,4 +340,32 @@ Zeitleiste automatisch). Neue Aufnahmen nur, wenn eine Szene sie braucht (z. B. 
   ohne Stufen (`abstand = roh`) und mit Parallaxe 1 — genau die zwei Wächter rot.
 - **Renderzeit:** die Messung schwankt mit der Last der VM (derselbe Bereich 0,15–0,48 s/Bild, auch
   ohne Raster) — kein messbarer Mehraufwand durch das Raster.
+
+## Anmerkungen 16.8 — Bewegung + Text (2026-11-01, Opus)
+
+- **(a) Kachel im Raum:** Zoom im Halt 0,72 (Kachel 1152 px ≈ 60 %), Mitte 300 px neben der
+  Bildmitte, die Seite wechselt je Szene. Um den Halt kippt die Kachel zur Textseite
+  (`rotateY` 13° → 6°, `rotateX` 5° → 2°, driftet zurück) und rückt 6 % heran; `perspective()` je
+  Kachel, nicht an der Welt. Bei `MORPH[0]` sind alle flach (Wächter). **3D bei `clip.scale = 2`
+  geprüft:** UI-Schrift auf gekippter Kachel nach `lanczos` scharf.
+- **(b) Text:** jede Szene Titel + Zeile auf der freien Seite, Wort für Wort mit dem **Streif** (den
+  hat jetzt jede Kachel; bei den drei alten macht er die UI neu, sonst nur Licht), kurzes
+  Aufleuchten, geht mit der Abfahrt. Die Unterzeilen-Tafeln sind entfallen. Keine Fremdmarke
+  („Words Reihenfolge“ → „klare Knopfleiste“), keine Anbieter-Behauptung, Review-Fixes nicht genannt.
+- **(c) Tempo:** 55,0 → **48,4 s** (2905 Bilder) — Fahrten −25 % (710 → 535 Bilder), Halte ohne s1
+  −13 % (1610 → 1400): die Halte tragen jetzt Text, darunter wird er unlesbar.
+- **(d) Suche gezeigt:** s5b und s11 fahren auf den Fokus heran (Treffer in der Karte, Ergebnisliste),
+  Bild-Zoom × Heranrücken ≤ 2,0 (die Aufnahme ist 2×; Wächter); ein Schleier dunkelt die Textseite ab.
+  s5b bleibt (die 4 braucht die Zelle).
+- **Vorschau ganz gesichtet** (1×, 2905 Bilder, 0,16 s/Bild, Kontaktbögen alle 1,5 s) — **vor** dem
+  folgenden Fix. **Fund:** Nachbarkacheln ragten in die Textseite und lagen unter den Wörtern ⇒ im
+  Halt treten alle anderen Kacheln auf 35 % zurück, in der Fahrt sind alle hell. Das Zurücktreten ist
+  an **4 Standbildern** geprüft (1450, 1700, 1800, 2180); den ganzen Film sieht erst 16.9 wieder.
+- **Mono-Teilsatz hat `ä`** (fontTools): das Terminal schreibt jetzt „Einträge“; `→` fehlt in beiden
+  Teilsätzen. Wächter `test_film_texts_are_in_the_font_subsets` (läuft über `film-venv`, sonst skip).
+- **L1:** Bilder 30–90 (Knall, Welle) und 540–570 (3D) je zweimal — Hashes gleich.
+- **Wächter** (23): Kamera im Halt still + Kachel auf ihrer Seite ganz im Bild · Fokus scharf ·
+  4 aus flachen Kacheln · Text mit dem Streif auf der freien Seite · Länge 40–50 s · Teilsätze ·
+  nur die aktive Kachel hell. **Gegenlauf** je Wächter (Pfeil im Text, Kippung endet nie, Text vor
+  dem Streif, Fokus-Zoom 3, `Z_KACHEL` 0,85, ohne Zurücktreten) — jeweils genau der eigene rot.
 

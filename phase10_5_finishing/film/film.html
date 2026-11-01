@@ -34,8 +34,12 @@
   .terminal .kopf { position: absolute; left: 0; right: 0; top: 0; height: 64px; background: #141A22;
                     font: 500 24px/64px "IBM Plex Sans Var"; color: #8B95A3; padding-left: 90px; }
   .terminal .ein { color: #6FB1FF; } .terminal .ok { color: #3FD1B5; }
-  #tafel { position: absolute; left: 0; right: 0; bottom: 34px; text-align: center;
-           font: 500 46px "IBM Plex Sans Var"; letter-spacing: -.01em; color: #F2F4F8; }
+  /* Der Text der Szene (16.8): auf der freien Seite, Wort für Wort. */
+  #text { position: absolute; top: 540px; width: 540px; transform: translateY(-50%); }
+  #text .titel { font: 600 50px/1.12 "IBM Plex Sans Var"; letter-spacing: -.015em; color: #F2F4F8; }
+  #text .zeile { margin-top: 18px; font: 400 27px/1.38 "IBM Plex Sans Var"; color: #A9B7C8; }
+  #text span { display: inline-block; white-space: pre; }
+  #schleier { position: absolute; top: 0; bottom: 0; width: 900px; }
   #punkte { position: absolute; inset: 0; width: 1920px; height: 1080px; }
   #glyphe { position: absolute; left: 0; top: 0; font-weight: 600; font-family: "IBM Plex Sans Var";
             color: #F2F4F8; white-space: nowrap; transform-origin: 0 0; }
@@ -53,7 +57,8 @@
 <div class="marke" id="marke"><img src="/static/logo.svg" alt="">harefyx<span class="version"><span>v3.1.6</span><span>v4.0.0</span></span></div>
 <div id="glyphe">4.0.0</div>
 <div id="endtafel"><img src="/static/logo.svg" alt="">harefyx</div>
-<div id="tafel"></div>
+<div id="schleier"></div>
+<div id="text"></div>
 <canvas id="grain" width="960" height="540"></canvas>
 <script type="module">
   import { cameraTransform, drawGrain, prng, easeInOut, clamp, lerp } from "/film/stage.js";
@@ -77,11 +82,14 @@
       if (k.alt) {
         e.alt = document.createElement("img");
         e.alt.src = "/still/" + k.alt + ".png";
-        e.streif = document.createElement("div");
-        e.streif.className = "streif";
-        d.append(e.alt, e.streif);
+        d.appendChild(e.alt);
       }
     }
+    // Der Streif läuft über **jede** Kachel, wenn ihr Text erscheint; nur bei den drei alten macht er
+    // die UI neu (`alt` wird weggeschnitten).
+    e.streif = document.createElement("div");
+    e.streif.className = "streif";
+    d.appendChild(e.streif);
     world.appendChild(d);
     el[k.id] = e;
   }
@@ -97,8 +105,8 @@
     await img.decode();
   }
 
-  // Das Transkript des echten MCP-Laufs (`ki_lauf.py`) als Zeilen — nur ASCII, die Mono-Schrift ist
-  // ein Teilsatz.
+  // Das Transkript des echten MCP-Laufs (`ki_lauf.py`) als Zeilen. Die Mono-Schrift ist ein
+  // Teilsatz — er hat `ä` (16.9 geprüft, Wächter `test_film_texts_are_in_the_font_subsets`).
   function terminalZeilen(lauf) {
     const [ls, si, ap] = lauf.schritte;
     const titel = Object.fromEntries((si.ergebnis.items || []).map((i) => [i.id, i.title]));
@@ -107,7 +115,7 @@
     z.push(["", "  " + ls.ergebnis.length + " Spaces: " + ls.ergebnis.map((s) => s.name).join(" . ")]);
     z.push(["ein", '> search_items(query: "Wochenplan", limit: 3)']);
     z.push(["", "  " + (si.ergebnis.items || []).length + " Treffer"]);
-    z.push(["ein", "> append_to_items(" + ap.args.entries.length + " Eintraege, je mit Version)"]);
+    z.push(["ein", "> append_to_items(" + ap.args.entries.length + " Einträge, je mit Version)"]);
     for (const r of ap.ergebnis.results) {
       const vorher = ap.args.entries.find((e) => e.item_id === r.item_id).version;
       z.push(["ok", "  ok  " + (titel[r.item_id] || r.item_id).padEnd(14) + " v" + vorher + " -> v" + r.version]);
@@ -223,6 +231,24 @@
   }
 
   const FARBEN = ["#3E8DF3", "#2EB8A6", "#7FB6FF", "#E9EDF2"];
+  // Der Text der Szene: Seite +1 = rechts. Jedes Wort ein eigenes Element (Deckkraft, Aufstieg,
+  // Aufleuchten); der Schleier dunkelt die Textseite ab, wenn die Kachel beim Heranfahren hinüberwächst.
+  const textEl = document.getElementById("text"), schleier = document.getElementById("schleier");
+  const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  function textSetzen(t) {
+    if (!t) { textEl.innerHTML = ""; schleier.style.opacity = "0"; return; }
+    textEl.style.left = (t.seite > 0 ? 1300 : 80) + "px";
+    textEl.style.textAlign = "left";
+    const zeilen = [[], []];
+    for (const w of t.woerter) {
+      zeilen[w.zeile].push(`<span style="opacity:${w.deck};transform:translateY(${w.dy}px);`
+        + `text-shadow:0 0 ${24 * w.glanz}px rgba(130,185,255,${0.9 * w.glanz})">${esc(w.wort)} </span>`);
+    }
+    textEl.innerHTML = `<div class="titel">${zeilen[0].join("")}</div><div class="zeile">${zeilen[1].join("")}</div>`;
+    schleier.style.left = (t.seite > 0 ? 1020 : 0) + "px";
+    schleier.style.background = `linear-gradient(${t.seite > 0 ? 90 : 270}deg, rgba(0,0,0,0), rgba(0,0,0,.9) 40%)`;
+    schleier.style.opacity = String(t.schleier);
+  }
   // Das Raster (16.7): Linien im Blau der Knöpfe (`--btn-std` #3E8DF3), sehr leise. Die Welle des
   // Knalls ist dasselbe Raster heller, auf einen Ring maskiert.
   const RASTER_DECK = 0.14, rasterWelle = document.createElement("canvas");
@@ -283,7 +309,8 @@
     const warten = [];
     z.kacheln.forEach((s, i) => {
       const e = el[s.id];
-      e.box.style.transform = `translate(${s.x - KACHELN[i].zelle[0] * CELL_W}px, ${s.y - KACHELN[i].zelle[1] * CELL_H}px) rotate(${s.rot}deg)`;
+      e.box.style.transform = `translate(${s.x - KACHELN[i].zelle[0] * CELL_W}px, ${s.y - KACHELN[i].zelle[1] * CELL_H}px) rotate(${s.rot}deg)`
+        + ` perspective(2600px) rotateY(${s.kipp.ry}deg) rotateX(${s.kipp.rx}deg) scale(${s.kipp.push})`;
       e.box.style.opacity = String(s.deckkraft);
       // Beim Ordnen leuchtet der Rand auf — die dunklen UI-Kacheln heben sich sonst kaum vom
       // Schwarz ab, und die 4 soll man **sehen**.
@@ -291,11 +318,9 @@
         ? `0 0 0 ${28 * s.rand}px rgba(110,170,255,${0.7 * s.rand}), 0 0 ${120 * s.rand}px rgba(62,141,243,${0.45 * s.rand})`
         : "";
       if (e.img && s.bild) warten.push(bildSetzen(e.img, s.bild));
-      if (e.alt) {
-        e.alt.style.clipPath = `inset(0 0 0 ${s.streif * 100}%)`;
-        e.streif.style.left = s.streif * 100 + "%";
-        e.streif.style.opacity = String(Math.sin(Math.PI * s.streif));
-      }
+      if (e.alt) e.alt.style.clipPath = `inset(0 0 0 ${s.streif * 100}%)`;
+      e.streif.style.left = s.streif * 100 + "%";
+      e.streif.style.opacity = String(Math.sin(Math.PI * s.streif));
       if (e.term) {
         let rest = Math.round(s.terminal * geo.zeichen), html = '<div class="kopf">MCP-Client  -  sharefyx</div>';
         for (const [cls, text] of geo.zeilen) {
@@ -311,9 +336,7 @@
     marke.style.opacity = String(z.marke.deck);
     marke.style.background = `rgba(0,0,0,${z.marke.hg})`;
     rolle.forEach((sp) => { sp.style.transform = `translateY(${-14 * easeInOut(z.marke.roll)}px)`; });
-    const tafel = document.getElementById("tafel");
-    tafel.textContent = z.tafel ? z.tafel.text : "";
-    tafel.style.opacity = z.tafel ? String(z.tafel.deck) : "0";
+    textSetzen(z.text);
     const pc = document.getElementById("punkte").getContext("2d");
     pc.clearRect(0, 0, 1920, 1080);
     // Auftakt: der Funke, der Blitz, die Punkte (auseinander → zur Marke).
