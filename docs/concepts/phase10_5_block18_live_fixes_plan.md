@@ -1,12 +1,12 @@
 ---
 status: live
-purpose: Mini-Plan Block 18 „Live-Funde nach Deploy D" — Karte ruckelt mit Tags/Ordnern, einzelne Punkte weit draußen, Editor-Farben (Wahl). Befunde am Code, Hypothesen, Schritte 18.0–18.4, Entscheidungen für den Nikinger. Ausführer: eine eigene Session.
-read-when: Ausführung von Block 18 — zuerst §1 (Auftrag) und §3 (Schritte); Entscheidungen §4 vor dem Start klären
+purpose: Mini-Plan Block 18 „Live-Funde nach Deploy D" — Karte ruckelt mit Tags/Ordnern, einzelne Punkte weit draußen, Editor-Farben (Wahl). Befunde am Code, Hypothesen, Schritte 18.0–18.5, Entscheidungen E1–E4 (beantwortet). Ausführer: eine eigene Session.
+read-when: Ausführung von Block 18 — zuerst §1 (Auftrag), §4 (Entscheidungen) und §3 (Schritte)
 detail: L2
 up: ../../phase10_5_finishing/CLAUDE.md
 down:
   - ./phase10_5_block14_7_plan.md   # 📗 die Kartengeometrie (Hex-Anker, LOBE_SCALE), auf der 18.2 aufsetzt
-updated: 2026-11-01 (Mini-Plan, Claude Code — Live-Sichtung des Nikingers nach Deploy D)
+updated: 2026-11-01 (E1–E4 beantwortet: Stern, Farben → P11, v4.0.1, Zeilen 18/49 als Wegwerf-Probe 18.5) | 2026-11-01 (Mini-Plan, Claude Code — Live-Sichtung des Nikingers nach Deploy D)
 ---
 # Live-Funde nach Deploy D (Plan Block 18)
 
@@ -14,7 +14,7 @@ updated: 2026-11-01 (Mini-Plan, Claude Code — Live-Sichtung des Nikingers nach
 > **sehr träge**, sobald Ordner und/oder Tags an sind · der Fehler „ein oder wenige Punkte liegen weit
 > weg" ist **noch da** (Bildschirmfoto: ein Einzelpunkt in eigenem Umriss weit unten, die Karte deshalb
 > auf 50 % gezoomt) · der neue Editor ist der richtige Schritt, aber nicht das Ende (echte RGB-Fläche
-> zum Wählen, mehr Farben). „Since this space should be a real step": **sofort beheben** — Mini-Plan
+> zum Wählen, mehr Farben — **nach P11**, E2). „Since this space should be a real step": **sofort beheben** — Mini-Plan
 > hier, Ausführung in einer anderen Session.
 
 ## 1. Was der Ausführer wissen muss
@@ -25,7 +25,7 @@ updated: 2026-11-01 (Mini-Plan, Claude Code — Live-Sichtung des Nikingers nach
   `film/wegwerf.py`. Eine frische Instanz zeigt seit Block 17 zuerst das Film-Startbild:
   `add_init_script("localStorage.setItem('sfx:film:gesehen','4.0.0')")`.
 - Jede Änderung bekommt einen Gegenlauf, der **die neue Szene** prüft (Memory „honest counter-runs").
-- Deploy: eigener Patch-Deploy **`v4.0.1`** nach Block 18 (Vorschlag, Nikinger entscheidet, §4 E3).
+- Deploy: eigener Patch-Deploy **`v4.0.1`** nach Block 18 (E3).
 
 ## 2. Befunde am Code (`main@<HEAD nach Deploy D>`, `phase5_ui/webui/static/js/graph.js`)
 
@@ -45,18 +45,20 @@ updated: 2026-11-01 (Mini-Plan, Claude Code — Live-Sichtung des Nikingers nach
 | # | Inhalt | Fertig, wenn |
 |---|---|---|
 | 18.0 | **Messen** an der Wegwerf-Instanz mit einer Saat in Live-Form (≈ 200 Items, 5–7 Spaces, 2–3 Ordner mit 40–80 Items, ein Space mit **1** Item, Tags wie live). Je Zustand (aus / Tags / Ordner / beide): Kantenzahl, ms je `draw()` (`performance.now()` um `draw`, 60 Bilder Pan), Dauer der Simulation. Ausreißer: reproduzieren, dann „Layout zurücksetzen" — bleibt er (A1) oder geht er (A3)? Die Saatzahlen vorher beim Nikinger erfragen (er kennt die Live-Form; **kein** Lesen des echten `DATA_ROOT`) | Tabelle im Plan §5, Ursache für Ausreißer benannt |
-| 18.1 | **Karte flüssig.** In der Reihenfolge der gemessenen Kosten: (a) Ordner-Cliquen begrenzen wie Tags — **oder** statt Clique eine Kette/ein Stern je Ordner (k−1 Kanten, gleiche Zusammengehörigkeit, E1 §4); (b) Kanten **gebündelt** zeichnen: je Stil (Art × Fokus × Breitenstufe) **ein** Pfad, **ein** `stroke()`; (c) `all` und Nachbarringe nur bei Änderung neu bauen (Kantenliste beim Toggle, Ringe je `hoverId`); (d) `draw()` aus Mausereignissen per `requestAnimationFrame` bündeln | `draw()` ≤ 16 ms bei „beide an" auf der Saat (Zahl vorher/nachher); bestehende Kartenwächter grün (`phase10_5_finishing/tests/test_graph_c2.py`, `test_b14_*`); Gegenlauf je Teilschritt |
+| 18.1 | **Karte flüssig.** In der Reihenfolge der gemessenen Kosten: (a) Ordner-Kanten als **Stern** um das zuletzt geänderte Item (k−1 Kanten statt Clique, E1); (b) Kanten **gebündelt** zeichnen: je Stil (Art × Fokus × Breitenstufe) **ein** Pfad, **ein** `stroke()`; (c) `all` und Nachbarringe nur bei Änderung neu bauen (Kantenliste beim Toggle, Ringe je `hoverId`); (d) `draw()` aus Mausereignissen per `requestAnimationFrame` bündeln | `draw()` ≤ 16 ms bei „beide an" auf der Saat (Zahl vorher/nachher); bestehende Kartenwächter grün (`phase10_5_finishing/tests/test_graph_c2.py`, `test_b14_*`); Gegenlauf je Teilschritt |
 | 18.2 | **Kein Punkt weit draußen.** Bei A1: der Ankerabstand richtet sich nach den **echten** Radien der Nachbarn (eng gepackt: `r_eigen + r_k + REGION_GAP`, kleine Spaces auf die inneren Plätze), nicht nach dem größten Space. Bei A3: Ablage auf `v: 2` heben (alte Positionen verfallen einmal). Zusätzlich robust: `fitView()` darf einen einzelnen Ausreißer nicht die ganze Karte verkleinern lassen (Vorschlag: einrahmen nach Umrissen, nicht nach Knoten — **nur** wenn 18.0 zeigt, dass A1/A3 allein nicht reichen) | Saat mit 1-Item-Space: größter Abstand Punkt ↔ nächster Nachbarumriss ≤ 2 × `REGION_GAP` (Zahl in §5); Zoom nach dem Öffnen > 50 %; Determinismus-Wächter (P10.5-65) bleibt grün |
-| 18.3 | **Editor-Farben** — nur nach Entscheidung E2 (§4) | je nach Wahl: mehr Klassen + Farbraster im Knopf **oder** freie Farbe per Farbwähler |
+| 18.3 | ~~Editor-Farben~~ — **nach P11** (E2) | — |
+| 18.5 | **P10.5-18 und P10.5-49 als Wegwerf-Probe, automatisch und bleibend** (E4). Eine Probe im Repo (`probes/p105_b18_live_zeilen_probe.py`, JSON daneben, jederzeit wiederholbar): **18** — `/api/v1/overview` Waiting ≤ 300 ms und Space-Wechsel während des Polls ≤ 1 s, gemessen im Browser (Playwright, `PerformanceResourceTiming.responseStart − requestStart`) mit der Saat aus 18.0; **49** — zwei Browser-Kontexte, ein Write im einen, das Ereignis kommt im anderen an (≤ 2 s). Je **beide Eingänge**: direkt (Loopback, wie der Funnel auf den Dienst zeigt `[VERIFY]` an `phase3_edge/`) **und** hinter einem lokalen Caddy aus `phase9_hardening/step_a/Caddyfile.template` in der Live-Version 2.6.2 (Netzwerk-Werkzeuge sind erlaubt, E4). Werkzeug in eigenem Verzeichnis unter `~/.claude-code-tools/`, nie im Projekt-`.venv` | beide Zeilen ✅ mit Zahlen und Gegenlauf (z. B. Caddy mit `flush_interval` aus ⇒ 49 rot; künstliche Verzögerung im Poll ⇒ 18 rot); Probe vom Nikinger gesichtet (Memory „throwaway evidence counts as live") |
 | 18.4 | Update-Log-Zeile(n), volle Suite, `doc_health`, `ui_budget`, Commit + Push; Sichtung beim Nikinger (Bild der Karte, „beide an"); Deploy `v4.0.1` beim Nikinger | Abnahmezeile(n) P10.5-80 ff. im Head |
 
-## 4. Entscheidungen für den Nikinger (vor 18.1)
+## 4. Entscheidungen (Nikinger, 2026-11-01)
 
-| # | Frage | Empfehlung |
+| # | Frage | Antwort |
 |---|---|---|
-| E1 | Ordner-Kanten: **Kette/Stern** (k−1 Kanten, Bild ruhiger) oder **Clique mit Obergrenze** wie Tags (große Ordner zeigen dann gar keine Ordnerkanten) | **Stern** um das zuletzt geänderte Item — die Zugehörigkeit bleibt sichtbar, die Kosten linear |
-| E2 | Editor-Farben jetzt oder in **P11**? P10.5 sagt „neues Feature erst in P11". Wenn jetzt: (a) **Farbraster** mit z. B. 16 benannten Farben (Klassen, kein CSP-Thema, ½ Tag) oder (b) **freier Farbwähler** (RGB-Fläche; Syntax `[Text]{#3e8df3}`, Renderer setzt geprüftes Hex per CSSOM, neuer Sanitizer-Wächter, ≈ 1–2 Tage) | **(a) jetzt, (b) in P11** — (a) erfüllt „mehr Farben" ohne neue Angriffsfläche; die RGB-Fläche gehört zum Editor Stufe 3 |
-| E3 | Deploy: eigener `v4.0.1` direkt nach Block 18? | ja — die Funde sind live sichtbar, ein Patch-Deploy hält sie klein |
+| E1 | Ordner-Kanten: Kette/Stern oder Clique mit Obergrenze? | **Stern** um das zuletzt geänderte Item des Ordners (k−1 Kanten) — Empfehlung angenommen |
+| E2 | Editor-Farben jetzt oder in P11? | **P11** — „if I'd like to do it fully": Farbraster **und** freie RGB-Fläche zusammen, als Editor Stufe 3. **P11-Vormerkung** (Closeout Z übernimmt sie in den Handover); Befund E1 in §2 bleibt die Grundlage (CSP: freie Farbe nur per CSSOM) |
+| E3 | Eigener Deploy `v4.0.1` nach Block 18? | **ja** |
+| E4 | Prüfungen automatisch und bleibend: die Live-Zeilen **P10.5-18** und **P10.5-49** werden **Wegwerf-Proben** (Schritt 18.5). „Keine externen Werkzeuge, so wenige wie möglich" gilt für die **Software selbst**, nicht für Netzwerk-Werkzeuge beim Testen (lokaler Caddy usw. erlaubt) | angenommen. Außerdem: **P10.5-22** und **P10.5-27** macht der Nikinger, **P10.5-28** geht an **eurofleet** (verwaltet die Container) — Notiz `docs/concepts/phase10_5_p10j_lauf2_eurofleet.md` |
 
 ## 5. Messungen (füllt der Ausführer)
 
