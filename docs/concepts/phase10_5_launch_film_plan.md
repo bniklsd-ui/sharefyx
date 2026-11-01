@@ -6,7 +6,7 @@ detail: L2
 up: ../../phase10_5_finishing/CLAUDE.md
 down:
   - ../UPDATE_LOG.md   # die Quelle der Feature-Liste (Blöcke 2026-10-23 bis 2026-10-26)
-updated: 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
+updated: 2026-11-01 (Schritt 16.1 ✅ — Aufnahmen, Funde: Ordner-Menü, clip.scale > 2) | 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
 ---
 # Launch-Film — Sharefyx v4.0.0 (Plan Block 16)
 
@@ -169,7 +169,7 @@ File-Keyring, Umgebung ohne `SHAREFYX_*`/`SFX_*`, Stopp nur über die PID-Datei 
 | Schritt | Inhalt | Fertig, wenn |
 |---|---|---|
 | **16.0 ✅** Probe | `film-venv` (Playwright vorhanden, `imageio-ffmpeg`, numpy); Bühne mit zwei Platzhalter-Kacheln + einem echten UI-Standbild; 2 s rendern, **zweimal** | `libx264` vorhanden · beide Läufe **byteweise gleiche** Frame-Hashes · Sekunden je Frame gemessen · Platte: keine Frame-Dateien |
-| **16.1** Aufnahmen | Saatdaten (§4), Wegwerf-Instanz, Playwright nimmt S1–S12 auf (2×, Bildfolgen für Tippen/Karte); KI-Lauf aufzeichnen + bereinigen | alle Kacheln als Bilder da · Checkliste §4 Punkte 1–4 ✓ |
+| **16.1 ✅** Aufnahmen | Saatdaten (§4), Wegwerf-Instanz, Playwright nimmt S1–S12 auf (2×, Bildfolgen für Tippen/Karte); KI-Lauf aufzeichnen + bereinigen | alle Kacheln als Bilder da · Checkliste §4 Punkte 1–4 ✓ |
 | **16.2** Standbilder | drei Schlüsselbilder: Anfang (Leiste), mitten in der Fahrt, **die 4.0.0** (Kacheln und Schrift) | Claude Code prüft (Lesbarkeit der 4 bei 1080p) — vorher kein Volllauf (N3) |
 | **16.3** Zeitleiste | volle `frame → Zustand`-Funktion, Easing, Texttafeln; Wächter: Determinismus (zwei Läufe, Hash) + Kacheln der 4 im Bild | pytest grün · Vorschau (niedrige Auflösung) ansehbar |
 | **16.4** Ton | Ton-Skript, Marken aus der Zeitleiste | WAV deterministisch (Hash) |
@@ -205,3 +205,27 @@ Sharefyx-Space fand sich am 2026-10-29 **nichts** — falls es sie gibt, ist sie
   Beleg `probes/p105_b16_0_probe.json`.
 - **Wächter:** `tests/test_film_stage.py` (9: PRNG, `phase`, Kamera, Pfadschutz des
   Render-Servers); Gegenlauf (PRNG → `Math.random`, Pfadschutz entfernt) **4 rot**.
+
+## Anmerkungen 16.1 — Aufnahmen (2026-11-01, Opus)
+
+- **Werkzeug:** `film/wegwerf.py` (zwei Instanzen mit derselben erfundenen Saat — `neu` = HEAD,
+  Port 8811; `alt` = `v3.1.6` aus `git worktree` auf `e5c834e`, Port 8812, alter Code über
+  `PYTHONPATH` vor den *editable*-Findern; Badges gemessen `v4.0.0` / `v3.1.6`), `film/capture.py`
+  (Fenster 1600 × 1000, `clip.scale = 2`), `film/ki_lauf.py` (S9).
+- **Reihenfolge für einen sauberen Lauf** (die Szenen schreiben in die Saat — S7 benennt
+  `projekte` um, S9 hängt an): je Instanz `stop` → Baum löschen → `setup` → `start`; dann
+  `capture.py neu`, `capture.py alt`, zuletzt `ki_lauf.py`. Alles unter `~/sharefyx-film/` (40 MB).
+- **Bestand:** neu S1–S8, S10–S12 (S2 = 107 Tippbilder), alt S1/S2/S5; S9 = echtes Transkript
+  (`list_spaces`, `search_items`, `append_to_items` ⇒ 3 × `ok`, Version 3 → 4), geprüft: kein
+  Token, keine URL, kein Host, kein `Bearer`.
+- **Funde:** (1) „Umbenennen“ im Ordner-Menü öffnete nie den Dialog — eigener Commit `68eff7e`,
+  Probe 4/4, Gegenlauf 3 rot. (2) Ein **Teil**ausschnitt mit `clip.scale` > 2 ignoriert den
+  Ausschnitt (das ganze Fenster wird hineingequetscht, gemessen bei 4/5/6/8/10) ⇒ der Zoom aus
+  der Marke wird auf der Bühne als **Vektor** gebaut (`logo.svg`, Plex, Lage aus
+  `~/sharefyx-film/s1_*.json`); die Vollbild-Aufnahme bei 2× bleibt scharf (16.0). (3) v3.1.6
+  öffnet den Editor in der Vorschau — Aufnahme schaltet über `#toggle-preview` um.
+  (4) `scripts/move_sections.py` bricht mit `StopIteration` ab (nichts geschrieben) — nicht
+  angefasst, Head stattdessen über `rotate_index_updates.sh` entlastet.
+- **Für die Bühne gemessen:** der Versionsstreifen links im Editor zeigt „v1“ hochkant und
+  beschnitten (sieht aus wie „\\“) — Produktgestaltung, kein Fehler; in der Kachel klein.
+

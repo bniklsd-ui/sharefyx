@@ -65,10 +65,10 @@ class Kamera:
             p.locator("#update-banner-dismiss").click()
             p.wait_for_timeout(500)
 
-    def shot(self, szene: str, name: str, clip: dict | None = None) -> Path:
+    def shot(self, szene: str, name: str, clip: dict | None = None, scale: float = SCALE) -> Path:
         c = clip or {"x": 0, "y": 0, "width": VW, "height": VH}
         png = base64.b64decode(self.cdp.send("Page.captureScreenshot", {
-            "format": "png", "clip": {**c, "scale": SCALE}})["data"])
+            "format": "png", "clip": {**c, "scale": scale}})["data"])
         ziel = self.dir / f"{szene}__{name}.png"
         ziel.write_bytes(png)
         self.dateien.setdefault(szene, []).append(ziel.name)
@@ -83,11 +83,15 @@ def szene_s1(k: Kamera) -> None:
     k.page.goto(k.base + "/ui/", wait_until="networkidle")
     k.page.wait_for_timeout(1500)
     k.shot("s1", "uebersicht")
-    box = k.page.locator(".rail__version").bounding_box()
     k.dateien["s1_version"] = [k.page.locator(".rail__version").inner_text().strip()]
-    if box:
-        k.shot("s1", "version", {"x": max(box["x"] - 120, 0), "y": max(box["y"] - 40, 0),
-                                 "width": 320, "height": 120})
+    # Lage der Marke in CSS-Pixeln — die Bühne baut Zeichen, Name und Versionsangabe als
+    # **Vektor** genau dort nach (16.1: ein Teilausschnitt mit `clip.scale` > 2 ignoriert den
+    # Ausschnitt und quetscht das ganze Fenster hinein — für den Zoom aus der Marke taugt nur
+    # der Vektor).
+    for sel in (".rail__brand", ".brand__mark", ".rail__version"):
+        loc = k.page.locator(sel)
+        bb = loc.first.bounding_box() if loc.count() else None  # v3.1.6 hat kein Zeichen
+        k.dateien.setdefault("s1_geometrie", []).append({sel: bb})
 
 
 TEXT_S2 = "## Ablauf\n**Wichtig:** Getränke bestellen\n- [ ] Tische leihen\n- [ ] Musik fragen\n- [ ] Einladung schreiben"
