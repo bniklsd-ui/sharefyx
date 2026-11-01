@@ -14,7 +14,7 @@ down:
   - MODULSTATUS_ARCHIVE.md                         # 📦 die ausführlichen Statusspalten der Blöcke 0–10, verbatim
   - ABNAHME_ARCHIVE.md                             # 📦 die geschlossenen Abnahmezeilen (P10.5-1–72), verbatim
   - FREIGABEN_ARCHIVE.md                           # 📦 die Freigaben der Phase, verbatim
-updated: 2026-11-01 (Block 17 ✅ — Film in der App; Deploy D vorbereitet, `deploy.sh` beim Nikinger) | 2026-11-01 (Block 16 ✅ — Sichtung 2 abgenommen, Lehren notiert; Film in die App + Deploy D nächste Session) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-11-01 (Deploy D live — `v4.0.0`, `2eb697f`, health_gate 9/9) | 2026-11-01 (Block 17 ✅ — Film in der App; Deploy D vorbereitet, `deploy.sh` beim Nikinger) | 2026-11-01 (Block 16 ✅ — Sichtung 2 abgenommen, Lehren notiert; Film in die App + Deploy D nächste Session) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -60,7 +60,7 @@ updated: 2026-11-01 (Block 17 ✅ — Film in der App; Deploy D vorbereitet, `de
 | A | `v3.1.5` | `7358f22` | **9/9 OK** | nach Block 1–4 — **live seit 2026-10-23**, Release `20261023T065010.377336Z` |
 | B | `v3.1.6` | `e5c834e` | **9/9 OK** | nach Block 5–6 (+ **Block 7.0**, die Update-Log-ID) — **live seit 2026-10-23**, Release `20261023T165838.591015Z` · **Deploy beim Nikinger** (Hard Rule 9, `sudo`; `deploy.sh main` → Release-Tests **1380 grün** (340,7 s) → Symlink-Wechsel → Dienst neu gestartet) · `health_gate.sh --expected-version=v3.1.6 --require-todays-update-log --expected-sha=e5c834e` → **9/9 OK** (`.rail__version` v3.1.6, Release-SHA `e5c834e…`, Update-Log 2026-10-23) · **Block 7.1 (UI-1) ist gemergt** (`f0e76b0`, aus `p105-block7`) — **nicht** in diesem Release, sondern in `v3.1.7` |
 | C | `v3.1.7` | — | — | nach Block 7–8 — **2026-10-24 vorbereitet** (Badge, eigener `## 2026-10-24`-Block im Update-Log, Suite 1425 grün, `doc_health` 0, `ui_budget` 5/5), **`deploy.sh` beim Nikinger** |
-| D | `v4.0.0` (vorher `v3.1.8`; Nikinger 2026-10-26) | — | — | nach Block 9–11 **+ 13** + Nachzug 2026-10-26 (**enthält RE-4 `rename_folder` und RE-3 `rename_space`**) (die UI-Änderungen aus Block 13 fahren mit) · **+ Block 14.7** (Karte kompakt/verteilt/glatt, 2026-10-29 geplant) · **+ Block 15** (Review-Fixes B1–B10 inkl. B1 — **kein** Hotfix vorab, Nikinger 2026-10-30: Deploy nach allen Fixes, Wochenende) · **+ Block 17** (Film in der App, ✅ 2026-11-01) · Update-Log `## 2026-11-01` · **`deploy.sh` + `health_gate.sh` beim Nikinger** |
+| D | `v4.0.0` (vorher `v3.1.8`; Nikinger 2026-10-26) | `2eb697f` | **9/9 OK** | **live seit 2026-11-01**, Release `20261101T172738.984499Z` (Release-Tests 1842 grün; Deploy beim Nikinger; enthält C) · nach Block 9–11 **+ 13** + Nachzug 2026-10-26 (**enthält RE-4 `rename_folder` und RE-3 `rename_space`**) (die UI-Änderungen aus Block 13 fahren mit) · **+ Block 14.7** (Karte kompakt/verteilt/glatt, 2026-10-29 geplant) · **+ Block 15** (Review-Fixes B1–B10 inkl. B1 — **kein** Hotfix vorab, Nikinger 2026-10-30: Deploy nach allen Fixes, Wochenende) · **+ Block 17** (Film in der App, ✅ 2026-11-01) · Update-Log `## 2026-11-01` · **`deploy.sh` + `health_gate.sh` beim Nikinger** |
 
 **Stand 2026-10-24 (Abend):** Deploy A ist **live** (`v3.1.5`, Release `20261023T065010.377336Z`, SHA `7358f22`, `health_gate` **9/9 OK**); der Branch `p105-block5` (Block 5 + 6 + P10.5-26) ist **gemergt**. **Deploy B ist ebenfalls live**: `v3.1.6`, Release `20261023T165838.591015Z`, SHA `e5c834e`, `health_gate` **9/9 OK** (aus `main` mit `fastmcp 4.1.3`; der Deploy lief beim Nikinger, die Release-Tests im Release **1380 grün** in 340,7 s). **Block 7.1 (UI-1) ist gemergt** (`f0e76b0`) und damit ab `v3.1.7` dabei. **Deploy C (`v3.1.7`) ist vorbereitet** — Badge, eigener Update-Log-Block `## 2026-10-24` (9 Zeilen für Menschen), Suite **1425 grün** (332,6 s), `doc_health` 0, `ui_budget` **5/5** (Erstaufruf 204,5 KB); **`deploy.sh` liegt beim Nikinger**. **Die Generalprobe davor ist gefahren: 26/26 Zellen grün an der Wegwerf-Instanz** (Details im Session-Block unten; die Zeile stand vorher auf „25/25" — **datierte Korrektur**, der Block-7.0-Commit hat die Probe um eine Zelle erweitert). **Der Deploy-Aufruf der letzten Session ist an den Release-Tests gescheitert — nicht am Befehl:** eine verklebte `updated:`-Zeile in `SESSIONS_ARCHIVE.md` (behoben, Details im Session-Block) — es fehlt nur noch der Deploy-Aufruf durch den Nikinger. **Block 7.1 (UI-1) ist gebaut** auf dem Branch `p105-block7` — **nicht gemergt** (Nikinger-Entscheidung: Deploy A vor dem Branch-Merge); der Merge wartet auf Deploy A/B.
 
@@ -215,6 +215,8 @@ Schritt (Nikinger, Hard Rule 9):** `deploy.sh main`, dann
 `health_gate.sh --expected-version=v4.0.0 --require-todays-update-log --expected-sha=<SHA>` — **am
 2026-11-01**; an einem anderen Tag erst die oberste Überschrift umdatieren. Live zu sehen: das
 Startbild über die echte Adresse (Caddy reicht die CSP durch, Plan F9).
+
+**Nachtrag, Deploy D live:** Startbild abgenommen; Gate 9/9 (Werte: Deploy-Tabelle); Video live `206 video/mp4` (Loopback). **Offen:** Film im Browser über die echte Adresse (Nikinger).
 
 **Für ältere Playwright-Proben:** gegen eine frische Instanz zeigt die UI zuerst das Startbild —
 `add_init_script` mit `localStorage.setItem('sfx:film:gesehen','4.0.0')` (auch `film/capture.py`).
