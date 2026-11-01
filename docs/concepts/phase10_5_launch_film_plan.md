@@ -6,7 +6,7 @@ detail: L2
 up: ../../phase10_5_finishing/CLAUDE.md
 down:
   - ../UPDATE_LOG.md   # die Quelle der Feature-Liste (Blöcke 2026-10-23 bis 2026-10-26)
-updated: 2026-11-01 (§7 Sichtung 1 wörtlich + Runde 2: Urknall, Raster, 3D + Text, schneller) | 2026-11-01 (Schritt 16.5 🔄 — Volllauf fertig, Sichtung offen) | 2026-11-01 (Schritte 16.3/16.4 ✅ — Vorschau, Feinschliff, Ton) | 2026-11-01 (Schritt 16.2 ✅ — Bühne, Schlüsselbilder selbst geprüft) | 2026-11-01 (Schritt 16.1 ✅ — Aufnahmen, Funde: Ordner-Menü, clip.scale > 2) | 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
+updated: 2026-11-01 (Schritt 16.6 ✅ — Urknall-Auftakt, Zeitleiste relativ) | 2026-11-01 (§7 Sichtung 1 wörtlich + Runde 2: Urknall, Raster, 3D + Text, schneller) | 2026-11-01 (Schritt 16.5 🔄 — Volllauf fertig, Sichtung offen) | 2026-11-01 (Schritte 16.3/16.4 ✅ — Vorschau, Feinschliff, Ton) | 2026-11-01 (Schritt 16.2 ✅ — Bühne, Schlüsselbilder selbst geprüft) | 2026-11-01 (Schritt 16.1 ✅ — Aufnahmen, Funde: Ordner-Menü, clip.scale > 2) | 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
 ---
 # Launch-Film — Sharefyx v4.0.0 (Plan Block 16)
 
@@ -297,7 +297,7 @@ ein Auftakt.
 
 | Schritt | Inhalt | Fertig, wenn |
 |---|---|---|
-| **16.6** Auftakt | Ersetzt den Zoom aus der Marke: ein **Urknall** — ein Lichtpunkt auf Schwarz, der in die Punktwolke aufbricht (dieselbe Punktsprache wie das Finale: der Film beginnt mit Punkten, die auseinanderfliegen, und endet mit Punkten, die „4.0.0“ bilden); die Punkte ordnen sich zur Marke / zur ersten Kachel. Alternative „sich öffnendes Auge“ nur, falls der Urknall im Standbild nicht trägt. Die Ziffernrolle `v3.1.6` → `v4.0.0` bleibt, aber **ganz** im Bild (Name + Version, nicht angeschnitten) | drei Standbilder des Auftakts selbst geprüft; nichts angeschnitten |
+| **16.6 ✅** Auftakt | Ersetzt den Zoom aus der Marke: ein **Urknall** — ein Lichtpunkt auf Schwarz, der in die Punktwolke aufbricht (dieselbe Punktsprache wie das Finale: der Film beginnt mit Punkten, die auseinanderfliegen, und endet mit Punkten, die „4.0.0“ bilden); die Punkte ordnen sich zur Marke / zur ersten Kachel. Alternative „sich öffnendes Auge“ nur, falls der Urknall im Standbild nicht trägt. Die Ziffernrolle `v3.1.6` → `v4.0.0` bleibt, aber **ganz** im Bild (Name + Version, nicht angeschnitten) | drei Standbilder des Auftakts selbst geprüft; nichts angeschnitten |
 | **16.7** Hintergrund | dezentes blaues Raster (Linien ≈ `rgba(62,141,243,.06–.08)`, Weltkoordinaten ⇒ es zieht mit der Kamera, Parallaxe), Vignette; die Körnung bleibt | Standbild Fahrt + große 4: Raster sichtbar, nicht laut |
 | **16.8** Bewegung + Text | (a) die Kachel füllt das Bild nicht mehr: kleiner (≈ 60–65 % Breite), im Raum leicht **3D-gedreht** (`perspective` + `rotateY/rotateX`, driftet während des Halts, Push-in) — die Aufnahmen „leben“; (b) der freie Platz trägt je Szene einen **kurzen animierten Text** (Titel + eine Zeile, Wort für Wort / Zeile für Zeile eingeblendet), gekoppelt an den **Lichtstreif** (Text erscheint mit dem Streif); die Unterzeilen-Tafeln entfallen oder werden zu diesen Texten; (c) **schneller**: Halte ≈ −25 %, Film ≈ 42–48 s; (d) die Szenen, deren Effekt nicht ankommt, gezielt zeigen (Suche: Treffer heranzoomen; S5b ggf. streichen) | Vorschau ganz gesichtet; jede Szene hat ihren Text; Länge 40–60 s |
 | **16.9** Volllauf 2 | Volllauf wie 16.5 (+ „Einträge“ statt „Eintraege“ prüfen: hat der Mono-Teilsatz `ä`?) | **Sichtung 2** beim Nikinger |
@@ -306,3 +306,23 @@ ein Auftakt.
 UI aus den Aufnahmen (keine erfundene), §4 Datenschutz, Ton aus `ton.py` (Marken folgen der neuen
 Zeitleiste automatisch). Neue Aufnahmen nur, wenn eine Szene sie braucht (z. B. Suche näher).
 
+## Anmerkungen 16.6 — Auftakt (2026-11-01, Opus)
+
+- **Vorab: die Zeitleiste ist relativ.** `film.js :: FAHRT` trägt je Kachel Halt + Fahrt; Streif,
+  Bildfolge, Wechsel und Terminal zählen ab dem Halt; `HALTE`, `KACHELN`, `ZOOM_AUS`, `MORPH`, `ENDE`,
+  `FRAMES` werden abgeleitet (gleiche Namen und Formen — `ton.py` liest sie weiter). **Beleg:** mit den
+  alten Dauern ist `zustand(n)` für **alle 3300 Bilder** gleich der alten Datei (0 Unterschiede).
+- **Urknall** (`AUFTAKT` in `film.js`): Funke (Bild 10–46) → Blitz + Knall (46) → 485 Punkte fliegen
+  auseinander (+ 1400 Staubpunkte, die nur verglimmen) → sammeln sich zur **ganzen** Marke (Zeichen,
+  Name, Version; Zielpunkte aus der Tinte der gesetzten Marke, Raster 7 px) → die Marke blendet auf →
+  Ziffernrolle 3.1.6 → 4.0.0 **groß in der Bildmitte** → die Marke landet in der Leiste von s1 (alte
+  UI), der Streif macht die Kachel neu. **Eine** Punkt-Zeichenart für Auftakt und Finale
+  (`film.html :: punkteZeichnen`).
+- **Mitte = Tinte, nicht Kasten:** der Kasten der Leiste (239 px) ist breiter als seine Tinte
+  (117 × 17 px) — gemessen in der Bühne (`filmGeo.markeBox`); gerendert: Tinte 830 px breit, Mitte
+  (958,5 / 520). Standbilder 30–420 selbst geprüft, nichts angeschnitten.
+- **Wächter** (`tests/test_film_stage.py`): die Tinte liegt in **jedem** Bild des Auftakts mit 20 px
+  Rand im Bild und ist ≥ 800 px breit; gelandet sitzt sie im Maßstab der Kamera auf dem Kachelpunkt
+  (0, 8). **Gegenlauf** (`MARKE_GROSS` = 34, der alte Zoom): genau dieser Wächter rot.
+- **Ton:** Sog zum Funken + tiefer Schlag mit Rauschen auf dem Knall (`ton.py`, Marken aus
+  `AUFTAKT`); zwei Läufe byteweise gleich; Pegel Knall-Spitze 0,89, Fahrt −18,8 dB RMS.

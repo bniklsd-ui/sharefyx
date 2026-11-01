@@ -18,9 +18,9 @@
             background: linear-gradient(90deg, rgba(62,141,243,0), rgba(150,200,255,.85), rgba(46,184,166,0));
             filter: blur(6px); }
   /* Die Marke als Vektor — dieselben Werte wie `.rail__brand` in der App (16.2 gemessen). */
-  .marke { position: absolute; width: 239px; box-sizing: border-box; padding: 8px 16px 16px;
+  .marke { position: absolute; left: 0; top: 0; width: 239px; box-sizing: border-box; padding: 8px 16px 16px; transform-origin: 0 0;
            font: 600 12.5px/19.375px "IBM Plex Sans Var"; letter-spacing: 1px; text-transform: uppercase;
-           color: #E9EDF2; white-space: nowrap; background: #000; }
+           color: #E9EDF2; white-space: nowrap; }
   .marke img { height: 15.625px; width: auto; vertical-align: -2.75px; margin-right: 2.5px; }
   .marke .version { display: inline-block; margin-left: 4.95px; font: 400 11px/14px "IBM Plex Sans Var";
                     letter-spacing: .33px; text-transform: none; vertical-align: super; height: 14px; overflow: hidden; }
@@ -44,13 +44,14 @@
 <body>
 <div id="world"></div>
 <canvas id="punkte" width="1920" height="1080"></canvas>
+<div class="marke" id="marke"><img src="/static/logo.svg" alt="">harefyx<span class="version"><span>v3.1.6</span><span>v4.0.0</span></span></div>
 <div id="glyphe">4.0.0</div>
 <div id="endtafel"><img src="/static/logo.svg" alt="">harefyx</div>
 <div id="tafel"></div>
 <canvas id="grain" width="960" height="540"></canvas>
 <script type="module">
   import { cameraTransform, drawGrain, prng, easeInOut, clamp, lerp } from "/film/stage.js";
-  import { KACHELN, CELL_W, CELL_H, TILE_W, TILE_H, VIER_BOX, zustand, welt2bild } from "/film/film.js";
+  import { KACHELN, CELL_W, CELL_H, TILE_W, TILE_H, VIER_BOX, MARKE_GROSS, zustand, welt2bild } from "/film/film.js";
 
   const world = document.getElementById("world");
   const el = {};
@@ -78,13 +79,9 @@
     world.appendChild(d);
     el[k.id] = e;
   }
-  // Die Marke (Vektor) liegt in Kachel s1 genau über der Marke der Aufnahme.
-  const marke = document.createElement("div");
-  marke.className = "marke";
-  marke.style.left = 2 * CELL_W + "px";
-  marke.style.top = 8 + "px";
-  marke.innerHTML = '<img src="/static/logo.svg" alt="">harefyx<span class="version"><span>v3.1.6</span><span>v4.0.0</span></span>';
-  world.appendChild(marke);
+  // Die Marke (Vektor) liegt über dem Bild (nicht in der Welt): groß in der Mitte, dann gelandet
+  // genau über der Marke der Leiste in s1 (Lage aus `markePose`).
+  const marke = document.getElementById("marke");
   const rolle = marke.querySelectorAll(".version span");
 
   async function bildSetzen(img, name) {
@@ -113,10 +110,57 @@
     return z;
   }
 
+  // Zielpunkte der Punkte im Auftakt: die Tinte der Marke, so wie sie groß in der Mitte steht.
+  // Gemessen wird die gesetzte Marke selbst (Rechtecke von Zeichen, Name, Version unter derselben
+  // Transformation), nachgezeichnet auf einer Leinwand — fester Raster, feste Reihenfolge.
+  function markeZiele() {
+    const gs = MARKE_GROSS;
+    marke.style.transform = `scale(${gs})`; // gemessen an (0, 0); verschoben wird danach
+    const c = document.createElement("canvas"); c.width = 1920; c.height = 1080;
+    const g = c.getContext("2d"); g.fillStyle = "#fff";
+    const bild = marke.querySelector("img"), rb = bild.getBoundingClientRect();
+    g.drawImage(bild, rb.left, rb.top, rb.width, rb.height);
+    const text = (knoten, font, ls, gross = false) => {
+      const r = document.createRange(); r.selectNodeContents(knoten);
+      const b = r.getBoundingClientRect();
+      g.font = font; g.letterSpacing = ls; g.textBaseline = "alphabetic";
+      const m = g.measureText(knoten.textContent);
+      // die Zeile zentriert die Schriftbox; die Grundlinie liegt um ihre Unterlänge über dem Boden
+      const hoehe = m.fontBoundingBoxAscent + m.fontBoundingBoxDescent;
+      g.fillText(gross ? knoten.textContent.toUpperCase() : knoten.textContent, b.left, b.top + (b.height - hoehe) / 2 + m.fontBoundingBoxAscent);
+    };
+    text(bild.nextSibling, `600 ${12.5 * gs}px "IBM Plex Sans Var"`, `${1 * gs}px`, true); // `text-transform` kennt die Leinwand nicht
+    const alt = rolle[0];
+    text(alt.firstChild, `400 ${11 * gs}px "IBM Plex Sans Var"`, `${0.33 * gs}px`);
+    const d = g.getImageData(0, 0, 1920, 1080).data, tinte = [];
+    for (let y = 0; y < 1080; y += 7) for (let x = 0; x < 1920; x += 7) if (d[(y * 1920 + x) * 4 + 3] > 128) tinte.push([x, y]);
+    // Der Kasten der Leiste ist breiter als seine Tinte — die Mitte des Bildes trifft die Tinte.
+    const xs = tinte.map((p) => p[0]), ys = tinte.map((p) => p[1]);
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    geo.markeBox = { w: marke.offsetWidth, h: marke.offsetHeight, ix: x0 / gs, iy: y0 / gs, iw: (x1 - x0) / gs, ih: (y1 - y0) / gs };
+    const gx = 960 - (x0 + x1) / 2, gy = 520 - (y0 + y1) / 2;
+    return tinte.map(([x, y]) => [x + gx, y + gy]);
+  }
+
   const geo = {};
+  window.filmGeo = geo; // für Proben: die gemessenen Größen (Wächter `_GEO`)
   async function messen() {
     await document.fonts.load('600 100px "IBM Plex Sans Var"');
     await document.fonts.load('400 30px "IBM Plex Mono"');
+    await marke.querySelector("img").decode();
+    geo.markeZiele = markeZiele();
+    // Der Knall: je Punkt eine feste Richtung und Weite (flach gedrückt wie das Bild), fester Seed.
+    const rk = prng(0x0b16);
+    geo.knall = geo.markeZiele.map(() => {
+      const w = rk() * Math.PI * 2, r = 120 + 1000 * Math.pow(rk(), 0.7);
+      return [Math.cos(w) * r, Math.sin(w) * r * 0.62, rk()];
+    });
+    // Staub: weitere Punkte, die nur auseinanderfliegen und verglimmen (der Knall ist größer als
+    // die Marke).
+    geo.staub = Array.from({ length: 1400 }, () => {
+      const w = rk() * Math.PI * 2, r = 200 + 1500 * Math.pow(rk(), 0.55);
+      return [Math.cos(w) * r, Math.sin(w) * r * 0.62];
+    });
     const lauf = await (await fetch("/daten/ki_lauf.json")).json();
     geo.zeilen = terminalZeilen(lauf);
     geo.zeichen = geo.zeilen.reduce((a, z) => a + z[1].length, 0);
@@ -173,6 +217,24 @@
   }
 
   const FARBEN = ["#3E8DF3", "#2EB8A6", "#7FB6FF", "#E9EDF2"];
+  // Eine Zeichenart für alle Punkte des Films (Auftakt und Finale): `lage(i)` → [x, y, Radius].
+  function punkteZeichnen(pc, anzahl, deck, lage) {
+    pc.globalAlpha = deck;
+    for (let i = 0; i < anzahl; i++) {
+      const [x, y, r] = lage(i);
+      pc.fillStyle = FARBEN[i % FARBEN.length];
+      pc.beginPath(); pc.arc(x, y, r, 0, Math.PI * 2); pc.fill();
+    }
+    pc.globalAlpha = 1;
+  }
+  // Ein weiches Licht (Funke, Blitz): radialer Verlauf, weiß → blau → nichts.
+  function glimmen(pc, x, y, r, deck) {
+    const v = pc.createRadialGradient(x, y, 0, x, y, r);
+    v.addColorStop(0, `rgba(255,255,255,${deck})`);
+    v.addColorStop(0.25, `rgba(150,200,255,${0.7 * deck})`);
+    v.addColorStop(1, "rgba(62,141,243,0)");
+    pc.fillStyle = v; pc.fillRect(x - r, y - r, 2 * r, 2 * r);
+  }
   window.renderFrame = async (n) => {
     const z = zustand(n, geo);
     world.style.transform = cameraTransform(z.cam.cx, z.cam.cy, z.cam.z);
@@ -202,26 +264,42 @@
         e.term.innerHTML = html;
       }
     });
+    const mp = z.marke.pose;
+    marke.style.transform = `translate(${mp.x}px, ${mp.y}px) rotate(${mp.rot}deg) scale(${mp.s})`;
     marke.style.opacity = String(z.marke.deck);
+    marke.style.background = `rgba(0,0,0,${z.marke.hg})`;
     rolle.forEach((sp) => { sp.style.transform = `translateY(${-14 * easeInOut(z.marke.roll)}px)`; });
     const tafel = document.getElementById("tafel");
     tafel.textContent = z.tafel ? z.tafel.text : "";
     tafel.style.opacity = z.tafel ? String(z.tafel.deck) : "0";
-    // Punkte: aus den Kacheln (Bildposition unter der aktuellen Kamera) zur Glyphe.
     const pc = document.getElementById("punkte").getContext("2d");
     pc.clearRect(0, 0, 1920, 1080);
+    // Auftakt: der Funke, der Blitz, die Punkte (auseinander → zur Marke).
+    const a = z.auftakt;
+    if (a.funke > 0) glimmen(pc, 960, 520, 8 + 46 * a.funke, a.funke);
+    if (a.blitz > 0.01) glimmen(pc, 960, 520, 40 + 900 * (1 - a.blitz), a.blitz);
+    if (a.punkte > 0) {
+      const flug = 1 - Math.pow(1 - a.flug, 3); // ease-out: der Knall bremst
+      const weiter = 1 + 0.25 * a.sammeln;      // der Staub treibt weiter, während er verglimmt
+      punkteZeichnen(pc, geo.staub.length, a.punkte * (1 - a.sammeln), (i) =>
+        [960 + geo.staub[i][0] * flug * weiter, 520 + geo.staub[i][1] * flug * weiter, 1.6]);
+      punkteZeichnen(pc, geo.markeZiele.length, a.punkte, (i) => {
+        const q = geo.knall[i], [tx, ty] = geo.markeZiele[i];
+        const bx = 960 + q[0] * flug, by = 520 + q[1] * flug;
+        const t = easeInOut(clamp((a.sammeln - q[2] * 0.3) / 0.7));
+        const wirbel = Math.sin(Math.PI * t) * 90 * (q[2] - 0.5);
+        return [lerp(bx, tx, t) + wirbel, lerp(by, ty, t) - wirbel, lerp(2.2, 2.6, t)];
+      });
+    }
+    // Finale: aus den Kacheln (Bildposition unter der aktuellen Kamera) zur Glyphe.
     const pDeck = Math.min(z.zerfall, 1 - 0.85 * z.schrift);
     if (pDeck > 0) {
-      for (let i = 0; i < geo.ziele.length; i++) {
+      punkteZeichnen(pc, geo.ziele.length, pDeck, (i) => {
         const q = geo.quellen[i], [sx, sy] = welt2bild(z.cam, q[0], q[1]), [tx, ty] = geo.ziele[i];
         const t = easeInOut(clamp((z.flug - q[2] * 0.35) / 0.65));
         const bogen = Math.sin(Math.PI * t) * 60 * (q[2] - 0.5);
-        const x = lerp(sx, tx, t) + bogen, y = lerp(sy, ty, t) - bogen;
-        pc.globalAlpha = pDeck;
-        pc.fillStyle = FARBEN[i % FARBEN.length];
-        pc.beginPath(); pc.arc(x, y, lerp(2.6, 3.4, t), 0, Math.PI * 2); pc.fill();
-      }
-      pc.globalAlpha = 1;
+        return [lerp(sx, tx, t) + bogen, lerp(sy, ty, t) - bogen, lerp(2.6, 3.4, t)];
+      });
     }
     document.getElementById("glyphe").style.opacity = String(z.schrift);
     document.getElementById("endtafel").style.opacity = String(z.ende);

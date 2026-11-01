@@ -68,7 +68,9 @@ def test_render_server_maps_its_roots():
 
 # --- Block 16.2: der Film (`film/film.js`) -------------------------------------------------------
 
-_GEO = "{marke: {x: 119, y: 24}, ziel: {cx: 3500, cy: 4100, z: 0.05}}"
+# `markeBox` wie in der Bühne gemessen (16.6, `filmGeo.markeBox`): Kasten 239 × 49, Tinte darin.
+_GEO = ("{marke: {x: 119, y: 24}, ziel: {cx: 3500, cy: 4100, z: 0.05},"
+        " markeBox: {w: 239, h: 49, ix: 17, iy: 12, iw: 117, ih: 17}}")
 
 
 def _film(expr: str):
@@ -108,3 +110,31 @@ def test_old_tiles_turn_new_during_their_sweep():
     vorher, nachher = _film("[f.kachel('s5').streif[0] - 1, f.kachel('s5').streif[1]]"
                             ".map(n => f.zustand(n, geo).kacheln.find(k => k.id === 's5').streif)")
     assert (vorher, nachher) == (0, 1)
+
+
+# --- Block 16.6: der Auftakt ---------------------------------------------------------------------
+
+@pytest.mark.skipif(NODE is None, reason="node fehlt")
+def test_opening_mark_is_never_cut_off():
+    """Sichtung 1: vom Namen war nur ein angeschnittenes „x“ zu sehen. Im ganzen Auftakt liegt die
+    Tinte der Marke (Zeichen, Name, Version) mit Rand im Bild — groß in der Mitte und im Flug."""
+    rows = _film("Array.from({length: f.HALTE[0][0] + 1}, (_, n) => { const z = f.zustand(n, geo);"
+                 " return [n, z.marke.deck, z.marke.pose]; })")
+    b = {"ix": 17, "iy": 12, "iw": 117, "ih": 17}
+    sichtbar = [r for r in rows if r[1] > 0]
+    assert sichtbar, "die Marke erscheint im Auftakt nie"
+    for n, _deck, p in sichtbar:
+        x0, y0 = p["x"] + b["ix"] * p["s"], p["y"] + b["iy"] * p["s"]
+        x1, y1 = x0 + b["iw"] * p["s"], y0 + b["ih"] * p["s"]
+        assert 20 <= x0 and x1 <= 1900 and 20 <= y0 and y1 <= 1060, (n, x0, y0, x1, y1)
+    gross = max(p["s"] for _n, _d, p in sichtbar)
+    assert gross * b["iw"] >= 800  # groß genug, um gelesen zu werden
+
+
+@pytest.mark.skipif(NODE is None, reason="node fehlt")
+def test_opening_mark_lands_on_the_rail_of_the_first_tile():
+    """Gelandet sitzt die Marke im Maßstab der Kamera auf dem Kachelpunkt (0, 8) von s1."""
+    pose, cam, ziel = _film("(() => { const n = f.HALTE[0][0], z = f.zustand(n, geo), s1 = z.kacheln[0];"
+                            " return [z.marke.pose, z.cam, f.welt2bild(z.cam, ...f.kachelPunkt(s1, 0, 8))]; })()")
+    assert pose["s"] == pytest.approx(cam["z"])
+    assert (pose["x"], pose["y"]) == (pytest.approx(ziel[0]), pytest.approx(ziel[1]))

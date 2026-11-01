@@ -2,7 +2,8 @@
 """P10.5 Block 16.4 — der Ton des Launch-Films, im Code erzeugt (Plan §3.4, Q4).
 
 Keine Aufnahme, keine Lizenzfrage: Flächen (ein D-Dur-Akkord mit None, leicht verstimmt), ein
-Glockenton bei jeder Ankunft der Kamera an einer Kachel, ein Anschwellen im Zoom heraus, ein
+Urknall am Anfang (ein Sog zum Funken, dann ein tiefer Schlag
+mit Rauschen), ein Glockenton bei jeder Ankunft der Kamera an einer Kachel, ein Anschwellen im Zoom heraus, ein
 Glitzern im Morph und ein Schlussakkord. Die Zeitmarken kommen **aus `film.js`** (HALTE, ZOOM_AUS,
 MORPH, ENDE) — Bild und Ton haben eine Quelle. Fester Seed, nur numpy ⇒ dieselbe Datei in jedem
 Lauf (Kriterium L1 gilt auch hier: Hash im Ergebnis).
@@ -29,7 +30,7 @@ def marken() -> dict:
     node = shutil.which("node") or "/usr/bin/node"
     script = (f"const f = await import({json.dumps((FILM / 'film.js').as_uri())});"
               "console.log(JSON.stringify({FPS: f.FPS, FRAMES: f.FRAMES, HALTE: f.HALTE,"
-              " ZOOM_AUS: f.ZOOM_AUS, MORPH: f.MORPH, ENDE: f.ENDE}));")
+              " ZOOM_AUS: f.ZOOM_AUS, MORPH: f.MORPH, ENDE: f.ENDE, AUFTAKT: f.AUFTAKT}));")
     return json.loads(subprocess.run([node, "--input-type=module", "-e", script],
                                      capture_output=True, text=True, check=True).stdout)
 
@@ -84,6 +85,19 @@ def mischen(dauer: float, m: dict) -> np.ndarray:
             s = ton(hz(note + verst), flaeche_ende, (1, 2, 3), (1, 0.25, 0.08))
             s *= huelle(len(s), 3.5, 1.5) * (0.055 if note < 50 else 0.035)
             setze(s, 0.0, l, r)
+    # 1b) Urknall (16.6): ein Sog, der zum Funken ansteigt, dann ein tiefer Schlag mit Rauschen.
+    f0, knall = sek(m["AUFTAKT"]["funke"][0]), sek(m["AUFTAKT"]["knall"])
+    k = int((knall - f0) * RATE)
+    sog = rng.standard_normal(k)
+    for j in range(1, k):  # Tiefpass, der sich öffnet
+        sog[j] = sog[j - 1] + (0.004 + 0.08 * (j / k) ** 2) * (sog[j] - sog[j - 1])
+    setze(sog * np.linspace(0, 1, k) ** 3 * 0.9, f0)
+    schlag = ton(hz(26), 3.5, (1, 1.5, 2), (1, 0.3, 0.15), abkling=0.9) * 0.22
+    krach = rng.standard_normal(int(1.2 * RATE)) * np.exp(-np.arange(int(1.2 * RATE)) / RATE / 0.18)
+    for j in range(1, len(krach)):
+        krach[j] = krach[j - 1] + 0.05 * (krach[j] - krach[j - 1])
+    setze(schlag, knall)
+    setze(krach * 0.6, knall, 1.0, 0.9)
     # 2) Glocke bei jeder Ankunft — die Töne laufen den Akkord hinauf.
     glocken = [74, 76, 78, 81, 83, 86, 78, 81, 83, 86, 88, 90, 93]
     for i, (an, _ab, _id) in enumerate(m["HALTE"]):
