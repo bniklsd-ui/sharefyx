@@ -72,6 +72,7 @@ def main() -> int:
     ap.add_argument("--start", type=int, default=0)
     ap.add_argument("--end", type=int, default=120)
     ap.add_argument("--dpr", type=float, default=2.0)
+    ap.add_argument("--ton", type=Path, help="WAV aus ton.py — wird als AAC dazugemischt")
     ap.add_argument("--nur-stills", action="store_true", help="nur die --still-Bilder rendern")
     ap.add_argument("--out", type=Path)
     ap.add_argument("--still", action="append", default=[], help="N:pfad.png — Einzelbild sichern")
@@ -119,6 +120,17 @@ def main() -> int:
         if enc.wait() != 0:
             print("ffmpeg ist gescheitert", file=sys.stderr)
             return 1
+    if args.out and args.ton:
+        import imageio_ffmpeg
+
+        stumm = args.out.with_suffix(".stumm.mp4")
+        args.out.replace(stumm)
+        # Bild unverändert kopieren, Ton als AAC; `-shortest`, damit nichts übersteht.
+        subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), "-hide_banner", "-loglevel", "error",
+                        "-y", "-i", str(stumm), "-i", str(args.ton), "-map", "0:v", "-map", "1:a",
+                        "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest",
+                        "-movflags", "+faststart", str(args.out)], check=True)
+        stumm.unlink()
     frames = len(hashes)
     result = {"page": args.page, "frames": frames, "dpr": args.dpr,
               "s_per_frame": round((t_end - t_ready) / max(frames, 1), 4),

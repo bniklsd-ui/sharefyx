@@ -181,6 +181,11 @@
       const e = el[s.id];
       e.box.style.transform = `translate(${s.x - KACHELN[i].zelle[0] * CELL_W}px, ${s.y - KACHELN[i].zelle[1] * CELL_H}px) rotate(${s.rot}deg)`;
       e.box.style.opacity = String(s.deckkraft);
+      // Beim Ordnen leuchtet der Rand auf — die dunklen UI-Kacheln heben sich sonst kaum vom
+      // Schwarz ab, und die 4 soll man **sehen**.
+      e.box.style.boxShadow = s.rand > 0
+        ? `0 0 0 ${28 * s.rand}px rgba(110,170,255,${0.7 * s.rand}), 0 0 ${120 * s.rand}px rgba(62,141,243,${0.45 * s.rand})`
+        : "";
       if (e.img && s.bild) warten.push(bildSetzen(e.img, s.bild));
       if (e.alt) {
         e.alt.style.clipPath = `inset(0 0 0 ${s.streif * 100}%)`;

@@ -1,7 +1,8 @@
 // P10.5 Block 16 — der Launch-Film (Plan §3.5). Jedes Bild ist eine reine Funktion seiner Nummer.
 //
 // Die Szenen liegen als Kacheln auf **einer** Fläche, entlang der Striche einer „4“ (Raster 4 × 7:
-// Abstrich schräg, Querstrich Zeile 4, senkrechter Strich Spalte 2). Die Kamera fährt ohne Schnitt
+// Abstrich schräg — Spalten 1,0 → 0,6 → 0,2, damit er als Schräge liest, nicht als Treppe —,
+// Querstrich Zeile 4, senkrechter Strich Spalte 2). Die Kamera fährt ohne Schnitt
 // von Kachel zu Kachel; am Ende zoomt sie heraus, alle Kacheln ordnen sich gleichzeitig zur
 // sauberen 4, zerfallen in Punkte und die Punkte bilden die gesetzte Schrift „4.0.0“ (N1).
 // Drei Kacheln kommen im Aussehen von v3.1.6 an und werden per Lichtstreif neu (N2, „3 → 4“).
@@ -20,8 +21,8 @@ export const Z_KACHEL = 0.85; // eine Kachel füllt das Bild, unten bleibt Platz
 export const KACHELN = [
   { id: "s1", zelle: [2, 0], bild: "neu/s1__uebersicht", alt: "alt/s1__uebersicht", streif: [250, 300] },
   { id: "s2", zelle: [1, 1], folge: { prefix: "neu/s2__t", n: 107, von: 380, bis: 560 } },
-  { id: "s3", zelle: [1, 2], bild: "neu/s3__kaestchen", alt: "alt/s2__fertig", streif: [670, 740] },
-  { id: "s4", zelle: [0, 3], bild: "neu/s4__rot", danach: { bild: "neu/s4__gross", ab: 885 } },
+  { id: "s3", zelle: [0.6, 2], bild: "neu/s3__kaestchen", alt: "alt/s2__fertig", streif: [670, 740] },
+  { id: "s4", zelle: [0.2, 3], bild: "neu/s4__rot", danach: { bild: "neu/s4__gross", ab: 885 } },
   { id: "s5", zelle: [0, 4], bild: "neu/s5__ganz", alt: "alt/s5__ganz", streif: [1020, 1110], karte: true },
   { id: "s5b", zelle: [1, 4], bild: "neu/s5__suche", karte: true },
   { id: "s6", zelle: [2, 4], bild: "neu/s6__in_arbeit", karte: true },
@@ -44,7 +45,7 @@ export const MORPH = [2860, 3060];    // Kacheln → Punkte → Glyphe
 export const ENDE = [3060, FRAMES];   // Schrift steht, Endtafel
 
 export const TAFELN = [
-  [270, 760, "Schreiben, wie es aussieht."],
+  [330, 760, "Schreiben, wie es aussieht."],
   [800, 1640, "Alles verbunden."],
   [1840, 2180, "Für Menschen und Maschinen."],
   [2200, 2620, "Schneller. Robuster."],
@@ -127,7 +128,7 @@ export function zustand(n, geo) {
     const v = versatz(k, i);
     const f = 1 - ordnen;
     const s = { id: k.id, x: k.zelle[0] * CELL_W + v.dx * f, y: k.zelle[1] * CELL_H + v.dy * f,
-                rot: v.rot * f, deckkraft: (1 - zerfall) * einblend, bild: k.bild, alt: k.alt || null, streif: 1 };
+                rot: v.rot * f, deckkraft: (1 - zerfall) * einblend, rand: ordnen, bild: k.bild, alt: k.alt || null, streif: 1 };
     if (k.alt) {
       // 0 = ganz alt, 1 = ganz neu; der Streif läuft von links nach rechts.
       s.streif = easeInOut(clamp((n - k.streif[0]) / (k.streif[1] - k.streif[0])));

@@ -6,7 +6,7 @@ detail: L2
 up: ../../phase10_5_finishing/CLAUDE.md
 down:
   - ../UPDATE_LOG.md   # die Quelle der Feature-Liste (Blöcke 2026-10-23 bis 2026-10-26)
-updated: 2026-11-01 (Schritt 16.2 ✅ — Bühne, Schlüsselbilder selbst geprüft) | 2026-11-01 (Schritt 16.1 ✅ — Aufnahmen, Funde: Ordner-Menü, clip.scale > 2) | 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
+updated: 2026-11-01 (Schritte 16.3/16.4 ✅ — Vorschau, Feinschliff, Ton) | 2026-11-01 (Schritt 16.2 ✅ — Bühne, Schlüsselbilder selbst geprüft) | 2026-11-01 (Schritt 16.1 ✅ — Aufnahmen, Funde: Ordner-Menü, clip.scale > 2) | 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
 ---
 # Launch-Film — Sharefyx v4.0.0 (Plan Block 16)
 
@@ -171,8 +171,8 @@ File-Keyring, Umgebung ohne `SHAREFYX_*`/`SFX_*`, Stopp nur über die PID-Datei 
 | **16.0 ✅** Probe | `film-venv` (Playwright vorhanden, `imageio-ffmpeg`, numpy); Bühne mit zwei Platzhalter-Kacheln + einem echten UI-Standbild; 2 s rendern, **zweimal** | `libx264` vorhanden · beide Läufe **byteweise gleiche** Frame-Hashes · Sekunden je Frame gemessen · Platte: keine Frame-Dateien |
 | **16.1 ✅** Aufnahmen | Saatdaten (§4), Wegwerf-Instanz, Playwright nimmt S1–S12 auf (2×, Bildfolgen für Tippen/Karte); KI-Lauf aufzeichnen + bereinigen | alle Kacheln als Bilder da · Checkliste §4 Punkte 1–4 ✓ |
 | **16.2 ✅** Standbilder | drei Schlüsselbilder: Anfang (Leiste), mitten in der Fahrt, **die 4.0.0** (Kacheln und Schrift) | Claude Code prüft (Lesbarkeit der 4 bei 1080p) — vorher kein Volllauf (N3) |
-| **16.3** Zeitleiste | volle `frame → Zustand`-Funktion, Easing, Texttafeln; Wächter: Determinismus (zwei Läufe, Hash) + Kacheln der 4 im Bild | pytest grün · Vorschau (niedrige Auflösung) ansehbar |
-| **16.4** Ton | Ton-Skript, Marken aus der Zeitleiste | WAV deterministisch (Hash) |
+| **16.3 ✅** Zeitleiste | volle `frame → Zustand`-Funktion, Easing, Texttafeln; Wächter: Determinismus (zwei Läufe, Hash) + Kacheln der 4 im Bild | pytest grün · Vorschau (niedrige Auflösung) ansehbar |
+| **16.4 ✅** Ton | Ton-Skript, Marken aus der Zeitleiste | WAV deterministisch (Hash) |
 | **16.5** Render | Volllauf §3.3, MP4 nach `~/sharefyx-film/`, SHA-256 in den Commit; **Minimalfassung** als Rückfall: die 4-Fahrt mit 8 Kacheln, ohne KI-Szene und ohne Ton, 40 s | Kriterien §6 · Freigabe Nikinger |
 
 ## §6 Kriterien (planintern — Abnahmezeilen P10.5-80 ff. nur, wenn der Nikinger sie will)
@@ -247,4 +247,17 @@ Sharefyx-Space fand sich am 2026-10-29 **nichts** — falls es sie gibt, ist sie
   Zoom aus der Marke war in der ersten Fassung weich (Bitmap hinter dem Vektor) — behoben durch das
   Einblenden erst unter 3×. Wächter `tests/test_film_stage.py` +4 (rein, Halte, Ordnen, Streif);
   Gegenlauf „Ordnen nie fertig“ 1 rot.
+
+## Anmerkungen 16.3/16.4 — Vorschau, Feinschliff, Ton (2026-11-01, Opus)
+
+- **Vorschau** des ganzen Films bei 1× (3300 Bilder, 0,13 s/Bild) und als Kontaktbögen alle 1,5 s
+  gesichtet. Nachgeschärft: erste Tafel erst ab dem Editor (Bild 330, nicht über der Übersicht) ·
+  beim Ordnen leuchten die Kachelränder auf (die dunklen UI-Kacheln verschwammen mit dem Schwarz) ·
+  der Abstrich liegt auf den Spalten 1,0 → 0,6 → 0,2 (vorher drei Stufen: Treppe statt Schräge).
+- **Saubere Aufnahme vor dem Volllauf:** Saat neu, `capture.py neu` + `alt` in Szenenreihenfolge,
+  `ki_lauf.py` — vorher zeigte S1 schon den umbenannten Ordner aus S7 und S9 hatte doppelt angehängt.
+- **Ton (`film/ton.py`):** Fläche (D-Dur mit None), Glocke je Kamera-Ankunft, Anschwellen im Zoom
+  heraus, Glitzern im Morph, Schlussakkord; Marken aus `film.js` über Node. Zwei Läufe ⇒ dieselbe
+  WAV (`e55b591e…`); Pegel ≈ −16 dB RMS, Spitze −1 dBFS. **Gehört hat ihn noch niemand** — das Urteil
+  ist Teil der Sichtung (N3). `render.py --ton` mischt ihn als AAC dazu (Bild kopiert).
 
