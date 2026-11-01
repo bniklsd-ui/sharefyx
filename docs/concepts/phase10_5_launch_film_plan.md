@@ -6,7 +6,7 @@ detail: L2
 up: ../../phase10_5_finishing/CLAUDE.md
 down:
   - ../UPDATE_LOG.md   # die Quelle der Feature-Liste (Blöcke 2026-10-23 bis 2026-10-26)
-updated: 2026-11-01 (Schritt 16.5 🔄 — Volllauf fertig, Sichtung offen) | 2026-11-01 (Schritte 16.3/16.4 ✅ — Vorschau, Feinschliff, Ton) | 2026-11-01 (Schritt 16.2 ✅ — Bühne, Schlüsselbilder selbst geprüft) | 2026-11-01 (Schritt 16.1 ✅ — Aufnahmen, Funde: Ordner-Menü, clip.scale > 2) | 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
+updated: 2026-11-01 (§7 Sichtung 1 wörtlich + Runde 2: Urknall, Raster, 3D + Text, schneller) | 2026-11-01 (Schritt 16.5 🔄 — Volllauf fertig, Sichtung offen) | 2026-11-01 (Schritte 16.3/16.4 ✅ — Vorschau, Feinschliff, Ton) | 2026-11-01 (Schritt 16.2 ✅ — Bühne, Schlüsselbilder selbst geprüft) | 2026-11-01 (Schritt 16.1 ✅ — Aufnahmen, Funde: Ordner-Menü, clip.scale > 2) | 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
 ---
 # Launch-Film — Sharefyx v4.0.0 (Plan Block 16)
 
@@ -173,7 +173,7 @@ File-Keyring, Umgebung ohne `SHAREFYX_*`/`SFX_*`, Stopp nur über die PID-Datei 
 | **16.2 ✅** Standbilder | drei Schlüsselbilder: Anfang (Leiste), mitten in der Fahrt, **die 4.0.0** (Kacheln und Schrift) | Claude Code prüft (Lesbarkeit der 4 bei 1080p) — vorher kein Volllauf (N3) |
 | **16.3 ✅** Zeitleiste | volle `frame → Zustand`-Funktion, Easing, Texttafeln; Wächter: Determinismus (zwei Läufe, Hash) + Kacheln der 4 im Bild | pytest grün · Vorschau (niedrige Auflösung) ansehbar |
 | **16.4 ✅** Ton | Ton-Skript, Marken aus der Zeitleiste | WAV deterministisch (Hash) |
-| **16.5 🔄** Render (gerendert, Sichtung offen) | Volllauf §3.3, MP4 nach `~/sharefyx-film/`, SHA-256 in den Commit; **Minimalfassung** als Rückfall: die 4-Fahrt mit 8 Kacheln, ohne KI-Szene und ohne Ton, 40 s | Kriterien §6 · Freigabe Nikinger |
+| **16.5 ✅** Render (Sichtung 1 gefahren → Runde 2, §7) | Volllauf §3.3, MP4 nach `~/sharefyx-film/`, SHA-256 in den Commit; **Minimalfassung** als Rückfall: die 4-Fahrt mit 8 Kacheln, ohne KI-Szene und ohne Ton, 40 s | Kriterien §6 · Freigabe Nikinger |
 
 ## §6 Kriterien (planintern — Abnahmezeilen P10.5-80 ff. nur, wenn der Nikinger sie will)
 
@@ -184,7 +184,7 @@ File-Keyring, Umgebung ohne `SHAREFYX_*`/`SFX_*`, Stopp nur über die PID-Datei 
 | L3 | Länge 40–60 s |
 | L4 | Checkliste §4 vollständig ✓ |
 | L5 | jede gezeigte Funktion existiert in HEAD an der Wegwerf-Instanz |
-| L6 | der ganze Film (16.5) vom Nikinger abgenommen (N3) |
+| L6 | der ganze Film vom Nikinger abgenommen (N3) — Sichtung 1 (2026-11-01): „nicht schlecht“, drei Wünsche ⇒ Runde 2 (§7) |
 | L7 | Quelle im Repo, pytest grün; MP4 außerhalb, SHA-256 notiert |
 
 **Herkunft:** der Nikinger erinnert eine frühere Session zum Film. Im Repo, im Memory und im
@@ -275,4 +275,34 @@ Sharefyx-Space fand sich am 2026-10-29 **nichts** — falls es sie gibt, ist sie
 - **Für die Sichtung vorgemerkt:** das Terminal schreibt „Eintraege“ (die Mono-Schrift ist ein
   Teilsatz, gewählt wurde ASCII) — eine Zeile in `film.html :: terminalZeilen()`, falls gewünscht.
   Änderungswünsche gehen über die Zeitleiste in `film.js` (rein, Wächter) und einen neuen Volllauf.
+
+## §7 Sichtung 1 und Runde 2 (Nikinger, 2026-11-01)
+
+> **Wörtlich:** „Wow, honestly, not bad. Really not bad. Only three things i have to say:
+> 1. the start is not that good, its seems buggy. I suggest using something similar as the big bang
+> or an opening eye or something instead (see screenshot)
+> 2. Black background seems unfinished - maybe add a slightly visible blue grid as background or
+> something similar
+> 3. Motion: most screenshots feel like a static diashow and some dont really get the viewer to
+> realize the new effect. 3 Changes: use the not filled screen and add a short animated text.
+> animate the screenshots / videos itselfs, a 3D effect with slight rotation is something i did as
+> an editor, but just as an idea. Make the scenes slightly faster. the Renew effect you already
+> have + the text would be a great match, in my opinion.“
+> Screenshot: das Anfangsbild (angeschnittenes „x“, „v3.1.6“ frei im Schwarz) — abgelegt unter
+> `~/sharefyx-film/sichtung1_anfang.png`.
+
+**Befund zum Anfang (am Bild nachvollzogen):** die Kamera steht auf der Mitte der Versionsangabe;
+vom Namen ist nur das angeschnittene „x“ zu sehen — wirkt wie ein Darstellungsfehler, nicht wie
+ein Auftakt.
+
+| Schritt | Inhalt | Fertig, wenn |
+|---|---|---|
+| **16.6** Auftakt | Ersetzt den Zoom aus der Marke: ein **Urknall** — ein Lichtpunkt auf Schwarz, der in die Punktwolke aufbricht (dieselbe Punktsprache wie das Finale: der Film beginnt mit Punkten, die auseinanderfliegen, und endet mit Punkten, die „4.0.0“ bilden); die Punkte ordnen sich zur Marke / zur ersten Kachel. Alternative „sich öffnendes Auge“ nur, falls der Urknall im Standbild nicht trägt. Die Ziffernrolle `v3.1.6` → `v4.0.0` bleibt, aber **ganz** im Bild (Name + Version, nicht angeschnitten) | drei Standbilder des Auftakts selbst geprüft; nichts angeschnitten |
+| **16.7** Hintergrund | dezentes blaues Raster (Linien ≈ `rgba(62,141,243,.06–.08)`, Weltkoordinaten ⇒ es zieht mit der Kamera, Parallaxe), Vignette; die Körnung bleibt | Standbild Fahrt + große 4: Raster sichtbar, nicht laut |
+| **16.8** Bewegung + Text | (a) die Kachel füllt das Bild nicht mehr: kleiner (≈ 60–65 % Breite), im Raum leicht **3D-gedreht** (`perspective` + `rotateY/rotateX`, driftet während des Halts, Push-in) — die Aufnahmen „leben“; (b) der freie Platz trägt je Szene einen **kurzen animierten Text** (Titel + eine Zeile, Wort für Wort / Zeile für Zeile eingeblendet), gekoppelt an den **Lichtstreif** (Text erscheint mit dem Streif); die Unterzeilen-Tafeln entfallen oder werden zu diesen Texten; (c) **schneller**: Halte ≈ −25 %, Film ≈ 42–48 s; (d) die Szenen, deren Effekt nicht ankommt, gezielt zeigen (Suche: Treffer heranzoomen; S5b ggf. streichen) | Vorschau ganz gesichtet; jede Szene hat ihren Text; Länge 40–60 s |
+| **16.9** Volllauf 2 | Volllauf wie 16.5 (+ „Einträge“ statt „Eintraege“ prüfen: hat der Mono-Teilsatz `ä`?) | **Sichtung 2** beim Nikinger |
+
+**Leitplanken bleiben:** jedes Bild eine Funktion seiner Nummer (`film.js` rein, Wächter), echte
+UI aus den Aufnahmen (keine erfundene), §4 Datenschutz, Ton aus `ton.py` (Marken folgen der neuen
+Zeitleiste automatisch). Neue Aufnahmen nur, wenn eine Szene sie braucht (z. B. Suche näher).
 
