@@ -21,6 +21,32 @@ sucht, findet ihn hier — nicht im Head.
 trugen 10–17 KB, das P9-Archiv wuchs auf 396 KB — der teuerste Abschnitt einer Datei, den jede
 Lesesitzung zuerst liest.
 
+## Session stopped — 2026-11-01 (Block 16.0–16.5: Launch-Film gerendert, Sichtung 1 → Runde 2; Fund im Ordner-Menü behoben)
+
+**Ergebnis.** Der Launch-Film steht als erste Fassung: `~/sharefyx-film/sharefyx-4.0.0.mp4` (55 s,
+1080p60, H.264 + AAC, SHA-256 `4ad60f96…`). Kette: Bühne `film/film.js` (rein: `zustand(n)`) +
+`film/film.html` → Playwright (CDP `clip.scale = 2`) → ffmpeg; zwei Läufe byteweise gleich. Echte UI
+von HEAD und v3.1.6 (Worktree), echter MCP-Lauf (S9), Ton aus `film/ton.py`. **Sichtung 1 (Nikinger,
+heute):** „Wow, honestly, not bad“ — drei Wünsche, **wörtlich im Plan §7**: Auftakt wirkt fehlerhaft
+(⇒ Urknall), Schwarz wirkt unfertig (⇒ dezentes blaues Raster), Bewegung wie Diashow (⇒ 3D-Kacheln,
+animierter Text im freien Platz zum Lichtstreif, schneller). **Fund, eigener Commit `68eff7e`:**
+„Umbenennen“ im Ordner-Menü öffnete nie den Dialog (seit 9.2) — behoben, Suite **1822 passed**.
+Einzelheiten je Schritt: Plan, Anmerkungen 16.0–16.5.
+
+**Nächste Session — Runde 2 (16.6–16.9), kalt startbar:**
+1. Lesen: Plan §3.5, §5, **§7** (Wünsche + Schritte), `film/film.js` (Zeitleiste) und `film/film.html`.
+2. Werkzeug steht: `~/.claude-code-tools/film-venv`; Aufnahmen `~/sharefyx-film/stills/{neu,alt}/`
+   (sauberer Satz vom 2026-11-01), `daten/` (KI-Transkript, Lage der Marke). Neue Aufnahmen nur bei
+   Bedarf: `film/wegwerf.py <neu|alt> start` (Saat liegt noch in `/tmp/opencode/sharefyx-film-*`),
+   Stopp nur `… stop` (PID-Datei, Hard Rule 9).
+3. Schlüsselbilder: `render.py --page film.html --nur-stills --dpr 1 --still N:pfad`; Vorschau ganz
+   `--dpr 1 --start 0 --end <FRAMES> --out …` (≈ 7 min); Volllauf `--dpr 2 … --ton ~/sharefyx-film/ton.wav`
+   (≈ 30 min; `ton.py` vorher neu, die Marken folgen der Zeitleiste).
+4. Der Nikinger sieht wieder den **ganzen** Film (N3). **Deploy D:** offen, wann — die Vorbereitung
+   (oberste UPDATE_LOG-Überschrift auf den Deploy-Tag, volle Suite, `doc_health`, `ui_budget`, Push)
+   erst auf seine Ansage; `deploy.sh`/`health_gate.sh` beim Nikinger (Hard Rule 9).
+5. Nebenbei offen: `scripts/move_sections.py` bricht mit `StopIteration` ab (nichts geschrieben).
+
 ## Session stopped — 2026-10-31 (Block 15.7: Update-Log, P10.5-79 ✅ — Block 15 fertig)
 
 **Ergebnis.** Block 15 ist **fertig** (15.1–15.7 ✅), Abnahme **72 ✅ · 0 ⚠️ · 7 ⬜ von 79**. Drei

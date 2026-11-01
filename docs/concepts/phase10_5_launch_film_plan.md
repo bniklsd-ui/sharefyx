@@ -6,7 +6,7 @@ detail: L2
 up: ../../phase10_5_finishing/CLAUDE.md
 down:
   - ../UPDATE_LOG.md   # die Quelle der Feature-Liste (Blöcke 2026-10-23 bis 2026-10-26)
-updated: 2026-11-01 (Schritt 16.8 ✅ — 3D-Kacheln, Text am Streif, 48,4 s) | 2026-11-01 (Schritt 16.7 ✅ — blaues Raster, Parallaxe, Vignette) | 2026-11-01 (Schritt 16.6 ✅ — Urknall-Auftakt, Zeitleiste relativ) | 2026-11-01 (§7 Sichtung 1 wörtlich + Runde 2: Urknall, Raster, 3D + Text, schneller) | 2026-11-01 (Schritt 16.5 🔄 — Volllauf fertig, Sichtung offen) | 2026-11-01 (Schritte 16.3/16.4 ✅ — Vorschau, Feinschliff, Ton) | 2026-11-01 (Schritt 16.2 ✅ — Bühne, Schlüsselbilder selbst geprüft) | 2026-11-01 (Schritt 16.1 ✅ — Aufnahmen, Funde: Ordner-Menü, clip.scale > 2) | 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
+updated: 2026-11-01 (Schritt 16.9 ✅ — Volllauf 2, 48,4 s; Sichtung 2 beim Nikinger) | 2026-11-01 (Schritt 16.8 ✅ — 3D-Kacheln, Text am Streif, 48,4 s) | 2026-11-01 (Schritt 16.7 ✅ — blaues Raster, Parallaxe, Vignette) | 2026-11-01 (Schritt 16.6 ✅ — Urknall-Auftakt, Zeitleiste relativ) | 2026-11-01 (§7 Sichtung 1 wörtlich + Runde 2: Urknall, Raster, 3D + Text, schneller) | 2026-11-01 (Schritt 16.5 🔄 — Volllauf fertig, Sichtung offen) | 2026-11-01 (Schritte 16.3/16.4 ✅ — Vorschau, Feinschliff, Ton) | 2026-11-01 (Schritt 16.2 ✅ — Bühne, Schlüsselbilder selbst geprüft) | 2026-11-01 (Schritt 16.1 ✅ — Aufnahmen, Funde: Ordner-Menü, clip.scale > 2) | 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
 ---
 # Launch-Film — Sharefyx v4.0.0 (Plan Block 16)
 
@@ -300,7 +300,7 @@ ein Auftakt.
 | **16.6 ✅** Auftakt | Ersetzt den Zoom aus der Marke: ein **Urknall** — ein Lichtpunkt auf Schwarz, der in die Punktwolke aufbricht (dieselbe Punktsprache wie das Finale: der Film beginnt mit Punkten, die auseinanderfliegen, und endet mit Punkten, die „4.0.0“ bilden); die Punkte ordnen sich zur Marke / zur ersten Kachel. Alternative „sich öffnendes Auge“ nur, falls der Urknall im Standbild nicht trägt. Die Ziffernrolle `v3.1.6` → `v4.0.0` bleibt, aber **ganz** im Bild (Name + Version, nicht angeschnitten) | drei Standbilder des Auftakts selbst geprüft; nichts angeschnitten |
 | **16.7 ✅** Hintergrund | dezentes blaues Raster (Linien ≈ `rgba(62,141,243,.06–.08)`, Weltkoordinaten ⇒ es zieht mit der Kamera, Parallaxe), Vignette; die Körnung bleibt | Standbild Fahrt + große 4: Raster sichtbar, nicht laut |
 | **16.8 ✅** Bewegung + Text | (a) die Kachel füllt das Bild nicht mehr: kleiner (≈ 60–65 % Breite), im Raum leicht **3D-gedreht** (`perspective` + `rotateY/rotateX`, driftet während des Halts, Push-in) — die Aufnahmen „leben“; (b) der freie Platz trägt je Szene einen **kurzen animierten Text** (Titel + eine Zeile, Wort für Wort / Zeile für Zeile eingeblendet), gekoppelt an den **Lichtstreif** (Text erscheint mit dem Streif); die Unterzeilen-Tafeln entfallen oder werden zu diesen Texten; (c) **schneller**: Halte ≈ −25 %, Film ≈ 42–48 s; (d) die Szenen, deren Effekt nicht ankommt, gezielt zeigen (Suche: Treffer heranzoomen; S5b ggf. streichen) | Vorschau ganz gesichtet; jede Szene hat ihren Text; Länge 40–60 s |
-| **16.9** Volllauf 2 | Volllauf wie 16.5 (+ „Einträge“ statt „Eintraege“ prüfen: hat der Mono-Teilsatz `ä`?) | **Sichtung 2** beim Nikinger |
+| **16.9 ✅** Volllauf 2 (Sichtung 2 offen) | Volllauf wie 16.5 (+ „Einträge“ statt „Eintraege“ prüfen: hat der Mono-Teilsatz `ä`?) | **Sichtung 2** beim Nikinger |
 
 **Leitplanken bleiben:** jedes Bild eine Funktion seiner Nummer (`film.js` rein, Wächter), echte
 UI aus den Aufnahmen (keine erfundene), §4 Datenschutz, Ton aus `ton.py` (Marken folgen der neuen
@@ -368,4 +368,25 @@ Zeitleiste automatisch). Neue Aufnahmen nur, wenn eine Szene sie braucht (z. B. 
   4 aus flachen Kacheln · Text mit dem Streif auf der freien Seite · Länge 40–50 s · Teilsätze ·
   nur die aktive Kachel hell. **Gegenlauf** je Wächter (Pfeil im Text, Kippung endet nie, Text vor
   dem Streif, Fokus-Zoom 3, `Z_KACHEL` 0,85, ohne Zurücktreten) — jeweils genau der eigene rot.
+
+## Anmerkungen 16.9 — Volllauf 2 (2026-11-01, Opus)
+
+- **Vorher nachgeschärft (am dekodierten Bild):** (1) die zurückgetretenen Kacheln waren per
+  Deckkraft gedimmt — das Raster schien durch ⇒ Schatten **in** der Kachel (`.schatten`, schwarz
+  0,65), die Kachel bleibt deckend; Wächter prüft Deckkraft 1 + Helligkeit ≤ 35 %, Gegenlauf
+  (zurück zur Deckkraft) rot. (2) s11: die Leiste stieß an das Zeilenende ⇒ Endpunkt des
+  Heranfahrens 100 px weiter vom Text weg.
+- **L4 neu abgehakt:** das Heranfahren (×1,8) macht kleine UI-Schrift erstmals lesbar — beide
+  Endbilder (s5b 1234, s11 2214) und S9 bei 2× in voller Größe gesehen: nur erfundene Saat (studio,
+  recherche, reise, Gedanken 2–5, sommer-2026, Suche „Route“), keine Person, keine URL, keine
+  Browserleiste. Die Checkliste §4 gilt damit weiter ✓.
+- **Ton** neu (Marken der neuen Zeitleiste): 48,42 s, zwei Läufe gleich, `9e315d9b…`; der alte liegt
+  als `ton_r1.wav`.
+- **Film:** `~/sharefyx-film/sharefyx-4.0.0-r2.mp4` (Fassung 1 bleibt daneben) — **48,4 s**
+  (Bild 48,41 s, Ton 48,42 s), 1920 × 1080, 60 fps, H.264 High `yuv420p` (CRF 17, aus 2×), AAC Stereo
+  48 kHz, **25.663.438 B**, SHA-256 `cab1f13a78a836c2945e9e1051ee4c9144934171d9ce2bf83124872857657d3f`;
+  Bild-Hashkette `85de2c41…`; 0,47 s/Bild (≈ 23 min). Kontaktbögen des fertigen MP4 (alle 1,5 s)
+  selbst gesichtet.
+- **Kriterien:** L1 ✅ · L2 ✅ (Zahlen; Banding-Urteil Sichtung) · L3 ✅ 48,4 s · L4 ✅ (s. o.) ·
+  L5 ✅ (dieselben Aufnahmen von HEAD/v3.1.6) · L6 ⬜ **Sichtung 2 beim Nikinger (N3)** · L7 ✅.
 

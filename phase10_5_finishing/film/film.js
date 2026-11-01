@@ -129,7 +129,8 @@ function kameraFokus(n, id, cam) {
   const v = versatz(k, i);
   const s = { x: k.zelle[0] * CELL_W + v.dx, y: k.zelle[1] * CELL_H + v.dy, rot: v.rot };
   const [px, py] = kachelPunkt(s, k.fokus.x, k.fokus.y), [p0x, p0y] = welt2bild(cam, px, py);
-  const ax = W / 2 + k.seite * SEITE_PX, ay = H / 2;
+  // 100 px weiter weg vom Text als im Halt: die herangefahrene Kachel wächst zur Textseite hin
+  const ax = W / 2 + k.seite * (SEITE_PX + 100), ay = H / 2;
   const z = cam.z * lerp(1, k.fokus.zoom, e);
   return { z, cx: px - (lerp(p0x, ax, e) - W / 2) / z, cy: py - (lerp(p0y, ay, e) - H / 2) / z };
 }
@@ -235,13 +236,14 @@ export function zustand(n, geo) {
   const flug = phase(n, MORPH[0] + 30, MORPH[1]);            // Punkte fliegen zur Glyphe
   const schrift = phase(n, MORPH[1] - 40, MORPH[1] + 40);    // gesetzte Schrift blendet auf
   // Wer gerade spielt: um ihren Halt herum ist eine Kachel „aktiv“; die übrigen treten auf 35 %
-  // zurück — der Blick bleibt bei der Szene, und die Nachbarn liegen nicht unter dem Text (16.8,
+  // zurück — als Schatten **in** der Kachel, nicht als Deckkraft (sonst schien das Raster durch;
+  // am dekodierten Bild 1450 gesehen) — der Blick bleibt bei der Szene, und die Nachbarn liegen nicht unter dem Text (16.8,
   // Vorschau: sie ragten in die Textseite). In der Fahrt sind alle wieder hell.
   const aktiv = HALTE.map(([an, ab]) => phase(n, an - 30, an + 10) * (1 - phase(n, ab - 10, ab + 30)));
   const kacheln = KACHELN.map((k, i) => {
     const v = versatz(k, i);
     const andere = Math.max(0, ...aktiv.filter((_, j) => j !== i));
-    const zurueck = 1 - 0.65 * andere * (1 - aktiv[i]);
+    const schatten = 0.65 * andere * (1 - aktiv[i]);
     const f = 1 - ordnen;
     // Im Raum: um den Halt herum dreht sich die Kachel leicht zur Textseite und rückt heran; die
     // Drehung driftet während des Halts zurück (die Aufnahme „lebt“). Außerhalb flach.
@@ -250,7 +252,7 @@ export function zustand(n, geo) {
     const ruhig = 1 - 0.7 * fokusFortschritt(n, k); // beim Heranfahren auf den Fokus wird sie flacher
     const kipp = { ry: -k.seite * lerp(13, 6, t) * w * ruhig, rx: lerp(5, 2, t) * w * ruhig, push: 1 + 0.06 * t * w };
     const s = { id: k.id, x: k.zelle[0] * CELL_W + v.dx * f, y: k.zelle[1] * CELL_H + v.dy * f,
-                rot: v.rot * f * (1 - 0.8 * w), deckkraft: (1 - zerfall) * einblend * zurueck, rand: ordnen, bild: k.bild, alt: k.alt || null,
+                rot: v.rot * f * (1 - 0.8 * w), deckkraft: (1 - zerfall) * einblend, schatten, rand: ordnen, bild: k.bild, alt: k.alt || null,
                 kipp, streif: easeInOut(clamp((n - k.streif[0]) / (k.streif[1] - k.streif[0]))) };
     if (k.folge) {
       const t = clamp((n - k.folge.von) / (k.folge.bis - k.folge.von));

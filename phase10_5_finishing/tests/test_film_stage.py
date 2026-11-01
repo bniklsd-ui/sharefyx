@@ -247,10 +247,13 @@ def test_film_texts_are_in_the_font_subsets():
 @pytest.mark.skipif(NODE is None, reason="node fehlt")
 def test_only_the_playing_tile_is_bright_while_it_holds():
     """Vorschau 16.8: Nachbarkacheln ragten in die Textseite. Im Halt steht die aktive Kachel voll da,
-    alle anderen auf ≤ 35 %; vor dem Morph (Fahrt vorbei) sind wieder alle hell."""
+    alle anderen auf ≤ 35 % Helligkeit — als Schatten, **deckend** (Deckkraft bleibt 1, sonst scheint
+    das Raster durch); vor dem Morph (Fahrt vorbei) sind wieder alle hell."""
     rows = _film("f.HALTE.map(([an, ab, id]) => [id, f.zustand(Math.floor((an + ab) / 2), geo).kacheln"
-                 ".map(t => [t.id, t.deckkraft])])")
+                 ".map(t => [t.id, t.deckkraft * (1 - t.schatten)])])")
     for kid, kacheln in rows:
         for tid, deck in kacheln:
             assert deck == pytest.approx(1) if tid == kid else deck <= 0.36, (kid, tid, deck)
-    assert all(t["deckkraft"] == 1 for t in _film("f.zustand(f.MORPH[0], geo).kacheln"))
+    mitte = _film("f.HALTE.map(([an, ab]) => f.zustand(Math.floor((an + ab) / 2), geo).kacheln.map(t => t.deckkraft))")
+    assert all(d == 1 for zeile in mitte for d in zeile)  # deckend: das Raster scheint nicht durch
+    assert all(t["deckkraft"] == 1 and t["schatten"] == 0 for t in _film("f.zustand(f.MORPH[0], geo).kacheln"))
