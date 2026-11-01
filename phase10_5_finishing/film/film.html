@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Sharefyx 4.0.0 — Launch-Film</title>
+<style>
+  @font-face { font-family: "IBM Plex Sans Var"; src: url("/static/fonts/IBMPlexSans-subset.6c21979f.woff2") format("woff2"); font-weight: 380 620; }
+  @font-face { font-family: "IBM Plex Mono"; src: url("/static/fonts/IBMPlexMono-subset.a8d5dfa6.woff2") format("woff2"); font-weight: 400; }
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #000; }
+  #world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .tile { position: absolute; width: 1600px; height: 1000px; border-radius: 18px; overflow: hidden;
+          background: #000; box-shadow: 0 30px 90px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.07);
+          transform-origin: 50% 50%; }
+  .tile.karte { background: #14181D; }
+  .tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .tile.karte img { object-fit: contain; }
+  .streif { position: absolute; top: -5%; height: 110%; width: 140px; margin-left: -70px;
+            background: linear-gradient(90deg, rgba(62,141,243,0), rgba(150,200,255,.85), rgba(46,184,166,0));
+            filter: blur(6px); }
+  /* Die Marke als Vektor — dieselben Werte wie `.rail__brand` in der App (16.2 gemessen). */
+  .marke { position: absolute; width: 239px; box-sizing: border-box; padding: 8px 16px 16px;
+           font: 600 12.5px/19.375px "IBM Plex Sans Var"; letter-spacing: 1px; text-transform: uppercase;
+           color: #E9EDF2; white-space: nowrap; background: #000; }
+  .marke img { height: 15.625px; width: auto; vertical-align: -2.75px; margin-right: 2.5px; }
+  .marke .version { display: inline-block; margin-left: 4.95px; font: 400 11px/14px "IBM Plex Sans Var";
+                    letter-spacing: .33px; text-transform: none; vertical-align: super; height: 14px; overflow: hidden; }
+  .marke .version span { display: block; }
+  .terminal { position: absolute; inset: 0; background: #0A0D12; font: 400 30px/46px "IBM Plex Mono";
+              color: #C9D3DF; padding: 110px 90px; white-space: pre; }
+  .terminal .kopf { position: absolute; left: 0; right: 0; top: 0; height: 64px; background: #141A22;
+                    font: 500 24px/64px "IBM Plex Sans Var"; color: #8B95A3; padding-left: 90px; }
+  .terminal .ein { color: #6FB1FF; } .terminal .ok { color: #3FD1B5; }
+  #tafel { position: absolute; left: 0; right: 0; bottom: 34px; text-align: center;
+           font: 500 46px "IBM Plex Sans Var"; letter-spacing: -.01em; color: #F2F4F8; }
+  #punkte { position: absolute; inset: 0; width: 1920px; height: 1080px; }
+  #glyphe { position: absolute; left: 0; top: 0; font-weight: 600; font-family: "IBM Plex Sans Var";
+            color: #F2F4F8; white-space: nowrap; transform-origin: 0 0; }
+  #endtafel { position: absolute; left: 0; right: 0; top: 830px; text-align: center;
+              font: 600 40px "IBM Plex Sans Var"; letter-spacing: 5px; text-transform: uppercase; color: #C9D3DF; }
+  #endtafel img { height: 46px; vertical-align: -8px; margin-right: 6px; }
+  #grain { position: absolute; inset: 0; width: 1920px; height: 1080px; mix-blend-mode: soft-light; opacity: .5; }
+</style>
+</head>
+<body>
+<div id="world"></div>
+<canvas id="punkte" width="1920" height="1080"></canvas>
+<div id="glyphe">4.0.0</div>
+<div id="endtafel"><img src="/static/logo.svg" alt="">harefyx</div>
+<div id="tafel"></div>
+<canvas id="grain" width="960" height="540"></canvas>
+<script type="module">
+  import { cameraTransform, drawGrain, prng, easeInOut, clamp, lerp } from "/film/stage.js";
+  import { KACHELN, CELL_W, CELL_H, TILE_W, TILE_H, VIER_BOX, zustand, welt2bild } from "/film/film.js";
+
+  const world = document.getElementById("world");
+  const el = {};
+  for (const k of KACHELN) {
+    const d = document.createElement("div");
+    d.className = "tile" + (k.karte ? " karte" : "");
+    d.style.left = k.zelle[0] * CELL_W + "px";
+    d.style.top = k.zelle[1] * CELL_H + "px";
+    const e = { box: d };
+    if (k.terminal) {
+      e.term = document.createElement("div");
+      e.term.className = "terminal";
+      d.appendChild(e.term);
+    } else {
+      e.img = document.createElement("img");
+      d.appendChild(e.img);
+      if (k.alt) {
+        e.alt = document.createElement("img");
+        e.alt.src = "/still/" + k.alt + ".png";
+        e.streif = document.createElement("div");
+        e.streif.className = "streif";
+        d.append(e.alt, e.streif);
+      }
+    }
+    world.appendChild(d);
+    el[k.id] = e;
+  }
+  // Die Marke (Vektor) liegt in Kachel s1 genau über der Marke der Aufnahme.
+  const marke = document.createElement("div");
+  marke.className = "marke";
+  marke.style.left = 2 * CELL_W + "px";
+  marke.style.top = 8 + "px";
+  marke.innerHTML = '<img src="/static/logo.svg" alt="">harefyx<span class="version"><span>v3.1.6</span><span>v4.0.0</span></span>';
+  world.appendChild(marke);
+  const rolle = marke.querySelectorAll(".version span");
+
+  async function bildSetzen(img, name) {
+    const src = "/still/" + name + ".png";
+    if (img.getAttribute("src") === src) return;
+    img.src = src;
+    await img.decode();
+  }
+
+  // Das Transkript des echten MCP-Laufs (`ki_lauf.py`) als Zeilen — nur ASCII, die Mono-Schrift ist
+  // ein Teilsatz.
+  function terminalZeilen(lauf) {
+    const [ls, si, ap] = lauf.schritte;
+    const titel = Object.fromEntries((si.ergebnis.items || []).map((i) => [i.id, i.title]));
+    const z = [];
+    z.push(["ein", "> list_spaces()"]);
+    z.push(["", "  " + ls.ergebnis.length + " Spaces: " + ls.ergebnis.map((s) => s.name).join(" . ")]);
+    z.push(["ein", '> search_items(query: "Wochenplan", limit: 3)']);
+    z.push(["", "  " + (si.ergebnis.items || []).length + " Treffer"]);
+    z.push(["ein", "> append_to_items(" + ap.args.entries.length + " Eintraege, je mit Version)"]);
+    for (const r of ap.ergebnis.results) {
+      const vorher = ap.args.entries.find((e) => e.item_id === r.item_id).version;
+      z.push(["ok", "  ok  " + (titel[r.item_id] || r.item_id).padEnd(14) + " v" + vorher + " -> v" + r.version]);
+    }
+    z.push(["ok", "  " + ap.ergebnis.ok + " ok, " + ap.ergebnis.failed + " Fehler - ein Aufruf"]);
+    return z;
+  }
+
+  const geo = {};
+  async function messen() {
+    await document.fonts.load('600 100px "IBM Plex Sans Var"');
+    await document.fonts.load('400 30px "IBM Plex Mono"');
+    const lauf = await (await fetch("/daten/ki_lauf.json")).json();
+    geo.zeilen = terminalZeilen(lauf);
+    geo.zeichen = geo.zeilen.reduce((a, z) => a + z[1].length, 0);
+    // Marke: Mitte der Versionsangabe in Kachel-Koordinaten (aus `capture.py`, s1_neu.json).
+    const s1 = await (await fetch("/daten/s1_neu.json")).json();
+    const v = s1.dateien.s1_geometrie.find((g) => g[".rail__version"])[".rail__version"];
+    geo.marke = { x: v.x + v.width / 2, y: v.y + v.height / 2 };
+    // Die Glyphe: „4.0.0“ in großer Schrift auf eine Leinwand, Tintenrahmen messen.
+    const F = 1000, c = document.createElement("canvas");
+    c.width = 3200; c.height = 1300;
+    const g = c.getContext("2d");
+    g.font = `600 ${F}px "IBM Plex Sans Var"`;
+    g.textBaseline = "alphabetic";
+    const tinte = (text) => {
+      g.clearRect(0, 0, c.width, c.height); g.fillStyle = "#fff"; g.fillText(text, 50, 1100);
+      const d = g.getImageData(0, 0, c.width, c.height).data;
+      let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1; const punkte = [];
+      for (let y = 0; y < c.height; y += 1) for (let x = 0; x < c.width; x += 1) {
+        if (d[(y * c.width + x) * 4 + 3] > 128) {
+          if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+        }
+      }
+      return { x0, y0, x1, y1, d };
+    };
+    const ganz = tinte("4.0.0");
+    const vier = tinte("4");
+    // auf dem Bild: die ganze Schrift 1500 px breit, Mitte bei (960, 470)
+    const s = 1500 / (ganz.x1 - ganz.x0);
+    const ox = 960 - ((ganz.x0 + ganz.x1) / 2) * s, oy = 470 - ((ganz.y0 + ganz.y1) / 2) * s;
+    geo.glyphe = { s, ox, oy, F, basis: 1100, links: 50 };
+    const r4 = { x0: vier.x0 * s + ox, y0: vier.y0 * s + oy, x1: vier.x1 * s + ox, y1: vier.y1 * s + oy };
+    const z = (r4.y1 - r4.y0) / VIER_BOX.h;
+    geo.ziel = { z, cx: VIER_BOX.w / 2 - ((r4.x0 + r4.x1) / 2 - 960) / z, cy: VIER_BOX.h / 2 - ((r4.y0 + r4.y1) / 2 - 540) / z };
+    // Zielpunkte: Tinte der ganzen Schrift auf einem Raster, fest sortiert.
+    tinte("4.0.0");
+    const d = ganz.d, ziele = [], schritt = 14;
+    for (let y = ganz.y0; y <= ganz.y1; y += schritt) for (let x = ganz.x0; x <= ganz.x1; x += schritt) {
+      if (d[(y * c.width + x) * 4 + 3] > 128) ziele.push([x * s + ox, y * s + oy]);
+    }
+    geo.ziele = ziele;
+    // Quellen: je Punkt eine Kachel und ein fester Ort darin (Weltkoordinaten).
+    const r = prng(0x0400);
+    geo.quellen = ziele.map((_, i) => {
+      const k = KACHELN[i % KACHELN.length];
+      return [k.zelle[0] * CELL_W + r() * TILE_W, k.zelle[1] * CELL_H + r() * TILE_H, r()];
+    });
+    const gl = document.getElementById("glyphe");
+    gl.style.fontSize = F * s + "px";
+    gl.style.lineHeight = "1";
+    // die Grundlinie der Leinwand (y = basis) auf dem Bild treffen
+    gl.style.left = (50 * s + ox) + "px";
+    const m = g.measureText("4.0.0");
+    gl.style.top = (1100 * s + oy - m.fontBoundingBoxAscent * s - (F * s - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent) * s) / 2) + "px";
+  }
+
+  const FARBEN = ["#3E8DF3", "#2EB8A6", "#7FB6FF", "#E9EDF2"];
+  window.renderFrame = async (n) => {
+    const z = zustand(n, geo);
+    world.style.transform = cameraTransform(z.cam.cx, z.cam.cy, z.cam.z);
+    const warten = [];
+    z.kacheln.forEach((s, i) => {
+      const e = el[s.id];
+      e.box.style.transform = `translate(${s.x - KACHELN[i].zelle[0] * CELL_W}px, ${s.y - KACHELN[i].zelle[1] * CELL_H}px) rotate(${s.rot}deg)`;
+      e.box.style.opacity = String(s.deckkraft);
+      if (e.img && s.bild) warten.push(bildSetzen(e.img, s.bild));
+      if (e.alt) {
+        e.alt.style.clipPath = `inset(0 0 0 ${s.streif * 100}%)`;
+        e.streif.style.left = s.streif * 100 + "%";
+        e.streif.style.opacity = String(Math.sin(Math.PI * s.streif));
+      }
+      if (e.term) {
+        let rest = Math.round(s.terminal * geo.zeichen), html = '<div class="kopf">MCP-Client  -  sharefyx</div>';
+        for (const [cls, text] of geo.zeilen) {
+          if (rest <= 0) break;
+          const teil = text.slice(0, rest); rest -= text.length;
+          html += `<span class="${cls}">${teil.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</span>\n`;
+        }
+        e.term.innerHTML = html;
+      }
+    });
+    marke.style.opacity = String(z.marke.deck);
+    rolle.forEach((sp) => { sp.style.transform = `translateY(${-14 * easeInOut(z.marke.roll)}px)`; });
+    const tafel = document.getElementById("tafel");
+    tafel.textContent = z.tafel ? z.tafel.text : "";
+    tafel.style.opacity = z.tafel ? String(z.tafel.deck) : "0";
+    // Punkte: aus den Kacheln (Bildposition unter der aktuellen Kamera) zur Glyphe.
+    const pc = document.getElementById("punkte").getContext("2d");
+    pc.clearRect(0, 0, 1920, 1080);
+    const pDeck = Math.min(z.zerfall, 1 - 0.85 * z.schrift);
+    if (pDeck > 0) {
+      for (let i = 0; i < geo.ziele.length; i++) {
+        const q = geo.quellen[i], [sx, sy] = welt2bild(z.cam, q[0], q[1]), [tx, ty] = geo.ziele[i];
+        const t = easeInOut(clamp((z.flug - q[2] * 0.35) / 0.65));
+        const bogen = Math.sin(Math.PI * t) * 60 * (q[2] - 0.5);
+        const x = lerp(sx, tx, t) + bogen, y = lerp(sy, ty, t) - bogen;
+        pc.globalAlpha = pDeck;
+        pc.fillStyle = FARBEN[i % FARBEN.length];
+        pc.beginPath(); pc.arc(x, y, lerp(2.6, 3.4, t), 0, Math.PI * 2); pc.fill();
+      }
+      pc.globalAlpha = 1;
+    }
+    document.getElementById("glyphe").style.opacity = String(z.schrift);
+    document.getElementById("endtafel").style.opacity = String(z.ende);
+    drawGrain(document.getElementById("grain"), n);
+    await Promise.all(warten);
+  };
+  window.stageReady = messen().then(() => Promise.all([...document.images].map((i) => i.decode().catch(() => null)))).then(() => true);
+</script>
+</body>
+</html>

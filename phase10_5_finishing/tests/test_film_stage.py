@@ -64,3 +64,47 @@ def test_render_server_maps_its_roots():
     handler = object.__new__(render._Handler)
     assert Path(handler.translate_path("/film/stage.js")) == FILM_DIR / "stage.js"
     assert Path(handler.translate_path("/static/logo.svg")) == render.STATIC_DIR / "logo.svg"
+
+
+# --- Block 16.2: der Film (`film/film.js`) -------------------------------------------------------
+
+_GEO = "{marke: {x: 119, y: 24}, ziel: {cx: 3500, cy: 4100, z: 0.05}}"
+
+
+def _film(expr: str):
+    script = (f"const f = await import({json.dumps((FILM_DIR / 'film.js').as_uri())});"
+              f"const geo = {_GEO}; console.log(JSON.stringify({expr}));")
+    out = subprocess.run([NODE, "--input-type=module", "-e", script], capture_output=True,
+                         text=True, check=True, timeout=30)
+    return json.loads(out.stdout)
+
+
+@pytest.mark.skipif(NODE is None, reason="node fehlt")
+def test_film_state_is_a_pure_function_of_the_frame():
+    a, b = _film("[0, 1].map(() => [0, 500, 1175, 2840, 2950, 3299].map(n => f.zustand(n, geo)))")
+    assert a == b
+
+
+@pytest.mark.skipif(NODE is None, reason="node fehlt")
+def test_camera_rests_on_each_tile_while_it_holds():
+    rows = _film("f.HALTE.map(([an, ab, id]) => [f.kamera(Math.floor((an + ab) / 2), geo), f.mitte(f.kachel(id))])")
+    for cam, (cx, cy) in rows[1:]:  # der erste Halt endet im Zoom aus der Marke
+        assert (cam["cx"], cam["cy"], cam["z"]) == (cx, cy, 0.85)
+
+
+@pytest.mark.skipif(NODE is None, reason="node fehlt")
+def test_tiles_snap_into_the_four_before_the_morph():
+    """Während der Fahrt liegen die Kacheln versetzt; vor dem Morph genau im Raster der 4."""
+    fahrt, geordnet = _film("[1175, f.MORPH[0]].map(n => f.zustand(n, geo).kacheln)")
+    raster = _film("f.KACHELN.map(k => [k.zelle[0] * f.CELL_W, k.zelle[1] * f.CELL_H])")
+    assert any((t["x"], t["y"]) != tuple(r) for t, r in zip(fahrt, raster))
+    assert all((t["x"], t["y"], t["rot"]) == (r[0], r[1], 0) for t, r in zip(geordnet, raster))
+    zellen = {tuple(z) for z in _film("f.KACHELN.map(k => k.zelle)")}
+    assert len(zellen) == 13  # 3 schräg + 4 quer + 6 senkrecht (die Kreuzung zählt einmal)
+
+
+@pytest.mark.skipif(NODE is None, reason="node fehlt")
+def test_old_tiles_turn_new_during_their_sweep():
+    vorher, nachher = _film("[f.kachel('s5').streif[0] - 1, f.kachel('s5').streif[1]]"
+                            ".map(n => f.zustand(n, geo).kacheln.find(k => k.id === 's5').streif)")
+    assert (vorher, nachher) == (0, 1)

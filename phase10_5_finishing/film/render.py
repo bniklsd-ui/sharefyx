@@ -35,7 +35,8 @@ W, H, FPS = 1920, 1080, 60
 class _Handler(http.server.SimpleHTTPRequestHandler):
     """/film/* → dieses Verzeichnis · /static/* → UI-Statik · /still/* → Aufnahmen. Sonst 404."""
 
-    ROOTS = {"film": FILM_DIR, "static": STATIC_DIR, "still": WORK_DIR / "stills"}
+    ROOTS = {"film": FILM_DIR, "static": STATIC_DIR, "still": WORK_DIR / "stills",
+             "daten": WORK_DIR / "daten"}
 
     def translate_path(self, path: str) -> str:
         parts = path.split("?", 1)[0].lstrip("/").split("/", 1)
@@ -71,6 +72,7 @@ def main() -> int:
     ap.add_argument("--start", type=int, default=0)
     ap.add_argument("--end", type=int, default=120)
     ap.add_argument("--dpr", type=float, default=2.0)
+    ap.add_argument("--nur-stills", action="store_true", help="nur die --still-Bilder rendern")
     ap.add_argument("--out", type=Path)
     ap.add_argument("--still", action="append", default=[], help="N:pfad.png — Einzelbild sichern")
     args = ap.parse_args()
@@ -94,11 +96,13 @@ def main() -> int:
         page.evaluate("window.stageReady")
         cdp = page.context.new_cdp_session(page)
         t_ready = time.perf_counter()
-        for n in range(args.start, args.end):
+        bereich = sorted(stills) if args.nur_stills else range(args.start, args.end)
+        for n in bereich:
             # Zwei rAF warten nur darauf, dass das gesetzte Bild gemalt ist — der Zustand selbst
             # hängt allein an n.
-            page.evaluate("n => { renderFrame(n); return new Promise(r => requestAnimationFrame("
-                          "() => requestAnimationFrame(r))); }", n)
+            # `renderFrame` darf ein Promise liefern (Bildwechsel: `img.decode()` abwarten).
+            page.evaluate("async n => { await renderFrame(n); await new Promise(r => "
+                          "requestAnimationFrame(() => requestAnimationFrame(r))); }", n)
             png = base64.b64decode(cdp.send("Page.captureScreenshot", {
                 "format": "png", "optimizeForSpeed": True,
                 "clip": {"x": 0, "y": 0, "width": W, "height": H, "scale": args.dpr}})["data"])
@@ -115,7 +119,7 @@ def main() -> int:
         if enc.wait() != 0:
             print("ffmpeg ist gescheitert", file=sys.stderr)
             return 1
-    frames = args.end - args.start
+    frames = len(hashes)
     result = {"page": args.page, "frames": frames, "dpr": args.dpr,
               "s_per_frame": round((t_end - t_ready) / max(frames, 1), 4),
               "setup_s": round(t_ready - t0, 2),

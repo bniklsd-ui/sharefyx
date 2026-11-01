@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-11-01 (Block 16.1) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-11-01 (Block 16.2) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -59,7 +59,7 @@ updated: 2026-11-01 (Block 16.1) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing; Plan siehe unten)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **39347 B** · Head: Modulstatus, Deploys, Abnahme (72 ✅ · 7 ⬜)
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **39779 B** · Head: Modulstatus, Deploys, Abnahme (72 ✅ · 7 ⬜)
 - [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **41958 B** · die **geschlossenen** Abnahmezeilen, verbatim
 - [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **200889 B** · Session-Blöcke, verbatim
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · Startaufträge Block 7 und 9, verbatim
@@ -69,7 +69,7 @@ updated: 2026-11-01 (Block 16.1) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE
 - [docs/concepts/phase10_5_block14_kartenlayout_plan_anhang.md](./concepts/phase10_5_block14_kartenlayout_plan_anhang.md) — 📦 **20525 B** · Anhang Block 14
 - [docs/concepts/phase10_5_block14_6_plan.md](./concepts/phase10_5_block14_6_plan.md) — 📗 **27332 B** · Plan 14.6
 - [docs/concepts/phase10_5_block14_7_plan.md](./concepts/phase10_5_block14_7_plan.md) — 📗 **29756 B** · Plan 14.7 (Karte kompakt)
-- [docs/concepts/phase10_5_launch_film_plan.md](./concepts/phase10_5_launch_film_plan.md) — 📗 **18396 B** · Plan Block 16: Launch-Film v4.0.0
+- [docs/concepts/phase10_5_launch_film_plan.md](./concepts/phase10_5_launch_film_plan.md) — 📗 **19966 B** · Plan Block 16: Launch-Film v4.0.0
 - [docs/concepts/phase10_5_block15_review_fixes_plan.md](./concepts/phase10_5_block15_review_fixes_plan.md) — 📗 **31775 B** · Block 15: Review-Fixes B1–B10 (✅)
 - [docs/concepts/phase10_5_block15_review_fixes_plan_anhang.md](./concepts/phase10_5_block15_review_fixes_plan_anhang.md) — 📦 **14534 B** · Anhang Block 15: Anmerkungen 15.1–15.3b
 - [docs/concepts/phase10_5_ultra_review_v4.0.0.md](./concepts/phase10_5_ultra_review_v4.0.0.md) — 📕 **19192 B** · Ultra-Review v4.0.0: 22 Befunde, B1 kritisch
