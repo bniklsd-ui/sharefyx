@@ -6,7 +6,7 @@ detail: L2
 up: ../../phase10_5_finishing/CLAUDE.md
 down:
   - ../UPDATE_LOG.md   # die Quelle der Feature-Liste (Blöcke 2026-10-23 bis 2026-10-26)
-updated: 2026-11-01 (Schritte 16.3/16.4 ✅ — Vorschau, Feinschliff, Ton) | 2026-11-01 (Schritt 16.2 ✅ — Bühne, Schlüsselbilder selbst geprüft) | 2026-11-01 (Schritt 16.1 ✅ — Aufnahmen, Funde: Ordner-Menü, clip.scale > 2) | 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
+updated: 2026-11-01 (Schritt 16.5 🔄 — Volllauf fertig, Sichtung offen) | 2026-11-01 (Schritte 16.3/16.4 ✅ — Vorschau, Feinschliff, Ton) | 2026-11-01 (Schritt 16.2 ✅ — Bühne, Schlüsselbilder selbst geprüft) | 2026-11-01 (Schritt 16.1 ✅ — Aufnahmen, Funde: Ordner-Menü, clip.scale > 2) | 2026-11-01 (Schritt 16.0 ✅ — Probe: 2× über clip.scale, zwei Läufe byteweise gleich) | 2026-11-01 (Freigabe + Nachtrag N1–N3: Morph zur Schrift, 3 → 4, Sichtung = ganzer Film) | 2026-10-31 (Plan, Claude Code — Notiz zum Plan Block 16 ausgebaut: Antworten Q1–Q7/QA–QC, Material neu, Storyboard, Schritte) | 2026-10-29 (notiert, Claude Code — Reihenfolge: erst das Ultra-Review, dann die Planung des Films)
 ---
 # Launch-Film — Sharefyx v4.0.0 (Plan Block 16)
 
@@ -173,7 +173,7 @@ File-Keyring, Umgebung ohne `SHAREFYX_*`/`SFX_*`, Stopp nur über die PID-Datei 
 | **16.2 ✅** Standbilder | drei Schlüsselbilder: Anfang (Leiste), mitten in der Fahrt, **die 4.0.0** (Kacheln und Schrift) | Claude Code prüft (Lesbarkeit der 4 bei 1080p) — vorher kein Volllauf (N3) |
 | **16.3 ✅** Zeitleiste | volle `frame → Zustand`-Funktion, Easing, Texttafeln; Wächter: Determinismus (zwei Läufe, Hash) + Kacheln der 4 im Bild | pytest grün · Vorschau (niedrige Auflösung) ansehbar |
 | **16.4 ✅** Ton | Ton-Skript, Marken aus der Zeitleiste | WAV deterministisch (Hash) |
-| **16.5** Render | Volllauf §3.3, MP4 nach `~/sharefyx-film/`, SHA-256 in den Commit; **Minimalfassung** als Rückfall: die 4-Fahrt mit 8 Kacheln, ohne KI-Szene und ohne Ton, 40 s | Kriterien §6 · Freigabe Nikinger |
+| **16.5 🔄** Render (gerendert, Sichtung offen) | Volllauf §3.3, MP4 nach `~/sharefyx-film/`, SHA-256 in den Commit; **Minimalfassung** als Rückfall: die 4-Fahrt mit 8 Kacheln, ohne KI-Szene und ohne Ton, 40 s | Kriterien §6 · Freigabe Nikinger |
 
 ## §6 Kriterien (planintern — Abnahmezeilen P10.5-80 ff. nur, wenn der Nikinger sie will)
 
@@ -260,4 +260,19 @@ Sharefyx-Space fand sich am 2026-10-29 **nichts** — falls es sie gibt, ist sie
   heraus, Glitzern im Morph, Schlussakkord; Marken aus `film.js` über Node. Zwei Läufe ⇒ dieselbe
   WAV (`e55b591e…`); Pegel ≈ −16 dB RMS, Spitze −1 dBFS. **Gehört hat ihn noch niemand** — das Urteil
   ist Teil der Sichtung (N3). `render.py --ton` mischt ihn als AAC dazu (Bild kopiert).
+
+## Anmerkungen 16.5 — Volllauf (2026-11-01, Opus)
+
+- **Film:** `~/sharefyx-film/sharefyx-4.0.0.mp4` (außerhalb des Repos) — 55,0 s, 1920 × 1080,
+  60 fps, H.264 High `yuv420p` (CRF 17, aus 2×-Aufnahme), AAC Stereo 48 kHz, **19.200.339 B**,
+  SHA-256 `4ad60f966bfc1d9781f6323953d3761e31b8e68a0b5e0b2c7838a8dcb90b8085`; Bild-Hashkette
+  `f76a421d…`; Ton `e55b591e…`. 0,54 s/Bild (≈ 30 min).
+- **Kriterien:** L1 ✅ (16.0 byteweise; Ton zwei Läufe gleich) · L2 ✅ Zahlen (Banding-Urteil in der
+  Sichtung) · L3 ✅ 55 s · L4 ✅ (erfundene Saat, keine Browserleiste/URL, Transkript geprüft, keine
+  Fremdmarke, Review-Fixes nicht genannt) · L5 ✅ (jede Kachel ist eine Aufnahme von HEAD bzw.
+  v3.1.6) · L6 ⬜ **Sichtung des ganzen Films beim Nikinger (N3)** · L7 ✅ (Quelle im Repo, pytest
+  grün, MP4 außerhalb, SHA-256 hier).
+- **Für die Sichtung vorgemerkt:** das Terminal schreibt „Eintraege“ (die Mono-Schrift ist ein
+  Teilsatz, gewählt wurde ASCII) — eine Zeile in `film.html :: terminalZeilen()`, falls gewünscht.
+  Änderungswünsche gehen über die Zeitleiste in `film.js` (rein, Wächter) und einen neuen Volllauf.
 
