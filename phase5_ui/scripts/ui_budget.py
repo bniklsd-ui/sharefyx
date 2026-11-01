@@ -132,7 +132,8 @@ def static_payload_files(static_dir: Path) -> tuple[list[Path], list[Path]]:
     `phase10_5_finishing/tests/test_budget_coverage.py` prueft das. Zwei Dateien sind
     bewusst **nicht** dabei: `app.html` (das kommt als Shell ueber `/ui/` in die Zeile
     „Erstaufruf bis interaktiv") und die Lizenztexte (`fonts/OFL.txt` — die lädt der
-    Browser nicht, sie liegen dem Repo bei).
+    Browser nicht, sie liegen dem Repo bei). **Dazu `media/`** (2026-11-01, P10.5 Block 17):
+    der Launch-Film lädt nur auf Abruf, nach einem Klick — nie beim Erstaufruf.
     """
     erstaufruf = sorted((static_dir / "js").glob("*.js"))
     erstaufruf += [static_dir / "app.css", static_dir / "logo.svg"]

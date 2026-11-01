@@ -3038,3 +3038,36 @@ body.has-update-banner .shell { height: calc(100vh - var(--banner-h)); margin-to
       transparent 10px 22px);
   }
 }
+
+/* -- Launch-Film v4.0.0 (P10.5 Block 17, js/launchfilm.js) ------------------------------------
+   Ueber allem (z-index 40 ist die hoechste Ebene sonst): die Ueberlagerung deckt das Fenster
+   auch dann, wenn die Fullscreen-API scheitert. */
+.launch-film {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-void);
+}
+.launch-film[hidden],
+.launch-film__start[hidden],
+.launch-film__video[hidden],
+.launch-film__close[hidden] { display: none; }
+.launch-film__start {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--space) * 2);
+  padding: calc(var(--space) * 3);
+  text-align: center;
+  color: var(--text);
+}
+.launch-film__mark { width: 72px; height: 72px; }
+.launch-film__title { margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.01em; }
+.launch-film__lead { margin: 0; color: var(--text-muted); max-width: 40ch; }
+.launch-film__actions { display: flex; gap: var(--space); }
+.launch-film__hint { margin: 0; color: var(--text-faint); font-size: 13px; }
+.launch-film__video { width: 100%; height: 100%; object-fit: contain; background: var(--bg-void); }
+.launch-film__close { position: absolute; top: calc(var(--space) * 2); right: calc(var(--space) * 2); }

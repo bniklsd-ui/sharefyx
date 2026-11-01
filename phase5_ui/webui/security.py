@@ -18,6 +18,9 @@ logger = logging.getLogger(__name__)
 
 def ui_security_headers(settings: UiSettings) -> dict[str, str]:
     """Plan §3.4. `img-src 'self' data:` ist die einzige Lockerung (Inline-SVG-QR-Code, Step 4).
+    `media-src 'self'` (2026-11-01, P10.5 Block 17): der Launch-Film unter
+    `/ui/static/media/` — ohne die Direktive greift `default-src 'none'` und der Browser
+    blockiert das Video lautlos. Nur der eigene Ursprung, kein `blob:`, kein `data:`.
     `script-src 'self'` ohne `unsafe-inline`: jedes Stück JavaScript liegt in `app.js`, kein
     `onclick`-Attribut, kein `<script>`-Block.
 
@@ -42,7 +45,8 @@ def ui_security_headers(settings: UiSettings) -> dict[str, str]:
     headers = {
         "Content-Security-Policy": (
             "default-src 'none'; script-src 'self'; style-src 'self'; "
-            "img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self'; "
+            "img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; "
+            "form-action 'self'; "
             "frame-ancestors 'none'; base-uri 'none'"
         ),
         "Referrer-Policy": "strict-origin",

@@ -107,6 +107,7 @@ async def test_app_loads_as_a_single_es_module(static_app, totp_code):
 
 _JS_MODULES = (
     "app", "api", "state", "tree", "list", "editor", "markdown", "dialogs", "toasts", "updates",
+    "launchfilm",
     "spaces",
 )
 
@@ -157,6 +158,29 @@ async def test_static_hashed_assets_get_immutable_cache_header(static_app):
 
         unhashed = await client.get("/ui/static/js/app.js")
         assert unhashed.headers["cache-control"] == "no-store"
+
+
+_FILM = "media/sharefyx-4.0.0.cab1f13a.mp4"
+
+
+@pytest.mark.asyncio
+async def test_the_launch_film_is_served_as_video_with_ranges(static_app):
+    """P10.5 Block 17 (2026-11-01): der Film kommt als `video/mp4` (mit `nosniff` spielt der
+    Browser `application/octet-stream` nicht ab), `immutable` (gehashter Name) und mit
+    **`Range` → 206** — ohne 206 kann der Browser nicht spulen, Safari spielt gar nicht ab.
+    Die Sicherheits-Header müssen dabei stehen bleiben: `FileResponse` setzt eigene nur per
+    `setdefault`."""
+    async with _client(static_app) as client:
+        teil = await client.get(f"/ui/static/{_FILM}", headers={"Range": "bytes=0-99"})
+
+    assert teil.status_code == 206
+    assert teil.headers["content-type"] == "video/mp4"
+    assert teil.headers["content-range"].startswith("bytes 0-99/")
+    assert len(teil.content) == 100
+    assert teil.content[4:8] == b"ftyp"
+    assert "immutable" in teil.headers["cache-control"]
+    assert "media-src 'self'" in teil.headers["content-security-policy"]
+    assert teil.headers["x-content-type-options"] == "nosniff"
 
 
 def test_resolve_static_path_rejects_traversal():

@@ -24,7 +24,7 @@ import re
 from pathlib import Path
 
 from starlette.requests import Request
-from starlette.responses import RedirectResponse, Response
+from starlette.responses import FileResponse, RedirectResponse, Response
 from starlette.routing import Route
 
 from .config import UiSettings
@@ -43,6 +43,9 @@ _CONTENT_TYPES: dict[str, str] = {
     # Das fällt nur auf, wenn man die Seite wirklich ansieht -- ein Test auf den Pfad ist
     # grün, egal was der Server antwortet.
     ".svg": "image/svg+xml",
+    # [2026-11-01, P10.5 Block 17] Der Launch-Film. Mit `nosniff` spielt der Browser ein Video
+    # unter `application/octet-stream` nicht ab -- dieselbe Falle wie `logo.svg` oben.
+    ".mp4": "video/mp4",
 }
 _DEFAULT_CONTENT_TYPE = "application/octet-stream"
 
@@ -92,6 +95,12 @@ def static_routes(settings: UiSettings, sessions: SessionManager) -> list[Route]
             return Response("Nicht gefunden.", status_code=404, media_type="text/plain", headers=headers)
         if _HASHED_NAME_RE.search(found.name):
             headers["Cache-Control"] = _IMMUTABLE_CACHE
+        if found.suffix.lower() == ".mp4":
+            # [2026-11-01, P10.5 Block 17] Das Video (25,7 MB) **nicht** per `read_bytes()`:
+            # `FileResponse` streamt in 64-KiB-Bloecken und beantwortet `Range` mit 206 -- ohne
+            # das kann der Browser nicht spulen (Safari spielt gar nicht ab). Eigene Header setzt
+            # `FileResponse` nur per `setdefault`, CSP und `Cache-Control` oben bleiben stehen.
+            return FileResponse(found, media_type=_content_type(found), headers=headers)
         return Response(found.read_bytes(), media_type=_content_type(found), headers=headers)
 
     return [

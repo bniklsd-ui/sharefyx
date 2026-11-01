@@ -1,0 +1,101 @@
+{
+  "ok": false,
+  "vorab_gesehen": false,
+  "cells": {
+    "P1_startbild": {
+      "ok": true,
+      "t": 0,
+      "muted": false,
+      "paused": true,
+      "src": "/ui/static/media/sharefyx-4.0.0.cab1f13a.mp4",
+      "err": null,
+      "offen": true,
+      "start": true,
+      "vollbild": false,
+      "gesehen": "4.0.0",
+      "csp": []
+    },
+    "P1_klick_spielt_mit_ton": {
+      "ok": true,
+      "t": 2.359945,
+      "muted": false,
+      "paused": false,
+      "src": "/ui/static/media/sharefyx-4.0.0.cab1f13a.mp4",
+      "err": null,
+      "offen": true,
+      "start": false,
+      "vollbild": true,
+      "gesehen": "4.0.0",
+      "csp": []
+    },
+    "P3_csp": {
+      "ok": true,
+      "verletzungen": []
+    },
+    "P4_range": {
+      "ok": true,
+      "antworten": [
+        {
+          "status": 206,
+          "range": "bytes 0-25663437/25663438"
+        },
+        {
+          "status": 206,
+          "range": "bytes 786432-25663437/25663438"
+        }
+      ]
+    },
+    "P8_bild": {
+      "ok": true,
+      "datei": "/tmp/opencode/sharefyx-film-neu/p105_b17_mitten_im_film.png"
+    },
+    "P6_escape_schliesst": {
+      "ok": true,
+      "t": 0,
+      "muted": false,
+      "paused": true,
+      "src": null,
+      "err": null,
+      "offen": false,
+      "start": false,
+      "vollbild": false,
+      "gesehen": "4.0.0",
+      "csp": []
+    },
+    "P2_ohne_klick_kein_download": {
+      "ok": false,
+      "anfragen_vor_erstem_klick": 1,
+      "anfragen_nach_reload": 1
+    },
+    "P5_wiedersehen": {
+      "ok": true,
+      "t": 2.350553,
+      "muted": false,
+      "paused": false,
+      "src": "/ui/static/media/sharefyx-4.0.0.cab1f13a.mp4",
+      "err": null,
+      "offen": true,
+      "start": false,
+      "vollbild": true,
+      "gesehen": "4.0.0",
+      "csp": []
+    },
+    "seitenfehler": {
+      "ok": true,
+      "fehler": []
+    },
+    "P7_privat_kein_startbild": {
+      "ok": false,
+      "t": 0,
+      "muted": false,
+      "paused": true,
+      "src": "/ui/static/media/sharefyx-4.0.0.cab1f13a.mp4",
+      "err": null,
+      "offen": false,
+      "start": true,
+      "vollbild": false,
+      "gesehen": "WIRFT",
+      "csp": []
+    }
+  }
+}

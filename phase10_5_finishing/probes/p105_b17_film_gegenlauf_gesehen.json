@@ -1,0 +1,40 @@
+{
+  "ok": false,
+  "vorab_gesehen": true,
+  "cells": {
+    "P1_startbild": {
+      "ok": false,
+      "t": 0,
+      "muted": false,
+      "paused": true,
+      "src": null,
+      "err": null,
+      "offen": false,
+      "start": true,
+      "vollbild": false,
+      "gesehen": "4.0.0",
+      "csp": []
+    },
+    "abbruch": {
+      "ok": false,
+      "grund": "kein Startbild — Rest der Probe ohne Sinn"
+    },
+    "seitenfehler": {
+      "ok": true,
+      "fehler": []
+    },
+    "P7_privat_kein_startbild": {
+      "ok": true,
+      "t": 0,
+      "muted": false,
+      "paused": true,
+      "src": null,
+      "err": null,
+      "offen": false,
+      "start": true,
+      "vollbild": false,
+      "gesehen": "WIRFT",
+      "csp": []
+    }
+  }
+}

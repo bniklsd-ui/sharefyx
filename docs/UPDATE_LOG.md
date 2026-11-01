@@ -9,8 +9,9 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
-## 2026-10-26
+## 2026-11-01
 - Version 4.0: der Editor ist jetzt ein Live-Editor — Markdown wird beim Schreiben hervorgehoben, To-dos sind Kästchen, und Farbe und Größe lassen sich im Text setzen. Den Schalter „Rohtext" gibt es nicht mehr.
+- Zu Version 4.0 gibt es einen kurzen Film (48 Sekunden, mit Ton). Er wird beim ersten Start einmal angeboten und lässt sich hier im Update-Log jederzeit wieder abspielen.
 - Die Knopfleiste des Editors folgt jetzt der Reihenfolge von Word: Schriftart, Absatz, Formatvorlagen, Einfügen. Die Knöpfe sind einheitlich groß und blau-transparent.
 - Ordner lassen sich umbenennen — alle Items darin ziehen mit um.
 - Team-Spaces lassen sich umbenennen; der eigene Home-Space bleibt wie er ist.

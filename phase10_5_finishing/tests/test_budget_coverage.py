@@ -77,6 +77,23 @@ def _alle_dateien(static_dir: Path) -> set[Path]:
     return {p for p in static_dir.rglob("*") if p.is_file()}
 
 
+def _ausgenommen(static_dir: Path) -> set[Path]:
+    """Die **benannten** Ausnahmen — eine Stelle für Wächter und Gegenprobe.
+
+    **`media/` (2026-11-01, P10.5 Block 17):** der Launch-Film (25,7 MB) lädt der Browser
+    **nur auf Abruf** — nach dem Klick auf „Film ansehen", nie beim Erstaufruf. Er gehört
+    weder in den Erstaufruf (der Korridor von 250 KB wäre hundertfach gerissen, obwohl kein
+    Erstaufruf ihn lädt) noch in den nachgeladenen Editor. Dass er wirklich nicht beim
+    Erstaufruf lädt, misst die Browser-Probe am Netzwerk-Log
+    (`probes/p105_b17_film_probe.py`), nicht dieser Wächter."""
+    alle = _alle_dateien(static_dir)
+    return (
+        {static_dir / "app.html"}
+        | {p for p in alle if p.suffix.lower() == ".txt"}
+        | {p for p in alle if p.relative_to(static_dir).parts[0] == "media"}
+    )
+
+
 def _ungedeckte_dateien(static_dir: Path, erstaufruf: list, nachgeladen: list) -> set[Path]:
     """Die Dateien unter `static/`, die **keine** der beiden Listen nennt.
 
@@ -84,10 +101,7 @@ def _ungedeckte_dateien(static_dir: Path, erstaufruf: list, nachgeladen: list) -
     und seine Gegenprobe benutzen **dieselbe** Prüfung. Eine zweite Auswahl im Test wäre die
     Fehlerklasse, die dieser Wächter verhindert.
     """
-    ausgenommen = {static_dir / "app.html"} | {
-        p for p in _alle_dateien(static_dir) if p.suffix.lower() == ".txt"
-    }
-    erwartet = _alle_dateien(static_dir) - ausgenommen
+    erwartet = _alle_dateien(static_dir) - _ausgenommen(static_dir)
     return erwartet - set(erstaufruf) - set(nachgeladen)
 
 
@@ -115,10 +129,7 @@ def _assert_vollstaendig(static_dir: Path, erstaufruf: list, nachgeladen: list) 
         f"{sorted(str(p.relative_to(static_dir)) for p in ungedeckt)}"
     )
 
-    ausgenommen = {static_dir / "app.html"} | {
-        p for p in _alle_dateien(static_dir) if p.suffix.lower() == ".txt"
-    }
-    zu_viel = set(alle) - (_alle_dateien(static_dir) - ausgenommen)
+    zu_viel = set(alle) - (_alle_dateien(static_dir) - _ausgenommen(static_dir))
     assert not zu_viel, (
         "die Auswahl zaehlt Dateien, die es unter `static/` nicht gibt: "
         f"{sorted(str(p) for p in zu_viel)}"

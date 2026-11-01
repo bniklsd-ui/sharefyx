@@ -670,6 +670,7 @@
       <h2>Update-Log</h2>
       <div id="update-log-list"></div>
       <div class="overlay__actions">
+        <button type="button" class="btn" id="update-log-film">&#9654; Film zu v4.0.0</button>
         <button type="button" class="btn" id="update-log-close">Schlie&szlig;en</button>
       </div>
     </div>
@@ -920,6 +921,24 @@
   </symbol>
 </svg>
 <!-- ICONS:END -->
+
+<!-- Launch-Film v4.0.0 (P10.5 Block 17, js/launchfilm.js). Das Video traegt KEIN `src`:
+     `data-src` setzt erst der Klick auf "Film ansehen" -- ohne Klick laedt der Browser die
+     25,7 MB nie (Plan docs/concepts/phase10_5_block17_film_app_plan.md). -->
+<div class="launch-film" id="launch-film" role="dialog" aria-modal="true" aria-label="Launch-Film Sharefyx 4.0.0" hidden>
+  <div class="launch-film__start" id="launch-film-start">
+    <img class="launch-film__mark" src="/ui/static/logo.svg" alt="">
+    <h2 class="launch-film__title">Sharefyx 4.0.0</h2>
+    <p class="launch-film__lead">Ein kurzer Film &uuml;ber das, was neu ist &mdash; 48 Sekunden, mit Ton.</p>
+    <div class="launch-film__actions">
+      <button type="button" class="btn btn-primary" id="launch-film-play">&#9654; Film ansehen</button>
+      <button type="button" class="btn" id="launch-film-skip">&Uuml;berspringen</button>
+    </div>
+    <p class="launch-film__hint">Jederzeit wieder: Einstellungen &rarr; Update-Log.</p>
+  </div>
+  <video class="launch-film__video" id="launch-film-video" data-src="/ui/static/media/sharefyx-4.0.0.cab1f13a.mp4" preload="none" controls playsinline hidden></video>
+  <button type="button" class="btn btn--icon launch-film__close" id="launch-film-close" title="Schlie&szlig;en" aria-label="Schlie&szlig;en" hidden><svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg></button>
+</div>
 
 <script type="module" src="/ui/static/js/app.js"></script>
 </body>

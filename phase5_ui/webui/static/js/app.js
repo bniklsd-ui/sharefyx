@@ -15,6 +15,7 @@ import {
   closeTrashDialog,
 } from "./dialogs.js";
 import { init as initUpdates } from "./updates.js";
+import { init as initLaunchFilm } from "./launchfilm.js";
 import { init as initSpaces, closeRemoveSpaceDialog } from "./spaces.js";
 import { init as initSettings, closeRightmost } from "./settings.js";
 import { init as initGraph, loadGraph as loadGraphPanel } from "./graph.js";
@@ -456,6 +457,8 @@ function initShell() {
 
   // -- Update-Banner (P6 Step 3) -----------------------------------------------------------
   initUpdates();
+  // Launch-Film v4.0.0 (P10.5 Block 17): Startbild beim ersten Start in diesem Browser.
+  initLaunchFilm();
 
   // -- Realtime (P10.5, Block 10, Schritt 10.3 -- LG-2) ---------------------------------------
   // Der Ereignis-Stream wird **nach** den Modulen verdrahtet, die er aufruft (`List`/

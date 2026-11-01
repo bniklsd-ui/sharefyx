@@ -124,3 +124,12 @@ def test_ui_csp_form_action_is_self_only():
     assert "form-action 'self';" in csp
     assert "claude.ai" not in csp
     assert "claude.com" not in csp
+
+
+def test_ui_csp_allows_media_from_self_only():
+    """P10.5 Block 17 (2026-11-01): der Launch-Film unter `/ui/static/media/`. Ohne `media-src`
+    greift `default-src 'none'` und der Browser blockiert das Video **lautlos** — kein Fehler im
+    Seitentext, nur eine CSP-Meldung in der Konsole. Nur der eigene Ursprung, kein `blob:`/`data:`."""
+    csp = ui_security_headers(_settings())["Content-Security-Policy"]
+    assert "media-src 'self';" in csp
+    assert "blob:" not in csp
