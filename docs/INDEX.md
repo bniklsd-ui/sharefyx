@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-11-01 (Block 17 ✅, Film in der App) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-11-01 (Block 18 geplant, Deploy D live) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -60,7 +60,7 @@ updated: 2026-11-01 (Block 17 ✅, Film in der App) | ältere Einträge: docs/IN
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing; Plan siehe unten)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **40790 B** · Head: Modulstatus, Deploys, Abnahme (72 ✅ · 7 ⬜)
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **40829 B** · Head: Modulstatus, Deploys, Abnahme (72 ✅ · 7 ⬜)
 - [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **41958 B** · die **geschlossenen** Abnahmezeilen, verbatim
 - [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **205409 B** · Session-Blöcke, verbatim
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · Startaufträge Block 7 und 9, verbatim
@@ -73,6 +73,7 @@ updated: 2026-11-01 (Block 17 ✅, Film in der App) | ältere Einträge: docs/IN
 - [docs/concepts/phase10_5_launch_film_plan.md](./concepts/phase10_5_launch_film_plan.md) — 📗 **34170 B** · Plan Block 16: Launch-Film v4.0.0
 - [docs/concepts/phase10_5_block15_review_fixes_plan.md](./concepts/phase10_5_block15_review_fixes_plan.md) — 📗 **31775 B** · Block 15: Review-Fixes B1–B10 (✅)
 - [docs/concepts/phase10_5_block17_film_app_plan.md](./concepts/phase10_5_block17_film_app_plan.md) — 📗 **11012 B** · Plan Block 17: Film in die App (✅)
+- [docs/concepts/phase10_5_block18_live_fixes_plan.md](./concepts/phase10_5_block18_live_fixes_plan.md) — 📗 **7670 B** · Mini-Plan Block 18: Live-Funde nach D (⬜)
 - [docs/concepts/phase10_5_block15_review_fixes_plan_anhang.md](./concepts/phase10_5_block15_review_fixes_plan_anhang.md) — 📦 **14534 B** · Anhang Block 15: Anmerkungen 15.1–15.3b
 - [docs/concepts/phase10_5_ultra_review_v4.0.0.md](./concepts/phase10_5_ultra_review_v4.0.0.md) — 📕 **19192 B** · Ultra-Review v4.0.0: 22 Befunde, B1 kritisch
 - [phase10_5_finishing/UPDATES_ARCHIVE.md](../phase10_5_finishing/UPDATES_ARCHIVE.md) — 📦 **18517 B** · ältere `updated:`-Fäden des Heads, verbatim
@@ -115,7 +116,7 @@ updated: 2026-11-01 (Block 17 ✅, Film in der App) | ältere Einträge: docs/IN
 - [phase9_hardening/SESSIONS_ARCHIVE.md](../phase9_hardening/SESSIONS_ARCHIVE.md) — 📦 **396.550 B**** · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [phase9_hardening/MODULE_STATUS_ARCHIVE.md](../phase9_hardening/MODULE_STATUS_ARCHIVE.md) — 📦 **38.362 B** — L3-Archiv der ausführlichen §-Modulstatus-Statusspalten, verbatim, eine Sektion je Step (2026-10-04 angelegt, Nikinger-Entscheidung; **der letzte Hebel** gegen die Softcap-Überschreitung des Phase-9-Heads)
 - [phase9_hardening/UPDATES_ARCHIVE.md](../phase9_hardening/UPDATES_ARCHIVE.md) — 📦 **33.086 B** · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
-- [docs/concepts/phase9_hardening_plan.md](./concepts/phase9_hardening_plan.md) — 📕 ~66KB · **der P9-Plan**, ausfuehrungsreif, 📕-Snapshot gegen `main@2f752f9`. Locks **P9-A–P9-T**, Abnahme **P9-1–P9-58**, `[VERIFY]` **V145–V164** plus die drei geerbten (V118, V136, V120). **Zwei Befunde, die eine Handover-Annahme widerlegen:** Tailscale Funnel kann keine eigene Domain (der CNAME-Weg aus `PHASE8_6_CLOSEOUT_HANDOVER.md` §4.2 existiert nicht, P9-E), und `SharePolicy` ist bereits gebaut — das Cross-Space-Rechte-Thema braucht **kein** fertiges P6 (§0.6). §12 ist der kanonische Closeout, §15 die P10-Liste
+- [docs/concepts/phase9_hardening_plan.md](./concepts/phase9_hardening_plan.md) — 📕 ~66KB · der P9-Plan (volle Kartenzeile: `INDEX_KURZUNG_ARCHIVE.md`)
 - [docs/concepts/phase9_hardening_block_trace_plan.md](./concepts/phase9_hardening_block_trace_plan.md) — 📕 **26.392 B** · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/concepts/phase9_hardening_block_doing_plan.md](./concepts/phase9_hardening_block_doing_plan.md) — 📕 **43.221 B** · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/concepts/phase9_hardening_block_settings_plan.md](./concepts/phase9_hardening_block_settings_plan.md) — 📕 **30.035 B** (§10–§12.1 seit 2026-10-07 im Archiv) · Mini-Plan 2026-10-05: Einstellungen als Fensterkette (P9-AE–AL), V118 eine Linie, D1 neu beschrieben, P9-11-Portscan-Anleitung (§5), Closeout-Liste (§6); Abnahme P9-83–95, V185–188 · **§10 = der Nachtrag aus der Bildsichtung (Locks P9-AM–P9-AS, Abnahme P9-96–P9-102), ebenfalls gebaut (§10.1) — zwei der Vorgaben sind dabei als No-op bzw. unerreichbar widerlegt**
@@ -200,7 +201,7 @@ doppelt hier gelistet.)*
 ## Project-wide session log (Wurzel-Current-State-Archiv)
 
 - [docs/INDEX_ENTRIES_ARCHIVE.md](./INDEX_ENTRIES_ARCHIVE.md) — 📦 **46.456 B** · L3-Archiv der **datierten Nachträge aus den Einträgen dieser Karte**, verbatim, ein Abschnitt je Karte in der Reihenfolge der Karte (nicht newest-first). **Regel:** eine Kartenzeile bekommt **keinen** datierten Nachtrag mehr (`test_no_entry_line_carries_a_dated_addendum_any_more`) — die Karte ist **Stand**, das Archiv ist **Chronik**
-- [docs/INDEX_KURZUNG_ARCHIVE.md](./INDEX_KURZUNG_ARCHIVE.md) — 📦 **13018 B** · L3-Archiv der aus der Karte gekürzten Texte — die acht Abschnittsköpfe und sechs Kartenzeilen-Chroniken, verbatim (zuletzt 2026-11-01, P10.5-2-Luft); die Karte trägt wieder Stand, dieses Archiv die Chronik des Kürzens
+- [docs/INDEX_KURZUNG_ARCHIVE.md](./INDEX_KURZUNG_ARCHIVE.md) — 📦 **13917 B** · L3-Archiv der aus der Karte gekürzten Texte — die acht Abschnittsköpfe und sechs Kartenzeilen-Chroniken, verbatim (zuletzt 2026-11-01, P10.5-2-Luft); die Karte trägt wieder Stand, dieses Archiv die Chronik des Kürzens
 
 - [docs/INDEX_UPDATES_ARCHIVE.md](./INDEX_UPDATES_ARCHIVE.md) — 📦 **26.463 B** · L3-Archiv der `updated:`-Kette **dieser** Datei, verbatim, newest-first (erste Rotation 2026-09-19); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/PROJECT_SESSION_LOG.md](./PROJECT_SESSION_LOG.md) — 📦 **268.563 B** (vor der 24-Block-Rotation 101.450 B) · L3-Archiv der historischen `[YYYY-MM-DD]`-Session-Bloecke aus `CLAUDE.md` §Current state, newest-first, plus §Frontmatter-Archiv (die `updated:`-Kette der Wurzel-`CLAUDE.md`, 28 Eintraege, verbatim seit 2026-09-13). Wer die Chronik einer alten Phase sucht, faengt hier an, nicht im Wurzel-Head
