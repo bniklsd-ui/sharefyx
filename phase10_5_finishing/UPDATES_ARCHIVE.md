@@ -7,6 +7,18 @@ up: ./CLAUDE.md
 down:
 updated: 2026-10-30 (30 Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — Session-Ende 15.3; der Head stand bei 41.325 B, über dem Softcap) | 2026-10-24 (ein Faden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 11.3 folgt im Head) | 2026-10-24 (ein Faden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 11.2 folgt im Head) | 2026-10-24 (ein Faden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 11.1 folgt im Head) | 2026-10-24 (ein Faden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 10.5 folgt im Head) | 2026-10-24 (zwei Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 10.3 LG-2 Realtime-Client folgt im Head) | 2026-10-24 (zwei Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 10.2 LG-2 Realtime serverseitig folgt im Head) | 2026-10-24 (drei Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — Block 10.1 LG-1 Volltext folgt im Head) | 2026-10-24 (11 Fäden der `updated:`-Kette des Phase-10.5-Heads rotiert — der Head stand bei 43.545 B und damit über dem Softcap) | 2026-10-23 (angelegt — die `updated:`-Kette des Phase-10.5-Heads rotiert hierher; im Head bleibt der neueste Faden plus Zeiger)
 ---
+- 2026-11-01 (Block 16.0: Probe grün — Plan freigegeben, N1–N3; Session-Block neu)
+- 2026-10-31 (Block 16 geplant: Launch-Film — Antworten des Nikingers, Plan statt Notiz)
+- 2026-10-31 (Block 15.7: Update-Log-Zeilen, P10.5-79 ✅ — Block 15 fertig; Session-Ende, nächste Session Launch-Film → Deploy D)
+- 2026-10-31 (Block 15.6b: Fund B3′ gebaut; Session-Ende, nächste Session 15.7)
+- 2026-10-31 (Block 15.6: B9/B10 geschlossen; Fund B3′ beim Nikinger)
+- 2026-10-30 (Block 15.5c: Titel ≤ 256 Zeichen; Live-Durchsicht 0 Treffer; Session-Ende)
+- 2026-10-30 (Block 15.5b: Verwalten-Knöpfe nur bei `manageable`)
+- 2026-10-30 (Block 15.5: B6/B7 — Space-Name eine Regel, Slug ≤ 100 Byte)
+- 2026-10-30 (Block 15.4b: B4′ + Selbst-Austragen; E1 überholt)
+- 2026-10-30 (Block 15.4: B4 geschlossen, P10.5-78 ✅)
+- 2026-10-30 (Block 15.3b: `share_*`-Skalar = eine Freigabe, E5 gebaut)
+- 2026-10-30 (Session-Ende: E5 = A entschieden, nächste Session 15.3b → 15.4) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 - 2026-10-30 (Block 15.3: B5/B8 geschlossen — P10.5-77 ✅, 70 ✅ · 9 ⬜)
 - 2026-10-30 (Block 15.2: B2/B3/B20 geschlossen — P10.5-76 ✅, 69 ✅ · 10 ⬜)
 - 2026-10-30 (Session-Ende: E1/E4 entschieden, Branch hotfix-b1)

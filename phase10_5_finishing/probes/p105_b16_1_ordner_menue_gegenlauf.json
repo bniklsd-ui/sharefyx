@@ -1,0 +1,18 @@
+{
+  "cells": {
+    "dialog_offen": {
+      "ok": false
+    },
+    "umbenannt": {
+      "ok": false
+    },
+    "zurueck": {
+      "ok": false
+    },
+    "seitenfehler": {
+      "ok": true,
+      "fehler": []
+    }
+  },
+  "alle_gruen": false
+}

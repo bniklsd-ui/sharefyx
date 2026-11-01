@@ -212,7 +212,13 @@ function ensureFolderMenu() {
   });
   // Ein Klick daneben schliesst das Menue. `capture: true`, weil der Klick auf einen anderen
   // Ordner sonst zuerst dessen eigenes `contextmenu` ausloest.
-  document.addEventListener("click", function () { hideFolderMenu(); }, true);
+  // P10.5 16.1 (Fund beim Filmen, 2026-11-01): ein Klick **im** Menue zaehlt nicht als
+  // „daneben" — der Capture-Listener lief vor dem Klick auf „Umbenennen", leerte
+  // `folderMenuTarget`, und der Dialog ging nie auf (seit Block 9.2).
+  document.addEventListener("click", function (event) {
+    if (folderMenuEl.contains(event.target)) return;
+    hideFolderMenu();
+  }, true);
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") hideFolderMenu();
   });
