@@ -1,0 +1,189 @@
+{
+ "caddy_version": "v2.6.2",
+ "gegenlauf": "poll",
+ "saat_items": 263,
+ "schwellen_ms": {
+  "waiting": 300,
+  "wechsel": 1000,
+  "ereignis": 2000
+ },
+ "eingaenge": {
+  "direkt": {
+   "eingang": "direkt",
+   "base": "https://127.0.0.1:52027",
+   "waiting_ms": [
+    753.8,
+    744.9,
+    748,
+    742.1,
+    734.7,
+    741.7,
+    740.3,
+    741.8,
+    742.8,
+    742.7
+   ],
+   "gesamt_ms": [
+    755.4,
+    746.4,
+    749.4,
+    743.6,
+    736.2,
+    743.3,
+    741.9,
+    743.2,
+    744.3,
+    744.3
+   ],
+   "wechsel_ms": [
+    1368.6,
+    1355.2,
+    1345.9,
+    1311.7,
+    1352.6
+   ],
+   "wechsel_zeilen": [
+    34,
+    26,
+    11,
+    17,
+    34
+   ],
+   "stream_a": 1,
+   "ereignisse": [
+    {
+     "titel": "Probe-Ereignis-1793650905-0",
+     "status": 201,
+     "ereignis_ms": 101,
+     "zeile_ms": 1479,
+     "angekommen": true
+    },
+    {
+     "titel": "Probe-Ereignis-1793650907-1",
+     "status": 201,
+     "ereignis_ms": 596,
+     "zeile_ms": 1932,
+     "angekommen": true
+    },
+    {
+     "titel": "Probe-Ereignis-1793650909-2",
+     "status": 201,
+     "ereignis_ms": 589,
+     "zeile_ms": 1977,
+     "angekommen": true
+    },
+    {
+     "titel": "Probe-Ereignis-1793650912-3",
+     "status": 201,
+     "ereignis_ms": 533,
+     "zeile_ms": 1968,
+     "angekommen": true
+    },
+    {
+     "titel": "Probe-Ereignis-1793650914-4",
+     "status": 201,
+     "ereignis_ms": 517,
+     "zeile_ms": 1868,
+     "angekommen": true
+    }
+   ],
+   "seitenfehler": [],
+   "zellen": {
+    "waiting": false,
+    "wechsel": false,
+    "ereignis": true
+   }
+  },
+  "caddy": {
+   "eingang": "caddy",
+   "base": "https://127.0.0.1:41083",
+   "waiting_ms": [
+    802.9,
+    752.3,
+    749.4,
+    753.1,
+    754.3,
+    757,
+    749.1,
+    1202.4,
+    752.6,
+    748
+   ],
+   "gesamt_ms": [
+    804.2,
+    753.8,
+    751,
+    754.7,
+    755.5,
+    758.4,
+    750.5,
+    1203.8,
+    754.2,
+    749.5
+   ],
+   "wechsel_ms": [
+    1242.4,
+    1355.4,
+    1262.6,
+    1339.5,
+    1304.4
+   ],
+   "wechsel_zeilen": [
+    34,
+    26,
+    11,
+    17,
+    34
+   ],
+   "stream_a": 1,
+   "ereignisse": [
+    {
+     "titel": "Probe-Ereignis-1793650956-0",
+     "status": 201,
+     "ereignis_ms": 113,
+     "zeile_ms": 1771,
+     "angekommen": true
+    },
+    {
+     "titel": "Probe-Ereignis-1793650958-1",
+     "status": 201,
+     "ereignis_ms": 339,
+     "zeile_ms": 2066,
+     "angekommen": true
+    },
+    {
+     "titel": "Probe-Ereignis-1793650961-2",
+     "status": 201,
+     "ereignis_ms": 247,
+     "zeile_ms": 1622,
+     "angekommen": true
+    },
+    {
+     "titel": "Probe-Ereignis-1793650963-3",
+     "status": 201,
+     "ereignis_ms": 565,
+     "zeile_ms": 2296,
+     "angekommen": true
+    },
+    {
+     "titel": "Probe-Ereignis-1793650965-4",
+     "status": 201,
+     "ereignis_ms": 235,
+     "zeile_ms": 1995,
+     "angekommen": true
+    }
+   ],
+   "seitenfehler": [],
+   "zellen": {
+    "waiting": false,
+    "wechsel": false,
+    "ereignis": false
+   }
+  }
+ },
+ "zellen": {
+  "waiting": false,
+  "wechsel": false,
+  "ereignis": false
+ }
+}

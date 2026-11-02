@@ -176,6 +176,8 @@ def test_setbody_resets_the_cursor_line_marker_before_setvalue():
 
 def test_the_head_names_the_measurement():
     """Die Doku muss die Messung nennen — sonst steht im Head eine Behauptung ohne Beleg."""
-    head = HEAD.read_text(encoding="utf-8")
+    # Seit Block 18 stehen die Vollzeilen der Bloecke 11-17 verbatim im Modulstatus-Archiv (Head unter dem Softcap).
+    head = (HEAD.read_text(encoding="utf-8")
+            + (HEAD.parent / "MODULSTATUS_ARCHIVE.md").read_text(encoding="utf-8"))
     assert "11.4" in head, "der Phase-Head nennt 11.4 nicht"
     assert "V211" in head, "der Phase-Head nennt die V211-Messung nicht"

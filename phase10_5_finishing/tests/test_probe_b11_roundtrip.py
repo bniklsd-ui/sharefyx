@@ -107,6 +107,8 @@ def test_the_raw_mode_shows_every_character():
 
 
 def test_the_head_names_the_step():
-    head = HEAD.read_text(encoding="utf-8")
+    # Seit Block 18 stehen die Vollzeilen der Bloecke 11-17 verbatim im Modulstatus-Archiv (Head unter dem Softcap).
+    head = (HEAD.read_text(encoding="utf-8")
+            + (HEAD.parent / "MODULSTATUS_ARCHIVE.md").read_text(encoding="utf-8"))
     assert "11.8" in head, "der Phase-Head nennt 11.8 nicht"
     assert "Roundtrip" in head, "der Phase-Head nennt den Roundtrip nicht"

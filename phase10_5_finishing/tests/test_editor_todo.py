@@ -200,6 +200,8 @@ def test_the_read_view_shows_a_disabled_checkbox_without_a_write_path():
 
 def test_the_head_names_the_step():
     """Die Doku muss den Schritt nennen — sonst steht im Head eine Behauptung ohne Beleg."""
-    head = HEAD.read_text(encoding="utf-8")
+    # Seit Block 18 stehen die Vollzeilen der Bloecke 11-17 verbatim im Modulstatus-Archiv (Head unter dem Softcap).
+    head = (HEAD.read_text(encoding="utf-8")
+            + (HEAD.parent / "MODULSTATUS_ARCHIVE.md").read_text(encoding="utf-8"))
     assert "11.5" in head, "der Phase-Head nennt 11.5 nicht"
     assert "ED-2" in head, "der Phase-Head nennt ED-2 nicht"

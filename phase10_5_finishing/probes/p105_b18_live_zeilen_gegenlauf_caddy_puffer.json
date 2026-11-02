@@ -1,0 +1,103 @@
+{
+ "caddy_version": "v2.6.2",
+ "gegenlauf": "caddy_puffer",
+ "saat_items": 263,
+ "schwellen_ms": {
+  "waiting": 300,
+  "wechsel": 1000,
+  "ereignis": 2000
+ },
+ "eingaenge": {
+  "caddy": {
+   "eingang": "caddy",
+   "base": "https://127.0.0.1:44361",
+   "waiting_ms": [
+    411.2,
+    146.3,
+    136.5,
+    136.2,
+    137.4,
+    150,
+    133.8,
+    138.6,
+    145.1,
+    137.6
+   ],
+   "gesamt_ms": [
+    412.7,
+    147.6,
+    137.9,
+    137.7,
+    138.9,
+    151.3,
+    136.5,
+    139.9,
+    146.6,
+    139.1
+   ],
+   "wechsel_ms": [
+    185.3,
+    659.9,
+    862.7,
+    610.3,
+    707.8
+   ],
+   "wechsel_zeilen": [
+    34,
+    26,
+    11,
+    17,
+    34
+   ],
+   "stream_a": 0,
+   "ereignisse": [
+    {
+     "titel": "Probe-Ereignis-1793652329-0",
+     "status": 201,
+     "ereignis_ms": null,
+     "zeile_ms": null,
+     "angekommen": false
+    },
+    {
+     "titel": "Probe-Ereignis-1793652337-1",
+     "status": 201,
+     "ereignis_ms": null,
+     "zeile_ms": null,
+     "angekommen": false
+    },
+    {
+     "titel": "Probe-Ereignis-1793652346-2",
+     "status": 201,
+     "ereignis_ms": null,
+     "zeile_ms": null,
+     "angekommen": false
+    },
+    {
+     "titel": "Probe-Ereignis-1793652354-3",
+     "status": 201,
+     "ereignis_ms": null,
+     "zeile_ms": null,
+     "angekommen": false
+    },
+    {
+     "titel": "Probe-Ereignis-1793652362-4",
+     "status": 201,
+     "ereignis_ms": null,
+     "zeile_ms": null,
+     "angekommen": false
+    }
+   ],
+   "seitenfehler": [],
+   "zellen": {
+    "waiting": false,
+    "wechsel": true,
+    "ereignis": false
+   }
+  }
+ },
+ "zellen": {
+  "waiting": false,
+  "wechsel": true,
+  "ereignis": false
+ }
+}

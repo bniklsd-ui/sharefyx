@@ -9,6 +9,11 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
+## 2026-11-02
+- Die Verknüpfungskarte ist mit Tags und Ordnern wieder flüssig: Schwenken, Zoomen und Überfahren reagieren sofort, auch wenn beides eingeschaltet ist.
+- Ordner und Tags verbinden sich auf der Karte als Stern um das zuletzt geänderte Item, nicht mehr jedes mit jedem — das Bild wird ruhiger.
+- Einzelne Punkte fliegen nicht mehr weit von der Karte weg.
+
 ## 2026-11-01
 - Version 4.0: der Editor ist jetzt ein Live-Editor — Markdown wird beim Schreiben hervorgehoben, To-dos sind Kästchen, und Farbe und Größe lassen sich im Text setzen. Den Schalter „Rohtext" gibt es nicht mehr.
 - Zu Version 4.0 gibt es einen kurzen Film (48 Sekunden, mit Ton). Er wird beim ersten Start einmal angeboten und lässt sich hier im Update-Log jederzeit wieder abspielen.
