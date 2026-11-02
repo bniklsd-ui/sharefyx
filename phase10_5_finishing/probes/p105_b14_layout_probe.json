@@ -22,7 +22,7 @@
     "LOBE_SCALE": "1.5",
     "LOBE_SMOOTH_PASSES": "2"
   },
-  "zeit": "2026-10-29T19:16:34.088189+00:00",
+  "zeit": "2026-11-02T18:12:25.501190+00:00",
   "seed": {
     "spaces": 5,
     "items": 152,
@@ -190,7 +190,7 @@
     },
     "budget": {
       "knoten": 201,
-      "pos_pruefsumme": 199672332,
+      "pos_pruefsumme": 3527367083,
       "graph_reihenfolge": [
         "itm_00000931",
         "itm_00000930",
@@ -202,43 +202,43 @@
         "itm_0000092a"
       ],
       "graph_knoten": 201,
-      "ruhe_ms": 2147,
+      "ruhe_ms": 1080,
       "luecken_ms": [],
-      "raf_calls": 130,
+      "raf_calls": 66,
       "raf_calls_reduced_motion": 0,
-      "kern_pixel_reduced_motion": 8838,
-      "kern_pixel": 8838,
+      "kern_pixel_reduced_motion": 11018,
+      "kern_pixel": 11018,
       "grenze_ms": 3000,
       "kamera_200_knoten": {
         "messbar": true,
-        "zoom": 0.7262073004176,
-        "zoom_anzeige": 0.73,
+        "zoom": 0.7820288109504,
+        "zoom_anzeige": 0.78,
         "leerwand": [
           1134,
           1061.375
         ],
         "welt": {
-          "x0": -59,
-          "x1": 1218,
+          "x0": -56,
+          "x1": 1215,
           "y0": -115,
-          "y1": 1234
+          "y1": 1130
         },
         "bild_mass": [
-          927.3667226332751,
-          979.6536482633423
+          993.9586187179584,
+          973.625869633248
         ],
-        "fuellgrad": 0.9230042617014178,
+        "fuellgrad": 0.9173250449965827,
         "passt": true,
         "pan": [
-          145.4998893244798,
-          124.03815925011259
+          113.51016089143423,
+          132.9989086779861
         ],
         "umriss_mitte": [
           579.5,
-          559.5
+          507.5
         ],
-        "versatz_mitte_px": 0.6629800835210062,
-        "unsicherheit_px": 0.6638041344474981,
+        "versatz_mitte_px": 0.8089697646859122,
+        "unsicherheit_px": 0.6948331925560987,
         "zentriert": true,
         "ok": true
       },

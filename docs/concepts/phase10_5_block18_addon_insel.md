@@ -11,6 +11,8 @@ updated: 2026-11-02 (Addon-Agent, Claude Code: Reproduktion Node + Browser auf v
 ---
 # Addon Block 18 — die ferne Insel
 
+> **[2026-11-02, umgesetzt]** `REPULSION_MIN_DIST = 6` ist in `graph.js` gebaut, die Zelle `insel` und die Gegenläufe `tritt`/`kein_schutz` stehen in der Probe; Weg 1 für `schleuder` (der Gurt bleibt, sein Gegenlauf ist zahnlos). Zahlen: Plan §5.7.
+
 > Auftrag (Koordinator, 2026-11-02): reproduzieren, erklären, Lösung vorschlagen — **nichts bauen**. Gemessen an
 > **Kopien** von `graph.js` (Node-Harness und Wegwerf-Instanz); Arbeitsbaum, Belege und Tests unberührt. Experiment-
 > Skripte liegen **außerhalb** des Repos unter `/tmp/insel/` (flüchtig — die Befehle stehen unten zum Nachbauen).

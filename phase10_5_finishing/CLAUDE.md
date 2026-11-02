@@ -14,7 +14,7 @@ down:
   - MODULSTATUS_ARCHIVE.md                         # 📦 die ausführlichen Statusspalten der Blöcke 0–10, verbatim
   - ABNAHME_ARCHIVE.md                             # 📦 die geschlossenen Abnahmezeilen (P10.5-1–72), verbatim
   - FREIGABEN_ARCHIVE.md                           # 📦 die Freigaben der Phase, verbatim
-updated: 2026-11-02 (Block 18.1/18.2 gebaut: Stern, MAX_SPEED; offen: Strichelung, Ausreißer-Zelle) | 2026-11-01 (Block 18.0 gemessen: Kosten = Kantenzeichnen, N1 Schleuder-Fund; STOPP vor 18.1/18.2) | 2026-11-01 (Live-Sichtung: Film ✅; Block 18 geplant) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
+updated: 2026-11-02 (Block 18.2b/18.3 gebaut: Mindestdistanz, Zwischenspeicher, V3/V4; nächste Session: 18.5, 18.4) | 2026-11-02 (Block 18.1/18.2 gebaut: Stern, MAX_SPEED; offen: Strichelung, Ausreißer-Zelle) | 2026-11-01 (Block 18.0 gemessen: Kosten = Kantenzeichnen, N1 Schleuder-Fund; STOPP vor 18.1/18.2) | 2026-11-01 (Live-Sichtung: Film ✅; Block 18 geplant) | ältere Einträge: phase10_5_finishing/UPDATES_ARCHIVE.md
 ---
 # Phase 10.5 — Finishing
 
@@ -45,7 +45,7 @@ updated: 2026-11-02 (Block 18.1/18.2 gebaut: Stern, MAX_SPEED; offen: Strichelun
 | 15 | Fixes aus dem Ultra-Review B1–B10 — Plan `docs/concepts/phase10_5_block15_review_fixes_plan.md` | Claude Code | D | ✅ 2026-10-31 — **15.1 ✅** B1/B15 (`asset_id` nie roh zum Pfad: `Store._asset_matches()`, `\Z`; 9 Wächter, Gegenlauf 9 rot; P10.5-75 ✅) · **15.2 ✅** B2/B3/B20 (Dienststart scheitert nie an Daten: Rebuild je Datei + eine Transaktion, Elternordner, Wiederaufnahme fängt; Gegenlauf 6/5/5 rot; P10.5-76 ✅) · **15.3 ✅** B5/B8 (Lesen nachsichtig, Schreiben streng, kein Fehler nach dem Write; Gegenlauf je Fix rot; P10.5-77 ✅) · **15.3b ✅** E5 (`share_*`-Skalar = eine Freigabe, `WARNING` mit Pfad; Gegenlauf 3/3/2 rot) · **15.4 ✅** B4 (`manages_space` in GET/POST/DELETE der Mitglieder-Routen; Gegenlauf 3 rot; P10.5-78 ✅) · **15.4b ✅** B4′ (`share_*`/`visibility` fremder Home-Space-Items nur mit `manages_space`) + E6 (Selbst-Austragen) · **15.5 ✅** B6/B7 (`files.is_valid_space_name()` in `create`/`move`/`rename_space`/`acl.create_space`; Slug ≤ 100 UTF-8-Byte in `item_filename()`, E3 gemessen: `f_namemax` 255, tmp-Name + 14; Gegenlauf 6/15/1 rot) · **15.5b ✅** UI-Rest 15.4 (Hinzufügen/Entfernen nur bei `manageable`, eigener Name bleibt; Browser-Probe 4/4, Gegenlauf 3 rot) · **15.5c ✅** E3: Titel ≤ 256 Zeichen (Kern + `maxlength`; Gegenlauf 3 + 1 rot) · **15.6 ✅** B9/B10 (`/ui/invite/<token>` redigiert — ein Muster für beide Log-Verbraucher; `search()` holt eine verschwundene Datei unter dem Lock neu, sonst überspringen; Gegenlauf 3 + 3 rot, Thread-Wächter 5/5) · **15.6b ✅** Fund B3′ (kaputte Datei fehlt in der Suche, `CRITICAL` mit Pfad, statt sie für alle zu sprengen; Gegenlauf 2 rot) · **15.7 ✅** Update-Log (3 Zeilen), Suite 1811, P10.5-79 ✅ · **E1 überholt (2026-10-30): kein Hotfix, Deploy D nach allen Fixes am Wochenende** · E4: Opus** |
 | 16 | Launch-Film v4.0.0 (Nikinger 2026-10-29/31) — Plan `docs/concepts/phase10_5_launch_film_plan.md` | Claude Code (Sichtung Nikinger) | vor D | ✅ 2026-11-01 — Plan freigegeben (+ N1 Morph zur Schrift, N2 3 → 4, N3 Sichtung = ganzer Film) · **16.0 ✅** Probe: 2× über `clip.scale`, zwei Läufe byteweise gleich, 0,36 s/Bild, `libx264` da · **Fund 16.1 ✅** Ordner-Menü „Umbenennen“ öffnete nie den Dialog (seit 9.2, `tree.js` Capture-Listener) — behoben, Probe 4/4, Gegenlauf 3 rot · **16.1 ✅** Aufnahmen neu/alt + echter MCP-Lauf (S9) · **16.2 ✅** Bühne `film.js`/`film.html`, die 4 aus 13 Kacheln bei 1080p lesbar, Morph zu „4.0.0“ · **16.3 ✅** Vorschau gesichtet, Schräge/Rand/Tafel nachgeschärft · **16.4 ✅** Ton im Code (`ton.py`, deterministisch) · **16.5 ✅** Film gerendert (55 s, 1080p60, Ton) · **Sichtung 1 (Nikinger): „not bad“, drei Wünsche** ⇒ Runde 2 **16.6–16.9** (Plan §7: Urknall-Auftakt, blaues Raster, 3D-Kacheln + animierter Text, schneller) · **16.6 ✅** Urknall-Auftakt · **16.7 ✅** Raster · **16.8 ✅** 3D + Text · **16.9 ✅** Volllauf 2 (48,4 s) · **Sichtung 2 ✅** (abgenommen) |
 | 17 | Film in die App (Nikinger 2026-11-01) — Plan `docs/concepts/phase10_5_block17_film_app_plan.md` | Claude Code | D | ✅ 2026-11-01 — Startbild beim Erststart (E2), Klick ⇒ Ton + Vollbild, Wiedersehen im Update-Log; `media-src 'self'`, `.mp4` über `FileResponse` (206); Probe 10/10 (Chrome), 4 Gegenläufe rot |
-| 18 | Live-Funde nach D: Karte träge (Tags/Ordner), Ausreißer, Editor-Farben — Plan `docs/concepts/phase10_5_block18_live_fixes_plan.md` | eigene Session | v4.0.1 | 🔄 2026-11-02 — **18.0 ✅** `draw()` 309 ms „beide an", Fund N1 (Knoten bis 30.867 px weggeschleudert) · **18.1 ✅** Stern für Tags + Ordner, **34,3 ms**, Bündeln verworfen (langsamer) · **18.2 ✅** `MAX_SPEED`, Block-14-Probe 6/6 · **Addons** `…addon_render.md`/`…addon_insel.md`, Entscheidungen offen (Plan §5.6) · dann 18.5, 18.4 |
+| 18 | Live-Funde nach D: Karte träge (Tags/Ordner), Ausreißer, Editor-Farben — Plan `docs/concepts/phase10_5_block18_live_fixes_plan.md` | eigene Session | v4.0.1 | 🔄 2026-11-02 — **18.0–18.2 ✅** (Stern, `MAX_SPEED`) · **18.2b ✅** `REPULSION_MIN_DIST` + Zelle `insel` · **18.3 ✅** Zwischenspeicher (V1), V3, V4: „beide an" Ruhe/Pan **2,3 ms** (309), Einschwingen **1,6 s** (55 s), je Regel ein Gegenlauf · **offen:** 18.5 (Wegwerf-Probe P10.5-18/49), 18.4 (Update-Log, `v4.0.1`), A1 (`ausreisser`) — Plan §5.7/§6 |
 | Z | Closeout P10.5 (Handover, Grafik, Rotationen) | Claude Code + Nikinger | — | ⬜ |
 
 > **Die ausführlichen Statusspalten der Blöcke 0–10 stehen verbatim in
@@ -193,17 +193,16 @@ stehen im Commit und im Session-Block.
 > Deploys **C** (`v3.1.7`) und **D** (`v3.1.8`, jetzt **mit** den Änderungen aus Block 13) liegen
 > beim Nikinger.
 
-## Session stopped — 2026-11-02 (Block 18.1/18.2: Stern und Geschwindigkeitsgrenze gebaut — zwei Zellen offen beim Nikinger)
+## Session stopped — 2026-11-02 (Block 18.2b/18.3: Mindestdistanz, Zwischenspeicher, zwei Schritte je Bild, V4 — gebaut, gepusht)
 
-**Ergebnis.** „Beide an": `draw()` **309 → 34,3 ms**, Simulation **55,5 → 3,9 s**, kein Knoten mehr weggeschleudert (weitester 2.790 → 596–973 px).
-Gebaut: **Stern** für Tags und Ordner (E1/E5; der Graph-Payload trägt dafür `updated`, `api.py` + `test_graph.py`), **`MAX_SPEED` = 600** (N1), Probe
-`probes/p105_b18_karte_messung.py` mit Gegenläufen (`clique` → nur `kanten` rot, `schleuder` → nur `schleuder` rot), Wächter `tests/test_b18_karte_messung.py` (9).
-Block-14-Probe weiter **6/6 grün**, Suite **1842 grün** (vor dem neuen Wächter; dazu 9), `doc_health` 0, `ui_budget` 233,4 KB (Ziel 250).
+**Ergebnis.** Die Addons sind **umgesetzt** (Nikinger: alle Performance-Änderungen). „Beide an", 263 Items, headless Chromium: Bild in Ruhe/Pan **309 → 2,3 ms**
+(dpr 2: 6,2 ms), Einschwingen **55,5 → 1,6 s** (65 statt 129 Bilder), kein Einzelpunkt-Tritt mehr (`insel`: Körper = **eine** Komponente in allen vier Zuständen). Gebaut in `graph.js`:
+`REPULSION_MIN_DIST = 6`, `blitLayer()`/`layerSignature()` (Zwischenspeicher, Signatur mit **Positionshash** statt Auslöser-Liste), `SIM_STEPS_PER_FRAME = 2`, V4 (`dash[1] <= edgeWidth`).
+Probe `probes/p105_b18_karte_messung.py`: acht Zellen, **acht Gegenläufe**, dpr-2-Lauf; Wächter `tests/test_b18_karte_messung.py` (16).
+Suite **1857 grün** (Node-Gegenlauf `lappen`: sein Anker stand zweimal in `graph.js`, behoben), Block-14-Probe **6/6**, `ui_budget` 236,7 KB, `doc_health` 0.
 
-**Gemessen und verworfen:** 18.1 (b) Kanten je Stil bündeln — **langsamer** (37,6 statt 29,1 ms); der Code zeichnet je Kante. **Antworten des Nikingers:** A3 widerlegt (der Punkt
-bleibt nach „Layout zurücksetzen", es sind Dateien aus Fabians Home-Space); sein 50-%-Zoom war manuell, nicht die Klemme. **Fund:** die Block-14-Probe war seit dem Film-Startbild rot (`beschriftungen`) — behoben (`add_init_script`).
+**Ehrlich offen:** `ausreisser` rot (A1, Ordner-Zustand 3,1 × `REGION_GAP`) · Gegenlauf `schleuder` zahnlos unter der Mindestdistanz (Gurt bleibt, ungetestet) · Hover-Wechsel/Signaturwechsel ein volles Bild (29 ms, dpr 2: 47 ms) ·
+Einschwingen ≈ 39 fps, nicht 60 · gebrochene Dichte baut den Cache nie · **nicht gemessen:** GPU, Firefox/Safari.
 
-**Offen beim Nikinger:** Option A gewählt (Striche bleiben). Zwei Addons (Render-Effizienz, ferne Insel) liegen vor — Entscheidungen und die datierte
-Korrektur zu 18.2 (der Einzelpunkt-Tritt überlebt HEAD) in **Plan §5.6**; die Zellen `bildzeit`/`ausreisser` stehen bewusst rot im Beleg.
-
-**Nächste Session:** nach den Entscheidungen **18.5** (P10.5-18/49 als Wegwerf-Probe, Caddy 2.6.2 lokal), dann **18.4** (Update-Log, Suite, `v4.0.1`; Abnahmezeilen P10.5-80 ff.).
+**Nächste Session (Plan §6, kalt lesbar):** (1) Sichtung V4 + Gefühl Pan/Mausrad/Hover beim Nikinger · (2) **18.5** `probes/p105_b18_live_zeilen_probe.py` (P10.5-18/49, lokaler Caddy 2.6.2) · (3) **18.4** Update-Log, Badge `v4.0.1`, Suite, Abnahmezeilen P10.5-80 ff.,
+Commit + Push, **Deploy durch den Nikinger** (Hard Rule 9) · (4) zwei Live-Prüfschritte nach dem Deploy (Addon Insel §6) · (5) A1 nur nach Sichtung.

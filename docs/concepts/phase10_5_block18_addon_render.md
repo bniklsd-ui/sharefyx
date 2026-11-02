@@ -10,6 +10,8 @@ updated: 2026-11-02 (Erstfassung, Claude Code — Messungen an der Wegwerf-Insta
 ---
 # Addon Block 18: Render-Effizienz der Karte
 
+> **[2026-11-02, umgesetzt]** V1 (Zwischenspeicher, mit **Positionshash** statt Auslöser-Liste), V3 und V4 sind in `graph.js` gebaut — Beleg und Zahlen: Plan §5.7, `probes/p105_b18_karte_messung.{py,json}`. Der Nikinger hat „alle Performance-Änderungen einbauen" entschieden; Mausrad = Neuaufbau.
+
 > **Auftrag (2026-11-02):** Wege finden und **vorschlagen** (nicht bauen), wie die Karte mit **allen** Schaltern an
 > `draw()` ≤ 16,7 ms (60 fps) erreicht, gemessen mit der vorhandenen Probe; dazu eigene Zahlen für Hover, Pan und die
 > Simulation (129 Bilder). Randbedingung: **Entscheidung A** — Tag-Kanten gestrichelt `[4,4]`, Ordner gepunktet `[1.5,3]`,

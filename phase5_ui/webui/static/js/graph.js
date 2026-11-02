@@ -139,6 +139,26 @@ const DAMPING = 0.85;
 // die Spitze bei 456 px/Bild: die Grenze liegt darueber und aendert **dort nichts** (das Layout aus
 // Block 14 bleibt byte-gleich), sie greift nur, wo die Rechnung explodiert.
 const MAX_SPEED = 600;
+// P10.5 Block 18.2b (Addon `phase10_5_block18_addon_insel.md`): die Abstossung ~ 1/d^2 war **fast singulaer**
+// (`dist2 = dx^2 + dy^2 + 0.01`): zwei Knoten, die sich auf wenige Pixel naeherten -- schon in der Saat
+// (ueberlappende Ordner-Inseln) oder im Durchflug --, bekamen einen **Tritt** (Kraft bis 270.000) und
+// rollten als **Einzelpunkt in eigenem Umriss** weg; `MAX_SPEED` deckelt die Folge, nicht die Ursache.
+// Unter `REPULSION_MIN_DIST` px rechnet die Abstossung mit dieser Mindestdistanz (hoechste Kraft je Paar
+// 2.700 / 36 = 75). Fuer jedes Paar >= 6 px ist die Rechnung bitgleich. Gemessen: Inseln 40 % -> 0 % auf
+// sechs Live-Formen, Block-14-Probe 6/6, die 152-Item-Szene byte-gleich (dort kommen sich nie zwei
+// Knoten naeher als 6,64 px).
+const REPULSION_MIN_DIST = 6;
+// P10.5 Block 18.3 (Addon `phase10_5_block18_addon_render.md`, V3): Simulationsschritte je Bild. Die
+// Schritte sind unabhaengig vom Bildtakt (kein `dt`), zwei je Bild ergeben **dieselbe Endlage** (Hash
+// gleich) in der halben Zeit: 129 Schritte = 65 Bilder statt 129 (4,5 s -> 2,3 s bei „beide an").
+const SIM_STEPS_PER_FRAME = 2;
+// V1: der Zwischenspeicher der Lappen-/Kanten-Schicht (siehe `drawBackdrop()`)
+const LAYER_MAX_SIDE = 8192;       // Kante der Schicht in Geraetepixeln -- darueber wird direkt gezeichnet
+const LAYER_MAX_PX = 16000000;     // Flaeche (~ 64 MB RGBA) -- darueber wird direkt gezeichnet
+const LAYER_IDLE_MS = 120;         // so lange Ruhe, bis die Schicht ohne weiteres Bild gebaut wird
+// V4: die Strichmuster. Mit runden Kappen ist die sichtbare Luecke `Luecke - Linienbreite`.
+const DASH_TAG = [4, 4];
+const DASH_FOLDER = [1.5, 3];
 // **P10.5 Block 14, Schritt 14.2:** `CENTER_GRAVITY` (0,012) und `ALPHA_START` (1) sind
 // **weg** -- ersetzt, nicht zusaetzlich (Plan §2.4): die Gravitation zieht jetzt zum **eigenen
 // Space-Anker** (`ANCHOR_GRAVITY`), und die Startenergie ist die **gesaete** (`ALPHA_START_SEEDED`).
@@ -538,6 +558,7 @@ function dedupeEdges(edges) {
 }
 
 function rebuildImplicitEdges() {
+  edgesVersion += 1;     // V1: die Kanten haben sich geaendert -- der Zwischenspeicher gilt nicht mehr
   // Tag-/Ordner-Kanten sind reine Client-Ableitungen -- bei jedem Toggle-Wechsel neu
   // berechnen (P8-21: >15-Knoten-Tags erzeugen keine Clique).
   implicitEdges = [];
@@ -984,9 +1005,12 @@ function runSimulation() {
       settle();
       return;
     }
-    applyForces(alpha);
-    integrate(alpha);
-    alpha *= ALPHA_DECAY;
+    // V3: `SIM_STEPS_PER_FRAME` Schritte je Bild (dieselbe Endlage, halb so viele Bilder)
+    for (var step = 0; step < SIM_STEPS_PER_FRAME && alpha >= ALPHA_MIN; step++) {
+      applyForces(alpha);
+      integrate(alpha);
+      alpha *= ALPHA_DECAY;
+    }
     draw();
     if (alpha >= ALPHA_MIN) {
       activeRafId = requestAnimationFrame(tick);
@@ -1030,7 +1054,7 @@ function applyForces(alpha) {
       var b = nodes[j];
       var dx = a.x - b.x;
       var dy = a.y - b.y;
-      var dist2 = dx * dx + dy * dy + 0.01;
+      var dist2 = Math.max(dx * dx + dy * dy + 0.01, REPULSION_MIN_DIST * REPULSION_MIN_DIST);
       var dist = Math.sqrt(dist2);
       // Plan 14.7 §2.2: im **eigenen** Space ×s³ (bei s = 1 ist das exakt REPULSION_STRENGTH)
       var force = (a.space === b.space ? REPULSION_SAME_SPACE : REPULSION_STRENGTH) / dist2;
@@ -1112,6 +1136,155 @@ function integrate(alpha) {
   }
 }
 
+// -- P10.5 Block 18.3 (Addon Render, V1): der Zwischenspeicher der Lappen-/Kanten-Schicht --------------
+//
+// Gemessen (headless Chromium, Software-Rasterung, 263 Items, „beide an"): ein Bild kostet 34,5 ms,
+// 80 % davon die gestrichelten Kanten. Solange sich **nichts bewegt** (Pan, Ruhe, Zoomende), sind
+// Lappen und Kanten in jedem Bild **dieselben Pixel** -- sie werden einmal in eine eigene Leinwand
+// gezeichnet und danach nur noch geblittet: Pan **34,5 -> 2,3 ms**. Knoten und Beschriftungen bleiben
+// **live** (sie tragen Hover, Suche und Fokus).
+//
+// **Wann der Zwischenspeicher gilt** (`layer.sig`): Zoom, Geraetedichte, Bruchteil des Pans in
+// Geraetepixeln (ganze Pixel verschieben nur den Blit), die Schalter, die Filter, Kantenzahl und
+// `edgesVersion`, die Lappen (Objekt) und ein **Hash aller sichtbaren Knotenpositionen und Grade**.
+// Der Hash ersetzt eine Liste von Ausloesern („Drag, Reset, Toggle, Neuladen ..."): ein vergessener
+// Ausloeser waere ein **veraltetes Bild**, ein Hash kann das nicht vergessen (O(n), ~0,01 ms).
+//
+// **Wann nicht:** mit Hover (die Ringe aendern das Alpha der Kanten), waehrend die Simulation laeuft, im
+// Drag, ohne `document`/`drawImage` (Node-Waechter), und wenn die Schicht groesser als `LAYER_MAX_*` waere.
+//
+// **Bau-Regel (sonst wird es langsamer als vorher):** das Bild, in dem sich die Signatur aendert, wird
+// **direkt** gezeichnet; gebaut wird, wenn dieselbe Signatur ein **zweites** Mal kommt -- oder nach
+// `LAYER_IDLE_MS` Ruhe (Timer). Ein Mausrad-Schritt, ein Schalter, ein Drag zahlt den Aufbau nie.
+// Bei gebrochener Geraetedichte (Browser-Zoom 125 %) aendert **jedes** Pan-Bild die Signatur: dann wird nie
+// gebaut, die Karte zeichnet wie vorher.
+var layer = null;               // {sig, lobes, canvas, ix, iy, panX, panY}
+var layerKeySeen = null;        // Signatur des letzten **direkt** gezeichneten Ruhebilds
+var layerTimer = null;
+var edgesVersion = 0;
+var layerStats = { builds: 0, hits: 0, direct: 0 };
+
+function layerEligible() {
+  return typeof document !== "undefined" && !!document.createElement && !!ctx &&
+    typeof ctx.drawImage === "function";
+}
+
+function layerSignature(shown) {
+  var h = 0x811c9dc5 | 0;
+  for (var i = 0; i < nodes.length; i++) {
+    var n = nodes[i];
+    if (!shown[n.id]) continue;
+    h = Math.imul(h ^ Math.round(n.x * 8), 16777619);
+    h = Math.imul(h ^ Math.round(n.y * 8), 16777619);
+    h = Math.imul(h ^ n.deg, 16777619);
+  }
+  var fx = (((dpr * panX) % 1) + 1) % 1;
+  var fy = (((dpr * panY) % 1) + 1) % 1;
+  return [zoom, dpr, fx.toFixed(4), fy.toFixed(4), tagsEnabled ? 1 : 0, foldersEnabled ? 1 : 0,
+    filterType, filterStatus, explicitEdges.length, implicitEdges.length, edgesVersion, h].join("|");
+}
+
+// Der Umriss der Schicht in Weltkoordinaten: Knoten, Kontrollpunkte der Kanten, Lappen-Konturen + Rand.
+function layerBox(shown) {
+  var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  function add(x, y) {
+    if (x < x0) x0 = x;
+    if (x > x1) x1 = x;
+    if (y < y0) y0 = y;
+    if (y > y1) y1 = y;
+  }
+  for (var i = 0; i < nodes.length; i++) {
+    if (shown[nodes[i].id]) add(nodes[i].x, nodes[i].y);
+  }
+  var all = explicitEdges.concat(implicitEdges);
+  for (var j = 0; j < all.length; j++) {
+    var a = nodeById[all[j].src];
+    var b = nodeById[all[j].dst];
+    if (!a || !b || !shown[a.id] || !shown[b.id]) continue;
+    var g = edgeGeometry(a, b);
+    add(g.cx, g.cy);
+  }
+  if (lobeCache && lobeCache.lobes) {
+    for (var k = 0; k < lobeCache.lobes.length; k++) {
+      var rings = lobeCache.lobes[k].outer || [];
+      for (var r = 0; r < rings.length; r++) {
+        for (var q = 0; q < rings[r].length; q++) add(rings[r][q][0], rings[r][q][1]);
+      }
+    }
+  }
+  var margin = 16;      // Linienbreite (bis ~ 7 px) + Kontur
+  return { x0: x0 - margin, y0: y0 - margin, x1: x1 + margin, y1: y1 + margin };
+}
+
+// Baut die Schicht fuer die **aktuelle** Ansicht. `null`, wenn sie zu gross waere.
+function buildLayer(shown) {
+  var box = layerBox(shown);
+  if (!(box.x1 > box.x0) || !(box.y1 > box.y0)) return null;
+  var s = dpr * zoom;
+  var ix = Math.floor(dpr * panX + box.x0 * s);
+  var iy = Math.floor(dpr * panY + box.y0 * s);
+  var w = Math.ceil((box.x1 - box.x0) * s) + 2;
+  var h = Math.ceil((box.y1 - box.y0) * s) + 2;
+  if (w > LAYER_MAX_SIDE || h > LAYER_MAX_SIDE || w * h > LAYER_MAX_PX) return null;
+  var c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  var cc = c.getContext("2d");
+  if (!cc) return null;
+  // dieselbe Abbildung wie `draw()`: Geraet = dpr * (pan + zoom * welt), verschoben um (ix, iy)
+  cc.setTransform(s, 0, 0, s, dpr * panX - ix, dpr * panY - iy);
+  var main = ctx;
+  ctx = cc;
+  try {
+    drawLobes(shown);
+    drawEdges(explicitEdges.concat(implicitEdges), null, shown);
+  } finally {
+    ctx = main;
+  }
+  return { canvas: c, ix: ix, iy: iy, panX: panX, panY: panY };
+}
+
+// Setzt die Schicht in **dieses** Bild, wenn sie gilt (und baut sie nach der Bau-Regel). `true` = die
+// Lappen und Kanten stehen schon im Bild, der Aufrufer zeichnet nur noch Knoten und Beschriftungen.
+function blitLayer(shown, rings) {
+  if (rings || activeRafId !== null || dragNode || !layerEligible()) return false;
+  if (!lobeCache || lobeCache.key !== lobeKey(shown)) lobeCache = computeLobes(shown);
+  var sig = layerSignature(shown);
+  if (layer && (layer.sig !== sig || layer.lobes !== lobeCache)) layer = null;
+  if (!layer) {
+    if (layerKeySeen !== sig) {
+      layerKeySeen = sig;               // erstes Bild mit dieser Signatur: direkt zeichnen
+      layerStats.direct += 1;
+      scheduleLayerBuild();
+      return false;
+    }
+    layer = buildLayer(shown);
+    if (!layer) return false;
+    layer.sig = sig;
+    layer.lobes = lobeCache;
+    layerStats.builds += 1;
+  } else {
+    layerStats.hits += 1;
+  }
+  var dx = Math.round(dpr * (panX - layer.panX));
+  var dy = Math.round(dpr * (panY - layer.panY));
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.drawImage(layer.canvas, layer.ix + dx, layer.iy + dy);
+  ctx.restore();
+  return true;
+}
+
+// Nach `LAYER_IDLE_MS` Ruhe ein Bild zeichnen: dasselbe Signaturbild kommt ein zweites Mal -- die Schicht
+// wird gebaut, ohne dass der Nutzer etwas tun muss (nach `settle()`, nach dem letzten Mausrad-Schritt).
+function scheduleLayerBuild() {
+  if (layerTimer !== null || typeof window === "undefined" || !window.setTimeout) return;
+  layerTimer = window.setTimeout(function () {
+    layerTimer = null;
+    if (ctx && canvasEl && canvasEl.isConnected && activeRafId === null && !dragNode) draw();
+  }, LAYER_IDLE_MS);
+}
+
 function draw() {
   if (!ctx) return;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -1135,8 +1308,15 @@ function draw() {
   var shown = visibleNodes();
   var hits = searchQuery ? searchHits(shown) : null;
 
-  drawLobes(shown);
-  drawEdges(all, rings, shown);
+  if (blitLayer(shown, rings)) {
+    // `drawNodes()` **erbt** `lineCap`/`lineJoin` aus `drawEdges()`/`drawLobes()` (derselbe `save()`-Block);
+    // aus dem Zwischenspeicher kommt nichts davon -- also ausdruecklich setzen (sonst eckige Zell-Fortsaetze).
+    ctx.lineCap = "round";
+    ctx.lineJoin = lobeCache && lobeCache.lobes.length ? "round" : "miter";
+  } else {
+    drawLobes(shown);
+    drawEdges(all, rings, shown);
+  }
   drawNodes(rings, shown, hits);
 
   ctx.restore();
@@ -1236,14 +1416,13 @@ function drawEdges(all, rings, shown) {
     var focusEdge = rings && (a.id === rings.focus || b.id === rings.focus);
     ctx.globalAlpha = edgeAlpha(a, b, rings);
     ctx.strokeStyle = focusEdge ? COLORS.accent : COLORS.edge;
-    ctx.lineWidth = EDGE_WIDTH_BASE + Math.log2(1 + Math.min(a.deg, b.deg));
-    if (e.kind === "tag") {
-      ctx.setLineDash([4, 4]);
-    } else if (e.kind === "folder") {
-      ctx.setLineDash([1.5, 3]);
-    } else {
-      ctx.setLineDash([]);
-    }
+    var edgeWidth = EDGE_WIDTH_BASE + Math.log2(1 + Math.min(a.deg, b.deg));
+    ctx.lineWidth = edgeWidth;
+    var dash = e.kind === "tag" ? DASH_TAG : (e.kind === "folder" ? DASH_FOLDER : null);
+    // V4 (Addon Render): die runden Kappen schliessen eine Luecke, die nicht breiter ist als die Linie --
+    // der Strich **sieht** dann schon durchgezogen aus, kostet aber die volle Strichelung.
+    if (dash && dash[1] <= edgeWidth) dash = null;
+    ctx.setLineDash(dash || []);
     var geo = edgeGeometry(a, b);
     ctx.beginPath();
     ctx.moveTo(a.x, a.y);

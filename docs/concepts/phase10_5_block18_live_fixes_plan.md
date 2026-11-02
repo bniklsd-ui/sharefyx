@@ -8,7 +8,7 @@ down:
   - ./phase10_5_block18_addon_render.md   # 📗 Addon: Render-Effizienz (V1–V4), Messtabelle, Optionen
   - ./phase10_5_block18_addon_insel.md     # 📗 Addon: die ferne Insel (Tritt in der Abstoßung), Vorschlag ε, Zelle `insel`
   - ./phase10_5_block14_7_plan.md   # 📗 die Kartengeometrie (Hex-Anker, LOBE_SCALE), auf der 18.2 aufsetzt
-updated: 2026-11-02 (§5.6: zwei Addons — Render-Effizienz, ferne Insel; Korrektur zu 18.2) | 2026-11-02 (18.1/18.2 gebaut: Stern, Geschwindigkeitsgrenze, Bündeln verworfen; §5.5 offen: Strichelung, Ausreißer-Zelle) | 2026-11-01 (18.0 gemessen: §5 gefüllt, K1–K4/A1–A3 mit Befund, neuer Befund N1 — Schleuder-Instabilität im Tag-Zustand) | 2026-11-01 (E1–E4 beantwortet: Stern, Farben → P11, v4.0.1, Zeilen 18/49 als Wegwerf-Probe 18.5) | 2026-11-01 (Mini-Plan, Claude Code — Live-Sichtung des Nikingers nach Deploy D)
+updated: 2026-11-02 (§5.7/§6: Addons umgesetzt — V1/V3/V4, Mindestdistanz, Zelle `insel`; §6 nächste Session) | 2026-11-02 (§5.6: zwei Addons — Render-Effizienz, ferne Insel; Korrektur zu 18.2) | 2026-11-02 (18.1/18.2 gebaut: Stern, Geschwindigkeitsgrenze, Bündeln verworfen; §5.5 offen: Strichelung, Ausreißer-Zelle) | 2026-11-01 (18.0 gemessen: §5 gefüllt, K1–K4/A1–A3 mit Befund, neuer Befund N1 — Schleuder-Instabilität im Tag-Zustand) | 2026-11-01 (E1–E4 beantwortet: Stern, Farben → P11, v4.0.1, Zeilen 18/49 als Wegwerf-Probe 18.5) | 2026-11-01 (Mini-Plan, Claude Code — Live-Sichtung des Nikingers nach Deploy D)
 ---
 # Live-Funde nach Deploy D (Plan Block 18)
 
@@ -49,8 +49,8 @@ updated: 2026-11-02 (§5.6: zwei Addons — Render-Effizienz, ferne Insel; Korre
 | # | Inhalt | Fertig, wenn |
 |---|---|---|
 | 18.0 ✅ | **Messen** an der Wegwerf-Instanz mit einer Saat in Live-Form (≈ 200 Items, 5–7 Spaces, 2–3 Ordner mit 40–80 Items, ein Space mit **1** Item, Tags wie live). Je Zustand (aus / Tags / Ordner / beide): Kantenzahl, ms je `draw()` (`performance.now()` um `draw`, 60 Bilder Pan), Dauer der Simulation. Ausreißer: reproduzieren, dann „Layout zurücksetzen" — bleibt er (A1) oder geht er (A3)? Die Saatzahlen vorher beim Nikinger erfragen (er kennt die Live-Form; **kein** Lesen des echten `DATA_ROOT`) | Tabelle im Plan §5, Ursache für Ausreißer benannt — **✅ 2026-11-01** (§5; Ursache: N1 im Tag-Zustand, A1 nur teilweise, A3 wartet auf den Nikinger) |
-| 18.1 ✅/⚠️ | **Karte flüssig.** In der Reihenfolge der gemessenen Kosten: (a) Ordner-Kanten als **Stern** um das zuletzt geänderte Item (k−1 Kanten statt Clique, E1); (b) Kanten **gebündelt** zeichnen: je Stil (Art × Fokus × Breitenstufe) **ein** Pfad, **ein** `stroke()`; (c) `all` und Nachbarringe nur bei Änderung neu bauen (Kantenliste beim Toggle, Ringe je `hoverId`); (d) `draw()` aus Mausereignissen per `requestAnimationFrame` bündeln | `draw()` ≤ 16 ms bei „beide an" auf der Saat (Zahl vorher/nachher); bestehende Kartenwächter grün (`phase10_5_finishing/tests/test_graph_c2.py`, `test_b14_*`); Gegenlauf je Teilschritt |
-| 18.2 ✅/⚠️ | **Kein Punkt weit draußen.** *(2026-11-02: N1 gebaut, A1/A3 siehe §5.5)* Bei A1: der Ankerabstand richtet sich nach den **echten** Radien der Nachbarn (eng gepackt: `r_eigen + r_k + REGION_GAP`, kleine Spaces auf die inneren Plätze), nicht nach dem größten Space. Bei A3: Ablage auf `v: 2` heben (alte Positionen verfallen einmal). Zusätzlich robust: `fitView()` darf einen einzelnen Ausreißer nicht die ganze Karte verkleinern lassen (Vorschlag: einrahmen nach Umrissen, nicht nach Knoten — **nur** wenn 18.0 zeigt, dass A1/A3 allein nicht reichen) | Saat mit 1-Item-Space: größter Abstand Punkt ↔ nächster Nachbarumriss ≤ 2 × `REGION_GAP` (Zahl in §5); Zoom nach dem Öffnen > 50 %; Determinismus-Wächter (P10.5-65) bleibt grün |
+| 18.1 ✅ | **Karte flüssig.** In der Reihenfolge der gemessenen Kosten: (a) Ordner-Kanten als **Stern** um das zuletzt geänderte Item (k−1 Kanten statt Clique, E1); (b) Kanten **gebündelt** zeichnen: je Stil (Art × Fokus × Breitenstufe) **ein** Pfad, **ein** `stroke()`; (c) `all` und Nachbarringe nur bei Änderung neu bauen (Kantenliste beim Toggle, Ringe je `hoverId`); (d) `draw()` aus Mausereignissen per `requestAnimationFrame` bündeln | `draw()` ≤ 16 ms bei „beide an" auf der Saat (Zahl vorher/nachher); bestehende Kartenwächter grün (`phase10_5_finishing/tests/test_graph_c2.py`, `test_b14_*`); Gegenlauf je Teilschritt |
+| 18.2 ✅ | **Kein Punkt weit draußen.** *(2026-11-02: N1 gebaut, A1/A3 siehe §5.5)* Bei A1: der Ankerabstand richtet sich nach den **echten** Radien der Nachbarn (eng gepackt: `r_eigen + r_k + REGION_GAP`, kleine Spaces auf die inneren Plätze), nicht nach dem größten Space. Bei A3: Ablage auf `v: 2` heben (alte Positionen verfallen einmal). Zusätzlich robust: `fitView()` darf einen einzelnen Ausreißer nicht die ganze Karte verkleinern lassen (Vorschlag: einrahmen nach Umrissen, nicht nach Knoten — **nur** wenn 18.0 zeigt, dass A1/A3 allein nicht reichen) | Saat mit 1-Item-Space: größter Abstand Punkt ↔ nächster Nachbarumriss ≤ 2 × `REGION_GAP` (Zahl in §5); Zoom nach dem Öffnen > 50 %; Determinismus-Wächter (P10.5-65) bleibt grün |
 | 18.3 | ~~Editor-Farben~~ — **nach P11** (E2) | — |
 | 18.5 | **P10.5-18 und P10.5-49 als Wegwerf-Probe, automatisch und bleibend** (E4). Eine Probe im Repo (`probes/p105_b18_live_zeilen_probe.py`, JSON daneben, jederzeit wiederholbar): **18** — `/api/v1/overview` Waiting ≤ 300 ms und Space-Wechsel während des Polls ≤ 1 s, gemessen im Browser (Playwright, `PerformanceResourceTiming.responseStart − requestStart`) mit der Saat aus 18.0; **49** — zwei Browser-Kontexte, ein Write im einen, das Ereignis kommt im anderen an (≤ 2 s). Je **beide Eingänge**: direkt (Loopback, wie der Funnel auf den Dienst zeigt `[VERIFY]` an `phase3_edge/`) **und** hinter einem lokalen Caddy aus `phase9_hardening/step_a/Caddyfile.template` in der Live-Version 2.6.2 (Netzwerk-Werkzeuge sind erlaubt, E4). Werkzeug in eigenem Verzeichnis unter `~/.claude-code-tools/`, nie im Projekt-`.venv` | beide Zeilen ✅ mit Zahlen und Gegenlauf (z. B. Caddy mit `flush_interval` aus ⇒ 49 rot; künstliche Verzögerung im Poll ⇒ 18 rot); Probe vom Nikinger gesichtet (Memory „throwaway evidence counts as live") |
 | 18.4 | Update-Log-Zeile(n), volle Suite, `doc_health`, `ui_budget`, Commit + Push; Sichtung beim Nikinger (Bild der Karte, „beide an"); Deploy `v4.0.1` beim Nikinger | Abnahmezeile(n) P10.5-80 ff. im Head |
@@ -189,3 +189,48 @@ Mechanismus hoch). Der **Einzelpunkt in eigenem Umriss überlebt HEAD**: `MAX_SP
 
 **Entscheidungen beim Nikinger:** (1) Render: V1 + V3 (+ V4)? Mausrad? Bildschirmdichte? (2) Insel: ε-Regel in `v4.0.1` aufnehmen, und für `schleuder`
 Weg 1 oder 2. (3) Live-Prüfung nach dem Deploy (zwei Schritte, Addon Insel §6): Tags/Ordner aus + „Layout zurücksetzen" + herauszoomen; dann an + Reset.
+
+## 5.7 Gebaut: 18.2b und 18.3 — die Addons (2026-11-02, Entscheidung des Nikingers: „alle Performance-Änderungen einbauen")
+
+Beleg: `probes/p105_b18_karte_messung.{py,json}` (Normalfall, dpr 1), `…_dpr2.json`, Gegenläufe `p105_b18_gegenlauf_*.json`; Wächter
+`tests/test_b18_karte_messung.py` (16). Gebaut in `graph.js`: `REPULSION_MIN_DIST = 6` (Addon Insel), `SIM_STEPS_PER_FRAME = 2` (V3),
+`blitLayer()`/`buildLayer()`/`layerSignature()` (V1), `DASH_TAG`/`DASH_FOLDER` + die Regel `dash[1] <= edgeWidth` (V4). Mausrad: Neuaufbau
+(Standard, scharf). **Abweichung vom Addon:** die Signatur des Zwischenspeichers trägt einen **Hash aller Knotenpositionen und Grade** statt einer
+Liste von Auslösern (Drag, Reset, Toggle, Neuladen …) — ein vergessener Auslöser wäre ein veraltetes Bild, ein Hash kann ihn nicht vergessen (O(n), ~0,01 ms).
+
+| Zustand (dpr 1) | Bild in Ruhe / Pan | Bild mit Signaturwechsel (≈ vor V1) | Einschwingen vorher (18.1) → jetzt |
+|---|---|---|---|
+| aus | 1,8 ms | 3,8 ms | 2,1 s → 1,1 s |
+| Tags | 2,2 ms | 23,4 ms | 2,7 s → 1,4 s |
+| Ordner | 2,0 ms | 10,4 ms | 2,1 s → 1,0 s |
+| **beide** | **2,3 ms** (vorher 34,3) | 28,7 ms | 3,9 s → **1,6 s** (65 statt 129 Bilder, 25,5 ms je Bild) |
+| *beide, dpr 2* | **6,2 ms** | 46,8 ms | 2,6 s (> 2,5 s: die Zelle `sim_dauer` ist bei dpr 2 **rot**, ehrlich) |
+
+* **Zwischenspeicher = frisch gebaut:** **0** abweichende Pixel in acht Szenen (Ruhe, Pan, Zoom, Drag, Drag-Ende, Schalter Tags/Ordner, Filter), dpr 1 und 2.
+* **V4:** 135 der 573 Kanten (geschlossene Lücke) durchgezogen, **0** Verstöße gegen die Regel. **Nicht pixelgleich** (Addon: 28.282 Pixel, ≤ 0,3 %; im Ausschnitt nicht sichtbar) — der Nikinger sichtet.
+* **18.2b:** die Körpermaske ist in **allen vier Zuständen eine Komponente** (`insel` grün; HEAD von 18.2 war rot); weitester Knoten 905 / 617 / 919 / 598 px (vorher 973 / 662 / 919 / 596).
+  `MAX_SPEED` greift nirgends mehr (Spitze ≤ 244 px/Bild). Block-14-Probe **6/6 grün**; die 152-Item-Szene byte-gleich, **nur** die 200-Knoten-Budgetszene ist neu
+  (`pos_pruefsumme` 199672332 → 3527367083, `raf_calls` 130 → 66, `ruhe_ms` 2.147 → 1.080 — das ist V3). `ausreisser` **bleibt rot**: A1, Ordner-Zustand 125 px = 3,1 × `REGION_GAP`.
+
+**Gegenläufe** (jeder färbt **seine** Zelle rot, die übrigen bleiben): `clique` → `kanten` (+ `sim_dauer`, weil die Clique das alte Einschwingen ist) · `tritt` → `insel` · `veraltet` →
+`zwischenspeicher` · `ohne_speicher` → `bildzeit_ruhe` · `ein_schritt` → `sim_dauer` · `v4_aus` → `strichbild` · `kein_schutz` (beide Gurte aus) → `schleuder` **und** `insel`.
+**Ausnahme, ehrlich benannt:** der Gegenlauf `schleuder` (`MAX_SPEED` allein) **bleibt grün** — unter der Mindestdistanz greift die Grenze auf keiner gemessenen Saat (Addon Insel §4.4, Weg 1:
+der Gurt bleibt als **ungetesteter** zweiter Gurt stehen; `kein_schutz` zeigt, dass beide Gurte zusammen die Schleuder halten).
+
+**Nicht gelöst / Grenzen:** (1) **Hover-Wechsel und das Bild mit Signaturwechsel** kosten weiter ein volles Bild (28,7 ms bei dpr 1, 46,8 ms bei dpr 2) — ein verlorenes Bild je Fokuswechsel, kein Dauerruckeln.
+(2) **Das Einschwingen** läuft mit ≈ 25 ms je Bild (≈ 39 fps), nicht 60: unter A (Strichelung bleibt) ist das die Untergrenze; es dauert aber nur noch 1,6 s. (3) **Gebrochene Geräte-Dichte** (Browser-Zoom 125 %):
+jedes Pan-Bild ändert die Signatur, der Zwischenspeicher wird nie gebaut — die Karte zeichnet dann wie vorher (nie langsamer, aber ohne Gewinn). (4) **Nicht gemessen:** GPU-Rasterung, Firefox/Safari, die echte Bildschirmdichte des Nikingers.
+(5) Die Schicht hat einen Deckel (8.192 px je Kante, 16 Mio. Pixel); darüber wird direkt gezeichnet.
+
+## 6. Nächste Session (Stand 2026-11-02, nach 18.3)
+
+Offen in Block 18, in dieser Reihenfolge — **nichts davon ist gebaut**:
+
+1. **Sichtung beim Nikinger** (Wegwerf-Bilder genügen, `probes/p105_b18_karte_messung.py` legt sie unter `/tmp/opencode/sharefyx-wegwerf-b14/b18_1_*.png` ab): V4 (durchgezogene Kanten mit geschlossener Lücke) — „sieht so aus wie vorher"? Gefühl von Pan/Mausrad/Hover am echten Browser.
+2. **18.5 — P10.5-18/49 als Wegwerf-Probe** (E4, Schritt in §3): `probes/p105_b18_live_zeilen_probe.py` mit JSON; **18**: `/api/v1/overview` Waiting ≤ 300 ms und Space-Wechsel während des Polls ≤ 1 s (Playwright, `PerformanceResourceTiming.responseStart − requestStart`);
+   **49**: zwei Browser-Kontexte, ein Write im einen, das Ereignis kommt im anderen an (≤ 2 s); je **beide Eingänge** (Loopback **und** hinter lokalem Caddy 2.6.2 aus `phase9_hardening/step_a/Caddyfile.template`, Werkzeug unter `~/.claude-code-tools/`). Gegenläufe: Caddy mit `flush_interval` aus ⇒ 49 rot; künstliche Verzögerung im Poll ⇒ 18 rot. Muster: `p105_b18_karte_messung.py` (Wegwerf-Mechanik aus `p105_b14_layout_probe.py`).
+3. **18.4 — v4.0.1 vorbereiten:** `docs/UPDATE_LOG.md` (oberste Überschrift = Deploy-Tag; Vorschlag: „Die Karte ist mit Tags und Ordnern flüssig …", „Einzelne Punkte fliegen nicht mehr weit weg", „Ordner und Tags verbinden sich als Stern um das zuletzt geänderte Item"), Badge in
+   `phase5_ui/webui/static/app.html` (`.rail__version` und „Film zu v4.0.0" → Version prüfen), volle Suite, `doc_health`, `ui_budget` (nach 18.3 gemessen: `app.js` + `app.css` + Font **236,7 KB** gzip von 250 — `graph.js` ist um ≈ 8 KB gewachsen, **13 KB Luft** bleiben), Abnahmezeilen **P10.5-80 ff.** (Vorschlag: 80 Stern/Kantenzahl, 81 Mindestdistanz/`insel`,
+   82 Zwischenspeicher, 83 V3/V4) im Head, Commit + Push; **`deploy.sh main` und `health_gate.sh --expected-version=v4.0.1 --require-todays-update-log --expected-sha=<SHA>` macht der Nikinger** (Hard Rule 9).
+4. **Live-Prüfung nach dem Deploy, zwei Schritte** (Addon Insel §6): Tags **und** Ordner **aus**, „Layout zurücksetzen", herauszoomen — liegt ein Punkt in **eigenem** Umriss neben dem Körper? Dann **an**, „Layout zurücksetzen" — keine **Gruppe** grauer Knoten in eigenem Umriss, kein Bogen über mehrere Bildschirmbreiten.
+5. **Offen ohne Termin:** A1 (`ausreisser`, Ein-Item-Space auf seinem Hex-Platz, Ordner-Zustand 3,1 × `REGION_GAP`) — nur nach Sichtung; fasst P10.5-68 an. Editor-Farben → P11 (E2).

@@ -194,7 +194,14 @@ def seed(items: list[dict]) -> None:
 #
 # | Gegenlauf | Regel | Zelle | der Fehler |
 # |---|---|---|---|
-# | `clique` | 18.1 (a) -- Ordner/Tags sind ein **Stern** | `kanten`, `bildzeit` | die Gruppe wird wieder zur Clique |
+# | `clique` | 18.1 (a) -- Ordner/Tags sind ein **Stern** | `kanten` | die Gruppe wird wieder zur Clique |
+# | `tritt` | 18.2b -- die Abstossung hat eine **Mindestdistanz** | `insel` | `dist2` ohne Untergrenze (= HEAD von 18.2) |
+# | `kein_schutz` | 18.2/18.2b -- Mindestdistanz **und** `MAX_SPEED` | `schleuder` **und** `insel` | beide Gurte aus (zwei Zellen -- ehrlich benannt) |
+# | `schleuder` | 18.2 -- `MAX_SPEED` allein | **keine** (zahnlos unter der Mindestdistanz, Addon Insel §4.4) | die Grenze ist aus |
+# | `veraltet` | 18.3 V1 -- die Signatur **kennt die Positionen** | `zwischenspeicher` | nach einem Drag bleibt das alte Bild |
+# | `ohne_speicher` | 18.3 V1 -- der Zwischenspeicher wird **gebaut** | `bildzeit_ruhe` | nie gebaut: jedes Pan-Bild direkt |
+# | `ein_schritt` | 18.3 V3 -- **zwei** Schritte je Bild | `sim_dauer` | ein Schritt je Bild (129 Bilder) |
+# | `v4_aus` | 18.3 V4 -- geschlossene Luecke **durchgezogen** | `strichbild` | volle Strichelung trotz geschlossener Luecke |
 # (18.1 (b), Kanten je Stil **buendeln**, ist gemessen und **verworfen**: mit dem Buendel waren die Kanten bei
 # 480 + 93 Kanten **langsamer** (37,6 statt 29,1 ms) -- der Wert steht in `p105_b18_gegenlauf_buendel.json`)
 # | `schleuder` | 18.2 (N1) -- die Geschwindigkeit ist **begrenzt** | `schleuder` | die Grenze ist aus |
@@ -207,24 +214,60 @@ GEGENLAEUFE18: dict = {
             "    edges.push({ src: group[a].id, dst: group[b].id, kind: kind });\n"
             "  return;  // Gegenlauf: die Clique\n  var hub = starHub(group);",
     },
+    # 18.2 (N1): `MAX_SPEED` allein. **Unter der Mindestdistanz (18.2b) zahnlos** -- die Grenze greift auf
+    # keiner gemessenen Saat mehr (Spitze <= 326 px/Bild, Addon Insel §4.4); der Beleg zeigt das (Zelle bleibt gruen).
     "schleuder": {
         "const MAX_SPEED = 600;": "const MAX_SPEED = 1e9;   // Gegenlauf: keine Grenze",
+    },
+    # 18.2b: die Mindestdistanz der Abstossung (Addon Insel) -- ohne sie ist HEAD von 18.2: der Einzelpunkt-Tritt
+    "tritt": {
+        "      var dist2 = Math.max(dx * dx + dy * dy + 0.01, REPULSION_MIN_DIST * REPULSION_MIN_DIST);":
+            "      var dist2 = dx * dx + dy * dy + 0.01;   // Gegenlauf: keine Mindestdistanz",
+    },
+    # beide Gurte aus: die Schleuder (N1) kehrt zurueck -- `schleuder` UND `insel` werden rot
+    "kein_schutz": {
+        "      var dist2 = Math.max(dx * dx + dy * dy + 0.01, REPULSION_MIN_DIST * REPULSION_MIN_DIST);":
+            "      var dist2 = dx * dx + dy * dy + 0.01;   // Gegenlauf: keine Mindestdistanz",
+        "const MAX_SPEED = 600;": "const MAX_SPEED = 1e9;   // Gegenlauf: keine Grenze",
+    },
+    # 18.3 V1: die Signatur kennt die Knotenpositionen nicht -- nach einem Drag steht ein **veraltetes** Bild
+    "veraltet": {
+        "    h = Math.imul(h ^ Math.round(n.x * 8), 16777619);\n    h = Math.imul(h ^ Math.round(n.y * 8), 16777619);\n": "",
+    },
+    # 18.3 V1: der Zwischenspeicher wird nie gebaut
+    "ohne_speicher": {
+        "    layer = buildLayer(shown);\n    if (!layer) return false;":
+            "    layer = null;\n    return false;   // Gegenlauf: nie bauen",
+    },
+    # 18.3 V3: ein Simulationsschritt je Bild
+    "ein_schritt": {
+        "const SIM_STEPS_PER_FRAME = 2;": "const SIM_STEPS_PER_FRAME = 1;",
+    },
+    # 18.3 V4: die geschlossene Luecke bekommt wieder die volle Strichelung
+    "v4_aus": {
+        "    if (dash && dash[1] <= edgeWidth) dash = null;": "    // Gegenlauf: V4 aus",
     },
 }
 ARGS = {a.split("=", 1)[0]: (a.split("=", 1)[1] if "=" in a else "1") for a in _argv[1:]}
 GEGENLAUF = ARGS.get("--gegenlauf")
 if GEGENLAUF is not None and GEGENLAUF not in GEGENLAEUFE18:
     raise SystemExit("unbekannter Gegenlauf: %s (bekannt: %s)" % (GEGENLAUF, ", ".join(sorted(GEGENLAEUFE18))))
+DPR = int(ARGS.get("--dpr", "1"))      # Geraetedichte des Browsers (Retina = 2)
 if GEGENLAUF:
     RESULT = HIER / ("p105_b18_gegenlauf_%s.json" % GEGENLAUF)
 elif ARGS.get("--out"):
     RESULT = HIER / ("p105_b18_%s.json" % ARGS["--out"])
+elif DPR != 1:
+    RESULT = HIER / ("p105_b18_karte_messung_dpr%d.json" % DPR)
 
 
 # -- das Messpflaster ---------------------------------------------------------------------------
 # Haengt eine Hilfsschnittstelle an eine **Kopie** von `graph.js` (Anker: die erste Zeile von
 # `fitView()`, eindeutig). Der Patch aendert **keine** Regel -- er legt nur offen, was die Karte
 # im Inneren hat, und ruft vorhandene Funktionen auf.
+BODY_ANKER = "  return { key: lobeKey(shown), lobes: lobes };"
+BODY_NEU = ("  globalThis.__body = { koerper: koerper, spaceOf: spaceOf, furrow: furrow, cols: cols, rows: rows, cell: cell, minX: minX, minY: minY };\n"
+            "  return { key: lobeKey(shown), lobes: lobes };")
 PFLASTER_ANKER = "function fitView() {\n"
 PFLASTER = """globalThis.__sfx18 = {
   draw: function () { draw(); },
@@ -272,6 +315,41 @@ PFLASTER = """globalThis.__sfx18 = {
     }
     return sum;
   },
+  layerStats: function () { return {builds: layerStats.builds, hits: layerStats.hits, direct: layerStats.direct}; },
+  layerDrop: function () { layer = null; layerKeySeen = null; },
+  setView: function (z, px, py) { zoom = z; panX = px; panY = py; },
+  moveNode: function (id, dx, dy) { var n = nodeById[id]; n.x += dx; n.y += dy; },   // wie ein Drag: Lappen bleiben stehen
+  recomputeLobes: function () { lobeCache = computeLobes(visibleNodes()); },
+  snap: function () { globalThis.__snap = ctx.getImageData(0, 0, canvasEl.width, canvasEl.height).data; },
+  diff: function () {
+    var d = ctx.getImageData(0, 0, canvasEl.width, canvasEl.height).data, s = globalThis.__snap, n = 0;
+    for (var i = 0; i < d.length; i += 4) {
+      if (d[i] !== s[i] || d[i + 1] !== s[i + 1] || d[i + 2] !== s[i + 2] || d[i + 3] !== s[i + 3]) n++;
+    }
+    return n;
+  },
+  dashAudit: function () {          // Strichbild (V4): hat **jede** Kante das Muster, das die Regel verlangt?
+    var calls = [];
+    var o = ctx.setLineDash;
+    ctx.setLineDash = function (p) { calls.push(p.length); o.call(ctx, p); };
+    try { globalThis.__sfx18.edgesOnly(); } finally { ctx.setLineDash = o; }
+    calls.pop();                     // der Abschluss `setLineDash([])` nach der Schleife
+    var shown = visibleNodes(), all = explicitEdges.concat(implicitEdges);
+    var idx = 0, viol = 0, dashed = 0, closed = 0, solid = 0;
+    for (var i = 0; i < all.length; i++) {
+      var a = nodeById[all[i].src], b = nodeById[all[i].dst];
+      if (!a || !b || !shown[a.id] || !shown[b.id]) continue;
+      var w = EDGE_WIDTH_BASE + Math.log2(1 + Math.min(a.deg, b.deg));
+      var gap = all[i].kind === "tag" ? DASH_TAG[1] : (all[i].kind === "folder" ? DASH_FOLDER[1] : 0);
+      var expectDash = gap > 0 && gap > w;
+      var gotDash = calls[idx++] > 0;
+      if (gotDash !== expectDash) viol++;
+      if (gotDash) dashed++; else solid++;
+      if (gap > 0 && !expectDash) closed++;
+    }
+    return {kanten: idx, gestrichelt: dashed, durchgezogen: solid, geschlossene_luecke: closed,
+            verstoesse: viol, aufrufe: calls.length};
+  },
   positions: function () {
     return nodes.map(function (n) { return [n.id, n.x, n.y, n.space, n.deg]; });
   },
@@ -291,6 +369,30 @@ PFLASTER = """globalThis.__sfx18 = {
   view: function () { return {zoom: zoom, panX: panX, panY: panY, cssWidth: cssWidth, cssHeight: cssHeight}; },
 };
 globalThis.__sfx18trace = [];
+globalThis.__insel = function () {       // die Koerpermaske: genau **eine** Komponente? (Addon Insel §5)
+  var B = globalThis.__body; if (!B) return null;
+  var cols = B.cols, rows = B.rows, lab = new Int32Array(cols * rows).fill(-1), n = 0, st = [];
+  for (var s = 0; s < cols * rows; s++) {
+    if (lab[s] >= 0 || B.koerper[s] !== 1) continue;
+    lab[s] = n; st.push(s);
+    while (st.length) { var c = st.pop(), x = c % cols, y = (c / cols) | 0;
+      var nb = [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]];
+      for (var q = 0; q < 4; q++) { var nx = nb[q][0], ny = nb[q][1];
+        if (nx < 0 || ny < 0 || nx >= cols || ny >= rows) continue;
+        var k = ny * cols + nx; if (lab[k] < 0 && B.koerper[k] === 1) { lab[k] = n; st.push(k); } } }
+    n++;
+  }
+  var comp = nodes.map(function (nd) { return lab[Math.floor((nd.y - B.minY) / B.cell) * cols + Math.floor((nd.x - B.minX) / B.cell)]; });
+  var cnt = {}; comp.forEach(function (c) { cnt[c] = (cnt[c] || 0) + 1; });
+  var main = Object.keys(cnt).sort(function (a, b) { return cnt[b] - cnt[a]; })[0] | 0;
+  var isles = {};
+  nodes.forEach(function (nd, i) { if (comp[i] === main) return;
+    var g = Infinity; nodes.forEach(function (m, j) { if (comp[j] === main) g = Math.min(g, Math.hypot(nd.x - m.x, nd.y - m.y)); });
+    var I = isles[comp[i]] = isles[comp[i]] || {n: 0, gap: Infinity, ids: []};
+    I.n++; I.gap = Math.min(I.gap, g); I.ids.push(nd.id); });
+  return {body: n, isles: Object.keys(isles).map(function (k) { return isles[k]; }).sort(function (a, b) { return b.gap - a.gap; })};
+};
+
 var __integrate18 = integrate;
 integrate = function (alpha) {      // Messpflaster: ruft die echte Funktion, notiert danach nur mit
   __integrate18(alpha);
@@ -324,11 +426,17 @@ ZEIT = r"""(n) => {
                         for (let i = 0; i < n; i++) { f(); h.flush(); }
                         return (performance.now() - t0) / n; };
   h.setHover(null);
-  out.draw_ms = zeit(() => h.draw());
+  h.layerDrop(); h.draw(); h.draw(); h.draw();           // direkt, Bau, Treffer
+  out.draw_ms = zeit(() => h.draw());                    // Ruhe: der Zwischenspeicher (V1)
+  const v0 = h.view();
+  out.pan_ms = zeit(() => { const v = h.view(); h.setView(v.zoom, v.panX + 1, v.panY); h.draw(); });
+  h.setView(v0.zoom, v0.panX, v0.panY);
+  out.stats_nach_pan = h.layerStats();
+  out.draw_direkt_ms = zeit(() => { h.layerDrop(); h.draw(); });   // das Bild **mit** Signaturwechsel: wie vor V1
+  h.draw(); h.draw();
   out.draw_nur_kanten_ms = zeit(() => h.edgesOnly());
   out.kanten_ohne_strichelung_ms = zeit(() => h.edgesNoDash());
   out.kanten_lange_striche_ms = zeit(() => h.edgesLongDash());
-  out.draw_ohne_strichelung_ms = zeit(() => h.drawNoDash());
   out.implizite_laenge_px = h.implicitLength();
   const hub = h.hub();
   out.hub = hub;
@@ -343,6 +451,31 @@ ZEIT = r"""(n) => {
   out.kraefte_ms = (performance.now() - tf) / 5;
   h.draw();
   out.kanten = h.edges();
+  return out;
+}"""
+
+ZWISCHEN = r"""() => {
+  const h = globalThis.__sfx18;
+  const out = [];
+  const frames = () => { h.draw(); h.draw(); h.draw(); };      // direkt, Bau, Treffer
+  const pruefe = (name) => {
+    h.setHover(null); frames(); h.snap();                      // A: das Bild, das der Nutzer sieht
+    const s = h.layerStats();
+    h.layerDrop(); h.draw(); h.draw();                         // B: frisch gebauter Zwischenspeicher
+    out.push({name: name, abweichende_pixel: h.diff(), treffer: s.hits});
+  };
+  const ansicht = h.view();
+  pruefe('ruhe');
+  h.setView(ansicht.zoom, ansicht.panX + 37, ansicht.panY - 21); pruefe('pan');
+  h.setView(ansicht.zoom * 0.8, ansicht.panX + 37, ansicht.panY - 21); pruefe('zoom');
+  const hub = h.hub();
+  h.moveNode(hub, 60, -40); pruefe('drag');                    // wie ein Drag: die Lappen bleiben stehen
+  h.recomputeLobes(); pruefe('drag_ende');                     // Drag-Ende: die Lappen werden neu berechnet
+  const set = (id, v) => { const el = document.getElementById(id); el.checked = v; el.dispatchEvent(new Event('change', {bubbles: true})); };
+  set('overview-graph-toggle-tags', false); pruefe('schalter_tags');
+  set('overview-graph-toggle-folders', false); pruefe('schalter_ordner');
+  const sel = document.getElementById('overview-graph-filter-type');
+  if (sel && sel.options.length > 1) { sel.value = sel.options[1].value; sel.dispatchEvent(new Event('change', {bubbles: true})); pruefe('filter'); }
   return out;
 }"""
 
@@ -479,14 +612,15 @@ def main():
     out = {"konstanten": konst, "zustaende": {}}
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        ctx = browser.new_context(viewport={"width": 1920, "height": 1200}, ignore_https_errors=True)
+        ctx = browser.new_context(viewport={"width": 1920, "height": 1200}, ignore_https_errors=True,
+                                  device_scale_factor=AUFTRAG.get("dpr", 1))
         page = ctx.new_page()
         page.add_init_script("localStorage.setItem('sfx:film:gesehen','4.0.0')")
         page.add_init_script(RAF_PROBE)
         page.on("pageerror", lambda e: fehler.append(str(e)))
         login(page)
         out["browser"] = {"version": browser.version, "user_agent": page.evaluate("() => navigator.userAgent"),
-                          "viewport": "1920x1200", "kopfloser_chromium": True}
+                          "viewport": "1920x1200", "kopfloser_chromium": True, "dpr": AUFTRAG.get("dpr", 1)}
         # Basislauf: leere Ablage, alles aus -> der Ausreisser-Zustand der Wegwerf-Instanz (A1)
         lauf = frischer_lauf(page)
         out["pinned_beim_start"] = lauf["pinned_beim_start"]
@@ -500,6 +634,9 @@ def main():
             geo = geometrie(page, konst["FIT_MARGIN"], konst["ZOOM_MIN"], konst["REGION_GAP"])
             paare = page.evaluate("() => globalThis.__sfx18.implicitList()")
             messung["paare_sha256"] = hashlib.sha256("\n".join(paare).encode()).hexdigest()
+            ins = page.evaluate("() => globalThis.__insel()")
+            geo["koerper_komponenten"] = ins["body"] if ins else None
+            geo["inseln"] = ins["isles"] if ins else None
             out["zustaende"][name] = {"simulation": sim, "draw": messung, "geometrie": geo}
             if AUFTRAG.get("bilder_dir"):
                 page.locator("#overview-graph-canvas").screenshot(
@@ -509,6 +646,12 @@ def main():
                     page.locator("#overview-graph-canvas").screenshot(
                         path=str(Path(AUFTRAG["bilder_dir"]) / "b18_1_beide_ohne_strichelung.png"))
                     page.evaluate("() => globalThis.__sfx18.draw()")
+        # V1: ist der Zwischenspeicher nach jedem Ausloeser **gleich** einem frisch gebauten? (Zustand "beide")
+        zustand(page, True, True)
+        simulation(page)
+        page.wait_for_timeout(400)
+        out["strichbild"] = page.evaluate("() => globalThis.__sfx18.dashAudit()")
+        out["zwischenspeicher"] = page.evaluate(ZWISCHEN)
         # A3-Gegenprobe: 'Layout zuruecksetzen' auf der frischen Instanz aendert die Karte nicht
         # (es gibt dort keine gemerkte Ablage) -- die Ursache A3 laesst sich hier NICHT zeigen.
         out["fehler_in_der_seite"] = fehler
@@ -555,6 +698,7 @@ def main() -> int:
     creds = b14._setup()
     seed(items)
     b14.GRAPH_PATCH_EXTRA[PFLASTER_ANKER] = PFLASTER
+    b14.GRAPH_PATCH_EXTRA[BODY_ANKER] = BODY_NEU
     if GEGENLAUF:
         b14.GRAPH_PATCH_EXTRA.update(GEGENLAEUFE18[GEGENLAUF])
     resultat = RESULT
@@ -564,7 +708,7 @@ def main() -> int:
             "base": b14.BASE, "space": b14.SPACE, "password": creds["password"], "secret": creds["secret"],
             "repo_root": str(REPO_ROOT), "auth_db": str(b14.AUTH_DB), "result": str(resultat),
             "wachser_space": "epsilon", "extra_items": 0, "pid": b14.PID, "spaces": SPACES,
-            "n_bilder": 30, "bilder_dir": str(b14.WEGWERF_ROOT),
+            "n_bilder": 30, "bilder_dir": str(b14.WEGWERF_ROOT), "dpr": DPR,
         }
         b14.AUFTRAG_DATEI.write_text(json.dumps(auftrag), encoding="utf-8")
         skript = b14.WEGWERF_ROOT / ("browser18_%d.py" % b14.PID)
@@ -597,7 +741,13 @@ def main() -> int:
     beleg["zellen"] = {
         # 18.1: Kanten = Stern der Saat (Menge **und** Paare), Bildzeit "beide an" <= 16 ms
         "kanten": all(z["kanten_gegenrechnung"]["ok"] for z in zs.values()),
-        "bildzeit": zs["beide"]["draw"]["draw_ms"] <= 16.0,
+        # 18.3 V1/V3/V4 (Addon Render): Bildzeit in Ruhe/Pan <= 16,7 ms, Einschwingen <= 2,5 s, Strichbild, Cache gleich frisch
+        "bildzeit_ruhe": zs["beide"]["draw"]["pan_ms"] <= 16.7,
+        "sim_dauer": zs["beide"]["simulation"]["dauer_ms"] <= 2500,
+        "zwischenspeicher": all(s["abweichende_pixel"] == 0 for s in beleg["zwischenspeicher"]),
+        "strichbild": beleg["strichbild"]["verstoesse"] == 0 and beleg["strichbild"]["geschlossene_luecke"] > 0,
+        # 18.2b (Addon Insel): die Koerpermaske ist in **jedem** Zustand genau eine Komponente
+        "insel": all(z["geometrie"]["koerper_komponenten"] == 1 for z in zs.values()),
         # 18.2 (N1): kein Knoten weiter als 1300 px vom Median-Mittelpunkt (vorher 2790 im Tag-Zustand)
         "schleuder": all(z["geometrie"]["weiteste_knoten"][0]["abstand_vom_median_px"] <= 1300
                          for z in zs.values()),
@@ -605,6 +755,10 @@ def main() -> int:
         "ausreisser": all((z["geometrie"]["ausreisser_umriss_luecke_px"] or 0) <= 2 * gap
                           for z in zs.values()),
     }
+    # **Nur berichtet, keine Schwelle** (Addon Render §4 V2): der Hover-Wechsel kostet ein volles Bild
+    beleg["info"] = {"hover_wechsel_ms": zs["beide"]["draw"]["draw_hover_ms"],
+                     "bild_mit_signaturwechsel_ms": zs["beide"]["draw"]["draw_direkt_ms"],
+                     "einschwingen_je_bild_ms": zs["beide"]["simulation"]["intervall_mittel_ms"]}
     resultat.write_text(json.dumps(beleg, indent=1, ensure_ascii=False), encoding="utf-8")
     print("Gegenrechnung der Kanten:",
           {n: z["kanten_gegenrechnung"]["ok"] for n, z in beleg["zustaende"].items()})

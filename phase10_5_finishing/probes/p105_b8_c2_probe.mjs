@@ -45,8 +45,12 @@ const gegenlauf = argValue("--gegenlauf");
 // Kommentar) und war danach grün, ohne dass der Defekt wiederhergestellt war.
 const GEGENLAEUFE = {
   // Die Lappen fallen aus: die Karte zeigt nur noch Bahnen und Zellen.
+  // **[2026-11-02, Block 18.3]** Der Anker war `"  drawLobes(shown);"` -- seit dem Zwischenspeicher steht dieser
+  // Aufruf **zweimal** in `graph.js` (`buildLayer()` und `draw()`); der Gegenlauf traf nur den ersten und
+  // blieb gruen. Der Anker ist jetzt der Aufruf in `draw()` samt Nachbarzeile (der Direktweg, den dieser
+  // Node-Waechter ohne `document` ausschliesslich nimmt).
   lappen: [
-    ["  drawLobes(shown);", "  /* drawLobes(shown); */"],
+    ["    drawLobes(shown);\n    drawEdges(all, rings, shown);", "    /* drawLobes(shown); */\n    drawEdges(all, rings, shown);"],
   ],
   // Die Furche faellt aus: die Lappen zweier Spaces wachsen ineinander.
   furche: [
