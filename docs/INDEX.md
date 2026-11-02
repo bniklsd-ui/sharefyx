@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-11-02 (Block 18: zwei Addons) | 2026-11-02 (Block 18.1/18.2 gebaut) | 2026-11-01 (Block 18.0 gemessen) | 2026-11-01 (Block 18 geplant, Deploy D live) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-11-02 (Block 18: zwei Addons) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -38,7 +38,7 @@ updated: 2026-11-02 (Block 18: zwei Addons) | 2026-11-02 (Block 18.1/18.2 gebaut
 - [docs/concepts/sichtpruefung_automation_conventions.md](./concepts/sichtpruefung_automation_conventions.md) — 📗 **21.765 B** · Konventionen der Sichtprüfungs-Automatisierung · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/concepts/sichtpruefung_automation_tooling.md](./concepts/sichtpruefung_automation_tooling.md) — 📗 ~26KB · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/concepts/launch_film_learnings.md](./concepts/launch_film_learnings.md) — 📗 **6249 B** · Rezept + Lehren des Launch-Films v4.0.0 (Stil, den der Nikinger abnahm; Fallen) — zuerst lesen vor jedem neuen Film
-- [docs/PROMPTS.md](./PROMPTS.md) — 📗 **31742 B** · fünf Workflow-Prompts (Session-Start, Kickoff, Abschluss, Ultra-Review, Addon-Agent); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [docs/PROMPTS.md](./PROMPTS.md) — 📗 **31742 B** · fünf Workflow-Prompts (Start, Kickoff, Abschluss, Review, Addon); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 
 ## Phase 10 — ✅ abgeschlossen 2026-10-20 (Bestandsaufnahme, kein Produktcode; Plan P10.5)
 
@@ -73,9 +73,9 @@ updated: 2026-11-02 (Block 18: zwei Addons) | 2026-11-02 (Block 18.1/18.2 gebaut
 - [docs/concepts/phase10_5_launch_film_plan.md](./concepts/phase10_5_launch_film_plan.md) — 📗 **34170 B** · Plan Block 16: Launch-Film v4.0.0
 - [docs/concepts/phase10_5_block15_review_fixes_plan.md](./concepts/phase10_5_block15_review_fixes_plan.md) — 📗 **31775 B** · Block 15: Review-Fixes B1–B10 (✅)
 - [docs/concepts/phase10_5_block17_film_app_plan.md](./concepts/phase10_5_block17_film_app_plan.md) — 📗 **11012 B** · Plan Block 17: Film in die App (✅)
-- [docs/concepts/phase10_5_block18_live_fixes_plan.md](./concepts/phase10_5_block18_live_fixes_plan.md) — 📗 **22836 B** · Mini-Plan Block 18: Live-Funde nach D (🔄 18.0–18.2 ✅, §5.5 offen)
-- [docs/concepts/phase10_5_block18_addon_render.md](./concepts/phase10_5_block18_addon_render.md) — 📗 **25401 B** · Addon Block 18: Render-Effizienz der Karte (V1–V4, Messtabelle, Optionen)
-- [docs/concepts/phase10_5_block18_addon_insel.md](./concepts/phase10_5_block18_addon_insel.md) — 📗 **23811 B** · Addon Block 18: die ferne Insel (Tritt in der Abstoßung, Vorschlag ε, Zelle `insel`)
+- [docs/concepts/phase10_5_block18_live_fixes_plan.md](./concepts/phase10_5_block18_live_fixes_plan.md) — 📗 **22836 B** · Plan Block 18 (🔄)
+- [docs/concepts/phase10_5_block18_addon_render.md](./concepts/phase10_5_block18_addon_render.md) — 📗 **25401 B** · Addon: Render
+- [docs/concepts/phase10_5_block18_addon_insel.md](./concepts/phase10_5_block18_addon_insel.md) — 📗 **23811 B** · Addon: ferne Insel
 - [docs/concepts/phase10_5_p10j_lauf2_eurofleet.md](./concepts/phase10_5_p10j_lauf2_eurofleet.md) — 📗 **4149 B** · Notiz an eurofleet: P10.5-28 (P10-J Lauf 2)
 - [docs/concepts/phase10_5_block15_review_fixes_plan_anhang.md](./concepts/phase10_5_block15_review_fixes_plan_anhang.md) — 📦 **14534 B** · Anhang Block 15: Anmerkungen 15.1–15.3b
 - [docs/concepts/phase10_5_ultra_review_v4.0.0.md](./concepts/phase10_5_ultra_review_v4.0.0.md) — 📕 **19192 B** · Ultra-Review v4.0.0: 22 Befunde, B1 kritisch
@@ -206,7 +206,7 @@ doppelt hier gelistet.)*
 - [docs/INDEX_ENTRIES_ARCHIVE.md](./INDEX_ENTRIES_ARCHIVE.md) — 📦 **46.456 B** · L3-Archiv der **datierten Nachträge aus den Einträgen dieser Karte**, verbatim, ein Abschnitt je Karte in der Reihenfolge der Karte (nicht newest-first). **Regel:** eine Kartenzeile bekommt **keinen** datierten Nachtrag mehr (`test_no_entry_line_carries_a_dated_addendum_any_more`) — die Karte ist **Stand**, das Archiv ist **Chronik**
 - [docs/INDEX_KURZUNG_ARCHIVE.md](./INDEX_KURZUNG_ARCHIVE.md) — 📦 **13917 B** · L3-Archiv der aus der Karte gekürzten Texte — die acht Abschnittsköpfe und sechs Kartenzeilen-Chroniken, verbatim (zuletzt 2026-11-01, P10.5-2-Luft); die Karte trägt wieder Stand, dieses Archiv die Chronik des Kürzens
 
-- [docs/INDEX_UPDATES_ARCHIVE.md](./INDEX_UPDATES_ARCHIVE.md) — 📦 **26.463 B** · L3-Archiv der `updated:`-Kette **dieser** Datei, verbatim, newest-first (erste Rotation 2026-09-19); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [docs/INDEX_UPDATES_ARCHIVE.md](./INDEX_UPDATES_ARCHIVE.md) — 📦 **27.042 B** · L3-Archiv der `updated:`-Kette **dieser** Datei, verbatim, newest-first (erste Rotation 2026-09-19); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/PROJECT_SESSION_LOG.md](./PROJECT_SESSION_LOG.md) — 📦 **268.563 B** (vor der 24-Block-Rotation 101.450 B) · L3-Archiv der historischen `[YYYY-MM-DD]`-Session-Bloecke aus `CLAUDE.md` §Current state, newest-first, plus §Frontmatter-Archiv (die `updated:`-Kette der Wurzel-`CLAUDE.md`, 28 Eintraege, verbatim seit 2026-09-13). Wer die Chronik einer alten Phase sucht, faengt hier an, nicht im Wurzel-Head
 
 ## Referenzmaterial (nicht Teil des Plan/Konzept/Handover-Trios)
