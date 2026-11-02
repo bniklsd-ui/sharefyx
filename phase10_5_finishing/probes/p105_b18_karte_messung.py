@@ -32,6 +32,7 @@ Ergebnis: `phase10_5_finishing/probes/p105_b18_karte_messung.json`
 from __future__ import annotations
 
 import importlib.util
+import hashlib
 import json
 import re
 import subprocess
@@ -39,7 +40,7 @@ import sys
 from pathlib import Path
 
 HIER = Path(__file__).resolve().parent
-RESULT = HIER / "p105_b18_karte_messung.json"
+RESULT = HIER / "p105_b18_karte_messung.json"   # der Normalfall (18.1/18.2 nach dem Umbau)
 
 # -- die Block-14-Probe als Modul laden (ohne ihre Kommandozeile zu erben) ------------------------
 _argv = sys.argv
@@ -86,7 +87,8 @@ def spec() -> list[dict]:
 
 
 def erwartet(items: list[dict]) -> dict:
-    """Spiegel von `buildTagEdges`/`buildFolderEdges`/`rebuildImplicitEdges` -- aus der Saat."""
+    """Spiegel von `buildTagEdges`/`buildFolderEdges`/`rebuildImplicitEdges` (Stern, Block 18.1) --
+    aus der Saat. Die Mitte einer Gruppe ist ihr Item mit dem groessten `k` (= `updated`)."""
     def key(a, b):
         return (a, b) if a < b else (b, a)
 
@@ -99,24 +101,33 @@ def erwartet(items: list[dict]) -> dict:
     for t, ids in je_tag.items():
         if len(ids) > TAG_CLIQUE_LIMIT:
             continue
-        for a in range(len(ids)):
-            for b in range(a + 1, len(ids)):
-                k = key(ids[a], ids[b])
-                if k in gesehen:
-                    continue
-                gesehen.add(k)
-                tag_kanten.append(k)
+        hub = max(ids)
+        for k_ in ids:
+            if k_ == hub:
+                continue
+            k = key(hub, k_)
+            if k in gesehen:
+                continue
+            gesehen.add(k)
+            tag_kanten.append(k)
     je_ordner: dict = {}
     for it in items:
         if it["folder"]:
             je_ordner.setdefault((it["space"], it["folder"]), []).append(it["k"])
-    ordner_kanten = [key(ids[a], ids[b]) for ids in je_ordner.values() if len(ids) >= 2
-                     for a in range(len(ids)) for b in range(a + 1, len(ids))]
+    ordner_kanten = [key(max(ids), k_) for ids in je_ordner.values() if len(ids) >= 2
+                     for k_ in ids if k_ != max(ids)]
 
     def implizit(*listen):
-        out = [k for liste in listen for k in liste]
-        return len([k for k in out if k not in explizit])
+        # (Art, Paar) -- wie der Seitenhaken sie liefert; eine explizite Kante streicht die implizite
+        return sorted("%s:%d-%d" % (art, a, b)
+                      for art, liste in listen for (a, b) in liste if (a, b) not in explizit)
 
+    zustaende = {
+        "aus": [],
+        "tags": implizit(("tag", tag_kanten)),
+        "ordner": implizit(("folder", ordner_kanten)),
+        "beide": implizit(("tag", tag_kanten), ("folder", ordner_kanten)),
+    }
     return {
         "explizit": len(explizit),
         "tag_kanten": len(tag_kanten),
@@ -124,8 +135,8 @@ def erwartet(items: list[dict]) -> dict:
         "tags_gesamt": len(je_tag),
         "tags_ueber_limit": len([t for t, ids in je_tag.items() if len(ids) > TAG_CLIQUE_LIMIT]),
         "tag_max_knoten": max(len(v) for v in je_tag.values()),
-        "implizit": {"aus": 0, "tags": implizit(tag_kanten), "ordner": implizit(ordner_kanten),
-                     "beide": implizit(tag_kanten, ordner_kanten)},
+        "implizit": {z: len(v) for z, v in zustaende.items()},
+        "paare": zustaende,
     }
 
 
@@ -151,23 +162,63 @@ def seed(items: list[dict]) -> None:
         f"items = json.loads({json.dumps(json.dumps(items))})\n"
         "for sp in spaces: create_space(root, sp)\n"
         "for sp in spaces[1:]: add_member(root, sp, 'alpha', write=True)\n"
+        # **Die Uhr laeuft je Item eine Sekunde weiter** (Block 18.1): der Stern haengt am zuletzt
+        # geaenderten Item, `updated` ist auf die Sekunde genau -- gleiche Zeitstempel waeren lauter
+        # Gleichstaende, und die Probe prueft die Wahl der Mitte nicht. Item k hat `updated` = k s.
+        "tick = [0]\n"
         "s = Store(root, git=False,\n"
-        "          now_fn=lambda: datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc))\n"
-        "ids = {}\n"
+        "          now_fn=lambda: datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)\n"
+        "                         + __import__('datetime').timedelta(seconds=tick[0]))\n"
+        "def _id(k): return 'itm_%08x' % (k + 1)      # die festen IDs: Item k hat die ID k + 1\n"
         "for it in items:\n"
+        "    tick[0] = it['k']\n"
         "    kw = dict(type='task' if it['k'] % 3 == 0 else 'note',\n"
-        "              title='%s %03d' % (it['space'].title(), it['i'] + 1), tags=it['tags'])\n"
+        "              title='%s %03d' % (it['space'].title(), it['i'] + 1), tags=it['tags'],\n"
+        "              links=[_id(z) for z in dict.fromkeys(it['links'])])\n"
         "    if kw['type'] == 'task': kw['status'] = 'open'\n"
         "    if it['folder']: kw['folder'] = it['folder']\n"
-        "    ids[it['k']] = s.create(it['space'], **kw).id\n"
-        "for it in items:\n"
-        "    if it['links']:\n"
-        "        s.update(ids[it['k']], version=1, links=[ids[z] for z in dict.fromkeys(it['links'])])\n"
+        "    made = s.create(it['space'], **kw)\n"
+        "    assert made.id == _id(it['k']), (made.id, it['k'])\n"
         "s.rebuild_index()\n"
-        "print('geseedet:', len(ids))\n"
+        "print('geseedet:', len(items))\n"
     )
     subprocess.run([".venv/bin/python", "-c", code], check=True, cwd=str(REPO_ROOT),
                    env={**b14._saubere_umgebung(), "PYTHONPATH": str(REPO_ROOT / "phase1_storage")})
+
+
+# -- Aufruf: Beleg-Datei und Gegenlaeufe ---------------------------------------------------------
+# `--out=NAME` schreibt `p105_b18_NAME.json` (der Beleg von 18.0 heisst `basislinie` und bleibt
+# unangetastet). `--gegenlauf=NAME` bricht **eine** Regel in der Kopie von `graph.js` und schreibt in
+# `p105_b18_gegenlauf_NAME.json` -- ein Gegenlauf darf nie einen Normalfall-Beleg ueberschreiben.
+# Jeder Gegenlauf muss **genau die** zugehoerige Zelle rot machen (Memory: ehrliche Gegenlaeufe).
+#
+# | Gegenlauf | Regel | Zelle | der Fehler |
+# |---|---|---|---|
+# | `clique` | 18.1 (a) -- Ordner/Tags sind ein **Stern** | `kanten`, `bildzeit` | die Gruppe wird wieder zur Clique |
+# (18.1 (b), Kanten je Stil **buendeln**, ist gemessen und **verworfen**: mit dem Buendel waren die Kanten bei
+# 480 + 93 Kanten **langsamer** (37,6 statt 29,1 ms) -- der Wert steht in `p105_b18_gegenlauf_buendel.json`)
+# | `schleuder` | 18.2 (N1) -- die Geschwindigkeit ist **begrenzt** | `schleuder` | die Grenze ist aus |
+# (die Anker der Gegenlaeufe 18.2 stehen in `GEGENLAEUFE18`, sobald die Regel im Code steht)
+GEGENLAEUFE18: dict = {
+    "clique": {
+        "function starEdges(group, kind, seen, edges) {\n  var hub = starHub(group);":
+            "function starEdges(group, kind, seen, edges) {\n"
+            "  for (var a = 0; a < group.length; a++) for (var b = a + 1; b < group.length; b++)\n"
+            "    edges.push({ src: group[a].id, dst: group[b].id, kind: kind });\n"
+            "  return;  // Gegenlauf: die Clique\n  var hub = starHub(group);",
+    },
+    "schleuder": {
+        "const MAX_SPEED = 600;": "const MAX_SPEED = 1e9;   // Gegenlauf: keine Grenze",
+    },
+}
+ARGS = {a.split("=", 1)[0]: (a.split("=", 1)[1] if "=" in a else "1") for a in _argv[1:]}
+GEGENLAUF = ARGS.get("--gegenlauf")
+if GEGENLAUF is not None and GEGENLAUF not in GEGENLAEUFE18:
+    raise SystemExit("unbekannter Gegenlauf: %s (bekannt: %s)" % (GEGENLAUF, ", ".join(sorted(GEGENLAEUFE18))))
+if GEGENLAUF:
+    RESULT = HIER / ("p105_b18_gegenlauf_%s.json" % GEGENLAUF)
+elif ARGS.get("--out"):
+    RESULT = HIER / ("p105_b18_%s.json" % ARGS["--out"])
 
 
 # -- das Messpflaster ---------------------------------------------------------------------------
@@ -180,6 +231,12 @@ PFLASTER = """globalThis.__sfx18 = {
   setHover: function (id) { hoverId = id; },
   flush: function () { return ctx.getImageData(0, 0, 1, 1).data[0]; },
   edges: function () { return {explicit: explicitEdges.length, implicit: implicitEdges.length}; },
+  implicitList: function () {      // "Art:k1-k2" -- k = laufende Nummer der Saat (ID = k + 1)
+    return implicitEdges.map(function (e) {
+      var x = parseInt(e.src.slice(4), 16) - 1, y = parseInt(e.dst.slice(4), 16) - 1;
+      return e.kind + ":" + Math.min(x, y) + "-" + Math.max(x, y);
+    }).sort();
+  },
   hub: function () {
     var best = null;
     for (var i = 0; i < nodes.length; i++) if (!best || nodes[i].deg > best.deg) best = nodes[i];
@@ -191,6 +248,29 @@ PFLASTER = """globalThis.__sfx18 = {
     ctx.save(); ctx.translate(panX, panY); ctx.scale(zoom, zoom);
     drawEdges(explicitEdges.concat(implicitEdges), null, visibleNodes());
     ctx.restore();
+  },
+  edgesNoDash: function () {     // Zerlegung: dieselben Kanten, **ohne** Strichelung
+    var o = ctx.setLineDash;
+    ctx.setLineDash = function () { o.call(ctx, []); };
+    try { globalThis.__sfx18.edgesOnly(); } finally { ctx.setLineDash = o; }
+  },
+  drawNoDash: function () {      // das **ganze** Bild ohne Strichelung (Option fuer den Nikinger)
+    var o = ctx.setLineDash;
+    ctx.setLineDash = function () { o.call(ctx, []); };
+    try { draw(); } finally { ctx.setLineDash = o; }
+  },
+  edgesLongDash: function () {   // Zerlegung: Striche **3 x laenger** (weniger Striche je Strecke)
+    var o = ctx.setLineDash;
+    ctx.setLineDash = function (a) { o.call(ctx, a.map(function (x) { return x * 3; })); };
+    try { globalThis.__sfx18.edgesOnly(); } finally { ctx.setLineDash = o; }
+  },
+  implicitLength: function () {   // Summe der Sehnenlaengen der impliziten Kanten (Welt-px)
+    var sum = 0;
+    for (var i = 0; i < implicitEdges.length; i++) {
+      var a = nodeById[implicitEdges[i].src], b = nodeById[implicitEdges[i].dst];
+      if (a && b) sum += Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+    }
+    return sum;
   },
   positions: function () {
     return nodes.map(function (n) { return [n.id, n.x, n.y, n.space, n.deg]; });
@@ -246,6 +326,10 @@ ZEIT = r"""(n) => {
   h.setHover(null);
   out.draw_ms = zeit(() => h.draw());
   out.draw_nur_kanten_ms = zeit(() => h.edgesOnly());
+  out.kanten_ohne_strichelung_ms = zeit(() => h.edgesNoDash());
+  out.kanten_lange_striche_ms = zeit(() => h.edgesLongDash());
+  out.draw_ohne_strichelung_ms = zeit(() => h.drawNoDash());
+  out.implizite_laenge_px = h.implicitLength();
   const hub = h.hub();
   out.hub = hub;
   h.setHover(hub);
@@ -276,15 +360,28 @@ def zustand(page, tags, ordner):
 
 
 def simulation(page):
-    """'Layout zuruecksetzen' -> die Simulation laeuft neu; Dauer = erster bis letzter Frame."""
-    page.evaluate("() => { window.__rafLog.count = 0; window.__rafLog.stamps.length = 0; }")
+    """'Layout zuruecksetzen' -> die Simulation laeuft neu; Dauer = erster bis letzter Frame.
+    Dazu die **Spur** (Hook um `integrate()`): hoechste Geschwindigkeit, groesster Schritt und wann
+    ein Knoten weiter als 1500 px vom Ursprung steht (N1, Plan §5.3)."""
+    page.evaluate("() => { window.__rafLog.count = 0; window.__rafLog.stamps.length = 0;"
+                  " globalThis.__sfx18trace.length = 0; }")
     page.click("#overview-graph-reset-layout")
     settle(page)
     st = page.evaluate("() => window.__rafLog.stamps")
+    spur = page.evaluate("() => globalThis.__sfx18trace")
     ivs = [b - a for a, b in zip(st, st[1:])]
+    erste = next((i for i, s in enumerate(spur) if s[2] > 1500), None)
+    schnellste = max(range(len(spur)), key=lambda i: spur[i][1]) if spur else None
     return {"frames": len(st), "dauer_ms": (st[-1] - st[0]) if len(st) > 1 else 0.0,
             "intervall_mittel_ms": (sum(ivs) / len(ivs)) if ivs else 0.0,
-            "intervall_max_ms": max(ivs) if ivs else 0.0}
+            "intervall_max_ms": max(ivs) if ivs else 0.0,
+            "spur": {"ticks": len(spur),
+                     "hoechste_geschwindigkeit_px_pro_tick": spur[schnellste][1] if spur else None,
+                     "schnellster_tick": schnellste,
+                     "groesster_schritt_px": max((s[0] * s[1] for s in spur), default=None),
+                     "erster_tick_ueber_1500px_vom_ursprung": erste,
+                     "weitester_abstand_vom_ursprung_am_ende_px": spur[-1][2] if spur else None,
+                     "abstand_je_10_ticks": [round(spur[i][2]) for i in range(0, len(spur), 10)]}}
 
 
 def geometrie(page, fit_margin, zoom_min, region_gap):
@@ -401,28 +498,17 @@ def main():
             page.wait_for_timeout(400)
             messung = page.evaluate(ZEIT, AUFTRAG["n_bilder"])
             geo = geometrie(page, konst["FIT_MARGIN"], konst["ZOOM_MIN"], konst["REGION_GAP"])
+            paare = page.evaluate("() => globalThis.__sfx18.implicitList()")
+            messung["paare_sha256"] = hashlib.sha256("\n".join(paare).encode()).hexdigest()
             out["zustaende"][name] = {"simulation": sim, "draw": messung, "geometrie": geo}
             if AUFTRAG.get("bilder_dir"):
                 page.locator("#overview-graph-canvas").screenshot(
-                    path=str(Path(AUFTRAG["bilder_dir"]) / ("b18_0_%s.png" % name)))
-        # Spur der Simulation im Tag-Zustand: wann und wie wird ein Knoten weggeschleudert?
-        zustand(page, True, False)
-        page.evaluate("() => { globalThis.__sfx18trace.length = 0; }")
-        simulation(page)
-        spur = page.evaluate("() => globalThis.__sfx18trace")
-        erste = next((i for i, s in enumerate(spur) if s[2] > 1500), None)
-        schnellste = max(range(len(spur)), key=lambda i: spur[i][1]) if spur else None
-        out["tags_spur"] = {
-            "ticks": len(spur),
-            "erster_tick_ueber_1500px_vom_ursprung": erste,
-            "alpha_dort": spur[erste][0] if erste is not None else None,
-            "knoten_dort": spur[erste][3] if erste is not None else None,
-            "schnellster_tick": schnellste,
-            "hoechste_geschwindigkeit_px_pro_tick": spur[schnellste][1] if spur else None,
-            "weitester_abstand_vom_ursprung_am_ende_px": spur[-1][2] if spur else None,
-            "abstand_je_10_ticks": [round(spur[i][2]) for i in range(0, len(spur), 10)],
-            "geschwindigkeit_je_10_ticks": [round(spur[i][1], 1) for i in range(0, len(spur), 10)],
-        }
+                    path=str(Path(AUFTRAG["bilder_dir"]) / ("b18_1_%s.png" % name)))
+                if name == "beide":
+                    page.evaluate("() => globalThis.__sfx18.drawNoDash()")
+                    page.locator("#overview-graph-canvas").screenshot(
+                        path=str(Path(AUFTRAG["bilder_dir"]) / "b18_1_beide_ohne_strichelung.png"))
+                    page.evaluate("() => globalThis.__sfx18.draw()")
         # A3-Gegenprobe: 'Layout zuruecksetzen' auf der frischen Instanz aendert die Karte nicht
         # (es gibt dort keine gemerkte Ablage) -- die Ursache A3 laesst sich hier NICHT zeigen.
         out["fehler_in_der_seite"] = fehler
@@ -431,6 +517,8 @@ def main():
     print(json.dumps({z: {"edges": v["draw"]["kanten"], "draw_ms": round(v["draw"]["draw_ms"], 2),
                           "draw_hover_ms": round(v["draw"]["draw_hover_ms"], 2),
                           "kanten_ms": round(v["draw"]["draw_nur_kanten_ms"], 2),
+                          "ohne_strichelung_ms": round(v["draw"]["kanten_ohne_strichelung_ms"], 2),
+                          "laenge_px": round(v["draw"]["implizite_laenge_px"]),
                           "kraefte_ms": round(v["draw"]["kraefte_ms"], 2),
                           "ringe_ms": round(v["draw"]["ringe_ms"], 2),
                           "sim_ms": round(v["simulation"]["dauer_ms"]),
@@ -467,7 +555,9 @@ def main() -> int:
     creds = b14._setup()
     seed(items)
     b14.GRAPH_PATCH_EXTRA[PFLASTER_ANKER] = PFLASTER
-    resultat = HIER / ("p105_b18_karte_messung.json")
+    if GEGENLAUF:
+        b14.GRAPH_PATCH_EXTRA.update(GEGENLAEUFE18[GEGENLAUF])
+    resultat = RESULT
     try:
         b14._serve()
         auftrag = {
@@ -490,17 +580,35 @@ def main() -> int:
         b14._stop()          # jeder Ausgang stoppt den Wegwerf-Server -- ueber die PID-Datei
     beleg = json.loads(resultat.read_text(encoding="utf-8"))
     beleg["saat"] = {"spaces": ANZAHL, "items": len(items), "grosse_ordner": GROSSER_ORDNER,
-                     "tag_pool": TAG_POOL, "erwartet": soll}
+                     "tag_pool": TAG_POOL, "erwartet": {k: v for k, v in soll.items() if k != "paare"}}
+    beleg["gegenlauf"] = GEGENLAUF
     for name, z in beleg["zustaende"].items():
-        z["kanten_gegenrechnung"] = {"seite_implizit": z["draw"]["kanten"]["implicit"],
-                                      "saat_implizit": soll["implizit"][name],
-                                      "seite_explizit": z["draw"]["kanten"]["explicit"],
-                                      "saat_explizit": soll["explizit"],
-                                      "ok": z["draw"]["kanten"]["implicit"] == soll["implizit"][name]
-                                      and z["draw"]["kanten"]["explicit"] == soll["explizit"]}
+        soll_hash = hashlib.sha256("\n".join(soll["paare"][name]).encode()).hexdigest()
+        z["kanten_gegenrechnung"] = {
+            "seite_implizit": z["draw"]["kanten"]["implicit"], "saat_implizit": soll["implizit"][name],
+            "seite_explizit": z["draw"]["kanten"]["explicit"], "saat_explizit": soll["explizit"],
+            "paare_gleich": z["draw"]["paare_sha256"] == soll_hash}
+        z["kanten_gegenrechnung"]["ok"] = (
+            z["kanten_gegenrechnung"]["seite_implizit"] == soll["implizit"][name]
+            and z["kanten_gegenrechnung"]["seite_explizit"] == soll["explizit"]
+            and z["kanten_gegenrechnung"]["paare_gleich"])
+    zs = beleg["zustaende"]
+    gap = beleg["konstanten"]["REGION_GAP"]
+    beleg["zellen"] = {
+        # 18.1: Kanten = Stern der Saat (Menge **und** Paare), Bildzeit "beide an" <= 16 ms
+        "kanten": all(z["kanten_gegenrechnung"]["ok"] for z in zs.values()),
+        "bildzeit": zs["beide"]["draw"]["draw_ms"] <= 16.0,
+        # 18.2 (N1): kein Knoten weiter als 1300 px vom Median-Mittelpunkt (vorher 2790 im Tag-Zustand)
+        "schleuder": all(z["geometrie"]["weiteste_knoten"][0]["abstand_vom_median_px"] <= 1300
+                         for z in zs.values()),
+        # 18.2 (A1): der Ein-Item-Space liegt <= 2 x REGION_GAP vom naechsten fremden Umriss
+        "ausreisser": all((z["geometrie"]["ausreisser_umriss_luecke_px"] or 0) <= 2 * gap
+                          for z in zs.values()),
+    }
     resultat.write_text(json.dumps(beleg, indent=1, ensure_ascii=False), encoding="utf-8")
     print("Gegenrechnung der Kanten:",
           {n: z["kanten_gegenrechnung"]["ok"] for n, z in beleg["zustaende"].items()})
+    print("ZELLEN:", beleg["zellen"], "| Gegenlauf:", GEGENLAUF)
     return 0
 
 

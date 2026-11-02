@@ -6,6 +6,8 @@ ACL-Hilfskonstrukte ueber `item_store.update(... share_read=...)`.
 """
 from __future__ import annotations
 
+import re
+
 import pytest
 
 BASE_URL = "https://space.example.ts.net"
@@ -54,11 +56,14 @@ async def test_graph_returns_visible_nodes_and_edges(full_app_items, item_store,
     # Fix B (Plan §9.4.6 Befund B, 2026-09-02): `shared` -> `writable`, space-level ueber
     # `permissions.can_write`. Ein eigener Knoten ist immer writable (actor == target).
     assert by_id[source.id]["writable"] is True
-    # Exakt die neun Felder aus Plan §3 B3 -- nicht mehr (war zuvor faelschlich als "acht"
-    # dokumentiert, siehe die datierte Korrektur im `_graph_get`-Docstring).
+    # Die neun Felder aus Plan §3 B3 -- nicht mehr (war zuvor faelschlich als "acht"
+    # dokumentiert, siehe die datierte Korrektur im `_graph_get`-Docstring). **[2026-11-02,
+    # Block 18.1]** plus `updated` (ISO, UTC): der Stern der Karte (Ordner/Tags) haengt am
+    # zuletzt geaenderten Item der Gruppe; ein Wert ohne Tests waere ein stiller Vertrag.
     assert set(by_id[source.id].keys()) == {
-        "id", "title", "space", "own", "writable", "type", "status", "folder", "tags",
+        "id", "title", "space", "own", "writable", "type", "status", "folder", "tags", "updated",
     }
+    assert re.fullmatch(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ", by_id[source.id]["updated"])
 
     edges = sorted(data["edges"], key=lambda e: (e["src"], e["kind"], e["dst"]))
     assert edges == [

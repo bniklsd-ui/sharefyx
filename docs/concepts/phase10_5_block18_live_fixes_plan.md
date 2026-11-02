@@ -6,7 +6,7 @@ detail: L2
 up: ../../phase10_5_finishing/CLAUDE.md
 down:
   - ./phase10_5_block14_7_plan.md   # 📗 die Kartengeometrie (Hex-Anker, LOBE_SCALE), auf der 18.2 aufsetzt
-updated: 2026-11-01 (18.0 gemessen: §5 gefüllt, K1–K4/A1–A3 mit Befund, neuer Befund N1 — Schleuder-Instabilität im Tag-Zustand) | 2026-11-01 (E1–E4 beantwortet: Stern, Farben → P11, v4.0.1, Zeilen 18/49 als Wegwerf-Probe 18.5) | 2026-11-01 (Mini-Plan, Claude Code — Live-Sichtung des Nikingers nach Deploy D)
+updated: 2026-11-02 (18.1/18.2 gebaut: Stern, Geschwindigkeitsgrenze, Bündeln verworfen; §5.5 offen: Strichelung, Ausreißer-Zelle) | 2026-11-01 (18.0 gemessen: §5 gefüllt, K1–K4/A1–A3 mit Befund, neuer Befund N1 — Schleuder-Instabilität im Tag-Zustand) | 2026-11-01 (E1–E4 beantwortet: Stern, Farben → P11, v4.0.1, Zeilen 18/49 als Wegwerf-Probe 18.5) | 2026-11-01 (Mini-Plan, Claude Code — Live-Sichtung des Nikingers nach Deploy D)
 ---
 # Live-Funde nach Deploy D (Plan Block 18)
 
@@ -47,8 +47,8 @@ updated: 2026-11-01 (18.0 gemessen: §5 gefüllt, K1–K4/A1–A3 mit Befund, ne
 | # | Inhalt | Fertig, wenn |
 |---|---|---|
 | 18.0 ✅ | **Messen** an der Wegwerf-Instanz mit einer Saat in Live-Form (≈ 200 Items, 5–7 Spaces, 2–3 Ordner mit 40–80 Items, ein Space mit **1** Item, Tags wie live). Je Zustand (aus / Tags / Ordner / beide): Kantenzahl, ms je `draw()` (`performance.now()` um `draw`, 60 Bilder Pan), Dauer der Simulation. Ausreißer: reproduzieren, dann „Layout zurücksetzen" — bleibt er (A1) oder geht er (A3)? Die Saatzahlen vorher beim Nikinger erfragen (er kennt die Live-Form; **kein** Lesen des echten `DATA_ROOT`) | Tabelle im Plan §5, Ursache für Ausreißer benannt — **✅ 2026-11-01** (§5; Ursache: N1 im Tag-Zustand, A1 nur teilweise, A3 wartet auf den Nikinger) |
-| 18.1 | **Karte flüssig.** In der Reihenfolge der gemessenen Kosten: (a) Ordner-Kanten als **Stern** um das zuletzt geänderte Item (k−1 Kanten statt Clique, E1); (b) Kanten **gebündelt** zeichnen: je Stil (Art × Fokus × Breitenstufe) **ein** Pfad, **ein** `stroke()`; (c) `all` und Nachbarringe nur bei Änderung neu bauen (Kantenliste beim Toggle, Ringe je `hoverId`); (d) `draw()` aus Mausereignissen per `requestAnimationFrame` bündeln | `draw()` ≤ 16 ms bei „beide an" auf der Saat (Zahl vorher/nachher); bestehende Kartenwächter grün (`phase10_5_finishing/tests/test_graph_c2.py`, `test_b14_*`); Gegenlauf je Teilschritt |
-| 18.2 | **Kein Punkt weit draußen.** Bei A1: der Ankerabstand richtet sich nach den **echten** Radien der Nachbarn (eng gepackt: `r_eigen + r_k + REGION_GAP`, kleine Spaces auf die inneren Plätze), nicht nach dem größten Space. Bei A3: Ablage auf `v: 2` heben (alte Positionen verfallen einmal). Zusätzlich robust: `fitView()` darf einen einzelnen Ausreißer nicht die ganze Karte verkleinern lassen (Vorschlag: einrahmen nach Umrissen, nicht nach Knoten — **nur** wenn 18.0 zeigt, dass A1/A3 allein nicht reichen) | Saat mit 1-Item-Space: größter Abstand Punkt ↔ nächster Nachbarumriss ≤ 2 × `REGION_GAP` (Zahl in §5); Zoom nach dem Öffnen > 50 %; Determinismus-Wächter (P10.5-65) bleibt grün |
+| 18.1 ✅/⚠️ | **Karte flüssig.** In der Reihenfolge der gemessenen Kosten: (a) Ordner-Kanten als **Stern** um das zuletzt geänderte Item (k−1 Kanten statt Clique, E1); (b) Kanten **gebündelt** zeichnen: je Stil (Art × Fokus × Breitenstufe) **ein** Pfad, **ein** `stroke()`; (c) `all` und Nachbarringe nur bei Änderung neu bauen (Kantenliste beim Toggle, Ringe je `hoverId`); (d) `draw()` aus Mausereignissen per `requestAnimationFrame` bündeln | `draw()` ≤ 16 ms bei „beide an" auf der Saat (Zahl vorher/nachher); bestehende Kartenwächter grün (`phase10_5_finishing/tests/test_graph_c2.py`, `test_b14_*`); Gegenlauf je Teilschritt |
+| 18.2 ✅/⚠️ | **Kein Punkt weit draußen.** *(2026-11-02: N1 gebaut, A1/A3 siehe §5.5)* Bei A1: der Ankerabstand richtet sich nach den **echten** Radien der Nachbarn (eng gepackt: `r_eigen + r_k + REGION_GAP`, kleine Spaces auf die inneren Plätze), nicht nach dem größten Space. Bei A3: Ablage auf `v: 2` heben (alte Positionen verfallen einmal). Zusätzlich robust: `fitView()` darf einen einzelnen Ausreißer nicht die ganze Karte verkleinern lassen (Vorschlag: einrahmen nach Umrissen, nicht nach Knoten — **nur** wenn 18.0 zeigt, dass A1/A3 allein nicht reichen) | Saat mit 1-Item-Space: größter Abstand Punkt ↔ nächster Nachbarumriss ≤ 2 × `REGION_GAP` (Zahl in §5); Zoom nach dem Öffnen > 50 %; Determinismus-Wächter (P10.5-65) bleibt grün |
 | 18.3 | ~~Editor-Farben~~ — **nach P11** (E2) | — |
 | 18.5 | **P10.5-18 und P10.5-49 als Wegwerf-Probe, automatisch und bleibend** (E4). Eine Probe im Repo (`probes/p105_b18_live_zeilen_probe.py`, JSON daneben, jederzeit wiederholbar): **18** — `/api/v1/overview` Waiting ≤ 300 ms und Space-Wechsel während des Polls ≤ 1 s, gemessen im Browser (Playwright, `PerformanceResourceTiming.responseStart − requestStart`) mit der Saat aus 18.0; **49** — zwei Browser-Kontexte, ein Write im einen, das Ereignis kommt im anderen an (≤ 2 s). Je **beide Eingänge**: direkt (Loopback, wie der Funnel auf den Dienst zeigt `[VERIFY]` an `phase3_edge/`) **und** hinter einem lokalen Caddy aus `phase9_hardening/step_a/Caddyfile.template` in der Live-Version 2.6.2 (Netzwerk-Werkzeuge sind erlaubt, E4). Werkzeug in eigenem Verzeichnis unter `~/.claude-code-tools/`, nie im Projekt-`.venv` | beide Zeilen ✅ mit Zahlen und Gegenlauf (z. B. Caddy mit `flush_interval` aus ⇒ 49 rot; künstliche Verzögerung im Poll ⇒ 18 rot); Probe vom Nikinger gesichtet (Memory „throwaway evidence counts as live") |
 | 18.4 | Update-Log-Zeile(n), volle Suite, `doc_health`, `ui_budget`, Commit + Push; Sichtung beim Nikinger (Bild der Karte, „beide an"); Deploy `v4.0.1` beim Nikinger | Abnahmezeile(n) P10.5-80 ff. im Head |
@@ -61,6 +61,10 @@ updated: 2026-11-01 (18.0 gemessen: §5 gefüllt, K1–K4/A1–A3 mit Befund, ne
 | E2 | Editor-Farben jetzt oder in P11? | **P11** — „if I'd like to do it fully": Farbraster **und** freie RGB-Fläche zusammen, als Editor Stufe 3. **P11-Vormerkung** (Closeout Z übernimmt sie in den Handover); Befund E1 in §2 bleibt die Grundlage (CSP: freie Farbe nur per CSSOM) |
 | E3 | Eigener Deploy `v4.0.1` nach Block 18? | **ja** |
 | E4 | Prüfungen automatisch und bleibend: die Live-Zeilen **P10.5-18** und **P10.5-49** werden **Wegwerf-Proben** (Schritt 18.5). „Keine externen Werkzeuge, so wenige wie möglich" gilt für die **Software selbst**, nicht für Netzwerk-Werkzeuge beim Testen (lokaler Caddy usw. erlaubt) | angenommen. Außerdem: **P10.5-22** und **P10.5-27** macht der Nikinger, **P10.5-28** geht an **eurofleet** (verwaltet die Container) — Notiz `docs/concepts/phase10_5_p10j_lauf2_eurofleet.md` |
+
+| E5 | Tags auch als Stern? (Frage aus 18.0) | **Stern** (Nikinger 2026-11-02, „star") |
+| E6 | N1 (Schleuder-Instabilität) in 18.2 aufnehmen? | **ja** — mit dem Hinweis: der **50-%-Zoom auf seinem Bild war sein eigener** (er hat ihn gesetzt, um den Punkt zu finden), also **keine** Klemme von `fitView()`; die Aussage „Zoom klemmt auf 50 %" in §5.3 war eine Folgerung aus der **Wegwerf-Messung**, nicht aus seinem Bild |
+| E7 | A3: „Layout zurücksetzen" im Live-Browser | **der Punkt bleibt** — und es sind **Dateien aus Fabians Home-Space** (grau = fremder Space). **A3 widerlegt** (eine gemerkte Position erklärt es nicht); seine Bilder zeigen einen Knoten mit sehr langer Bahn weit rechts außen — das Bild der Schleuder (N1) |
 
 ## 5. Messungen (18.0, 2026-11-01)
 
@@ -99,7 +103,7 @@ ist ein Mehrfaches der Kosten **je Kante**.
 | K4 | **widerlegt als Kosten, bestätigt als Form** | `applyForces()` 0,5 ms; die Simulation dauert **nur**, weil jedes der 129 Bilder `draw()` ruft (129 × 309 ms ≈ 40 s + Planung). Das Bild zeigt aber: mit Ordnern zieht die Clique je Ordner **alle Items zu einem Klumpen**, weg von der Region des Spaces (`b18_0_ordner.png`) |
 | A1 | **nur teilweise** | `slot` = 2 · 250 + 40 = 540 px (der größte Space hat Radius 250), der Ein-Item-Space (Radius 52) sitzt auf dem Gitterplatz. Gemessen: Abstand seines Punkts zum nächsten **fremden Umriss** 63 px = **1,6 × `REGION_GAP`** im Zustand „aus" — also schon **unter** dem Ziel von 18.2 (≤ 2 ×); im Zustand „Ordner" 129 px = 3,2 ×. Das Bild „aus" zeigt den Einzelpunkt unten rechts in eigenem Umriss — **so** sieht das Foto des Nikingers aus, aber nicht **so weit** draußen |
 | A2 | **nicht die Ursache** | Der Zoom ohne die drei weitesten Knoten wäre 0,69 statt 0,6 („aus"); der Ein-Item-Space ist **nicht** der Rand der Welt. Im Tag-Zustand ändert das Weglassen **nichts** (0,5 bleibt, §5.3) |
-| A3 | **offen** | Die Wegwerf-Instanz hat keine gemerkte Ablage (`pinned_beim_start` = 0) — A3 lässt sich hier **nicht** zeigen. Entscheidend ist der Gegentest des Nikingers: im Live-Browser einmal „Layout zurücksetzen" (nur `localStorage`, nichts am Server) — **Antwort steht aus** |
+| A3 | **widerlegt (2026-11-02, E7)** | Die Wegwerf-Instanz hat keine gemerkte Ablage (`pinned_beim_start` = 0). Der Gegentest des Nikingers: nach „Layout zurücksetzen" **bleibt** der Punkt (Fabians Home-Space-Dateien) — eine gemerkte Position erklärt ihn nicht |
 
 ### 5.3 N1 — neuer Befund: im Tag-Zustand wird die Karte auseinandergeschleudert
 
@@ -122,3 +126,41 @@ je Bild und Welt-Umriss.
 * **18.1 (c) entfällt** (K3 widerlegt), (d) nur wenn nach (a)+(b) noch nötig.
 * **18.2 ist größer als geplant:** N1 braucht einen Eingriff in die **Kräfte** (nicht in die Anker). Das ändert die Karten-Physik von Block 14
   (Determinismus-Wächter P10.5-65, Stabilität P10.5-68) — Scope-Änderung ⇒ **Nikinger entscheidet** (Frage im Session-Block).
+
+## 5.5 Gebaut: 18.1 und 18.2 (2026-11-02)
+
+Beleg: `probes/p105_b18_karte_messung.{py,json}` (nach dem Umbau), `p105_b18_basislinie.json` (18.0, davor),
+Gegenläufe `p105_b18_gegenlauf_{clique,schleuder,buendel}.json`; Wächter `tests/test_b18_karte_messung.py` (9).
+Server: der Graph-Payload trägt `updated` (zehntes Feld, `api.py`, Test `test_graph.py`) — der Stern hängt am
+**zuletzt geänderten** Item, und die Knotenreihenfolge taugt dafür nicht (`store.search()` sortiert zuerst nach Status
+und Fälligkeit, dann nach `updated`).
+
+| Zustand | `draw()` vorher → nachher | Simulation vorher → nachher | weitester Knoten (Median) vorher → nachher |
+|---|---|---|---|
+| aus | 3,7 → 3,7 ms | 2,1 → 2,1 s | 973 → 973 px (**unverändert**, Block-14-Layout byte-gleich) |
+| Tags | 43 → **23,5** ms | 8,4 → **2,7** s | 2.790 → **662** px |
+| Ordner | 184 → **10,9** ms | 41 → **2,1** s | 943 → 919 px |
+| beide | **309 → 34,3** ms | **55,5 → 3,9** s | 451 → 596 px |
+
+* **18.1 (a) Stern** gebaut (Tags **und** Ordner, E1/E5): 188 statt 5.728 Ordner-Kanten, 292 statt 1.598 Tag-Kanten; Saat ↔ Seite
+  stimmen in **Menge und Paaren** (Hash der sortierten Paare) in allen vier Zuständen. Gegenlauf `clique`: nur `kanten` rot.
+* **18.1 (b) Bündeln: gemessen und VERWORFEN.** Ein Pfad je Stil war **langsamer** (gestrichelt 37,6 statt 29,1 ms Kantenzeit bei
+  573 Kanten): ein großer gestrichelter Pfad kostet in Skia mehr als viele kleine. Der Code zeichnet wieder **ein `stroke()` je Kante**
+  (der Hinweis steht im Quelltext); Beleg `p105_b18_gegenlauf_buendel.json`. 18.1 (c) entfiel schon in 18.0 (K3 widerlegt), (d) nicht nötig.
+* **18.2 (N1) Geschwindigkeitsgrenze** `MAX_SPEED = 600` in `integrate()`: im ruhigen Zustand liegt die Spitze bei 456 px/Bild —
+  die Grenze greift dort **nicht** (die Welt „aus" ist byte-gleich), in den drei anderen Zuständen greift sie (Spitze nach dem Dämpfen 510).
+  Gegenlauf `schleuder`: nur `schleuder` rot (Spitze wieder 1.274–5.317 px/Bild). Block-14-Probe: **alle sechs Zellen grün** (P10.5-65–71 bleiben).
+* **Fund (Probe):** die Block-14-Probe wurde seit Block 17 **rot** (`beschriftungen`), weil das Film-Startbild Hover und Mausrad
+  fraß — am Layout lag es nicht. Behoben mit dem `add_init_script` der übrigen Proben, JSON bis auf die Zeit unverändert.
+
+**Offen, ausdrücklich rot (Nikinger entscheidet):**
+1. **`bildzeit` — 34,3 ms statt ≤ 16 ms bei „beide an".** 80 % der Kantenzeit ist die **Strichelung** (Kanten 29,0 ms, ohne Striche 5,7 ms;
+   Striche 3 × länger 13,5 ms); die Zeit hängt an der **Länge** (112.459 px Sehnenlänge je Bild bei Stern + Tags quer durch die Spaces),
+   nicht an der Zahl. Ganzes Bild ohne Strichelung: **10,9 ms ✅** — aber dann sind Verknüpfung, Tag und Ordner **nicht mehr unterscheidbar**
+   (Bild `b18_1_beide_ohne_strichelung.png`, außerhalb des Repos). Optionen: (A) Striche **behalten** — 9 × schneller als vorher, 29 fps im
+   kopflosen Chromium mit Software-Rasterung (GPU-Zeichnen im echten Browser ist wahrscheinlich schneller; **nicht gemessen**);
+   (B) Tags/Ordner **durchgezogen**, dünner und blasser, Unterscheidung über Ton statt Strich (≈ 11 ms); (C) Striche 3 × länger (≈ 19 ms).
+2. **`ausreisser` — im Zustand „Ordner" 121 px = 3,0 × `REGION_GAP`** (Ziel ≤ 2 ×) zwischen dem Ein-Item-Space und dem nächsten
+   fremden Umriss; im Zustand „aus" 63 px, „Tags" 21, „beide" 23. Das Bild zeigt eine ruhige eigene Insel, **keinen** Ausreißer. A1
+   (Ankerabstand nach echten Radien) würde die Anker bewegen und damit P10.5-68 anfassen — **nicht gebaut**, bis der Nikinger das Bild
+   gesichtet hat (ob 121 px stören).

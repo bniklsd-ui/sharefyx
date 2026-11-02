@@ -1,0 +1,663 @@
+{
+ "konstanten": {
+  "FIT_MARGIN": 56.0,
+  "ZOOM_MIN": 0.5,
+  "REGION_GAP": 40.0,
+  "REGION_ITEM_STEP": 22.0,
+  "REGION_PAD": 30.0,
+  "TAG_CLIQUE_LIMIT": 15.0
+ },
+ "zustaende": {
+  "aus": {
+   "simulation": {
+    "frames": 129,
+    "dauer_ms": 2117.0,
+    "intervall_mittel_ms": 16.5390625,
+    "intervall_max_ms": 16.80000001192093,
+    "spur": {
+     "ticks": 129,
+     "hoechste_geschwindigkeit_px_pro_tick": 456.2129727338799,
+     "schnellster_tick": 9,
+     "groesster_schritt_px": 173.41363561671187,
+     "erster_tick_ueber_1500px_vom_ursprung": 15,
+     "weitester_abstand_vom_ursprung_am_ende_px": 1634.9364710785198,
+     "abstand_je_10_ticks": [
+      1269,
+      1279,
+      1656,
+      1691,
+      1669,
+      1651,
+      1642,
+      1638,
+      1636,
+      1635,
+      1635,
+      1635,
+      1635
+     ]
+    }
+   },
+   "draw": {
+    "draw_ms": 3.6566666667660077,
+    "draw_nur_kanten_ms": 0.5666666666666667,
+    "kanten_ohne_strichelung_ms": 0.6,
+    "kanten_lange_striche_ms": 0.5766666665673256,
+    "draw_ohne_strichelung_ms": 3.6966666668653487,
+    "implizite_laenge_px": 0,
+    "hub": "itm_000000c9",
+    "draw_hover_ms": 3.75,
+    "ringe_ms": 0.0066666667660077415,
+    "kraefte_ms": 0.2800000011920929,
+    "kanten": {
+     "explicit": 93,
+     "implicit": 0
+    },
+    "paare_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "geometrie": {
+    "luecke_zum_naechsten_fremden_knoten_px": {
+     "epsilon": 101.66100659576553,
+     "delta": 31.39481733990283,
+     "gamma": 25.365002845302563,
+     "beta": 21.407496446767812,
+     "alpha": 21.407496446767812
+    },
+    "luecke_zum_naechsten_fremden_umriss_px": {
+     "epsilon": 63.20618677754059,
+     "delta": 23.926531644659313,
+     "gamma": 24.26071775574031,
+     "beta": 20.82736912983833,
+     "alpha": 17.512266512717304
+    },
+    "ausreisser_umriss_luecke_px": 63.20618677754059,
+    "ausreisser_umriss_luecke_in_region_gap": 1.5801546694385147,
+    "weiteste_knoten": [
+     {
+      "id": "itm_0000004c",
+      "space": "alpha",
+      "deg": 0,
+      "abstand_vom_median_px": 972.8
+     },
+     {
+      "id": "itm_0000002f",
+      "space": "alpha",
+      "deg": 0,
+      "abstand_vom_median_px": 946.1
+     },
+     {
+      "id": "itm_00000101",
+      "space": "delta",
+      "deg": 0,
+      "abstand_vom_median_px": 900.3
+     }
+    ],
+    "zoom_ohne_die_3_weitesten_nachgerechnet": 0.688820137973104,
+    "welt_ohne_die_3_weitesten_px": [
+     1534.2933318657979,
+     1405.9697962833313
+    ],
+    "ausreisser_luecke_px": 101.66100659576553,
+    "ausreisser_luecke_in_region_gap": 2.5415251648941384,
+    "zoom_anzeige": 0.6,
+    "zoom_aus_fitview_nachgerechnet": 0.6022385215352749,
+    "zoom_ohne_ausreisser_nachgerechnet": 0.6022385215352749,
+    "welt_mit_ausreisser_px": [
+     1534.2933318657979,
+     1650.383112415754
+    ],
+    "welt_ohne_ausreisser_px": [
+     1534.2933318657979,
+     1650.383112415754
+    ],
+    "regionen": {
+     "order": [
+      "alpha",
+      "delta",
+      "beta",
+      "gamma",
+      "epsilon"
+     ],
+     "spaces": {
+      "alpha": {
+       "x": 567,
+       "y": 530.6875,
+       "radius": 250
+      },
+      "delta": {
+       "x": 208.8524541717456,
+       "y": 934.8289794563884,
+       "radius": 154.45079348883237
+      },
+      "beta": {
+       "x": 925.1475458282541,
+       "y": 126.5460205436114,
+       "radius": 226.7739820199815
+      },
+      "gamma": {
+       "x": 37.92943915361366,
+       "y": 422.59336673787436,
+       "radius": 185.56349186104046
+      },
+      "epsilon": {
+       "x": 1096.0705608463863,
+       "y": 638.7816332621253,
+       "radius": 52
+      }
+     }
+    }
+   },
+   "kanten_gegenrechnung": {
+    "seite_implizit": 0,
+    "saat_implizit": 0,
+    "seite_explizit": 93,
+    "saat_explizit": 93,
+    "paare_gleich": true,
+    "ok": true
+   }
+  },
+  "tags": {
+   "simulation": {
+    "frames": 129,
+    "dauer_ms": 10109.699999988079,
+    "intervall_mittel_ms": 78.98203124990687,
+    "intervall_max_ms": 175.29999999701977,
+    "spur": {
+     "ticks": 129,
+     "hoechste_geschwindigkeit_px_pro_tick": 510.0000000000001,
+     "schnellster_tick": 42,
+     "groesster_schritt_px": 239.9295,
+     "erster_tick_ueber_1500px_vom_ursprung": null,
+     "weitester_abstand_vom_ursprung_am_ende_px": 1089.5865633460257,
+     "abstand_je_10_ticks": [
+      1239,
+      1311,
+      1266,
+      1141,
+      1063,
+      1062,
+      1058,
+      1063,
+      1073,
+      1079,
+      1083,
+      1086,
+      1088
+     ]
+    }
+   },
+   "draw": {
+    "draw_ms": 92.67666666706403,
+    "draw_nur_kanten_ms": 85.06666666666666,
+    "kanten_ohne_strichelung_ms": 17.686666666467985,
+    "kanten_lange_striche_ms": 38.35999999990066,
+    "draw_ohne_strichelung_ms": 26.263333333532014,
+    "implizite_laenge_px": 307278.49146003235,
+    "hub": "itm_000000c9",
+    "draw_hover_ms": 93.82333333343267,
+    "ringe_ms": 0.023333333432674408,
+    "kraefte_ms": 0.35999999940395355,
+    "kanten": {
+     "explicit": 93,
+     "implicit": 1965
+    },
+    "paare_sha256": "9e0e31b30cfe2b296fd281df0f50e1db545ca9a68cfe981f4cc3535c7bb2375e"
+   },
+   "geometrie": {
+    "luecke_zum_naechsten_fremden_knoten_px": {
+     "epsilon": 29.68190693544276,
+     "delta": 14.641894902732647,
+     "gamma": 15.302681129599273,
+     "beta": 16.697598335533666,
+     "alpha": 14.641894902732647
+    },
+    "luecke_zum_naechsten_fremden_umriss_px": {
+     "epsilon": 22.01962531176794,
+     "delta": 14.579204050425457,
+     "gamma": 14.33322791857202,
+     "beta": 12.87465188341215,
+     "alpha": 14.076157402177024
+    },
+    "ausreisser_umriss_luecke_px": 22.01962531176794,
+    "ausreisser_umriss_luecke_in_region_gap": 0.5504906327941985,
+    "weiteste_knoten": [
+     {
+      "id": "itm_0000001b",
+      "space": "alpha",
+      "deg": 11,
+      "abstand_vom_median_px": 535.6
+     },
+     {
+      "id": "itm_0000008c",
+      "space": "beta",
+      "deg": 13,
+      "abstand_vom_median_px": 523.7
+     },
+     {
+      "id": "itm_000000b4",
+      "space": "beta",
+      "deg": 13,
+      "abstand_vom_median_px": 511.1
+     }
+    ],
+    "zoom_ohne_die_3_weitesten_nachgerechnet": 1.0,
+    "welt_ohne_die_3_weitesten_px": [
+     934.8351784424337,
+     925.0833522832012
+    ],
+    "ausreisser_luecke_px": 29.68190693544276,
+    "ausreisser_luecke_in_region_gap": 0.742047673386069,
+    "zoom_anzeige": 0.99,
+    "zoom_aus_fitview_nachgerechnet": 0.9876010694715551,
+    "zoom_ohne_ausreisser_nachgerechnet": 0.9876010694715551,
+    "welt_mit_ausreisser_px": [
+     936.7762811423615,
+     962.7001322790385
+    ],
+    "welt_ohne_ausreisser_px": [
+     936.7762811423615,
+     962.7001322790385
+    ],
+    "regionen": {
+     "order": [
+      "alpha",
+      "delta",
+      "beta",
+      "gamma",
+      "epsilon"
+     ],
+     "spaces": {
+      "alpha": {
+       "x": 567,
+       "y": 530.6875,
+       "radius": 250
+      },
+      "delta": {
+       "x": 208.8524541717456,
+       "y": 934.8289794563884,
+       "radius": 154.45079348883237
+      },
+      "beta": {
+       "x": 925.1475458282541,
+       "y": 126.5460205436114,
+       "radius": 226.7739820199815
+      },
+      "gamma": {
+       "x": 37.92943915361366,
+       "y": 422.59336673787436,
+       "radius": 185.56349186104046
+      },
+      "epsilon": {
+       "x": 1096.0705608463863,
+       "y": 638.7816332621253,
+       "radius": 52
+      }
+     }
+    }
+   },
+   "kanten_gegenrechnung": {
+    "seite_implizit": 1965,
+    "saat_implizit": 292,
+    "seite_explizit": 93,
+    "saat_explizit": 93,
+    "paare_gleich": false,
+    "ok": false
+   }
+  },
+  "ordner": {
+   "simulation": {
+    "frames": 129,
+    "dauer_ms": 31546.60000000894,
+    "intervall_mittel_ms": 246.45781250006985,
+    "intervall_max_ms": 501.29999999701977,
+    "spur": {
+     "ticks": 129,
+     "hoechste_geschwindigkeit_px_pro_tick": 510.0000000000001,
+     "schnellster_tick": 1,
+     "groesster_schritt_px": 247.35000000000005,
+     "erster_tick_ueber_1500px_vom_ursprung": null,
+     "weitester_abstand_vom_ursprung_am_ende_px": 1314.733646056419,
+     "abstand_je_10_ticks": [
+      1269,
+      1279,
+      1289,
+      1296,
+      1301,
+      1305,
+      1308,
+      1310,
+      1311,
+      1312,
+      1313,
+      1314,
+      1314
+     ]
+    }
+   },
+   "draw": {
+    "draw_ms": 181.20333333313465,
+    "draw_nur_kanten_ms": 178.806666666766,
+    "kanten_ohne_strichelung_ms": 31.1433333337307,
+    "kanten_lange_striche_ms": 94.35333333363135,
+    "draw_ohne_strichelung_ms": 34.15,
+    "implizite_laenge_px": 478770.43877228186,
+    "hub": "itm_0000001f",
+    "draw_hover_ms": 181.60333333363135,
+    "ringe_ms": 0.06666666666666667,
+    "kraefte_ms": 0.45999999940395353,
+    "kanten": {
+     "explicit": 93,
+     "implicit": 5728
+    },
+    "paare_sha256": "ba87f9abe5e06396eb5bdea4f28912e9fb638e097ec96404ea95be13709c6b25"
+   },
+   "geometrie": {
+    "luecke_zum_naechsten_fremden_knoten_px": {
+     "epsilon": 217.97559254957787,
+     "delta": 60.26579487354592,
+     "gamma": 86.62721711506602,
+     "beta": 215.5194347966971,
+     "alpha": 60.26579487354592
+    },
+    "luecke_zum_naechsten_fremden_umriss_px": {
+     "epsilon": 116.46670463776886,
+     "delta": 39.83897022653721,
+     "gamma": 49.416922711441316,
+     "beta": 113.96415511967523,
+     "alpha": 39.47315168734939
+    },
+    "ausreisser_umriss_luecke_px": 116.46670463776886,
+    "ausreisser_umriss_luecke_in_region_gap": 2.9116676159442214,
+    "weiteste_knoten": [
+     {
+      "id": "itm_00000101",
+      "space": "delta",
+      "deg": 0,
+      "abstand_vom_median_px": 918.4
+     },
+     {
+      "id": "itm_00000102",
+      "space": "delta",
+      "deg": 0,
+      "abstand_vom_median_px": 895.4
+     },
+     {
+      "id": "itm_00000104",
+      "space": "delta",
+      "deg": 1,
+      "abstand_vom_median_px": 860.6
+     }
+    ],
+    "zoom_ohne_die_3_weitesten_nachgerechnet": 0.7089176269376986,
+    "welt_ohne_die_3_weitesten_px": [
+     1487.6216724057542,
+     1352.3234511719033
+    ],
+    "ausreisser_luecke_px": 217.97559254957787,
+    "ausreisser_luecke_in_region_gap": 5.4493898137394465,
+    "zoom_anzeige": 0.7,
+    "zoom_aus_fitview_nachgerechnet": 0.7017437288312922,
+    "zoom_ohne_ausreisser_nachgerechnet": 0.7017437288312922,
+    "welt_mit_ausreisser_px": [
+     1487.6216724057542,
+     1400.482344185177
+    ],
+    "welt_ohne_ausreisser_px": [
+     1487.6216724057542,
+     1400.482344185177
+    ],
+    "regionen": {
+     "order": [
+      "alpha",
+      "delta",
+      "beta",
+      "gamma",
+      "epsilon"
+     ],
+     "spaces": {
+      "alpha": {
+       "x": 567,
+       "y": 530.6875,
+       "radius": 250
+      },
+      "delta": {
+       "x": 208.8524541717456,
+       "y": 934.8289794563884,
+       "radius": 154.45079348883237
+      },
+      "beta": {
+       "x": 925.1475458282541,
+       "y": 126.5460205436114,
+       "radius": 226.7739820199815
+      },
+      "gamma": {
+       "x": 37.92943915361366,
+       "y": 422.59336673787436,
+       "radius": 185.56349186104046
+      },
+      "epsilon": {
+       "x": 1096.0705608463863,
+       "y": 638.7816332621253,
+       "radius": 52
+      }
+     }
+    }
+   },
+   "kanten_gegenrechnung": {
+    "seite_implizit": 5728,
+    "saat_implizit": 188,
+    "seite_explizit": 93,
+    "saat_explizit": 93,
+    "paare_gleich": false,
+    "ok": false
+   }
+  },
+  "beide": {
+   "simulation": {
+    "frames": 129,
+    "dauer_ms": 39046.0,
+    "intervall_mittel_ms": 305.046875,
+    "intervall_max_ms": 668.7000000029802,
+    "spur": {
+     "ticks": 129,
+     "hoechste_geschwindigkeit_px_pro_tick": 510.0000000000001,
+     "schnellster_tick": 1,
+     "groesster_schritt_px": 253.5025584457224,
+     "erster_tick_ueber_1500px_vom_ursprung": null,
+     "weitester_abstand_vom_ursprung_am_ende_px": 929.8100132795781,
+     "abstand_je_10_ticks": [
+      1239,
+      1115,
+      1100,
+      1165,
+      1037,
+      973,
+      926,
+      942,
+      933,
+      932,
+      930,
+      930,
+      929
+     ]
+    }
+   },
+   "draw": {
+    "draw_ms": 314.84666666686536,
+    "draw_nur_kanten_ms": 310.7900000000993,
+    "kanten_ohne_strichelung_ms": 60.063333333532015,
+    "kanten_lange_striche_ms": 166.02333333343267,
+    "draw_ohne_strichelung_ms": 63.64000000009934,
+    "implizite_laenge_px": 845086.7888920774,
+    "hub": "itm_00000001",
+    "draw_hover_ms": 327.773333332936,
+    "ringe_ms": 0.15666666676600774,
+    "kraefte_ms": 0.5800000011920929,
+    "kanten": {
+     "explicit": 93,
+     "implicit": 7693
+    },
+    "paare_sha256": "6f3e2d6c029a9ae14217ee04a619c9e0ad3632c09d037dd6a659a3d7c453fc9f"
+   },
+   "geometrie": {
+    "luecke_zum_naechsten_fremden_knoten_px": {
+     "epsilon": 16.43164937804951,
+     "delta": 12.83441646808257,
+     "gamma": 8.99206655604349,
+     "beta": 11.618322432083229,
+     "alpha": 8.99206655604349
+    },
+    "luecke_zum_naechsten_fremden_umriss_px": {
+     "epsilon": 14.45435306536622,
+     "delta": 12.689714555308974,
+     "gamma": 9.232387843041211,
+     "beta": 13.027821284939915,
+     "alpha": 9.193604572654266
+    },
+    "ausreisser_umriss_luecke_px": 14.45435306536622,
+    "ausreisser_umriss_luecke_in_region_gap": 0.3613588266341555,
+    "weiteste_knoten": [
+     {
+      "id": "itm_000000e2",
+      "space": "gamma",
+      "deg": 12,
+      "abstand_vom_median_px": 270.1
+     },
+     {
+      "id": "itm_000000e6",
+      "space": "gamma",
+      "deg": 12,
+      "abstand_vom_median_px": 262.6
+     },
+     {
+      "id": "itm_00000102",
+      "space": "delta",
+      "deg": 13,
+      "abstand_vom_median_px": 260.5
+     }
+    ],
+    "zoom_ohne_die_3_weitesten_nachgerechnet": 1.0,
+    "welt_ohne_die_3_weitesten_px": [
+     461.19557852400857,
+     475.68958876724787
+    ],
+    "ausreisser_luecke_px": 16.43164937804951,
+    "ausreisser_luecke_in_region_gap": 0.4107912344512378,
+    "zoom_anzeige": 1,
+    "zoom_aus_fitview_nachgerechnet": 1.0,
+    "zoom_ohne_ausreisser_nachgerechnet": 1.0,
+    "welt_mit_ausreisser_px": [
+     461.19557852400857,
+     489.3813923918043
+    ],
+    "welt_ohne_ausreisser_px": [
+     461.19557852400857,
+     489.3813923918043
+    ],
+    "regionen": {
+     "order": [
+      "alpha",
+      "delta",
+      "beta",
+      "gamma",
+      "epsilon"
+     ],
+     "spaces": {
+      "alpha": {
+       "x": 567,
+       "y": 530.6875,
+       "radius": 250
+      },
+      "delta": {
+       "x": 208.8524541717456,
+       "y": 934.8289794563884,
+       "radius": 154.45079348883237
+      },
+      "beta": {
+       "x": 925.1475458282541,
+       "y": 126.5460205436114,
+       "radius": 226.7739820199815
+      },
+      "gamma": {
+       "x": 37.92943915361366,
+       "y": 422.59336673787436,
+       "radius": 185.56349186104046
+      },
+      "epsilon": {
+       "x": 1096.0705608463863,
+       "y": 638.7816332621253,
+       "radius": 52
+      }
+     }
+    }
+   },
+   "kanten_gegenrechnung": {
+    "seite_implizit": 7693,
+    "saat_implizit": 480,
+    "seite_explizit": 93,
+    "saat_explizit": 93,
+    "paare_gleich": false,
+    "ok": false
+   }
+  }
+ },
+ "browser": {
+  "version": "151.0.7922.34",
+  "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36",
+  "viewport": "1920x1200",
+  "kopfloser_chromium": true
+ },
+ "pinned_beim_start": 0,
+ "knoten": 263,
+ "fehler_in_der_seite": [],
+ "saat": {
+  "spaces": {
+   "alpha": 100,
+   "beta": 80,
+   "gamma": 50,
+   "delta": 32,
+   "epsilon": 1
+  },
+  "items": 263,
+  "grosse_ordner": {
+   "alpha": [
+    "projekt-a",
+    80
+   ],
+   "beta": [
+    "projekt-b",
+    60
+   ],
+   "gamma": [
+    "projekt-c",
+    40
+   ],
+   "delta": [
+    "ordner-d",
+    12
+   ]
+  },
+  "tag_pool": 40,
+  "erwartet": {
+   "explizit": 93,
+   "tag_kanten": 292,
+   "ordner_kanten": 188,
+   "tags_gesamt": 40,
+   "tags_ueber_limit": 0,
+   "tag_max_knoten": 14,
+   "implizit": {
+    "aus": 0,
+    "tags": 292,
+    "ordner": 188,
+    "beide": 480
+   }
+  }
+ },
+ "gegenlauf": "clique",
+ "zellen": {
+  "kanten": false,
+  "bildzeit": false,
+  "schleuder": true,
+  "ausreisser": false
+ }
+}

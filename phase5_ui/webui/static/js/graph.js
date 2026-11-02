@@ -132,6 +132,13 @@ const REPULSION_STRENGTH = 800;   // ~ Coulomb-Konstante (willkuerlich, durch Au
 const SPRING_LENGTH = 60;          // Ruhelaenge in CSS-Pixeln
 const SPRING_STRENGTH = 0.05;
 const DAMPING = 0.85;
+// P10.5 Block 18.2 (N1, gemessen in 18.0): die **hoechste Knotengeschwindigkeit**. Ohne Grenze hat ein
+// Knoten im Tag-Zustand im 5. Bild 28.104 px/Bild erreicht (Abstossung ~ 1/d^2 bei zwei fast
+// aufeinanderliegenden Knoten, dazu Federn je Kante) und ist bis 30.867 px weit weggeflogen -- die
+// Karte war 4.344 px hoch, der Zoom klemmte auf 50 %. Im ruhigen Zustand (nur Verknuepfungen) liegt
+// die Spitze bei 456 px/Bild: die Grenze liegt darueber und aendert **dort nichts** (das Layout aus
+// Block 14 bleibt byte-gleich), sie greift nur, wo die Rechnung explodiert.
+const MAX_SPEED = 600;
 // **P10.5 Block 14, Schritt 14.2:** `CENTER_GRAVITY` (0,012) und `ALPHA_START` (1) sind
 // **weg** -- ersetzt, nicht zusaetzlich (Plan §2.4): die Gravitation zieht jetzt zum **eigenen
 // Space-Anker** (`ANCHOR_GRAVITY`), und die Startenergie ist die **gesaete** (`ALPHA_START_SEEDED`).
@@ -579,55 +586,77 @@ function recomputeDegrees() {
   }
 }
 
+// P10.5 Block 18.1 (E1, Nikinger 2026-11-01/02): Tag- und Ordner-Kanten sind ein **Stern** um das
+// **zuletzt geaenderte** Item der Gruppe (k - 1 Kanten), keine Clique (k(k - 1)/2). Gemessen in 18.0:
+// vier Ordner mit 80/60/40/12 Items waren 5.728 Kanten und 180 ms je Bild; der Stern macht daraus 188.
+// Die Gruppe ist dieselbe wie vorher -- nur ihre Verbindung ist eine andere.
+//
+// **Die Mitte ist deterministisch:** das groesste `updated` (ISO-Strings, ein Formatierer -- die
+// lexikalische Ordnung ist die zeitliche), bei Gleichstand die kleinere ID. `updated` kommt mit dem
+// Graph-Payload (`/api/v1/graph`); die Reihenfolge der Knoten taugt nicht dafuer (der Server sortiert
+// zuerst nach Status und Faelligkeit).
+function starHub(group) {
+  var hub = group[0];
+  for (var i = 1; i < group.length; i++) {
+    var n = group[i];
+    var a = String(n.updated || "");
+    var b = String(hub.updated || "");
+    if (a > b || (a === b && n.id < hub.id)) hub = n;
+  }
+  return hub;
+}
+
+function starEdges(group, kind, seen, edges) {
+  var hub = starHub(group);
+  for (var i = 0; i < group.length; i++) {
+    var n = group[i];
+    if (n === hub) continue;
+    var lo = hub.id < n.id ? hub.id : n.id;
+    var hi = hub.id < n.id ? n.id : hub.id;
+    var key = lo + "|" + hi;
+    if (seen && seen[key]) continue;
+    if (seen) seen[key] = true;
+    edges.push({ src: hub.id, dst: n.id, kind: kind });
+  }
+}
+
 function buildTagEdges(nodeList) {
-  // Sammelt je Tag die Liste der Knoten-IDs, bildet dann alle ungerichteten Paare.
-  // Ein Tag, der auf > TAG_CLIQUE_LIMIT Knoten liegt, wird uebersprungen (P8-21).
+  // Sammelt je Tag die Knoten; ein Tag, der auf > TAG_CLIQUE_LIMIT Knoten liegt, wird
+  // uebersprungen (P8-21 -- die Grenze bleibt: ein Stern um 200 Knoten waere ein Haarball).
   var byTag = Object.create(null);
   for (var i = 0; i < nodeList.length; i++) {
     var n = nodeList[i];
     var tags = n.tags || [];
     for (var t = 0; t < tags.length; t++) {
-      (byTag[tags[t]] = byTag[tags[t]] || []).push(n.id);
+      (byTag[tags[t]] = byTag[tags[t]] || []).push(n);
     }
   }
   var edges = [];
   var seen = Object.create(null);
   Object.keys(byTag).forEach(function (tag) {
-    var ids = byTag[tag];
-    if (ids.length > TAG_CLIQUE_LIMIT) return;
-    for (var a = 0; a < ids.length; a++) {
-      for (var b = a + 1; b < ids.length; b++) {
-        var lo = ids[a] < ids[b] ? ids[a] : ids[b];
-        var hi = ids[a] < ids[b] ? ids[b] : ids[a];
-        var key = lo + "|" + hi;
-        if (seen[key]) continue;
-        seen[key] = true;
-        edges.push({ src: ids[a], dst: ids[b], kind: "tag" });
-      }
-    }
+    var group = byTag[tag];
+    if (group.length > TAG_CLIQUE_LIMIT) return;
+    starEdges(group, "tag", seen, edges);
   });
   return edges;
 }
 
 function buildFolderEdges(nodeList) {
-  // Kante zwischen Knoten im selben (space, folder)-Bucket -- folder != "" (Plan §5 D2).
-  // Das ist KEIN Space-Space-Kantenquerverweis -- nur Ordner-interna Struktur.
+  // Kante zwischen Knoten im selben (space, folder)-Bucket -- folder != "" (Plan §5 D2): ein Stern
+  // um das zuletzt geaenderte Item. Das ist KEIN Space-Space-Kantenquerverweis -- nur Ordner-interne
+  // Struktur.
   var byBucket = Object.create(null);
   for (var i = 0; i < nodeList.length; i++) {
     var n = nodeList[i];
     if (!n.folder) continue;
     var key = n.space + "\u0001" + n.folder;
-    (byBucket[key] = byBucket[key] || []).push(n.id);
+    (byBucket[key] = byBucket[key] || []).push(n);
   }
   var edges = [];
   Object.keys(byBucket).forEach(function (k) {
-    var ids = byBucket[k];
-    if (ids.length < 2) return;
-    for (var a = 0; a < ids.length; a++) {
-      for (var b = a + 1; b < ids.length; b++) {
-        edges.push({ src: ids[a], dst: ids[b], kind: "folder" });
-      }
-    }
+    var group = byBucket[k];
+    if (group.length < 2) return;
+    starEdges(group, "folder", null, edges);
   });
   return edges;
 }
@@ -1070,6 +1099,12 @@ function integrate(alpha) {
   for (var i = 0; i < nodes.length; i++) {
     var n = nodes[i];
     if (isHeld(n)) { n.vx = 0; n.vy = 0; continue; }
+    var speed2 = n.vx * n.vx + n.vy * n.vy;
+    if (speed2 > MAX_SPEED * MAX_SPEED) {       // N1: die Geschwindigkeit ist begrenzt
+      var scale = MAX_SPEED / Math.sqrt(speed2);
+      n.vx *= scale;
+      n.vy *= scale;
+    }
     n.x += n.vx * alpha;
     n.y += n.vy * alpha;
     n.vx *= DAMPING;
@@ -1184,6 +1219,12 @@ function drawEdges(all, rings, shown) {
   // (Plan: "der Kontrollpunkt liegt senkrecht zur Mitte und wächst mit der Länge"), die Breite
   // folgt dem Grad (`1 + log2(1 + min(deg(a), deg(b)))`), und die Kanten des Fokus tragen den
   // Akzentton (Vorlage C2).
+  // **P10.5 Block 18.1 (b), gemessen und verworfen (2026-11-02):** die Kanten je Stil in **einem** Pfad
+  // mit **einem** `stroke()` zu zeichnen war **langsamer**, nicht schneller -- gestrichelt 37,6 statt
+  // 29,1 ms bei 480 + 93 Kanten (`probes/p105_b18_karte_messung.py`, Gegenlauf `buendel`; headless
+  // Chromium, Software-Rasterung). Ein grosser gestrichelter Pfad kostet mehr als viele kleine; deshalb
+  // bleibt es bei **einem `stroke()` je Kante**. Die Zeit steckt in der **Strichelung** (ohne sie
+  // 5,8 statt 29,1 ms) -- das ist eine Frage der Darstellung, keine des Zeichenwegs.
   ctx.lineCap = "round";
   for (var i = 0; i < all.length; i++) {
     var e = all[i];

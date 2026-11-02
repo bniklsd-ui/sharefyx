@@ -110,7 +110,7 @@ from .errors import ApiError, CsrfError
 from .events import HEARTBEAT_SECONDS, HEAD_CHARS, ChangeFeed
 from .security import require_csrf
 from .serializers import (
-    asset_to_json, item_to_json, overview_row_to_json, search_to_json, space_to_json,
+    _iso, asset_to_json, item_to_json, overview_row_to_json, search_to_json, space_to_json,
     summary_to_json,
 )
 from .reauth import REAUTH_GRANT_TTL_S, ReauthGrantStore, verify_reauth
@@ -1116,8 +1116,9 @@ def api_routes(
           archiviertes Item ohne `?archived=1` produziert schlicht keine Kante),
         - exakt dedupliziert pro `(src, dst, kind)`.
 
-        Knoten-Payload: exakt die neun Felder aus Plan §3 B3 (`id`/`title`/`space`/`own`/
-        `writable`/`type`/`status`/`folder`/`tags` -- **[2026-09-02 Korrektur, Fix B, Plan
+        Knoten-Payload: die neun Felder aus Plan §3 B3 (`id`/`title`/`space`/`own`/
+        `writable`/`type`/`status`/`folder`/`tags`; **[2026-11-02, Block 18.1]** dazu `updated`, das
+        zehnte -- der Stern der Karte braucht es) -- **[2026-09-02 Korrektur, Fix B, Plan
         §9.4.6 Befund B]** war zuvor als "acht Felder .../`shared`/..." dokumentiert; das war
         schon vor dem `shared`→`writable`-Fix ein Zähl-Fehler, die Liste hatte immer neun
         Einträge). Kein `snippet`, kein `body` -- die Graph-Ansicht braucht keine Inhalte, und
@@ -1183,6 +1184,11 @@ def api_routes(
                 "status": i.status,
                 "folder": i.folder,
                 "tags": list(i.tags),
+                # P10.5 Block 18.1 (2026-11-02): die Karte verbindet Ordner und Tags als **Stern**
+                # um das zuletzt geaenderte Item der Gruppe -- dafuer braucht sie `updated`.
+                # Die Reihenfolge der Knoten hilft nicht: `store.search()` sortiert zuerst nach
+                # Status und Faelligkeit, erst dann nach `updated`.
+                "updated": _iso(i.updated),
             }
             for i in visible_items
         ]

@@ -1366,6 +1366,11 @@ def main():
         ctx = browser.new_context(viewport={"width": 1920, "height": 1200},
                                   ignore_https_errors=True)
         page = ctx.new_page()
+        # **[2026-11-02, Block 18.1] Das Film-Startbild (Block 17) liegt ueber der frischen Instanz** und
+        # frisst Hover und Mausrad: ohne diese Zeile blieb `beschriftungen` rot (0 Beschriftungen, Zoom
+        # 100 % statt 121 %), obwohl am Layout nichts geaendert war. `localStorage.clear()` in
+        # `frischer_lauf()` loescht den Schluessel -- das Init-Skript setzt ihn bei jedem Laden neu.
+        page.add_init_script("localStorage.setItem('sfx:film:gesehen','4.0.0')")
         page.add_init_script(RAF_PROBE)
         # **Der Recorder der gezeichneten Beschriftungen** (Schritt 14.35): er haengt sich an
         # die Leinwand-API des Browsers, nicht in den Produktcode (Plan §4).
