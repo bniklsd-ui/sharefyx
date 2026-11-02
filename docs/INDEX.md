@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-11-02 (Block 18.1/18.2 gebaut) | 2026-11-01 (Block 18.0 gemessen) | 2026-11-01 (Block 18 geplant, Deploy D live) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-11-02 (Block 18: zwei Addons) | 2026-11-02 (Block 18.1/18.2 gebaut) | 2026-11-01 (Block 18.0 gemessen) | 2026-11-01 (Block 18 geplant, Deploy D live) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -73,7 +73,9 @@ updated: 2026-11-02 (Block 18.1/18.2 gebaut) | 2026-11-01 (Block 18.0 gemessen) 
 - [docs/concepts/phase10_5_launch_film_plan.md](./concepts/phase10_5_launch_film_plan.md) — 📗 **34170 B** · Plan Block 16: Launch-Film v4.0.0
 - [docs/concepts/phase10_5_block15_review_fixes_plan.md](./concepts/phase10_5_block15_review_fixes_plan.md) — 📗 **31775 B** · Block 15: Review-Fixes B1–B10 (✅)
 - [docs/concepts/phase10_5_block17_film_app_plan.md](./concepts/phase10_5_block17_film_app_plan.md) — 📗 **11012 B** · Plan Block 17: Film in die App (✅)
-- [docs/concepts/phase10_5_block18_live_fixes_plan.md](./concepts/phase10_5_block18_live_fixes_plan.md) — 📗 **20007 B** · Mini-Plan Block 18: Live-Funde nach D (🔄 18.0–18.2 ✅, §5.5 offen)
+- [docs/concepts/phase10_5_block18_live_fixes_plan.md](./concepts/phase10_5_block18_live_fixes_plan.md) — 📗 **22836 B** · Mini-Plan Block 18: Live-Funde nach D (🔄 18.0–18.2 ✅, §5.5 offen)
+- [docs/concepts/phase10_5_block18_addon_render.md](./concepts/phase10_5_block18_addon_render.md) — 📗 **25401 B** · Addon Block 18: Render-Effizienz der Karte (V1–V4, Messtabelle, Optionen)
+- [docs/concepts/phase10_5_block18_addon_insel.md](./concepts/phase10_5_block18_addon_insel.md) — 📗 **23811 B** · Addon Block 18: die ferne Insel (Tritt in der Abstoßung, Vorschlag ε, Zelle `insel`)
 - [docs/concepts/phase10_5_p10j_lauf2_eurofleet.md](./concepts/phase10_5_p10j_lauf2_eurofleet.md) — 📗 **4149 B** · Notiz an eurofleet: P10.5-28 (P10-J Lauf 2)
 - [docs/concepts/phase10_5_block15_review_fixes_plan_anhang.md](./concepts/phase10_5_block15_review_fixes_plan_anhang.md) — 📦 **14534 B** · Anhang Block 15: Anmerkungen 15.1–15.3b
 - [docs/concepts/phase10_5_ultra_review_v4.0.0.md](./concepts/phase10_5_ultra_review_v4.0.0.md) — 📕 **19192 B** · Ultra-Review v4.0.0: 22 Befunde, B1 kritisch

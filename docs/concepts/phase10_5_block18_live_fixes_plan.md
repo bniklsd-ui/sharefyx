@@ -5,8 +5,10 @@ read-when: Ausführung von Block 18 — zuerst §1 (Auftrag), §4 (Entscheidunge
 detail: L2
 up: ../../phase10_5_finishing/CLAUDE.md
 down:
+  - ./phase10_5_block18_addon_render.md   # 📗 Addon: Render-Effizienz (V1–V4), Messtabelle, Optionen
+  - ./phase10_5_block18_addon_insel.md     # 📗 Addon: die ferne Insel (Tritt in der Abstoßung), Vorschlag ε, Zelle `insel`
   - ./phase10_5_block14_7_plan.md   # 📗 die Kartengeometrie (Hex-Anker, LOBE_SCALE), auf der 18.2 aufsetzt
-updated: 2026-11-02 (18.1/18.2 gebaut: Stern, Geschwindigkeitsgrenze, Bündeln verworfen; §5.5 offen: Strichelung, Ausreißer-Zelle) | 2026-11-01 (18.0 gemessen: §5 gefüllt, K1–K4/A1–A3 mit Befund, neuer Befund N1 — Schleuder-Instabilität im Tag-Zustand) | 2026-11-01 (E1–E4 beantwortet: Stern, Farben → P11, v4.0.1, Zeilen 18/49 als Wegwerf-Probe 18.5) | 2026-11-01 (Mini-Plan, Claude Code — Live-Sichtung des Nikingers nach Deploy D)
+updated: 2026-11-02 (§5.6: zwei Addons — Render-Effizienz, ferne Insel; Korrektur zu 18.2) | 2026-11-02 (18.1/18.2 gebaut: Stern, Geschwindigkeitsgrenze, Bündeln verworfen; §5.5 offen: Strichelung, Ausreißer-Zelle) | 2026-11-01 (18.0 gemessen: §5 gefüllt, K1–K4/A1–A3 mit Befund, neuer Befund N1 — Schleuder-Instabilität im Tag-Zustand) | 2026-11-01 (E1–E4 beantwortet: Stern, Farben → P11, v4.0.1, Zeilen 18/49 als Wegwerf-Probe 18.5) | 2026-11-01 (Mini-Plan, Claude Code — Live-Sichtung des Nikingers nach Deploy D)
 ---
 # Live-Funde nach Deploy D (Plan Block 18)
 
@@ -164,3 +166,26 @@ und Fälligkeit, dann nach `updated`).
    fremden Umriss; im Zustand „aus" 63 px, „Tags" 21, „beide" 23. Das Bild zeigt eine ruhige eigene Insel, **keinen** Ausreißer. A1
    (Ankerabstand nach echten Radien) würde die Anker bewegen und damit P10.5-68 anfassen — **nicht gebaut**, bis der Nikinger das Bild
    gesichtet hat (ob 121 px stören).
+
+## 5.6 Addons (2026-11-02, zwei Opus-Unteragenten: erkunden und vorschlagen, nichts gebaut)
+
+**Render-Effizienz** — `phase10_5_block18_addon_render.md`. Unter A (die Strichelung bleibt) erreichen **Ruhe und Pan** 60 fps
+(**34,5 → 2,3 ms**, Zwischenspeicher der Kanten-/Lappen-Schicht, V1); **Einschwingen und Hover-Wechsel** nicht (Untergrenze 34,6 ms,
+29,3 ms mit V4). V3 (zwei Simulationsschritte je Bild) halbiert die Einschwing-**Dauer** (4,5 → 2,3 s, Endlage byte-gleich). Die Zelle
+`bildzeit` müsste vor V1 in drei Zellen geteilt werden, sonst wird sie trivial grün. Offen: V1 + V3 (+ V4)? Mausrad: Blit oder Neuaufbau?
+Bildschirmdichte (bei dpr 2 braucht das Einschwingen selbst ohne Striche 22,4 ms).
+
+**Die ferne Insel** — `phase10_5_block18_addon_insel.md`. Eine Wurzel, zwei Gesichter: die Abstoßung in `applyForces()` ist fast singulär
+(`dist2 + 0.01`, Kraft 2700/dist2); zwei Knoten, die sich auf wenige px nähern (überlappende Ordner-Inseln in der Saat oder im Durchflug),
+bekommen einen **Tritt**. Bild 2 des Nikingers ist **N1 auf v4.0.0** (Gruppe; in HEAD behoben, noch nicht deployt — Sicherheit mittel, der
+Mechanismus hoch). Der **Einzelpunkt in eigenem Umriss überlebt HEAD**: `MAX_SPEED` deckelt ihn auf ≤ 1.052 px, beseitigt ihn nicht — auf der
+18.0-Saat selbst `itm_0000002f`, 490,7 px vom Körper, Zustand „aus", nach „Layout zurücksetzen" wieder da. **Vorschlag:** `REPULSION_MIN_DIST = 6`
+(eine Zeile): Inseln 40 % → 0 % auf sechs Live-Formen, Block-14-Probe 6/6 grün, 152-Item-Szene byte-gleich. **Folge:** der Gegenlauf
+`schleuder` wird zahnlos (`MAX_SPEED` greift nirgends mehr) — Weg 1 (zweiter Gurt, neue Szene suchen) oder Weg 2 (streichen, dann färbt `tritt` zwei Zellen).
+
+> **Datierte Korrektur zu 18.2 (2026-11-02):** die Aussage „N1 weg, kein Knoten weggeschleudert" (Session-Block, §5.5) gilt für **Gruppen** und die
+> **Geschwindigkeit**. Der **Einzelpunkt-Tritt** blieb unsichtbar, weil die Zelle `schleuder` (≤ 1.300 px vom Median) ihn nicht sieht und `ausreisser`
+> nur `epsilon` misst — beide waren grün/rot aus anderem Grund. Neue Zelle `insel` (Körpermaske = genau **eine** Komponente) fällt auf HEAD rot.
+
+**Entscheidungen beim Nikinger:** (1) Render: V1 + V3 (+ V4)? Mausrad? Bildschirmdichte? (2) Insel: ε-Regel in `v4.0.1` aufnehmen, und für `schleuder`
+Weg 1 oder 2. (3) Live-Prüfung nach dem Deploy (zwei Schritte, Addon Insel §6): Tags/Ordner aus + „Layout zurücksetzen" + herauszoomen; dann an + Reset.
