@@ -1,17 +1,17 @@
 ---
 status: live
-purpose: Die vier wiederverwendeten Workflow-Prompts (Claude Code Session-Start, Phasen-Kickoff im Browser, Phasen-Abschluss, Ultra-Review) — angepasst an dieses Projekt
+purpose: Die fünf wiederverwendeten Workflow-Prompts (Claude Code Session-Start, Phasen-Kickoff/Planung, Phasen-Abschluss, Ultra-Review, Addon-Agent) — angepasst an dieses Projekt
 read-when: Start einer Claude-Code-Session, Start eines neuen Phasen-Chats, Abschluss einer Phase
 detail: L2
 up: ../CLAUDE.md
 down:
   - DOC_LAYERS_CONVENTION.md   # Navigationsregeln, auf die Prompt 1 verweist
   - ../ROADMAP.md              # Phasenübersicht
-updated: 2026-10-29 (Prompt 4 neu: Ultra-Review vor v4.0.0) | 2026-10-20 (Notiz unter Prompt 2: P9-Transkript bereinigt, P10-Kickoff lief als Prompt 1 — der Block ist die einzige Vorlage) | 2026-10-16 (Korrektur unter Prompt 2: der Phasen-Kickoff läuft seit spätestens P9 in Claude Code; Beleg und die drei Abweichungen des P9-Wortlauts) | 2026-08-09
+updated: 2026-11-02 (Prompts 1–3 an die aktuell benutzte Fassung angeglichen, Prompt 5 Addon-Agent neu) | 2026-10-29 (Prompt 4 neu: Ultra-Review vor v4.0.0) | 2026-10-20 (Notiz unter Prompt 2: P9-Transkript bereinigt, P10-Kickoff lief als Prompt 1 — der Block ist die einzige Vorlage) | 2026-10-16 (Korrektur unter Prompt 2: der Phasen-Kickoff läuft seit spätestens P9 in Claude Code; Beleg und die drei Abweichungen des P9-Wortlauts) | 2026-08-09
 ---
 # Workflow-Prompts
 
-Drei Prompts. **[2026-08-09 Korrektur, Nikinger-Entscheidung]:** der Ablauf ist nicht mehr
+Fünf Prompts (**[2026-11-02]**: Prompts 1–3 stehen in der Fassung, die der Nikinger heute benutzt; Prompt 5 ist neu). **[2026-08-09 Korrektur, Nikinger-Entscheidung]:** der Ablauf ist nicht mehr
 „Planung im Browser, Ausführung in Claude Code, Abschluss zurück im Browser" — **Abschluss läuft
 jetzt ebenfalls in Claude Code** (Prompt 3). Grund: Google Drive ist für diesen Zweck ineffizient,
 und Sharefyx selbst trägt noch keine ganzen Projekte (nur einzelne Notizen/Aufgaben) — beides
@@ -28,8 +28,8 @@ Kosmetikhinweis, sondern der Grund für die Anpassung).
 ## Prompt 1 — Claude Code Session-Start (General Prompt)
 
 ```text
-Hello Claude, and welcome to Phase X of the Space-Server project (shared MCP context spaces,
-Markdown + YAML frontmatter on a home VM).
+Hello <Modell>, and welcome to Phase X of the "Sharefyx" Space-Server project (shared MCP contextspaces, Markdown + YAML frontmatter on a home VM).
+
 
 General Task:
 Start with docs/INDEX.md (L0). From there read only the header cards (first 15 lines) of the
@@ -38,7 +38,8 @@ Do NOT read every .md file — that defeats the layer model this repo is built o
 The minimum for any session: CLAUDE.md (root), the active phase head, and its newest
 "## Session stopped" block. Then docs/concepts/ for the current phase's plan.
 Read code whenever you touch something — code is always the source of truth. Don't be shy about
-it; a wrong assumption costs more than a Read call.
+it; a wrong assumption costs more than a Read call. You are also encouraged to use the memory files, e.g. created by Claude Code. You have specific permit to read and if needed edit them.
+
 
 Scope/Exceptions:
 If code and plan/concept disagree, the code wins. Fix small drift and note it with a dated
@@ -54,12 +55,15 @@ The phase is split into steps and progress is tracked; keep it current and edit 
 something changes. Commit ⇒ note update, in the SAME commit.
 Don't invent conventions — read the .md files or reuse existing ones.
 
+
 Hard rules that override convenience (full list in CLAUDE.md):
 - Never write a secret into a file. Tokens live in the OS keyring, service "nikinger-space".
 - Never propose port forwarding or DynDNS. The VM sits behind CGNAT; egress tunnel only.
 - Never introduce an LLM call into the server. The server is dumb by design.
 - No last-write-wins, anywhere, not even "temporarily for the test".
 - Never `pkill -f` with regex (kills the prod by accident) — see Hard Rule 9, root CLAUDE.md.
+- Only one advisor call per commit due to context reasons.
+
 
 Tests:
 Unit tests are yours and are expected — mocked, no network, never against the real DATA_ROOT
@@ -74,6 +78,7 @@ it, never point a throwaway run at the real DATA_ROOT/auth.sqlite3/keyring. The 
 everything that touches THAT reality: tunnel bring-up, the live
 Claude connector, and any end-to-end test against the real data directory.
 
+
 Eigene Wegwerf-Instanzen dürfen gestoppt werden — **aber nicht per `pkill -f` mit Regex**. Hard
 Rule 9 (Wurzel-`CLAUDE.md`) verbietet `pkill -f <modul>` und alle Regex-Substring-Muster im
 Cmdline, weil sie die echte Instanz mitkillen (Phase-8-Step-A3-Vorfall 2026-09-01,
@@ -83,6 +88,28 @@ phase2_mcp"` mit nachgestelltem `$`-Anker im Filter oder `pgrep` über den einde
 Wegwerf-Port (typisch 8799, nie 8765 = Produktion). Den **einen** `sharefyx-mcp.service`
 fasst ausschließlich der Nikinger an.
 
+
+Special task / note from last session (can overwrite anything from this prompt but reading tasks):
+
+xxx
+
+The nikinger wishes a good and fun coding session!!
+```
+
+**[2026-11-02, Angleichung an die benutzte Fassung]** Gegenüber dem Stand vom 2026-09-01: Kopfzeile „Hello <Modell> …
+Phase X of the „Sharefyx" Space-Server project" · neuer Satz zu den **Memory-Dateien** (lesen und bei Bedarf bearbeiten
+erlaubt) · neue harte Regel **„Only one advisor call per commit"** · Schlusszeile „Special task / note from last session
+(can overwrite anything from this prompt but reading tasks)" statt „Note/Special Task (may override anything …)". Der
+Nikinger-Wortlaut war am Ende des Wegwerf-Absatzes abgeschnitten (`… mit nachgestelltem $-Anker im`) — der **volle**
+Absatz bleibt, ebenso der Verweis auf `scripts/rotate_session_block.sh` (steht so in Root-`CLAUDE.md`). **Aus Prompt 1
+entfernt** (in der aktuellen Fassung nicht mehr enthalten): die Abschnitte **Skills**, **Claude Verification** („Nikinger"-
+Codename), **Plan mode** und der Absatz „Even outside plan mode …" — unten **verbatim** aufgehoben; wer sie wieder braucht,
+holt sie von dort.
+
+<details>
+<summary>Früherer Wortlaut (Prompt 1 bis 2026-11-02), verbatim — nicht mehr im Einsatz</summary>
+
+```text
 Skills:
 You have skills installed and may use them freely, including the browser skill for quick checks.
 If a skill would be extremely useful but isn't installed, install it yourself or ask me
@@ -111,12 +138,9 @@ assumptions against the actual code (= source of truth). Correct small drift; fl
 that needs a decision.
 The execution plan (the most detailed a plan gets here) is approved by the Nikinger and always
 saved for later checks.
-
-Note/Special Task (may override anything in this standard prompt):
-xxx
-
-Der Nikinger wishes you a happy coding session!
 ```
+
+</details>
 
 ---
 
@@ -136,7 +160,7 @@ vom 2026-10-16 lief als Prompt 1 mit Sondervermerk, nicht als Prompt 2. Die einz
 mit „Phase-10.5-Chat" und dem Einstieg `PHASE10_CLOSEOUT_HANDOVER.md` gefüllt.
 
 ```text
-Hallo Claude, du bist der Phase-X-Chat des Space-Server-Projekts.
+Hallo Claude, du bist der Phase-X-Chat des Space-Server-Projekts „Sharefyx".
 
 Onboarding:
 Es existieren bereits Dokumente aus dem Abschluss der Vorphase (Namensschema:
@@ -146,6 +170,7 @@ Navigiere über docs/INDEX.md, nicht über Verzeichnis-Scans. Du darfst alle Pro
 nutzen; eine aktuelle entpackte Version des Projekts liegt im Notfall auf meinem Google Drive.
 Führe die bereits verwendeten Benennungen fort — Paketnamen, Phasenverzeichnisse,
 Dateinamensschemata.
+You are also encouraged to use the memory files, e.g. created by Claude Code. You have specific permit to read and if needed edit them.
 
 Hinweise/Rahmen:
 Aktualität: halte den Projektkontext und alle Notizen aktuell. Aktualisiere nicht nur Notizen,
@@ -173,7 +198,7 @@ Konzept+Plan+Handover-Trio.
 Anweisung für den Plan an sich:
 Plane bis zur Ausführungsreife — gelockte Architektur-Entscheidungen (Tabelle), Schritt-Sequenz,
 pro Schritt exakte Funktions- und Typnamen, Datei:Zeile-Anker wo vorhanden, Testliste,
-Akzeptanzkriterien. Der Plan muss direkt an Sonnet gehen können; Opus in der CLI soll ihn nicht
+Akzeptanzkriterien. Der Plan muss direkt an Sonnet 5 gehen können; Opus 5 in der CLI soll ihn nicht
 neu herleiten müssen. Was seit dem letzten Repo-Stand gedriftet sein könnte, explizit als
 [VERIFY] markieren statt es als gesichert hinzuschreiben.
 Jedes neue .md bekommt eine L1-Header-Card und eine Zeile in docs/INDEX.md.
@@ -181,6 +206,13 @@ Jedes neue .md bekommt eine L1-Header-Card und eine Zeile in docs/INDEX.md.
 Besondere Notiz:
 xxx
 ```
+
+**[2026-11-02, Angleichung]** Aktuelle Fassung: „Hallo Claude, du bist der Phase-X-Chat …" (beim Einsatz gefüllt, P10.5:
+„Phase-10.5-„Ultra"-Chat"), Modellnamen **„Sonnet 5"/„Opus 5"**, neuer Memory-Satz im Onboarding. **P10.5-Einsatz als Beispiel
+für die „Besondere Notiz":** (1) ein detaillierter Plan für alle Fixes aus dem Ultra-Review, (2) ein Plan für den „Product
+Launch Film" — mit dem Nikinger abgesprochen, (3) darüber hinaus geplante Ideen nicht unerwünscht, aber mit Begründung
+abgesprochen, (4) **Cloud-Session** (Fable 5.1 Max, über Anthropic-Aktionsguthaben) über das GitHub-Repo des Nikingers —
+die Vorlage selbst bleibt `xxx`.
 
 ---
 
@@ -191,7 +223,7 @@ Guten Tag Claude! Phase X des Space-Server-Projekts „Sharefyx" ist abgeschloss
 
 Ergebnisse:
 - erfolgreich fertiggestellt
-- erfolgreich getestet (Unit, gemockt)
+- erfolgreich getestet (Unit, gemockt, Throwaway-Browser-Instanz)
 - im Rahmen der Möglichkeiten live validiert
 - gepusht und committet
 
@@ -205,6 +237,7 @@ kompletten Phase-Head, den vollständigen SESSIONS_ARCHIVE.md-Verlauf dieser Pha
 das Plan-Dokument und, falls vorhanden, das Abnahmeprotokoll. Das Minimal-Read-Prinzip aus
 Prompt 1 („nur Header-Karten, gezielt absteigen") gilt hier bewusst nicht — ein Rückblick, der
 Kapitel ausspart, ist keiner.
+You are also encouraged to use the memory files, e.g. created by Claude Code. You have specific permit to read and if needed edit them.
 
 Auftrag:
 1. Aufmerksame Analyse der beendeten Phase — lokales Repo ist die einzige Quelle, kein Google
@@ -244,7 +277,12 @@ Nenne offene [VERIFY]-Marker der abgeschlossenen Phase explizit — aufgelöste 
 
 Besondere Notiz:
 xxx
+
+Ich wünsche dir viel Spaß beim Tüfteln, du schaffst das!
 ```
+
+**[2026-11-02, Angleichung]** Neu gegenüber 2026-08-09: „Throwaway-Browser-Instanz" im Ergebnis-Bullet „getestet", der Memory-Satz
+unter „Hinweise/Rahmen" und die Schlusszeile.
 
 ---
 
@@ -335,6 +373,39 @@ Regeln:
 
 ---
 
+## Prompt 5 — Addon-Agent (Unteragent: erkunden und vorschlagen, nicht ausführen)
+
+> **[2026-11-02, Nikinger-Entscheidung, Block 18]** Für Fragen, die erst **gemessen und erklärt** werden müssen, bevor Code
+> geschrieben wird (Beispiel: „wie wird das Kartenzeichnen auf 60 FPS effizient", „warum fliegt eine Insel weg"). Ein Unteragent
+> (Opus) bekommt Prompt 1 als Rahmen, liest den **vorhandenen Plan** und schreibt ein **Addon** dazu — **keinen Code**. Der Hauptagent
+> integriert (INDEX, Phase-Head, ein Commit) — zwei Agenten, die denselben Head und INDEX anfassen, würden kollidieren.
+> **Nicht gleichzeitig starten, wenn beide Zeit messen:** parallele Browser-Proben teilen die CPU und verfälschen Bildzeiten.
+
+```text
+<Prompt 1, Kopfzeile „Hello Opus, …", Sonderaufgabe ersetzt durch den Block unten>
+
+## YOUR TASK: Addon für den Plan <Pfad zum Plan> — <Gegenstand>
+Nichts wird umgesetzt. FINDE und SCHLAGE VOR: <Ziel mit Zahl, z. B. „draw() <= 16,7 ms bei allen Schaltern an">.
+Gelesen werden müssen: der Plan (ganz), der Phase-Head, der neueste Session-Block, die Memory-Dateien, die Probe, die die
+Basislinie misst. **Schon festgestellte Tatsachen** (nicht neu herleiten) und **bereits verworfene Ideen** (nicht erneut
+vorschlagen) stehen mit Zahlen im Auftrag; Entscheidungen des Nikingers (z. B. „die Strichelung bleibt") sind Randbedingungen.
+
+ERLAUBT: alles lesen; Wegwerf-Experimente (eigener freier Port, tmp-DATA_ROOT, tmp-auth.sqlite3, TLS, bereinigte Umgebung,
+Stopp nur über die PID-Datei), Muster: `probes/p105_b18_karte_messung.py`; Änderungen nur an **Kopien** der statischen
+Dateien (Probe-Mechanismus `GRAPH_PATCH_EXTRA`), Skripte unter /tmp oder ~/.claude-code-tools/. Playwright braucht
+`add_init_script(localStorage.setItem('sfx:film:gesehen','4.0.0'))`, sonst frisst das Film-Startbild Hover und Mausrad.
+Jede Zeitmessung mindestens dreimal, mit Flush je Bild (`getImageData`), sonst misst man 30 × zu wenig.
+VERBOTEN: Produktcode/Tests/Proben im Repo ändern, committen, pushen, `docs/INDEX.md` oder den Phase-Head anfassen,
+`pkill -f`, der systemd-Dienst, das echte DATA_ROOT/auth.sqlite3/Keyring, Secrets in Dateien.
+
+ABLIEFERUNG: genau **eine** neue Datei `docs/concepts/<plan>_addon_<thema>.md` (≤ ~25 KB, L1-Header-Card) mit: Ergebnis (BLUF) ·
+Methode und Messgerät · Messtabelle · Vorschläge nach Rang (Gewinn, Risiko, Funktions-/Zeilenanker, Test und **Gegenlauf**, der
+genau eine Zelle rot macht) · Offenes für den Nikinger · [VERIFY]-Liste. Fehlschläge und Rauschen sind Ergebnisse. Am Ende ein
+Kurzbericht (≤ 200 Wörter): BLUF, Dateipfad, was nicht verifiziert werden konnte.
+```
+
+---
+
 ## Was ich gegenüber den Originalen geändert habe (und warum)
 
 | Änderung | Grund |
@@ -352,3 +423,5 @@ Regeln:
 | **[2026-08-09]** Punkt 5 (Commit) neu in Prompt 3 | Der Browser-Chat konnte nicht committen, Claude Code muss es per Hard Rule 8 („Commit ⇒ Doc-Update, im selben Commit"). Bewusst als eigener Punkt, nicht implizit in Punkt 3/4 versteckt — sonst wird das Bündeln zum Zufall statt zur Regel. |
 | **[2026-08-09]** „Aktualisiere … deine direkten Erinnerungen" konkretisiert auf Claude Codes eigene Memory-Dateien | Der Originalsatz war für den Browser-Chat formuliert (Konversationskontext). Claude Code hat ein eigenes, dateibasiertes Memory-System — der Hinweis bleibt sinnvoll, aber nur, wenn er auf den tatsächlichen Mechanismus zeigt. |
 | **[2026-08-18]** „Tests"-Absatz in Prompt 1 um die Wegwerf-Instanz-Erlaubnis erweitert | Bisher nur implizit aus Session zu Session weitergetragen (P4-Sicherheitsreview/P5-Plan nannten Wegwerf-Instanzen, aber der Session-Start-Prompt selbst sagte nichts dazu) — eine Instanz musste sich per Memory oder Nachfrage daran erinnern. Der Nikinger hat die Erlaubnis am 2026-08-18 (P6 Step 7b Nachlese) ausdrücklich als Standing Permission reconfirmt, mit der klaren Grenze „nicht die echte, gerade von Fabian genutzte Instanz". Jetzt Teil des Prompts selbst statt nur der Memory-Datei `feedback_throwaway_test_instance_permission.md` — der Prompt ist, wie die Rotationsregel-Zeile darüber es schon vormacht, die Stelle, an der eine wiederkehrende Erlaubnis tatsächlich für jede neue Session greift, nicht nur für eine, die sich zufällig erinnert. |
+| **[2026-11-02]** Prompts 1–3 an die vom Nikinger benutzte Fassung angeglichen (Memory-Satz, Advisor-Regel, „Special task / note from last session", Modellnamen Sonnet 5/Opus 5, „Throwaway-Browser-Instanz", Schlusszeile); die Abschnitte Skills / Claude Verification / Plan mode **verbatim** unter Prompt 1 aufgehoben | Der Nikinger hat die aktuell benutzte Liste vorgelegt; das Dokument hinkte hinterher. Verweis auf `scripts/rotate_session_block.sh` und der **volle** Wegwerf-Absatz bleiben (die Liste war dort abgeschnitten bzw. kürzer). |
+| **[2026-11-02]** Prompt 5 (Addon-Agent) neu | Block 18: erst messen und erklären lassen, dann bauen; ein Agent schreibt ein Addon zum Plan, der Hauptagent integriert. |

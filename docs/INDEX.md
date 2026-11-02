@@ -38,7 +38,7 @@ updated: 2026-11-02 (Block 18.1/18.2 gebaut) | 2026-11-01 (Block 18.0 gemessen) 
 - [docs/concepts/sichtpruefung_automation_conventions.md](./concepts/sichtpruefung_automation_conventions.md) — 📗 **21.765 B** · Konventionen der Sichtprüfungs-Automatisierung · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/concepts/sichtpruefung_automation_tooling.md](./concepts/sichtpruefung_automation_tooling.md) — 📗 ~26KB · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/concepts/launch_film_learnings.md](./concepts/launch_film_learnings.md) — 📗 **6249 B** · Rezept + Lehren des Launch-Films v4.0.0 (Stil, den der Nikinger abnahm; Fallen) — zuerst lesen vor jedem neuen Film
-- [docs/PROMPTS.md](./PROMPTS.md) — 📗 ~25KB · vier Workflow-Prompts (Session-Start, Kickoff, Abschluss, Ultra-Review); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [docs/PROMPTS.md](./PROMPTS.md) — 📗 **31742 B** · fünf Workflow-Prompts (Session-Start, Kickoff, Abschluss, Ultra-Review, Addon-Agent); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 
 ## Phase 10 — ✅ abgeschlossen 2026-10-20 (Bestandsaufnahme, kein Produktcode; Plan P10.5)
 
