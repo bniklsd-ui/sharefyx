@@ -1,0 +1,49 @@
+{
+ "probe": "p105_p10j_lauf1_wegwerf",
+ "modell": "minimax/MiniMax-M3.1-Flash",
+ "opencode_bin": "/home/savefyx/.nvm/versions/node/v24.18.0/bin/opencode",
+ "opencode_version": "1.18.33",
+ "base_url": "https://127.0.0.1:8799",
+ "gegenlauf": null,
+ "opencode_config": {
+  "$schema": "https://opencode.ai/config.json",
+  "model": "minimax/MiniMax-M3.1-Flash",
+  "agent": {
+   "build": {
+    "tools": {
+     "sharefyx_*": true
+    }
+   }
+  },
+  "mcp": {
+   "sharefyx": {
+    "type": "remote",
+    "url": "https://127.0.0.1:8799/mcp",
+    "enabled": true
+   }
+  }
+ },
+ "authorize_url_gefunden": true,
+ "browser_exit": 0,
+ "auth_ok": true,
+ "run_exit": 0,
+ "run_dauer_s": 8.0,
+ "run_stdout_tail": "{\"type\":\"step_start\",\"timestamp\":1793689850822,\"sessionID\":\"ses_e5fc0fda9ffe3GY5eqT77RQvhk\",\"part\":{\"id\":\"prt_1a03f13c1001L8BGA7a905syVK\",\"messageID\":\"msg_1a03f0454001mj0NBdeBYdPrnz\",\"sessionID\":\"ses_e5fc0fda9ffe3GY5eqT77RQvhk\",\"snapshot\":\"011e245a8016ca0e991801e202cef60ad16767e6\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1793689851102,\"sessionID\":\"ses_e5fc0fda9ffe3GY5eqT77RQvhk\",\"part\":{\"id\":\"prt_1a03f13c3001f5pwaj1pNxxeyn\",\"messageID\":\"msg_1a03f0454001mj0NBdeBYdPrnz\",\"sessionID\":\"ses_e5fc0fda9ffe3GY5eqT77RQvhk\",\"type\":\"text\",\"text\":\"I'll call the tool.\",\"time\":{\"start\":1793689850819,\"end\":1793689851096}}}\n{\"type\":\"tool_use\",\"timestamp\":1793689851140,\"sessionID\":\"ses_e5fc0fda9ffe3GY5eqT77RQvhk\",\"part\":{\"type\":\"tool\",\"tool\":\"sharefyx_list_spaces\",\"callID\":\"call_01a1a03f13eb732f99b7d724\",\"state\":{\"status\":\"completed\",\"input\":{},\"output\":\"[{\\\"name\\\":\\\"alpha\\\",\\\"item_count\\\":0,\\\"writable\\\":true,\\\"members\\\":[],\\\"folders\\\":[]}]\",\"metadata\":{\"truncated\":false},\"title\":\"\",\"time\":{\"start\":1793689851123,\"end\":1793689851138}},\"id\":\"prt_1a03f14db001XQ2usIPKwHHCUk\",\"sessionID\":\"ses_e5fc0fda9ffe3GY5eqT77RQvhk\",\"messageID\":\"msg_1a03f0454001mj0NBdeBYdPrnz\"}}\n{\"type\":\"step_finish\",\"timestamp\":1793689851200,\"sessionID\":\"ses_e5fc0fda9ffe3GY5eqT77RQvhk\",\"part\":{\"id\":\"prt_1a03f153c001nqirF1WDraCCGG\",\"reason\":\"tool-calls\",\"snapshot\":\"011e245a8016ca0e991801e202cef60ad16767e6\",\"messageID\":\"msg_1a03f0454001mj0NBdeBYdPrnz\",\"sessionID\":\"ses_e5fc0fda9ffe3GY5eqT77RQvhk\",\"type\":\"step-finish\",\"tokens\":{\"total\":28669,\"input\":1,\"output\":28,\"reasoning\":0,\"cache\":{\"write\":0,\"read\":28640}},\"cost\":0.00044655}}\n{\"type\":\"step_start\",\"timestamp\":1793689852971,\"sessionID\":\"ses_e5fc0fda9ffe3GY5eqT77RQvhk\",\"part\":{\"id\":\"prt_1a03f1c27001IsbOEYdAItziFZ\",\"messageID\":\"msg_1a03f1553001MYs18bQzrY3FBC\",\"sessionID\":\"ses_e5fc0fda9ffe3GY5eqT77RQvhk\",\"snapshot\":\"011e245a8016ca0e991801e202cef60ad16767e6\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1793689853214,\"sessionID\":\"ses_e5fc0fda9ffe3GY5eqT77RQvhk\",\"part\":{\"id\":\"prt_1a03f1c2a001ZfQvnI6AMOOGKR\",\"messageID\":\"msg_1a03f1553001MYs18bQzrY3FBC\",\"sessionID\":\"ses_e5fc0fda9ffe3GY5eqT77RQvhk\",\"type\":\"text\",\"text\":\"Es gibt genau einen sichtbaren Space: **alpha** (0 Items, beschreibbar).\",\"time\":{\"start\":1793689852970,\"end\":1793689853212}}}\n{\"type\":\"step_finish\",\"timestamp\":1793689853227,\"sessionID\":\"ses_e5fc0fda9ffe3GY5eqT77RQvhk\",\"part\":{\"id\":\"prt_1a03f1d28001QxrIkRKo2bteLA\",\"reason\":\"stop\",\"snapshot\":\"011e245a8016ca0e991801e202cef60ad16767e6\",\"messageID\":\"msg_1a03f1553001MYs18bQzrY3FBC\",\"sessionID\":\"ses_e5fc0fda9ffe3GY5eqT77RQvhk\",\"type\":\"step-finish\",\"tokens\":{\"total\":28730,\"input\":66,\"output\":22,\"reasoning\":0,\"cache\":{\"write\":0,\"read\":28642}},\"cost\":0.00045273}}\n",
+ "run_stderr_tail": "c0fda9ffe3GY5eqT77RQvhk step=1\ntimestamp=2026-11-03T07:10:51.245Z level=INFO run=b1bc3f59 message=tracking hash=011e245a8016ca0e991801e202cef60ad16767e6 cwd=/home/savefyx/dev/savefxy git=/tmp/opencode/p105-b6-opencode/data/opencode/snapshot/d642a893b3cb11de44c91865f0e3dbd3b87e7479/78d584cd2abab7d28f4cc9d3007a9fce49f4c468\ntimestamp=2026-11-03T07:10:51.250Z level=INFO run=b1bc3f59 message=process session.id=ses_e5fc0fda9ffe3GY5eqT77RQvhk messageID=msg_1a03f1553001MYs18bQzrY3FBC\ntimestamp=2026-11-03T07:10:51.251Z level=INFO run=b1bc3f59 message=stream providerID=minimax modelID=MiniMax-M3.1-Flash session.id=ses_e5fc0fda9ffe3GY5eqT77RQvhk small=false agent=build mode=primary\ntimestamp=2026-11-03T07:10:51.252Z level=INFO run=b1bc3f59 message=\"llm runtime selected\" llm.runtime=ai-sdk llm.provider=minimax llm.model=MiniMax-M3.1-Flash\ntimestamp=2026-11-03T07:10:53.223Z level=INFO run=b1bc3f59 message=tracking hash=011e245a8016ca0e991801e202cef60ad16767e6 cwd=/home/savefyx/dev/savefxy git=/tmp/opencode/p105-b6-opencode/data/opencode/snapshot/d642a893b3cb11de44c91865f0e3dbd3b87e7479/78d584cd2abab7d28f4cc9d3007a9fce49f4c468\ntimestamp=2026-11-03T07:10:53.245Z level=INFO run=b1bc3f59 message=loop session.id=ses_e5fc0fda9ffe3GY5eqT77RQvhk step=2\ntimestamp=2026-11-03T07:10:53.246Z level=INFO run=b1bc3f59 message=\"exiting loop\" session.id=ses_e5fc0fda9ffe3GY5eqT77RQvhk\ntimestamp=2026-11-03T07:10:53.252Z level=INFO run=b1bc3f59 message=\"disposing instance\" directory=/home/savefyx/dev/savefxy\n",
+ "modell_werkzeugaufrufe": [
+  {
+   "tool": "sharefyx_list_spaces",
+   "status": "completed",
+   "ergebnis": "[{\"name\":\"alpha\",\"item_count\":0,\"writable\":true,\"members\":[],\"folders\":[]}]"
+  }
+ ],
+ "server_ev_tool": [
+  "{\"ts\":\"2026-11-03T07:10:51.135Z\",\"ev\":\"tool\",\"tool\":\"list_spaces\",\"space\":\"alpha\",\"ms\":1,\"ok\":true,\"proto\":\"2025-11-25\"}"
+ ],
+ "zellen": {
+  "auth": true,
+  "modell_ruft_list_spaces": true,
+  "server_log_ev_tool_ok": true
+ },
+ "alle_gruen": true
+}
