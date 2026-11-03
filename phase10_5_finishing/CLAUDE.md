@@ -104,7 +104,7 @@ stehen im Commit und im Session-Block.
 
 | # | Kriterium | Status | Beleg |
 |---|---|---|---|
-| P10.5-27 | **Live P10-J Lauf 1** (M3.1 Flash) | ⬜ | Generalprobe an der Wegwerf-Instanz **grün** (2026-11-03, `probes/p105_p10j_lauf1_wegwerf.py`: das Modell ruft `list_spaces` selbst, Server `ev=tool ok=true`; Gegenlauf `--skip-auth` rot) — **Live-Lauf beim Nikinger**, Anleitung Plan Block 18 §5.9 |
+| P10.5-27 | **Live P10-J Lauf 1** (M3.1 Flash) — **eurofleet** | ⬜ | Generalprobe an der Wegwerf-Instanz **grün** (2026-11-03, `probes/p105_p10j_lauf1_wegwerf.py`: das Modell ruft `list_spaces` selbst, Server `ev=tool ok=true`; Gegenlauf `--skip-auth` rot) — **Live-Lauf jetzt bei eurofleet** (Nikinger 2026-11-03), Rezept `docs/concepts/phase10_5_p10j_lauf2_eurofleet.md` §6 + Plan Block 18 §5.9 |
 | P10.5-28 | **Live P10-J Lauf 2** (lokales Modell, CT 111) — mit 27 die Abschlussbedingung der Phase | ⬜ | eurofleet, Notiz `docs/concepts/phase10_5_p10j_lauf2_eurofleet.md` |
 | P10.5-60 | P10-J zweimal live belegt | ⬜ | — |
 | P10.5-61 | Closeout-Dokumente + Rotationen per Skript | ⬜ | — |
