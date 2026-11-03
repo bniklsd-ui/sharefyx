@@ -9,7 +9,7 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
-## 2026-11-02
+## 2026-11-03
 - Die Verknüpfungskarte ist mit Tags und Ordnern wieder flüssig: Schwenken, Zoomen und Überfahren reagieren sofort, auch wenn beides eingeschaltet ist.
 - Ordner und Tags verbinden sich auf der Karte als Stern um das zuletzt geänderte Item, nicht mehr jedes mit jedem — das Bild wird ruhiger.
 - Einzelne Punkte fliegen nicht mehr weit von der Karte weg.

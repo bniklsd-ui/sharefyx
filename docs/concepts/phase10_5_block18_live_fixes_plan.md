@@ -229,7 +229,7 @@ jedes Pan-Bild ändert die Signatur, der Zwischenspeicher wird nie gebaut — di
 - **Abweichungen vom Betrieb:** die App spricht im Betrieb Klartext-http auf 127.0.0.1:8765 (Funnel bzw. Caddy → socat, `phase3_edge/`; das `[VERIFY]` zu „Loopback wie der Funnel" ist damit gelesen), die Wegwerf-Instanz TLS (CSRF verlangt https) ⇒ Probe-Caddy per `https` + `tls_insecure_skip_verify`; `admin off` (die Vorlage lehnt es für den Dienst ab, hier ohne Belang); `skip_install_trust` (ohne ihn versucht `tls internal`, die Wurzel ins System zu schreiben — nachgesehen: nichts außerhalb `/tmp` entstanden).
 - **18.4 vorbereitet:** Update-Log `## 2026-11-02` (drei Zeilen; **Datum vor dem Deploy prüfen** — das Gate verlangt den Deploy-Tag), Badge `v4.0.1` (der Film-Knopf bleibt „Film zu v4.0.0": der Film zeigt 4.0.0), Abnahmezeilen **P10.5-80/81/82 ✅, 83 ⬜** (V3/V4 wartet auf die Sichtung), Summe 76 ✅ · 7 ⬜ von 83.
 
-## 6. Nächste Session (Stand 2026-11-02, nach 18.5)
+## 6. Nächste Session (Stand 2026-11-03, nach 18.5; Sichtung V4 ✅)
 
 1. **Sichtung beim Nikinger:** V4 (durchgezogene Kanten mit geschlossener Lücke) und das Gefühl von Pan/Mausrad/Hover; bei „gut" P10.5-83 und die Sichtung von P10.5-18/49 abhaken.
 2. **18.4 abschließen:** Update-Log-Datum prüfen, Commit + Push; **`deploy.sh main` und `health_gate.sh --expected-version=v4.0.1 --require-todays-update-log --expected-sha=<SHA>` macht der Nikinger** (Hard Rule 9).
