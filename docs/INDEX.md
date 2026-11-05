@@ -60,7 +60,7 @@ updated: 2026-11-02 (Block 18: zwei Addons) | ältere Einträge: docs/INDEX_UPDA
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing; Plan siehe unten)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **32241 B** · Head: Modulstatus, Deploys, Abnahme (79 ✅ · 4 ⬜)
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **33439 B** · Head: Modulstatus, Deploys, Abnahme (79 ✅ · 4 ⬜)
 - [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **45983 B** · die **geschlossenen** Abnahmezeilen, verbatim
 - [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **213485 B** · Session-Blöcke, verbatim
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · Startaufträge Block 7 und 9, verbatim
@@ -74,6 +74,8 @@ updated: 2026-11-02 (Block 18: zwei Addons) | ältere Einträge: docs/INDEX_UPDA
 - [docs/concepts/phase10_5_block15_review_fixes_plan.md](./concepts/phase10_5_block15_review_fixes_plan.md) — 📗 **31775 B** · Block 15: Review-Fixes B1–B10 (✅)
 - [docs/concepts/phase10_5_block17_film_app_plan.md](./concepts/phase10_5_block17_film_app_plan.md) — 📗 **11012 B** · Plan Block 17: Film in die App (✅)
 - [docs/concepts/phase10_5_block18_live_fixes_plan.md](./concepts/phase10_5_block18_live_fixes_plan.md) — 📗 **32920 B** · Plan Block 18 (🔄)
+- [docs/concepts/phase10_5_editor_4_1_plan.md](./concepts/phase10_5_editor_4_1_plan.md) — 📗 **39511 B** · Plan Editor 4.1.0 (v4.0.2 in P10.5, Rest P11)
+- [docs/concepts/phase10_5_editor_4_1_plan_anhang.md](./concepts/phase10_5_editor_4_1_plan_anhang.md) — 📗 **20187 B** · Anhang: Messungen, Prototyp
 - [docs/concepts/phase10_5_block18_addon_render.md](./concepts/phase10_5_block18_addon_render.md) — 📗 **25706 B** · Addon: Render
 - [docs/concepts/phase10_5_block18_addon_insel.md](./concepts/phase10_5_block18_addon_insel.md) — 📗 **24064 B** · Addon: ferne Insel
 - [docs/concepts/phase10_5_p10j_lauf2_eurofleet.md](./concepts/phase10_5_p10j_lauf2_eurofleet.md) — 📗 **6991 B** · Notiz an eurofleet: P10.5-27/28 + alle Instanzen
@@ -132,7 +134,7 @@ updated: 2026-11-02 (Block 18: zwei Addons) | ältere Einträge: docs/INDEX_UPDA
 
 - [phase8_ui_graph/CLAUDE.md](../phase8_ui_graph/CLAUDE.md) — 📗 **34.327 B** (DO-1: „C0“ verbatim in `SESSIONS_ARCHIVE.md`) · Phase-8-Head, alle Bloecke ✅, Abnahmestand **26 ✅ · 0 🟡 · 0 ⬜**, trägt die **Selection/Choice-Konvention v3** (fünfte Kategorie Vorsicht) · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [phase8_ui_graph/SESSIONS_ARCHIVE.md](../phase8_ui_graph/SESSIONS_ARCHIVE.md) — 📦 **277.993 B** · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
-- [docs/concepts/phase8_ui_graph_plan.md](./concepts/phase8_ui_graph_plan.md) — 📕 ~83KB · ausfuehrungsreifer P8-Plan gegen `main@8f46745`, **erstmals fuer opencode/M3 als Ausfuehrenden**. N1–N12 in §0.1 gelockt, Entscheidungen P8-A–P8-Q, vier Bloecke (0 → A → B → Gate → C → D → Z), Abnahme P8-1–P8-24, `[VERIFY]` V81–V92. **§9 ist der kanonische P8-Closeout** (P8-N: ein Dokument pro Phase) — §9.4.1–§9.4.3 stehen seit Phase 8.5 auf ERLEDIGT, §9.4.7 auf 26/0/0, §9.4.5 traegt das geerbte Ledger. Kein Advisor (P8-L). Als 📕-Snapshot ausgenommen
+- [docs/concepts/phase8_ui_graph_plan.md](./concepts/phase8_ui_graph_plan.md) — 📕 ~83KB · ausfuehrungsreifer P8-Plan gegen `main@8f46745`, **erstmals fuer opencode/M3 als Ausfuehrenden**. Rest: `docs/INDEX_ENTRIES_ARCHIVE.md` (Kürzung 2026-11-05)
 - [docs/screenshots/](./screenshots/README.md) — 📗 ~1.1MB · kanonische Ablage aller Sichtpruefungs-Bilder, pro Phase praefixiert (`sp2_*`, `c4c5_*`, `p86_block_*`, `p86_probe_*`, `p86_smoke_*` = die 17 Gate-Belege von `v3.0.2`, `p9_step_*`, `p9_btn*`, `p9_doing_*`, `p9_trace_0*`, `p9a_legacy_*`) · die `c4c5_*`-Bilder besetzen die „Sneak Peak"-Tabelle im `README.md` · Schnellzugriff auf die jeweils aktuellen: `screenshots_latest/` · L1-Header-Card in `docs/screenshots/README.md` · keine Geheimnisse in den Bildern, nur UI-Rendering
 
 ## Phase 7 — ✅ abgeschlossen (Space-Verwaltung, Mehrfachauswahl; live `e88a624`)
@@ -141,7 +143,7 @@ updated: 2026-11-02 (Block 18: zwei Addons) | ältere Einträge: docs/INDEX_UPDA
 - [phase7_spaces_admin/SESSIONS_ARCHIVE.md](../phase7_spaces_admin/SESSIONS_ARCHIVE.md) — 📦 ~103KB · zwei Einträge, newest-first: **2026-08-24** (der lange Block — A6-Purge, Deploy-Blocker-Fund, Block C C1–C5, siebte Contract-Öffnung, Block B, echter Deploy, Abnahmematrix-Walkthrough, P7-24-Fund, Live-Incident, A6/P7-9) und **2026-08-23** (Step 0 + Block A bis A8), verbatim
 - [docs/concepts/PHASE7_CLOSEOUT_HANDOVER.md](./concepts/PHASE7_CLOSEOUT_HANDOVER.md) — 📕 ~20KB · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [docs/concepts/phase7_spaces_admin_uebersicht.svg](./concepts/phase7_spaces_admin_uebersicht.svg) — 📕 Übersichtsgrafik Phase 7 (Blockfolge 0 → A → Gate → C → B, der zweiphasige Space-Entfernen-Mechanismus, `testnutzer-p7`-Lebenszyklus, „Was Phase 8 erbt"), Status-Badge grün mit sichtbarer 22/24-Bilanz
-- [docs/concepts/phase7_spaces_admin_plan.md](./concepts/phase7_spaces_admin_plan.md) — 📕 ~75KB · ausfuehrungsreifer P7-Plan gegen `main@f5691e0`. Vier Bloecke (0 → A → Gate → C → B): Haushalt, Fixes (Item-ID sichtbar, Bild-Entfernen, Feld-Whitelist, dritter Principal `testnutzer-p7`), Space-Verwaltung in der Weboberflaeche mit voller `spacectl.py`-Paritaet, Mehrfachauswahl. Gelockt P7-A–P7-W, N1–N10, Abnahme P7-1–P7-24, `[VERIFY]` V71–V80. P7-W: `testcred.py` macht Testnutzer-Credentials fuer Claude Code nutzbar. Als 📕-Snapshot ausgenommen
+- [docs/concepts/phase7_spaces_admin_plan.md](./concepts/phase7_spaces_admin_plan.md) — 📕 ~75KB · ausfuehrungsreifer P7-Plan gegen `main@f5691e0`. Rest: `docs/INDEX_ENTRIES_ARCHIVE.md` (Kürzung 2026-11-05)
 ## Phase 6 — 🟡 code-complete, nicht live-bewiesen (Freigaben, Ordner, Werkzeuge)
 
 - [phase6_shares/CLAUDE.md](../phase6_shares/CLAUDE.md) — 🟡 **35.071 B** · Phase-6-Head. Block A (Steps 0-3) ✅, Gate A→B 3/4 (Purge-Zeilenrueckgang offen); Steps 4-6 ✅ live; Step 7a/7/7b ✅ live; Mehrfachauswahl nie gebaut (ging nach Phase 7). Phase als 🟡 code-complete abgeschlossen — 12/39 Abnahmezeilen live; Handover: `PHASE6_CLOSEOUT_HANDOVER.md`. „Vormerkungen“ seit DO-1 verbatim in `SESSIONS_ARCHIVE.md`
