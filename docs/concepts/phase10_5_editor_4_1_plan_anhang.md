@@ -7,7 +7,7 @@ up: ./phase10_5_editor_4_1_plan.md
 down:
   - ../../phase10_5_finishing/probes/p105_b14_layout_probe.py   # Muster der Wegwerf-Instanz
   - ../../phase10_5_finishing/probes/p105_b11_roundtrip_probe.py # Muster Roundtrip
-updated: 2026-11-03 (angelegt — Opus-Planungsagent; alle Messungen an Wegwerf-Instanzen, Skripte im Scratchpad, nicht im Repo)
+updated: 2026-11-05 (A13 Korrekturen aus S0) | 2026-11-03 (angelegt — Opus-Planungsagent; alle Messungen an Wegwerf-Instanzen, Skripte im Scratchpad, nicht im Repo)
 ---
 # Anhang — Editor 4.1.0
 
@@ -115,7 +115,7 @@ clearOnEnter: true, handleMouseEvents: false})`; Abgleich per `setTimeout(0)` na
 | Pfeil ↓ aus der Tabelle hinaus | Widget wieder da | dito |
 | Pfeil ↑ von unten hinein | Rohtext, Cursor [6,40] (letzte Zeile ✅) | dito |
 | Klick auf „Anzahl der Versuche" | Cursor **[5,14]** = Zellbeginn ✅ | ✅ |
-| „Z" tippen → nur diese Zelle geändert | ✅ `| \`retries\` | ZAnzahl der Versuche |` | ✅ |
+| „Z" tippen → nur diese Zelle geändert | ✅ (Zeile `&#124; retries &#124; ZAnzahl der Versuche &#124;`) | ✅ |
 | Strg+Z → Ursprung, sauber; Strg+Y → wieder | ✅ | ✅ |
 | `getSelection()` über das sichtbare Widget = Quelle | ✅ 186 Zeichen | ✅ |
 | Strg+A, Strg+C → Zwischenablage = Body | ✅ | (Rechte nur in Chromium) |
@@ -160,7 +160,7 @@ gemessen, nicht geplant.
 | Konstrukt (Bestand) | Lesesicht heute | Editor heute | Ziel 4.1 (beide Sichten) |
 |---|---|---|---|
 | Tabelle (84) | `<table>` ✅, aber `\|` teilt, Ex. 202–204 falsch | Rohtext | Widget = Lesesicht (marked) |
-| `\|` in Tabelle (7) | Zelle zerbricht | Rohtext | eine Zelle mit `|` |
+| maskierter Strich in Tabelle (7) | Zelle zerbricht | Rohtext | eine Zelle mit `&#124;` |
 | Tabelle im Zitat (1) | Rohtext in Absätzen | Rohtext | Lesesicht Tabelle; Editor Rohtext |
 | verschachtelte Liste (45) | Absatz „- verschachtelt A - …" | eingerückt, **ohne** Listenzeichen; Ebene 3 lila 1,94 : 1 | `ul > li > ul`; Editor Zeichen sichtbar, Kontrast ✅ |
 | Aufgabe (66) | Kästchen (nur oberste Ebene) | Kästchen-Widget (alle Ebenen, `-*+`) | GFM: jede Ebene, auch `1. [ ]` |
@@ -250,7 +250,7 @@ Verzeichnis `/tmp/claude-1000/-home-savefyx-dev-savefxy/abb73e26-ae82-56cd-a555-
 | H1 „Tab = indent (unit 2)" | **falsch:** Tab fügt `\t` ein, Umschalt+Tab ohne Wirkung; `indentUnit 2` gilt nur für Auto-Einzug (Plan E8b, S7) |
 | H1 „`setRawMode` ohne Aufrufer" | **falsch:** Aufrufer `editor.js:539` und `:833`, Assertions `test_editor_live.py:95/110`, `test_editor_todo.py:176`; nur der Knopf ist weg (`8aba4d4`) |
 | H1 tote Reste `#editor-preview`, `editorPreviewEl` | ✅ tot im Produkt; nur alte Skripte (`p856_bracket_mini_smoke.py`, `p9_btn2_toolbar_probe.py`) fragen sie ab — keine pytest-Tests |
-| H2 „Tabellenzellen brechen an `\|` **und** an `|` im Codespan" | halb: GFM Ex. 200 teilt an einem **unmaskierten** `|` auch im Codespan — das tut `markdown.js` richtig; falsch ist nur `\|`. **Neu:** Ex. 202–204 (zeilenlose Fortsetzung, Kopf/Trenner-Zahl, ungleiche Zeilen) |
+| H2 „Tabellenzellen brechen am maskierten Strich **und** am Strich im Codespan" | halb: GFM Ex. 200 teilt an einem **unmaskierten** Strich auch im Codespan — das tut `markdown.js` richtig; falsch ist nur der maskierte Strich. **Neu:** Ex. 202–204 (zeilenlose Fortsetzung, Kopf/Trenner-Zahl, ungleiche Zeilen) |
 | H3 (3) „Format vor Bild kann Alt verderben" | **schlimmer:** das Bild verschwindet in **beiden** Sichten; die Reihenfolge ist durch `test_the_inline_rule_comes_before_the_links` festgenagelt |
 | H3 (4) `- [x]{.rot}` | bestätigt; zusätzlich versteckt der Editor `{.rot}` |
 | H3 (5) „CM5 normalisiert CRLF" | **falsch zugeordnet:** der Server liefert schon LF (`read_text`); CM5 bekommt nie CR; der erste Write jedes Clients macht die Datei LF |
@@ -275,3 +275,14 @@ grep -rhE '^\s*\|.*<br ?/?>' --include='*.md' --exclude-dir=.git "$D" | wc -l
 find "$D" -name '*.md' -not -path '*/.git/*' -printf '%s\n' | sort -n | tail -1
 find "$D" -name '*.md' -not -path '*/.git/*' -exec wc -l {} + | grep -v ' total$' | sort -n | tail -1 | awk '{print $1}'
 ```
+
+## A13 Korrekturen und Befunde aus S0 (2026-11-05, Ausführer Opus, Probe `p105_ed41_darstellung_probe.py`)
+
+Basislinie in **Chromium 151 und Firefox 153: je 30 von 57 Zellen rot, 27 grün, 0 Abweichungen** (5 Läufe). Rot: 12 Zellen aus der S0-Zeile (`tabelle_widget`, `listenzeichen`, `kontrast` = 1,94 / 1,70 / 2,54 / 3,32 : 1 wie A9, drei Entwurfszellen, sechs `konflikt_*` = F4a–f) und 18 Folgezellen aus F3/A7 (17 `l_*` der Lesesicht + `e_durchgestrichen`), die S3a/S3b/S4 heilen.
+1. `trimend` (`setBody` kürzt den Text) färbt nur `bytes_gleich` rot, weil V1, V2 und die Platten-Prüfung **eine** Zelle sind; darunter werden **25 von 28** Fixtures still gekürzt und bei Strg+S geschrieben.
+2. Die Fixtures sind `.txt`, weil `doc_health.py` nur `fixtures_m7/` ausnimmt; das Aufweiten des Präfixes bleibt offen.
+3. **E4 ist entschieden** (Nikinger 2026-11-05: „E4 works for me“, nur `<br>`); `l_tabelle_br` setzt das voraus.
+4. Dritte Entwurfszelle `oeffnen_schreibt_keinen_entwurf` (rot): bloßes Öffnen schreibt einen Entwurf — Ursache der „Wiederherstellen?“-Fehlmeldung; S1-Gegenlauf (1) färbt wahrscheinlich auch sie.
+5. S2 „Basis + 2 ms“ gilt gegen **diese** Probe: Tastenkosten Chromium Median 1,6–2,2 ms, Firefox 2–3 ms.
+6. `konflikt_c` prüft nur die Lesesicht (§7 nennt kein Editor-Ziel).
+7. Vor S1: eine grüne Zelle `kein_stilles_zurueck` zählt erst, wenn der veraltete Entwurf wirklich noch angeboten wird. Der Anker-Wächter fällt absichtlich, sobald S2/S4 `editor.js`/`app.css` ändern — dann den Gegenlauf neu bauen. Nicht gemessen: WebKit, IME, echte Hardware, live. Bilder: `/tmp/ed41_shots/`.

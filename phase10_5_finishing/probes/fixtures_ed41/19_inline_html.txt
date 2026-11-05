@@ -1,0 +1,11 @@
+Das ist ~~veraltet~~ und das <b>fett per HTML</b>, Zeile<br>Umbruch, Zeile<br/>zwei, Zeile<br />drei, <kbd>Strg</kbd>+<kbd>S</kbd>, H<sub>2</sub>O, x<sup>2</sup>.
+
+<details><summary>Mehr</summary>
+
+Versteckter Text.
+
+</details>
+
+Platzhalter wie <domain> und <repo> bleiben Text.
+
+Fisch &amp; Chips, gesch&uuml;tzt&nbsp;Leerzeichen.

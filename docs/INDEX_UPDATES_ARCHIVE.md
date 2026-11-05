@@ -107,3 +107,15 @@ updated: 2026-10-30 (ein Faden rotiert — Block 15.5) | 2026-10-30 (ein Faden r
 ## 2026-09-19
 
 2026-09-19 (**Phase 8.6 abgeschlossen ✅, `v3.0.2` live seit 2026-09-18** [SHA `1ad2665`, `health_gate` 9/9]. Step Z: Abnahmebilanz **45 ✅ · 5 ⚠️ · 0 ⬜ · 4 ersetzt** von 54 Zeilen, `[VERIFY]` **37 zu · 2 offen (V118, V136)**, kanonischer Closeout in `phase8_6_ui_polish_plan2.md` §9, Handover auf **Abschluss**-Fassung P8.6 → P9 umgeschrieben, Uebersichtsgrafik neu. **Diese Datei stand bei Step-Z-Beginn auf 45.870 B** gegen das ≤-38-KB-Kriterium — dritter Verstoss in einer Phase; die `updated:`-Kette ist hier auf **einen** Eintrag gekuerzt und die Phase-8.6-Sektion auf Abschluss-Umfang gebracht. Die eigentliche Loesung — `INDEX_UPDATES_ARCHIVE.md` + Rotation analog `rotate_session_block.sh` — bleibt **P9-Arbeit**; die Handarbeit traegt nachweislich nicht mehr. Aeltere `updated:`-Eintraege: die Phase-Heads und `phase*/SESSIONS_ARCHIVE.md`, sowie `git log -p docs/INDEX.md`.)
+
+
+## Zeilen-Kürzung 2026-11-05 (verbatim; hier statt im Eintrags-Archiv, weil dessen Skript Zeiger-Text im Archiv nicht verträgt — der INDEX brauchte Luft für die zwei Editor-Pläne; 3.000-B-Reserve)
+
+Original:
+
+    - [docs/concepts/phase8_ui_graph_plan.md](./concepts/phase8_ui_graph_plan.md) — 📕 ~83KB · ausfuehrungsreifer P8-Plan gegen `main@8f46745`, **erstmals fuer opencode/M3 als Ausfuehrenden**. N1–N12 in §0.1 gelockt, Entscheidungen P8-A–P8-Q, vier Bloecke (0 → A → B → Gate → C → D → Z), Abnahme P8-1–P8-24, `[VERIFY]` V81–V92. **§9 ist der kanonische P8-Closeout** (P8-N: ein Dokument pro Phase) — §9.4.1–§9.4.3 stehen seit Phase 8.5 auf ERLEDIGT, §9.4.7 auf 26/0/0, §9.4.5 traegt das geerbte Ledger. Kein Advisor (P8-L). Als 📕-Snapshot ausgenommen
+
+Original:
+
+    - [docs/concepts/phase7_spaces_admin_plan.md](./concepts/phase7_spaces_admin_plan.md) — 📕 ~75KB · ausfuehrungsreifer P7-Plan gegen `main@f5691e0`. Vier Bloecke (0 → A → Gate → C → B): Haushalt, Fixes (Item-ID sichtbar, Bild-Entfernen, Feld-Whitelist, dritter Principal `testnutzer-p7`), Space-Verwaltung in der Weboberflaeche mit voller `spacectl.py`-Paritaet, Mehrfachauswahl. Gelockt P7-A–P7-W, N1–N10, Abnahme P7-1–P7-24, `[VERIFY]` V71–V80. P7-W: `testcred.py` macht Testnutzer-Credentials fuer Claude Code nutzbar. Als 📕-Snapshot ausgenommen
+

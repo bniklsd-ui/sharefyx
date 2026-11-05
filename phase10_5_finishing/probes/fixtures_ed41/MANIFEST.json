@@ -1,0 +1,145 @@
+{
+ "hinweis": "SHA-256 je Fixture-Datei; Quelle der Wahrheit: p105_ed41_spec.py :: NEUE_FIXTURES (M7: ../fixtures_m7/, referenziert). Neu erzeugen nur nach gewollter Aenderung.",
+ "dateien": {
+  "../fixtures_m7/01_frontmatter.md": {
+   "name": "m7_01_frontmatter",
+   "bytes": 131,
+   "sha256": "7ad62b99600cbf1660f43a49f5ad8ae8ab3488f2eeb0214c9176e0a21bfc5e64"
+  },
+  "../fixtures_m7/02_listen.md": {
+   "name": "m7_02_listen",
+   "bytes": 135,
+   "sha256": "3079d8c4ef830676bad505324de067981e9833c6916f84af41d5726e8cff78ac"
+  },
+  "../fixtures_m7/03_tabelle.md": {
+   "name": "m7_03_tabelle",
+   "bytes": 135,
+   "sha256": "22f05e9b99a5df52889c92e5bf9f41c184ced31803aa445e0d2b6c886d9ace61"
+  },
+  "../fixtures_m7/04_code.md": {
+   "name": "m7_04_code",
+   "bytes": 131,
+   "sha256": "a8d600d80fe3f515ba45481c38db5db574b4920aa9e058336de51e39337517fb"
+  },
+  "../fixtures_m7/05_links.md": {
+   "name": "m7_05_links",
+   "bytes": 156,
+   "sha256": "33f97b7757376ae3ca95cb540f0da4bec7a0ef49560566d4e36ab4d662eca05a"
+  },
+  "../fixtures_m7/06_itm_refs.md": {
+   "name": "m7_06_itm_refs",
+   "bytes": 124,
+   "sha256": "18bc528696dced8e51ff7062c251963d49c3e340c6d17ee3391a4eefc4f80c6a"
+  },
+  "../fixtures_m7/07_tasklist.md": {
+   "name": "m7_07_tasklist",
+   "bytes": 65,
+   "sha256": "78990ab5c23f23e52ede42dc5d05742db4ee50638c5718a3aff6effcc4b43497"
+  },
+  "../fixtures_m7/08_zitat.md": {
+   "name": "m7_08_zitat",
+   "bytes": 52,
+   "sha256": "d44c84cd1ad87d3d3107db8280691dc679c92362ffad1702fe2e5a4bf067c10d"
+  },
+  "../fixtures_m7/09_unicode.md": {
+   "name": "m7_09_unicode",
+   "bytes": 123,
+   "sha256": "4a3eeaca5e2525592f3cff46bfaef253f27774876a38481cefdfc8a2650ea53d"
+  },
+  "../fixtures_m7/10_whitespace.md": {
+   "name": "m7_10_whitespace",
+   "bytes": 193,
+   "sha256": "e62d683322042e8bf8bbe5a51a893e280fb9cccb3c8f7539cf090193ce6aab22"
+  },
+  "11_tabelle_einfach.txt": {
+   "name": "11_tabelle_einfach",
+   "bytes": 204,
+   "sha256": "6cd9e263269b31170a173b9558d882bdb2b1763a3c71533481d751ef7284c900"
+  },
+  "12_tabelle_ki.txt": {
+   "name": "12_tabelle_ki",
+   "bytes": 320,
+   "sha256": "7ec839287db4c5c191bbbd73e8651dec954ea3275955a0a5fae2a34cbb892945"
+  },
+  "13_tabelle_im_zitat.txt": {
+   "name": "13_tabelle_im_zitat",
+   "bytes": 62,
+   "sha256": "7eb81de8901c4c711261cfadce03fbe4d0fb6650080712b5b9474eaa0b320c6e"
+  },
+  "14_listen_verschachtelt.txt": {
+   "name": "14_listen_verschachtelt",
+   "bytes": 255,
+   "sha256": "9c6e892a483774fef113016b17de1a8d9388dfd6d61da35b5798d37565a496c3"
+  },
+  "15_aufgaben.txt": {
+   "name": "15_aufgaben",
+   "bytes": 224,
+   "sha256": "d90faf7ee2ddec4adf9a4deea31591851af6c5081a81a47ea6ec14d9f2b941eb"
+  },
+  "16_code.txt": {
+   "name": "16_code",
+   "bytes": 219,
+   "sha256": "a762646e390efcc0e3faf7b1b18356ec7e1cc28a20b78f6b9754b425c24bf0fb"
+  },
+  "17_ueberschriften.txt": {
+   "name": "17_ueberschriften",
+   "bytes": 122,
+   "sha256": "0e4d0d8f133f7a7de67910c1cdfb77e0a9bf44bfd9c014daef202603cf19f71f"
+  },
+  "18_zitate_fussnoten.txt": {
+   "name": "18_zitate_fussnoten",
+   "bytes": 142,
+   "sha256": "e1255405ab1419b14f845eca2e10251fa83acacb39b2c0db9f230c5ffa6cd871"
+  },
+  "19_inline_html.txt": {
+   "name": "19_inline_html",
+   "bytes": 332,
+   "sha256": "3529cc9f12c99ccd57a00eaddba0fa245ef8c3ccc63793a2986c61e138a34f96"
+  },
+  "20_xss.txt": {
+   "name": "20_xss",
+   "bytes": 427,
+   "sha256": "71743c51a2d5533e6eacfa8320076f2478c4c78aa8dcd8a45e7b6092cf3709c7"
+  },
+  "21_format_konvention.txt": {
+   "name": "21_format_konvention",
+   "bytes": 245,
+   "sha256": "465ff4c71459ac6fddb2a1437c406229d94815fcdd72d4dce0342498b75a8893"
+  },
+  "22_ohne_newline.txt": {
+   "name": "22_ohne_newline",
+   "bytes": 38,
+   "sha256": "411c842ab8a7fd4655cc10f6ffacdc04738cccd3eac6085caff025153c86a669"
+  },
+  "23_tabs.txt": {
+   "name": "23_tabs",
+   "bytes": 81,
+   "sha256": "5db34345ce5cb3f99cb42b6d6000a4578ed70ed843bd0fe62753aa74a2b9aac6"
+  },
+  "24_doppel_leerzeichen.txt": {
+   "name": "24_doppel_leerzeichen",
+   "bytes": 150,
+   "sha256": "bede8561b564f90cff7300bc6391c9b0734d70356db397e2e23de9a312d6c7e6"
+  },
+  "25_unicode.txt": {
+   "name": "25_unicode",
+   "bytes": 157,
+   "sha256": "b266f397c779fcf85d4ebaa8328c28804edadd77d5a935e2bb871f59f4f3e857"
+  },
+  "26_crlf.txt": {
+   "name": "26_crlf",
+   "bytes": 59,
+   "sha256": "6d943cd7a13ad06ecd10b56c2810879c12a9c9e3b12c294b72d723deef230adc"
+  },
+  "27_gross.txt": {
+   "name": "27_gross",
+   "bytes": 137612,
+   "sha256": "997fc6b0b3e3341ad7de9dadc1dfb3dd0ec7f7f2a8d26897d1fab468ab5e494f"
+  },
+  "28_katalog.txt": {
+   "name": "28_katalog",
+   "bytes": 1749,
+   "sha256": "89962588e0319b65a49b2467c3d073b74ae081e67c3472b20779317820262927"
+  }
+ }
+}

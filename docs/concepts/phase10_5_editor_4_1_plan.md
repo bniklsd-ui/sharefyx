@@ -8,7 +8,7 @@ down:
   - ./phase10_5_editor_4_1_plan_anhang.md   # 📗 Messtabellen, Prototyp, Konstrukt×Fläche-Matrix, Bibliotheksgrößen, Korrekturen H1–H4
   - ./phase10_5_block18_live_fixes_plan.md  # 📗 Vorbild für Form und Proben-Muster
   - ../../phase10_inventory/messung/M7_editor.md  # 📗 Herkunft der CM5-Wahl (Block 11)
-updated: 2026-11-05 (§8: E1–E3, E5 entschieden, E10 beantwortet, Tag-Zählung) | 2026-11-03 (angelegt — Opus-Planungsagent; Messungen an drei Wegwerf-Instanzen, Chromium 151 + Firefox 153; nichts gebaut, kein Commit)
+updated: 2026-11-05 (S0 gebaut, E4 entschieden; Korrekturen in Anhang A13) | 2026-11-05 (§8: E1–E3, E5 entschieden, E10 beantwortet, Tag-Zählung) | 2026-11-03 (angelegt — Opus-Planungsagent; Messungen an drei Wegwerf-Instanzen, Chromium 151 + Firefox 153; nichts gebaut, kein Commit)
 ---
 # Editor 4.1.0 — der neue Editor (Plan)
 
@@ -244,7 +244,7 @@ der `static/` berührt.
 
 ## 8. Entscheidungen für den Nikinger (je mit Empfehlung)
 
-> **Entschieden (Nikinger 2026-11-05):** **E1** geteilt (`v4.0.2` in P10.5, Rest = P11 Block 1) · **E2** marked ✅ · **E3** ✅ „wenn es die Leistung nicht stark berührt“ — gemessen +0,4–0,9 ms je Taste, die Bibliotheken laden **nach** dem Erstaufruf (250 KB bleiben) · **E5** ✅. **E4** (nur `<br>`) auf Rückfrage erklärt, Antwort offen. Zählung außerhalb von Code (nur Tag-Namen): `<br>` 6× in **1** Datei, sonst nur Platzhalter wie `<domain>`/`<repo>`/`<site>`/`<redacted>` (je 1–2×, **bleiben Text**) ⇒ die Allowlist `<br>` verliert nichts. **E10** beantwortet: größte echte Notiz **1836 Zeilen / 112.821 B** (unter den gemessenen 2.005 Zeilen). E6–E9, E11, E12: offen, Empfehlungen unten.
+> **Entschieden (Nikinger 2026-11-05):** **E1** geteilt (`v4.0.2` in P10.5, Rest = P11 Block 1) · **E2** marked ✅ · **E3** ✅ „wenn es die Leistung nicht stark berührt“ — gemessen +0,4–0,9 ms je Taste, die Bibliotheken laden **nach** dem Erstaufruf (250 KB bleiben) · **E5** ✅. **E4** ✅ (nur `<br>`, Nikinger 2026-11-05 nach Erklärung). Zählung außerhalb von Code (nur Tag-Namen): `<br>` 6× in **1** Datei, sonst nur Platzhalter wie `<domain>`/`<repo>`/`<site>`/`<redacted>` (je 1–2×, **bleiben Text**) ⇒ die Allowlist `<br>` verliert nichts. **E10** beantwortet: größte echte Notiz **1836 Zeilen / 112.821 B** (unter den gemessenen 2.005 Zeilen). E6–E9, E11, E12: offen, Empfehlungen unten.
 
 | # | Frage | Empfehlung |
 |---|---|---|

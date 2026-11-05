@@ -1,0 +1,15 @@
+## Varianten
+
+Spalte A | Spalte B | Spalte C
+:--- | :---: | ---:
+links | mitte | rechts
+nur eins
+a | b | c | d (zu viel)
+
+| Befehl | Wirkung |
+| ------ | ------- |
+| `a \| b` | Pipe maskiert im Code |
+| a \| b | Pipe maskiert |
+| ~~alt~~ neu | durchgestrichen |
+| Zeile<br>Umbruch | br in der Zelle |
+|  | leere Zelle |

@@ -1,0 +1,9 @@
+Einleitung vor der Tabelle.
+
+| Einstellung | Bedeutung |
+|---|---|
+| `timeout` | Zeit in **Sekunden** |
+| `retries` | Anzahl der Versuche |
+| `mode` | *schnell* oder *gruendlich* |
+
+Text nach der Tabelle.

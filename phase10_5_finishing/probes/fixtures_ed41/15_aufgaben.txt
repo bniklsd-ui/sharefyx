@@ -1,0 +1,9 @@
+- [ ] offen
+- [x] erledigt
+- [X] erledigt gross
+  - [ ] Unteraufgabe
+* [ ] Stern-Aufgabe
+1. [ ] nummerierte Aufgabe
+2. [x] nummeriert erledigt
+- [x]{.rot} Format direkt nach dem Kaestchen
+- [ ]kein Leerraum nach der Klammer

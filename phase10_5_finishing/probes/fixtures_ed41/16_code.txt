@@ -1,0 +1,20 @@
+```python
+def f(x):
+    return x | 1  # | Pipe
+```
+
+```
+ohne Sprache
+```
+
+~~~
+Tilde-Zaun
+~~~
+
+~~~js
+const a = '<b>kein HTML</b>';
+~~~
+
+    eingerueckter Code (4 Spaces)
+
+Inline `**nicht fett**` und `[x]{.rot}` im Code.

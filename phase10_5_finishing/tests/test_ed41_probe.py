@@ -1,0 +1,192 @@
+"""Editor 4.1, Schritt S0: der **Beleg** der Darstellungs-Probe (`probes/p105_ed41_darstellung_probe.py`).
+
+Die Probe startet eine Wegwerf-Instanz und zwei Browser (rund zwei Minuten je Lauf) und laeuft deshalb
+nicht in der Suite. Dieser Waechter prueft die **Belegdateien** und den **Korpus** im Repo, ohne Browser
+(Muster `test_b18_live_zeilen_probe.py`):
+
+- die Basislinie ist in **beiden** Browsern genau so rot/gruen, wie `p105_ed41_spec.ZELLEN` es erwartet
+  (Plan S0: „Basislinie rot in den erwarteten Zellen — das ist der Befund");
+- jeder Gegenlauf dreht gegenueber der Basislinie **genau** seine Zellen um, in beiden Browsern;
+- jeder Gegenlauf-Anker steht **genau einmal** in den heutigen statischen Dateien bzw. im Katalog
+  (Falle aus 18.2b: ein doppelter oder verschwundener Anker beisst still nicht);
+- die Fixtures auf der Platte = Woerterbuch = Manifest (SHA-256), ≥ 22 Fixtures, M7 unveraendert;
+- die Kontrollen der Probe stimmen (der Entwurf kann ueberleben; die Tastenmessung hinterlaesst nichts);
+- kein Geheimnis im Beleg.
+
+Laeuft die Probe nach einem Editor-Schritt (S1, S2, …) neu, drehen sich Zellen absichtlich um: dann
+wird `ZELLEN[...]["basis"]` in `p105_ed41_spec.py` **bewusst** nachgezogen — nie dieser Waechter gelockert.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+import sys
+from pathlib import Path
+
+import pytest
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+PROBES = REPO_ROOT / "phase10_5_finishing" / "probes"
+STATIC = REPO_ROOT / "phase5_ui" / "webui" / "static"
+sys.path.insert(0, str(PROBES))
+import p105_ed41_spec as spec  # noqa: E402
+
+BROWSER = ("chromium", "firefox")
+BELEG = PROBES / "p105_ed41_darstellung.json"
+
+
+def _laden(pfad: Path) -> dict:
+    assert pfad.exists(), "Beleg fehlt: %s" % pfad.name
+    return json.loads(pfad.read_text(encoding="utf-8"))
+
+
+def _gegenlauf(name: str) -> Path:
+    return PROBES / ("p105_ed41_darstellung_gegenlauf_%s.json" % name)
+
+
+# -- Basislinie ------------------------------------------------------------------------------------
+
+def test_the_baseline_was_measured_in_both_browsers_without_a_counter_run():
+    beleg = _laden(BELEG)
+    assert beleg["gegenlauf"] is None
+    assert set(beleg["browser"]) == set(BROWSER)
+    assert beleg["fixtures"] >= 22
+
+
+@pytest.mark.parametrize("browser", BROWSER)
+def test_the_baseline_is_red_exactly_where_the_plan_expects_it(browser):
+    roh = _laden(BELEG)["browser"][browser]
+    assert list(roh["zellen"]) == list(spec.ZELLEN), "Zellnamen weichen von der Spec ab"
+    abweichend = {n: v for n, v in roh["zellen"].items() if v != spec.ERWARTET_BASIS[n]}
+    assert not abweichend, "Zellen weichen von der erwarteten Basislinie ab: %s" % abweichend
+    assert roh["abweichungen"] == []
+    assert not roh["seitenfehler"], roh["seitenfehler"]
+
+
+def test_the_cells_named_in_the_plan_s0_row_are_red_today():
+    """Plan §5 S0: rot in Editor-Tabelle, Listenzeichen, Entwurf, F4a–f, Kontrast."""
+    s0 = ["tabelle_widget", "listenzeichen", "kontrast", "oeffnen_schreibt_keinen_entwurf",
+          "entwurf_ueberlebt_neuladen", "kein_stilles_zurueck"] + [n for n in spec.ZELLEN if n.startswith("konflikt_")]
+    assert len(s0) == 12
+    for browser in BROWSER:
+        zellen = _laden(BELEG)["browser"][browser]["zellen"]
+        assert [n for n in s0 if zellen[n]] == [], browser
+
+
+@pytest.mark.parametrize("browser", BROWSER)
+def test_the_contrast_failures_are_the_vendored_token_colours_of_a9(browser):
+    klassen = _laden(BELEG)["browser"][browser]["kontrast"]["klassen"]
+    rot = {k for k, v in klassen.items() if v["kontrast"] < 4.5}
+    einzel = {t for k in rot for t in k.split()}
+    assert {"cm-keyword", "cm-tag", "cm-attribute", "cm-string"} <= einzel
+    assert klassen["cm-keyword"]["kontrast"] == pytest.approx(1.94, abs=0.01)
+
+
+@pytest.mark.parametrize("browser", BROWSER)
+def test_the_probe_controls_hold(browser):
+    roh = _laden(BELEG)["browser"][browser]
+    # der Entwurf **kann** ueberleben (A zuerst) -- die rote Zelle ist kein Messfehler
+    assert roh["entwurf"]["kontrolle_a_zuerst"] == {"dialog": True, "editor_hat_entwurf": True}
+    # die Tastenmessung hinterlaesst den Text unveraendert; Rohdaten 2 Zeilen x 3 Laeufe
+    assert roh["tastenkosten_sauber_danach"] is True and roh["tastenkosten"]["text_wie_vorher"] is True
+    for zeile in ("absatzzeile", "tabellenzeile"):
+        assert len(roh["tastenkosten"][zeile]) == 3
+    # die XSS-Liste hat kein aktives Element und keinen nativen Dialog ausgeloest
+    assert roh["aktive"]["boese"] == [] and roh["aktive"]["attrs"] == [] and roh["aktive"]["dialoge_nativ"] == []
+    # Saat-Treue: nur die CRLF-Fixture weicht im API-Body ab (der Server liefert LF, Plan F8)
+    abweichend = sorted(n for n, t in roh["saat_treue"].items() if not t["api_gleich_fixture"])
+    assert abweichend == ["26_crlf"]
+    assert all(t["datei_gleich_fixture"] for t in roh["saat_treue"].values())
+
+
+# -- Gegenlaeufe -----------------------------------------------------------------------------------
+
+@pytest.mark.parametrize("name", sorted(spec.GEGENLAEUFE))
+def test_each_counter_run_flips_exactly_its_own_cells_in_both_browsers(name):
+    beleg = _laden(_gegenlauf(name))
+    basis = _laden(BELEG)
+    soll = sorted(spec.GEGENLAEUFE[name]["kippt"])
+    assert beleg["gegenlauf"] == name and beleg["kippt_soll"] == soll and beleg["kippt_genau"] is True
+    assert set(beleg["browser"]) == set(BROWSER)
+    for browser in BROWSER:
+        neu, alt = beleg["browser"][browser]["zellen"], basis["browser"][browser]["zellen"]
+        assert sorted(n for n in neu if neu[n] != alt[n]) == soll, browser
+
+
+def test_there_is_a_counter_run_in_each_direction():
+    """Gruen -> rot (die Zelle kann brechen) und rot -> gruen (die rote Zelle kann heilen)."""
+    richtung = {"gruen_nach_rot": 0, "rot_nach_gruen": 0}
+    for gl in spec.GEGENLAEUFE.values():
+        for n in gl["kippt"]:
+            richtung["gruen_nach_rot" if spec.ERWARTET_BASIS[n] else "rot_nach_gruen"] += 1
+    assert all(richtung.values()), richtung
+
+
+@pytest.mark.parametrize("name", sorted(spec.GEGENLAEUFE))
+def test_each_counter_run_anchor_occurs_exactly_once_today(name):
+    gl = spec.GEGENLAEUFE[name]
+    for rel, patches in gl.get("static", {}).items():
+        text = (STATIC / rel).read_text(encoding="utf-8")
+        for alt, _neu in patches:
+            assert text.count(alt) == 1, "%s: Anker %r kommt %d-mal vor" % (rel, alt[:50], text.count(alt))
+    for fixture, patches in gl.get("fixture", {}).items():
+        text = spec.NEUE_FIXTURES[fixture]
+        for alt, _neu in patches:
+            assert text.count(alt) == 1, "%s: Anker %r" % (fixture, alt)
+
+
+# -- Korpus ----------------------------------------------------------------------------------------
+
+def test_the_corpus_on_disk_matches_dictionary_and_manifest():
+    manifest = json.loads(spec.MANIFEST.read_text(encoding="utf-8"))
+    assert manifest == spec.manifest_soll(), "Manifest veraltet: p105_ed41_spec.py neu ausfuehren (nur gewollt)"
+    platte = spec.fixtures_von_platte()          # prueft jede Datei gegen das Manifest (fail-closed)
+    assert platte == spec.alle_fixtures()
+    assert len(platte) >= 22
+    assert sum(1 for n in platte if n.startswith("m7_")) == 10
+    txt = sorted(p.name for p in spec.FIXTURE_DIR.glob("*.txt"))
+    assert txt == sorted(n + ".txt" for n in spec.NEUE_FIXTURES), "unerwartete Datei in fixtures_ed41/"
+
+
+def test_the_corpus_carries_the_byte_traps_of_the_plan():
+    f = spec.NEUE_FIXTURES
+    assert not f["22_ohne_newline"].endswith("\n")
+    assert "\t" in f["23_tabs"] and "  \n" in f["24_doppel_leerzeichen"]
+    assert f["25_unicode"].startswith("﻿") and " " in f["25_unicode"]
+    assert "\r\n" in f["26_crlf"]
+    gross = f["27_gross"].splitlines()
+    assert len(gross) == 2000 and sum(1 for z in gross if z.startswith("| ")) >= 200
+    for teil in ("1. [ ]", "[x]{.rot}", "~~~", "\\|", "<br>", "::: {.warnung}", "::: {.zentriert}",
+                 "[^1]", "=====", "##### ", "###### ", "    - ", "  - ", spec.ASSET_ID):
+        assert teil in f["28_katalog"], teil
+
+
+def test_the_katalog_editor_anchors_are_unique_lines():
+    probe = (PROBES / "p105_ed41_darstellung_probe.py").read_text(encoding="utf-8")
+    anker = re.search(r"^ANKER = \[(.*?)^\]", probe, re.S | re.M).group(1)
+    zeilen = spec.NEUE_FIXTURES["28_katalog"].split("\n")
+    gefunden = re.findall(r'"([^"]+)"', anker)
+    assert len(gefunden) >= 20
+    for a in gefunden:
+        # die Probe nimmt die **erste** Zeile mit dem Anker -- eindeutig nur, wenn es genau eine gibt
+        assert sum(1 for z in zeilen if a in z) == 1, a
+
+
+# -- Geheimnisse -----------------------------------------------------------------------------------
+
+@pytest.mark.parametrize("datei", ["p105_ed41_darstellung.json"]
+                         + ["p105_ed41_darstellung_gegenlauf_%s.json" % n for n in sorted(spec.GEGENLAEUFE)])
+def test_no_secret_in_the_evidence(datei):
+    text = (PROBES / datei).read_text(encoding="utf-8")
+    for muster in (r"wegwerf-b14-", r'"password"', r'"secret"', r"sfx_session", r"csrf", r"\b[A-Z2-7]{32}\b"):
+        assert not re.search(muster, text, re.I if muster == r"csrf" else 0), "%s: %s" % (datei, muster)
+
+
+def test_the_m7_fixtures_are_referenced_not_copied():
+    manifest = json.loads(spec.MANIFEST.read_text(encoding="utf-8"))["dateien"]
+    m7 = {rel: e for rel, e in manifest.items() if rel.startswith("../fixtures_m7/")}
+    assert len(m7) == 10
+    for rel, e in m7.items():
+        assert hashlib.sha256((spec.FIXTURE_DIR / rel).read_bytes()).hexdigest() == e["sha256"]
+    assert not list(spec.FIXTURE_DIR.glob("*.md")), "keine .md in fixtures_ed41/ (doc_health)"

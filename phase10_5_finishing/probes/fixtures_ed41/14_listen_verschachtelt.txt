@@ -1,0 +1,18 @@
+- Punkt eins
+- Punkt zwei
+  - verschachtelt A (zwei Spaces)
+  - verschachtelt B
+    - tiefer (Ebene drei)
+- Punkt drei
+
+1. erster
+   1. unter-erster
+   2. unter-zweiter
+2. zweiter
+    - vier Spaces eingerueckt
+
+* Stern
++ Plus
+
+3. beginnt bei drei
+4. vier

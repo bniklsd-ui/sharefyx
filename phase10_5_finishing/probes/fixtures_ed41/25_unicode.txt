@@ -1,0 +1,3 @@
+﻿BOM am Anfang des Bodys
+Trenner (U+2028) und NBSP und Familie 👨‍👩‍👧 und RTL שלום
+Kombiniert: é und 👍🏽, Pfeile ← → ✓ ≤

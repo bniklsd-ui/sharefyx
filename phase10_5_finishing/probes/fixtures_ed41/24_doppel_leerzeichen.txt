@@ -1,0 +1,10 @@
+Harter Umbruch mit zwei Spaces  
+naechste Zeile
+Harter Umbruch mit Backslash\
+naechste Zeile
+Zeile mit drei Spaces am Ende   
+
+
+
+Ende mit Leerzeilen
+

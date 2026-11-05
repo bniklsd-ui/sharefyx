@@ -1,0 +1,23 @@
+<script>alert(1)</script>
+
+<img src=x onerror=alert(2)>
+
+<svg onload=alert(3)>
+
+<iframe src="https://example.invalid/"></iframe>
+
+<style>body{display:none}</style>
+
+<a href="javascript:alert(4)">js-link</a>
+
+[md-js](javascript:alert(5))
+
+![md-data](data:image/png;base64,AAAA)
+
+<javascript:alert(6)>
+
+&lt;script&gt;alert(7)&lt;/script&gt;
+
+<!-- HTML-Kommentar -->
+
+<noscript><p title="</noscript><img src=x onerror=alert(8)>">

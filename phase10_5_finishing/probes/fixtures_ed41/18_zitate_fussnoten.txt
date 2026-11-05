@@ -1,0 +1,8 @@
+> Ebene 1
+> > Ebene 2
+> > > Ebene 3
+
+Text mit Fussnote[^1] und noch einer[^lang].
+
+[^1]: Die erste Fussnote.
+[^lang]: Eine laengere Fussnote.

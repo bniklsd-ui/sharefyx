@@ -1,0 +1,96 @@
+# Katalog Ueberschrift Eins
+## Katalog Ueberschrift Zwei
+### Katalog Ueberschrift Drei
+#### Katalog Ueberschrift Vier
+##### Katalog Ueberschrift Fuenf
+###### Katalog Ueberschrift Sechs
+
+Setext Katalog Eins
+===================
+
+Setext Katalog Zwei
+-------------------
+
+Absatz mit **fett**, *kursiv*, `codespan` und einem [Link](https://example.invalid/a).
+
+Durchgestrichen: ~~weg damit~~ steht da.
+
+Harter Umbruch hier  
+naechste Zeile nach dem Umbruch.
+
+Nackte URL: https://example.invalid/nackt
+
+Entitaet: Fisch &amp; Chips
+
+| Einstellung | Bedeutung | Mitte |
+|---|---|:---:|
+| `timeout` | Zeit in **Sekunden** | m1 |
+| a \| b | Pipe maskiert | m2 |
+| Zeile<br>Umbruch | br in Zelle | m3 |
+
+Spalte A | Spalte B | Spalte C
+:--- | :---: | ---:
+links | mitte | rechts
+nur eins
+a | b | c | d zu viel
+
+> Zitat Ebene eins
+> > Zitat Ebene zwei
+
+> | k | v |
+> |---|---|
+> | 1 | eins im Zitat |
+
+- Punkt eins
+  - verschachtelt zwei Spaces
+    - Ebene drei tief
+- Punkt zwei
+    - vier Spaces eingerueckt
+
+1. erster Nummernpunkt
+2. zweiter Nummernpunkt
+
+- [ ] offene Aufgabe
+- [x] erledigte Aufgabe
+  - [ ] Unteraufgabe tief
+
+1. [ ] nummerierte Aufgabe
+
+- [x]{.rot} Format nach dem Kaestchen
+
+```python
+def katalog_zaun(x):
+    return x
+```
+
+~~~
+Tilde-Zaun Inhalt
+~~~
+
+    eingerueckter Code Inhalt
+
+Code mit Format: `[x]{.rot}` bleibt Code.
+
+* * *
+
+[Rot]{.rot} und [Gross]{.gross} und [Unbekannt]{.lila}
+
+::: {.zentriert}
+Zentrierter Katalogtext
+:::
+
+::: {.warnung}
+Unbekannte Klasse bleibt sichtbar.
+:::
+
+Bild normal: ![Kontrollbild](asset:ast_0000e041)
+
+Bild mit Format: ![[Alt rot]{.rot}](asset:ast_0000e041)
+
+Inline-HTML: <b>fett per HTML</b> und <span class="x">Spanne</span>.
+
+Fussnote hier[^1].
+
+[^1]: Die Fussnote des Katalogs.
+
+Ende des Katalogs.

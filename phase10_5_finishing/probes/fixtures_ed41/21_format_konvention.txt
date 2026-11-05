@@ -1,0 +1,11 @@
+[Rot]{.rot} [Gross]{.gross} [Beides]{.rot .gross} [Unbekannt]{.lila}
+
+::: {.zentriert}
+Zentrierter Text
+:::
+
+::: {.warnung}
+Unbekannte Klasse: dieser Text darf nie verschwinden.
+:::
+
+Code: `[x]{.rot}` und Bild ![[alt]{.rot}](asset:ast_0000e041)

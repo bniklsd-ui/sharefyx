@@ -237,14 +237,3 @@ damit ausdrücklich überholt. §7-Abnahmematrix, C0-Anti-AI-Audit, Z-Closeout-B
 ## `phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md`
 
 **[2026-10-26, gekürzt für die INDEX-Luft (P10.5-2), Block-14-Planzeile]** Wortlaut der Kartenzeile bis dahin:L3-Archiv der Entscheidungsliste D-1–D-18 des Phase-10-Registers — jede Frage, ihre Empfehlung und die Antwort des Nikingers, verbatim; am 2026-10-22 aus dem Register gewandert (P10.5 Block 0, Schritt 0.8)
-
-## Zeilen-Kürzung 2026-11-05 (verbatim — der INDEX brauchte Luft für die zwei Editor-Pläne; 3.000-B-Reserve)
-
-Original:
-
-    - [docs/concepts/phase8_ui_graph_plan.md](./concepts/phase8_ui_graph_plan.md) — 📕 ~83KB · ausfuehrungsreifer P8-Plan gegen `main@8f46745`, **erstmals fuer opencode/M3 als Ausfuehrenden**. N1–N12 in §0.1 gelockt, Entscheidungen P8-A–P8-Q, vier Bloecke (0 → A → B → Gate → C → D → Z), Abnahme P8-1–P8-24, `[VERIFY]` V81–V92. **§9 ist der kanonische P8-Closeout** (P8-N: ein Dokument pro Phase) — §9.4.1–§9.4.3 stehen seit Phase 8.5 auf ERLEDIGT, §9.4.7 auf 26/0/0, §9.4.5 traegt das geerbte Ledger. Kein Advisor (P8-L). Als 📕-Snapshot ausgenommen
-
-Original:
-
-    - [docs/concepts/phase7_spaces_admin_plan.md](./concepts/phase7_spaces_admin_plan.md) — 📕 ~75KB · ausfuehrungsreifer P7-Plan gegen `main@f5691e0`. Vier Bloecke (0 → A → Gate → C → B): Haushalt, Fixes (Item-ID sichtbar, Bild-Entfernen, Feld-Whitelist, dritter Principal `testnutzer-p7`), Space-Verwaltung in der Weboberflaeche mit voller `spacectl.py`-Paritaet, Mehrfachauswahl. Gelockt P7-A–P7-W, N1–N10, Abnahme P7-1–P7-24, `[VERIFY]` V71–V80. P7-W: `testcred.py` macht Testnutzer-Credentials fuer Claude Code nutzbar. Als 📕-Snapshot ausgenommen
-
