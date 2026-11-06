@@ -7,7 +7,7 @@ up: ./phase10_5_editor_4_1_plan.md
 down:
   - ../../phase10_5_finishing/probes/p105_b14_layout_probe.py   # Muster der Wegwerf-Instanz
   - ../../phase10_5_finishing/probes/p105_b11_roundtrip_probe.py # Muster Roundtrip
-updated: 2026-11-05 (A13 Korrekturen aus S0) | 2026-11-03 (angelegt — Opus-Planungsagent; alle Messungen an Wegwerf-Instanzen, Skripte im Scratchpad, nicht im Repo)
+updated: 2026-11-06 (A14 Befunde aus S1) | 2026-11-05 (A13 Korrekturen aus S0) | 2026-11-03 (angelegt — Opus-Planungsagent; alle Messungen an Wegwerf-Instanzen, Skripte im Scratchpad, nicht im Repo)
 ---
 # Anhang — Editor 4.1.0
 
@@ -286,3 +286,13 @@ Basislinie in **Chromium 151 und Firefox 153: je 30 von 57 Zellen rot, 27 grün,
 5. S2 „Basis + 2 ms“ gilt gegen **diese** Probe: Tastenkosten Chromium Median 1,6–2,2 ms, Firefox 2–3 ms.
 6. `konflikt_c` prüft nur die Lesesicht (§7 nennt kein Editor-Ziel).
 7. Vor S1: eine grüne Zelle `kein_stilles_zurueck` zählt erst, wenn der veraltete Entwurf wirklich noch angeboten wird. Der Anker-Wächter fällt absichtlich, sobald S2/S4 `editor.js`/`app.css` ändern — dann den Gegenlauf neu bauen. Nicht gemessen: WebKit, IME, echte Hardware, live. Bilder: `/tmp/ed41_shots/`.
+
+## A14 Befunde aus S1 (2026-11-05/06, Ausführer Opus; `p105_ed41_darstellung_s1.json`)
+
+Beide Browser (Chromium 151, Firefox 153): rot **30 → 27**, genau `oeffnen_schreibt_keinen_entwurf`, `entwurf_ueberlebt_neuladen`, `kein_stilles_zurueck` gekippt, die übrigen 54 Zellen unverändert. Gegenläufe `s1_ohne_ursprung` (nur `entwurf_ueberlebt_neuladen` rot) und `s1_ohne_version` (nur `kein_stilles_zurueck` rot; der Server speicherte den alten Entwurf wirklich über die neuere Version) — `kippt_genau` in beiden Browsern.
+1. **Korrektur zu A13.4:** den Ursprungscheck allein zu entfernen färbt `oeffnen_schreibt_keinen_entwurf` **nicht** rot — `isDirty()` hält; der Ursprungscheck zählt, weil ein sauberer Editor jetzt seinen Entwurf löscht (sonst löschte das Öffnen den Entwurf, während seine Rückfrage offen ist).
+2. Zwei Zellen sind **strenger** als in S0: `entwurf_ueberlebt_neuladen` verlangt den Entwurf auch noch gespeichert, solange die Rückfrage offen ist; `kein_stilles_zurueck` verlangt, dass der Dialog beide Versionen nennt und der Entwurf als neues Item überlebt.
+3. Plan §4.4 „`editor.js` darf nicht wachsen“: er wuchs um **+0,73 KB gz** (Erstaufruf 237,7 von 250 KB, nachgeladener Editor 69,7 KB, alle sechs Metriken grün). Tastenkosten unverändert (Median Chromium 1,3–2,0 ms, Firefox 2,0 ms).
+4. **Verhalten:** ein Entwurf zu einer anderen Version kommt **mit seiner alten Basisversion** in den Editor; der Konfliktdialog fragt („Entwurf verwerfen“ / „Entwurf als neues Item anlegen“, Fokus auf „Abbrechen“ = Esc, der Entwurf bleibt); Strg+S aus diesem Zustand läuft in den 409 (Hard Rule 3). Nebenwirkung: CodeMirror nimmt keinen Fokus, solange eine Rückfrage offen ist. **UX-Hinweis:** die blaue Hauptschaltfläche des Dialogs heißt „Entwurf verwerfen“ (geerbt vom Konfliktdialog-Stil).
+5. **Nicht geprüft:** „Entwurf verwerfen“ geklickt, Esc auf dem Dialog, alte Entwürfe ohne `version` (laufen über Basis 0, im Code gelesen, nicht gedrückt); ältere Entwurfsproben (`p105_b11_*`, `p10_m5`) nicht neu gelaufen; ein Firefox-Lauf war zuerst rot wegen fester 1,5-s-Wartezeit der Probe (jetzt Polling bis 10 s, ein Lauf danach grün).
+6. Vor S2: `spec.STAND` anheben, S2 in `STAENDE`/`BELEG_JE_STAND` eintragen.

@@ -15,6 +15,11 @@ nicht in der Suite. Dieser Waechter prueft die **Belegdateien** und den **Korpus
 
 Laeuft die Probe nach einem Editor-Schritt (S1, S2, …) neu, drehen sich Zellen absichtlich um: dann
 wird `ZELLEN[...]["basis"]` in `p105_ed41_spec.py` **bewusst** nachgezogen — nie dieser Waechter gelockert.
+
+**[2026-11-06, S1]** Statt `basis` nachzuziehen, hat jeder Stand seinen eigenen Beleg
+(`spec.BELEG_JE_STAND`, `spec.ERWARTET[stand]`): die S0-Basislinie bleibt eingefroren, der S1-Beleg
+`p105_ed41_darstellung_s1.json` weicht von ihr in **genau** den drei Entwurfszellen ab. Ein Gegenlauf
+vergleicht mit dem Beleg, gegen den er gelaufen ist (`referenz`; fehlt das Feld: die S0-Basislinie).
 """
 from __future__ import annotations
 
@@ -34,6 +39,8 @@ import p105_ed41_spec as spec  # noqa: E402
 
 BROWSER = ("chromium", "firefox")
 BELEG = PROBES / "p105_ed41_darstellung.json"
+BELEG_S1 = PROBES / "p105_ed41_darstellung_s1.json"
+S1_ZELLEN = ["oeffnen_schreibt_keinen_entwurf", "entwurf_ueberlebt_neuladen", "kein_stilles_zurueck"]
 
 
 def _laden(pfad: Path) -> dict:
@@ -100,12 +107,54 @@ def test_the_probe_controls_hold(browser):
     assert all(t["datei_gleich_fixture"] for t in roh["saat_treue"].values())
 
 
+# -- S1: Entwurfsschutz (Plan §5 S1, V7) ----------------------------------------------------------
+
+def test_the_s1_evidence_is_the_current_stand_in_both_browsers():
+    assert spec.STAND == "S1" and spec.BELEG_JE_STAND["S1"] == BELEG_S1.name
+    beleg = _laden(BELEG_S1)
+    assert beleg["stand"] == "S1" and beleg["gegenlauf"] is None and beleg["referenz"] == BELEG_S1.name
+    assert set(beleg["browser"]) == set(BROWSER)
+
+
+@pytest.mark.parametrize("browser", BROWSER)
+def test_s1_turns_exactly_the_three_draft_cells_green(browser):
+    neu = _laden(BELEG_S1)["browser"][browser]
+    alt = _laden(BELEG)["browser"][browser]["zellen"]
+    assert list(neu["zellen"]) == list(spec.ZELLEN)
+    assert neu["abweichungen"] == [] and not neu["seitenfehler"], (neu["abweichungen"], neu["seitenfehler"])
+    assert {n: v for n, v in neu["zellen"].items() if v != spec.ERWARTET["S1"][n]} == {}
+    assert sorted(n for n in neu["zellen"] if neu["zellen"][n] != alt[n]) == sorted(S1_ZELLEN)
+    assert all(neu["zellen"][n] for n in S1_ZELLEN)
+
+
+@pytest.mark.parametrize("browser", BROWSER)
+def test_the_stale_draft_was_really_offered_not_just_absent(browser):
+    """A13.7: gruen zaehlt nur, wenn der veraltete Entwurf angeboten wurde -- Dialog mit beiden
+    Versionen, Fokus im Dialog, Strg+S laeuft in den Konflikt, „als neues Item anlegen" bewahrt ihn."""
+    roh = _laden(BELEG_S1)["browser"][browser]
+    k = roh["entwurf"]["kein_stilles_zurueck"]
+    assert k["konflikt_dialog"] is True and k["dialog"] is False
+    assert "Entwurf zu v%d, aktuell v%d" % (k["fremd"]["alt"], k["fremd"]["version"]) in k["konflikt_text"]
+    assert k["konflikt_fokus"] == "conflict-cancel"
+    assert k["editor_hat_entwurf"] is True and k["konflikt_nach_speichern"] is True
+    assert k["neu"] == {"anders": True, "hat_entwurf": True, "version": 1}
+    assert k["fremde_fassung_steht"] is True and k["server_hat_entwurf"] is False
+    assert k["entwurf_nach_entscheidung"] is False
+    u = roh["entwurf"]["ueberlebt"]
+    assert u["entwurf_waehrend_dialog"] is True and u["editor_hat_entwurf"] is True
+    assert roh["entwurf"]["kontrolle_a_zuerst"] == {"dialog": True, "editor_hat_entwurf": True}
+    assert roh["entwurf"]["oeffnen"] == {"schluessel_nach_oeffnen": False}
+
+
 # -- Gegenlaeufe -----------------------------------------------------------------------------------
 
 @pytest.mark.parametrize("name", sorted(spec.GEGENLAEUFE))
 def test_each_counter_run_flips_exactly_its_own_cells_in_both_browsers(name):
     beleg = _laden(_gegenlauf(name))
-    basis = _laden(BELEG)
+    basis = _laden(PROBES / beleg.get("referenz", BELEG.name))
+    ab = spec.GEGENLAEUFE[name].get("ab", "S0")
+    assert basis.get("stand", "S0") == beleg.get("stand", "S0")
+    assert spec.STAENDE.index(beleg.get("stand", "S0")) >= spec.STAENDE.index(ab)
     soll = sorted(spec.GEGENLAEUFE[name]["kippt"])
     assert beleg["gegenlauf"] == name and beleg["kippt_soll"] == soll and beleg["kippt_genau"] is True
     assert set(beleg["browser"]) == set(BROWSER)
@@ -118,8 +167,9 @@ def test_there_is_a_counter_run_in_each_direction():
     """Gruen -> rot (die Zelle kann brechen) und rot -> gruen (die rote Zelle kann heilen)."""
     richtung = {"gruen_nach_rot": 0, "rot_nach_gruen": 0}
     for gl in spec.GEGENLAEUFE.values():
+        erwartet = spec.ERWARTET[gl.get("ab", "S0")]
         for n in gl["kippt"]:
-            richtung["gruen_nach_rot" if spec.ERWARTET_BASIS[n] else "rot_nach_gruen"] += 1
+            richtung["gruen_nach_rot" if erwartet[n] else "rot_nach_gruen"] += 1
     assert all(richtung.values()), richtung
 
 
@@ -175,7 +225,7 @@ def test_the_katalog_editor_anchors_are_unique_lines():
 
 # -- Geheimnisse -----------------------------------------------------------------------------------
 
-@pytest.mark.parametrize("datei", ["p105_ed41_darstellung.json"]
+@pytest.mark.parametrize("datei", ["p105_ed41_darstellung.json", "p105_ed41_darstellung_s1.json"]
                          + ["p105_ed41_darstellung_gegenlauf_%s.json" % n for n in sorted(spec.GEGENLAEUFE)])
 def test_no_secret_in_the_evidence(datei):
     text = (PROBES / datei).read_text(encoding="utf-8")

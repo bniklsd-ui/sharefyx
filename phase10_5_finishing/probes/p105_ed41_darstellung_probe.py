@@ -33,9 +33,15 @@ durch Rot-Werden beweist, dass sie misst:
 | `fixture_kaputt` | Katalog-Kopie: `#### Katalog…` → `####Katalog…` (keine Ueberschrift) | `l_ueberschrift_h1_h4` gruen → rot |
 | `trimend` | `editor.js`-Kopie: `setBody` mit `trimEnd()` (Plan S2 Gegenlauf 4) | `bytes_gleich` gruen → rot |
 | `css_rot_nach_gruen` | `app.css`-Kopie: Listenzeichen sichtbar, die vier vendorten Tokenfarben hell | `listenzeichen`, `kontrast` rot → gruen |
+| `s1_ohne_ursprung` | `editor.js`-Kopie: Ursprungspruefung (`change.origin === "setValue"`) raus (Plan S1 Gegenlauf 1) | `entwurf_ueberlebt_neuladen` gruen → rot |
+| `s1_ohne_version` | `editor.js`-Kopie: Versionspruefung des Entwurfs raus (Plan S1 Gegenlauf 2) | `kein_stilles_zurueck` gruen → rot |
+
+**Staende** (ab S1): `p105_ed41_spec.STAND` ist der Stand des Arbeitsbaums; ein Lauf mit beiden Browsern
+schreibt `BELEG_JE_STAND[STAND]` (S0 = `p105_ed41_darstellung.json`, eingefroren; S1 = `…_s1.json`), und
+ein Gegenlauf vergleicht mit dem Beleg **dieses** Stands (Feld `referenz` im Gegenlauf-Beleg).
 
 Aufruf:   `.venv/bin/python phase10_5_finishing/probes/p105_ed41_darstellung_probe.py [--browser=chromium|firefox|beide] [--gegenlauf=NAME]`
-Ergebnis: `phase10_5_finishing/probes/p105_ed41_darstellung.json` (nur ein Lauf mit **beiden** Browsern schreibt
+Ergebnis: `phase10_5_finishing/probes/<BELEG_JE_STAND[STAND]>` (nur ein Lauf mit **beiden** Browsern schreibt
 ihn; `--browser=X` allein schreibt nach `/tmp/p105_ed41_darstellung_X.json`). Bilder nach `/tmp/ed41_shots/`.
 Die Fixtures werden **von der Platte** gesaet, jede gegen `fixtures_ed41/MANIFEST.json` geprueft (fail-closed).
 Rueckgabe 0 = die Probe ist gelaufen; rote Zellen stehen im JSON und auf stderr.
@@ -52,12 +58,14 @@ import sys
 from pathlib import Path
 
 HIER = Path(__file__).resolve().parent
-RESULT = HIER / "p105_ed41_darstellung.json"
 E2E = Path.home() / ".claude-code-tools/e2e-venv/bin/python"
 SHOTS = Path("/tmp/ed41_shots")
 
 sys.path.insert(0, str(HIER))
 import p105_ed41_spec as spec  # noqa: E402
+#: Beleg des **heutigen** Stands (`spec.STAND`): S0 = die Basislinie, ab S1 je Schritt eine eigene Datei --
+#: der Beleg eines frueheren Stands wird nie ueberschrieben.
+RESULT = HIER / spec.BELEG_JE_STAND[spec.STAND]
 
 GEGENLAUF = None
 BROWSER = None
@@ -528,6 +536,9 @@ def main():
         oeffne(page, A)
         page.wait_for_timeout(400)
         e1["dialog"] = page.evaluate(DIALOG)
+        # S1: solange die Rueckfrage offen ist, liegt der Entwurf noch im Speicher (ein Neuladen jetzt
+        # verloere sonst ihn) -- die Szene, in der die Ursprungspruefung die einzige Schranke ist.
+        e1["entwurf_waehrend_dialog"] = page.evaluate("(id) => (sessionStorage.getItem('sfx:draft:' + id) || '').indexOf('ENTWURF-1') !== -1", A)
         if e1["dialog"]:
             e1["dialog_text"] = page.evaluate("() => document.getElementById('confirm-message').textContent")
             page.click("#confirm-ok")
@@ -568,10 +579,16 @@ def main():
           const r = await fetch('/api/v1/items/' + id, {method: 'PATCH', credentials: 'same-origin',
             headers: {'Content-Type': 'application/json', 'X-CSRF-Token': sessionStorage.getItem('sfx:csrf')},
             body: JSON.stringify({version: it.version, body: neu})});
-          return {status: r.status, version: (await r.json()).version};
+          return {status: r.status, version: (await r.json()).version, alt: it.version};
         }""", [L, fremd])}
         oeffne(page, L, editor=False)
         page.wait_for_timeout(1200)
+        # S1: wird der veraltete Entwurf **angeboten** (Konfliktdialog mit beiden Versionen)? Eine gruene
+        # Zelle zaehlt nur dann -- ein verschwundener Entwurf liesse die fremde Fassung auch stehen (A13.7).
+        e2["konflikt_dialog"] = page.evaluate("() => !document.getElementById('conflict-dialog').hidden")
+        e2["konflikt_text"] = page.evaluate("() => document.getElementById('conflict-message').textContent")
+        e2["konflikt_fokus"] = page.evaluate("() => document.activeElement && document.activeElement.id")
+        page.screenshot(path=str(shots / ("%s_entwurf_veraltet.png" % AUFTRAG["browser"])))
         e2["dialog"] = page.evaluate(DIALOG)
         if e2["dialog"]:
             e2["dialog_text"] = page.evaluate("() => document.getElementById('confirm-message').textContent")
@@ -579,10 +596,35 @@ def main():
             page.wait_for_timeout(500)
         warte_cm(page, L)
         e2["dirty"] = page.evaluate("async () => (await import('/ui/static/js/editor.js')).isDirty()")
+        e2["editor_hat_entwurf"] = "ENTWURF-ALT" in page.evaluate("async () => (await import('/ui/static/js/editor.js')).getBody()")
         if e2["dirty"]:
             page.evaluate("() => " + CM + ".focus()")
             page.keyboard.press("Control+s")
             page.wait_for_timeout(1500)
+        # Strg+S aus dem veralteten Entwurf laeuft in den Konflikt; dann der vorhandene Weg
+        # „Entwurf als neues Item anlegen" (`conflict-save-as-new`) -- der Entwurf geht nicht verloren.
+        e2["konflikt_nach_speichern"] = page.evaluate("() => !document.getElementById('conflict-dialog').hidden")
+        if e2["konflikt_nach_speichern"]:
+            page.click("#conflict-save-as-new")
+            # bis der Editor das neue Item zeigt (afterWrite laedt Liste + Uebersicht; Firefox braucht
+            # dafuer gemessen laenger als 1,5 s) -- hoechstens 10 s, sonst steht `anders: false` im Beleg
+            page.evaluate("""async (alt) => {
+              const S = (await import('/ui/static/js/state.js')).state;
+              for (let i = 0; i < 100; i++) {
+                if (S.editingSnapshot && S.editingSnapshot.id !== alt) return true;
+                await new Promise((r) => setTimeout(r, 100));
+              }
+              return false;
+            }""", L)
+            page.wait_for_timeout(300)
+            e2["neu"] = page.evaluate("""async (alt) => {
+              const S = (await import('/ui/static/js/state.js')).state;
+              const id = S.editingSnapshot && S.editingSnapshot.id;
+              if (!id || id === alt) return {anders: false};
+              const it = await (await fetch('/api/v1/items/' + id)).json();
+              return {anders: true, hat_entwurf: it.body.indexOf('ENTWURF-ALT') !== -1, version: it.version};
+            }""", L)
+        e2["entwurf_nach_entscheidung"] = page.evaluate("(id) => sessionStorage.getItem('sfx:draft:' + id) !== null", L)
         nach = page.evaluate("async (id) => (await (await fetch('/api/v1/items/' + id)).json())", L)
         e2["server_version"] = nach["version"]
         e2["fremde_fassung_steht"] = nach["body"] == fremd
@@ -725,9 +767,15 @@ def zellen(roh: dict) -> dict:
                                and v3["22_ohne_newline"]["writes"] == 1)
     en = roh["entwurf"]
     z["oeffnen_schreibt_keinen_entwurf"] = not en["oeffnen"]["schluessel_nach_oeffnen"]
-    z["entwurf_ueberlebt_neuladen"] = en["ueberlebt"]["entwurf_vor_neuladen"] and en["ueberlebt"]["editor_hat_entwurf"]
+    u = en["ueberlebt"]
+    z["entwurf_ueberlebt_neuladen"] = u["entwurf_vor_neuladen"] and u["entwurf_waehrend_dialog"] and u["editor_hat_entwurf"]
     k = en["kein_stilles_zurueck"]
-    z["kein_stilles_zurueck"] = k["fremd"]["status"] == 200 and k["fremde_fassung_steht"]
+    # S1 (A13.7): gruen nur, wenn die fremde Fassung steht **und** der veraltete Entwurf angeboten wurde
+    # (Dialog nennt beide Versionen) **und** er als neues Item erhalten blieb.
+    angeboten = (k["konflikt_dialog"] and ("v%s" % k["fremd"]["alt"]) in k["konflikt_text"]
+                 and ("v%s" % k["fremd"]["version"]) in k["konflikt_text"])
+    z["kein_stilles_zurueck"] = (k["fremd"]["status"] == 200 and k["fremde_fassung_steht"] and angeboten
+                                 and bool(k.get("neu", {}).get("hat_entwurf")))
     fehlt = set(spec.ZELLEN) - set(z)
     extra = set(z) - set(spec.ZELLEN)
     if fehlt or extra:
@@ -739,14 +787,15 @@ def main() -> int:
     if not E2E.exists():
         raise SystemExit("Playwright-venv fehlt: %s" % E2E)
     creds = b14._setup()
-    beleg = {"plan": "docs/concepts/phase10_5_editor_4_1_plan.md §5 S0", "gegenlauf": GEGENLAUF,
+    beleg = {"plan": "docs/concepts/phase10_5_editor_4_1_plan.md §5 " + spec.STAND, "stand": spec.STAND,
+             "referenz": RESULT.name, "gegenlauf": GEGENLAUF,
              "fixtures": len(spec.alle_fixtures()), "browser": {}}
     try:
         for br in BROWSERS:
             roh = ein_browser(br, creds)
             roh["zellen"] = zellen(roh)
             roh["rot"] = [n for n, v in roh["zellen"].items() if not v]
-            roh["abweichungen"] = [n for n, v in roh["zellen"].items() if v != spec.ERWARTET_BASIS[n]]
+            roh["abweichungen"] = [n for n, v in roh["zellen"].items() if v != spec.ERWARTET[spec.STAND][n]]
             beleg["browser"][br] = roh
             print(br, roh.get("browser_version"), "rot:", len(roh["rot"]), "abweichend:", roh["abweichungen"],
                   file=sys.stderr)

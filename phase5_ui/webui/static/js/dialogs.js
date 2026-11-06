@@ -26,6 +26,7 @@ var createButtonEl;
 var newItemButtonEl;
 
 var conflictDialogEl;
+var conflictTitleEl;
 var conflictMessageEl;
 var conflictLoadCurrentButtonEl;
 var conflictSaveAsNewButtonEl;
@@ -449,13 +450,31 @@ function openTrashTitleDialog(item) {
 
 // -- Speichern / Konflikt (§4.5, Akzeptanzkriterium 11) ------------------------------------
 
-export function showConflictDialog(current) {
+// S1 (F7b): auch fuer einen **veralteten Entwurf** (`opts.entwurf`). Fokus auf „Abbrechen" (= Esc):
+// der Entwurf bleibt im Editor, kein Tastendruck verwirft oder schreibt etwas.
+export function showConflictDialog(current, opts) {
+  var entwurf = opts && opts.entwurf;
   state.conflictCurrent = current;
   updateVersionBand();
-  conflictMessageEl.textContent =
-    "Ein anderer Client hat dieses Item zwischenzeitlich geändert (deine Version v"
-    + state.editingSnapshot.version + " → aktuelle Version v" + current.version + ").";  // P8-C2 Audit: "→" hier ist Sprach-Interpunktion ("Version X fuehrt zu Y"), kein Icon
+  if (entwurf) {
+    conflictTitleEl.textContent = "Veralteter Entwurf";
+    conflictMessageEl.textContent =
+      "Für dieses Item liegt ein ungespeicherter Entwurf in diesem Tab: Entwurf zu "
+      + (typeof entwurf.version === "number" ? "v" + entwurf.version : "einer älteren Fassung")
+      + ", aktuell v" + current.version + ". Ein anderer Client hat das Item inzwischen geändert — "
+      + "der Entwurf wird deshalb nicht einfach übernommen.";
+    conflictLoadCurrentButtonEl.textContent = "Entwurf verwerfen";
+    conflictSaveAsNewButtonEl.textContent = "Entwurf als neues Item anlegen";
+  } else {
+    conflictTitleEl.textContent = "Konflikt";
+    conflictMessageEl.textContent =
+      "Ein anderer Client hat dieses Item zwischenzeitlich geändert (deine Version v"
+      + state.editingSnapshot.version + " → aktuelle Version v" + current.version + ").";  // P8-C2 Audit: "→" hier ist Sprach-Interpunktion ("Version X fuehrt zu Y"), kein Icon
+    conflictLoadCurrentButtonEl.textContent = "Aktuelle Fassung laden";
+    conflictSaveAsNewButtonEl.textContent = "Meine Fassung als neues Item anlegen";
+  }
   conflictDialogEl.hidden = false;
+  if (entwurf) conflictCancelButtonEl.focus();
 }
 
 export function hideConflictDialog() {
@@ -755,6 +774,7 @@ export function init() {
   newItemButtonEl = document.getElementById("new-item-button");
 
   conflictDialogEl = document.getElementById("conflict-dialog");
+  conflictTitleEl = document.getElementById("conflict-title");
   conflictMessageEl = document.getElementById("conflict-message");
   conflictLoadCurrentButtonEl = document.getElementById("conflict-load-current");
   conflictSaveAsNewButtonEl = document.getElementById("conflict-save-as-new");

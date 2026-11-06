@@ -94,6 +94,8 @@ export function showOverviewPane() {
 }
 
 export function clearDetail() {
+  // S1 (V7): ein sauberer Editor hinterlaesst keinen Entwurf, ein geaenderter behaelt ihn.
+  if (state.editingSnapshot && !isDirty()) clearDraft(state.editingSnapshot.id);
   state.selectedId = null;
   state.selectedReadonly = false;
   state.editingSnapshot = null;
@@ -328,7 +330,7 @@ export function updateVersionBand() {
     versionBandNumberEl.textContent = "";
     editorVersionEl.textContent = "";
     saveButtonEl.disabled = true;
-    return;
+    return false;
   }
   var dirty = isDirty();
   // Der Kern des V10-Fundes: ohne echte Änderung gibt es nichts zu speichern, und ein Klick
@@ -347,17 +349,40 @@ export function updateVersionBand() {
     editorVersionEl.textContent = "v" + state.editingSnapshot.version + " gespeichert";
   }
   renderMetaDigest();
+  return dirty;
 }
 
 // -- Entwurfsschutz (§4.5): sessionStorage, nie localStorage, nur für den eigenen Tab und
 // nur für Items, die man gerade bearbeitet (nicht für fremde/schreibgeschützte Items — die
 // haben keinen Editor).
+// S1 (V7/F7): `sfx:draft:<id>` = Formularwerte + `version` (Basis) + `gespeichert` (ISO), kein
+// Geheimnis; Kennung/Version aus dem Schnappschuss (F7 über `saveItem()`).
 
 function draftKeyFor(id) { return "sfx:draft:" + id; }
 
 function saveDraft() {
-  if (!state.selectedId) return;
-  sessionStorage.setItem(draftKeyFor(state.selectedId), JSON.stringify(currentFormValues()));
+  var snap = state.editingSnapshot;
+  if (!snap) return;
+  var entwurf = Object.assign(currentFormValues(), { version: snap.version, gespeichert: new Date().toISOString() });
+  sessionStorage.setItem(draftKeyFor(snap.id), JSON.stringify(entwurf));
+}
+
+// dieselben Felder wie `isDirty()`
+function _entwurfWeichtAb(draft, item) {
+  return draft.title !== item.title || draft.body !== item.body || draft.status !== item.status
+    || (draft.due || "") !== (item.due || "") || (draft.assignee || "") !== (item.assignee || "")
+    || (draft.tags || []).join(",") !== item.tags.join(",")
+    || (draft.links || []).join(",") !== item.links.join(",");
+}
+
+function _entwurfEinsetzen(draft) {
+  fieldTitleEl.value = draft.title;
+  setBody(draft.body);
+  fieldStatusEl.value = draft.status;
+  fieldDueEl.value = draft.due || "";
+  fieldAssigneeEl.value = draft.assignee || "";
+  fieldTagsEl.value = (draft.tags || []).join(", ");
+  fieldLinksEl.value = (draft.links || []).join(", ");
 }
 
 export function clearDraft(id) {
@@ -534,7 +559,8 @@ function _editorBereit() {
     // Der Editor kann mitten im Tippen eintreffen — der Cursor bleibt, wo der Mensch war.
     try {
       cm.setCursor(cm.posFromIndex(cursor));
-      cm.focus();
+      // S1: eine offene Rueckfrage (Entwurf) behaelt den Fokus.
+      if (!document.querySelector(".overlay:not([hidden])")) cm.focus();
     } catch (err) { /* der Cursor ist kein Pfad */ }
     setRawMode(state.mode === "raw");
     // Die Cursorzeile von Anfang an markieren (CM feuert „cursorActivity" erst bei einer
@@ -561,11 +587,15 @@ function _cursorZeileSetzen() {
   cmCursorZeile = zeile;
 }
 
-// **Eine Aenderung, ein Ort:** der Live-Editor feuert „change", die Textarea feuert „input".
-// Beides heisst dasselbe: Version neu rechnen und den Entwurf sichern.
-function _editorGeaendert() {
-  updateVersionBand();
-  saveDraft();
+// **Eine Aenderung, ein Ort:** CM feuert „change" (`cm`, `change`), Felder/Textarea „input".
+// S1 (V7): Entwurf nur bei Nutzer-Aenderung (nicht `setValue` = `setBody()`) und nur wenn
+// geaendert; sauber -> weg. Ohne Ursprungspruefung loeschte das Oeffnen den Entwurf, waehrend
+// seine Rueckfrage offen ist.
+function _editorGeaendert(_quelle, change) {
+  var dirty = updateVersionBand();
+  if (change && change.origin === "setValue") return;
+  if (dirty) saveDraft();
+  else if (state.editingSnapshot) clearDraft(state.editingSnapshot.id);
 }
 
 // -- To-do-Kaestchen (P10.5, Block 11, Schritt 11.5 -- ED-2) ---------------------------------
@@ -821,6 +851,8 @@ function showEditableItem(item, opts) {
   fillAssigneeOptions();
   fieldTagsEl.value = item.tags.join(", ");
   fieldLinksEl.value = item.links.join(", ");
+  // S1 (F7a): den Entwurf **vor** `setBody` lesen.
+  var draft = loadDraftIfAny(item.id);
   // P10.5, Block 11, Schritt 11.3 (ED-1): der **Live-Editor** trägt den Text — vor dem
   // Laden des Editors die Textarea (der Notausgang, ED-5).
   _editorBereit();
@@ -832,28 +864,37 @@ function showEditableItem(item, opts) {
   // derselbe wie für "live" und damit nicht zukunftsblind.
   setRawMode(opts.mode === "raw");
 
-  var draft = loadDraftIfAny(item.id);
-  if (draft && (draft.title !== item.title || draft.body !== item.body)) {
-    confirmDialog({
-      title: "Ungespeicherter Entwurf",
-      message: "Für dieses Item liegt ein ungespeicherter Entwurf in diesem Tab. Wiederherstellen?",
-      ok: "Wiederherstellen",
-    }).then(function (restore) {
-      if (!restore) {
-        clearDraft(item.id);
-        return;
-      }
-      fieldTitleEl.value = draft.title;
-      setBody(draft.body);
-      fieldStatusEl.value = draft.status;
-      fieldDueEl.value = draft.due || "";
-      fieldAssigneeEl.value = draft.assignee || "";
-      fieldTagsEl.value = draft.tags.join(", ");
-      fieldLinksEl.value = draft.links.join(", ");
-      updateVersionBand();
-    });
-  }
   updateVersionBand();
+  if (!draft) return;
+  // nichts Neues (auch die versionslosen Kopien, die vor S1 jedes Oeffnen schrieb)
+  if (!_entwurfWeichtAb(draft, item)) {
+    clearDraft(item.id);
+    return;
+  }
+  // S1 (F7b, Hard Rule 3): ein Entwurf zu einer **anderen** Version nie still zurueck (Strg+S
+  // setzte die fremde Aenderung zurueck). Er kommt mit seiner Basisversion (fehlt: 0) in den
+  // Editor, der Konfliktdialog fragt; Speichern laeuft in den 409.
+  if (draft.version !== item.version) {
+    state.editingSnapshot.version = typeof draft.version === "number" ? draft.version : 0;
+    _entwurfEinsetzen(draft);
+    showConflictDialog(item, { entwurf: draft });
+    return;
+  }
+  var snapBeimOeffnen = state.editingSnapshot;
+  confirmDialog({
+    title: "Ungespeicherter Entwurf",
+    message: "Für dieses Item liegt ein ungespeicherter Entwurf in diesem Tab. Wiederherstellen?",
+    ok: "Wiederherstellen",
+  }).then(function (restore) {
+    // inzwischen neu geladen (Realtime)? Dann waere Einsetzen derselbe stille Rueckschritt.
+    if (state.editingSnapshot !== snapBeimOeffnen) return;
+    if (!restore) {
+      clearDraft(item.id);
+      return;
+    }
+    _entwurfEinsetzen(draft);
+    updateVersionBand();
+  });
 }
 
 export function loadEditorFromItem(item, opts) {

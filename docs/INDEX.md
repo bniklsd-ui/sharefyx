@@ -60,9 +60,9 @@ updated: 2026-11-02 (Block 18: zwei Addons) | ältere Einträge: docs/INDEX_UPDA
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing; Plan siehe unten)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **33594 B** · Head: Modulstatus, Deploys, Abnahme (79 ✅ · 4 ⬜)
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **33928 B** · Head: Modulstatus, Deploys, Abnahme (79 ✅ · 4 ⬜)
 - [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **45983 B** · die **geschlossenen** Abnahmezeilen, verbatim
-- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **215754 B** · Session-Blöcke, verbatim
+- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **217813 B** · Session-Blöcke, verbatim
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · Startaufträge Block 7 und 9, verbatim
 - [phase10_5_finishing/FREIGABEN_ARCHIVE.md](../phase10_5_finishing/FREIGABEN_ARCHIVE.md) — 📦 **3.577 B** · die Freigaben der Phase, verbatim aus dem Head
 - [phase10_5_finishing/MODULSTATUS_ARCHIVE.md](../phase10_5_finishing/MODULSTATUS_ARCHIVE.md) — 📦 **23459 B** · Statusspalten 0–17
@@ -75,7 +75,7 @@ updated: 2026-11-02 (Block 18: zwei Addons) | ältere Einträge: docs/INDEX_UPDA
 - [docs/concepts/phase10_5_block17_film_app_plan.md](./concepts/phase10_5_block17_film_app_plan.md) — 📗 **11012 B** · Plan Block 17: Film in die App (✅)
 - [docs/concepts/phase10_5_block18_live_fixes_plan.md](./concepts/phase10_5_block18_live_fixes_plan.md) — 📗 **32920 B** · Plan Block 18 (🔄)
 - [docs/concepts/phase10_5_editor_4_1_plan.md](./concepts/phase10_5_editor_4_1_plan.md) — 📗 **39581 B** · Plan Editor 4.1.0 (v4.0.2 in P10.5, Rest P11)
-- [docs/concepts/phase10_5_editor_4_1_plan_anhang.md](./concepts/phase10_5_editor_4_1_plan_anhang.md) — 📗 **21945 B** · Anhang: Messungen, Prototyp
+- [docs/concepts/phase10_5_editor_4_1_plan_anhang.md](./concepts/phase10_5_editor_4_1_plan_anhang.md) — 📗 **24264 B** · Anhang: Messungen, Prototyp
 - [docs/concepts/phase10_5_block18_addon_render.md](./concepts/phase10_5_block18_addon_render.md) — 📗 **25706 B** · Addon: Render
 - [docs/concepts/phase10_5_block18_addon_insel.md](./concepts/phase10_5_block18_addon_insel.md) — 📗 **24064 B** · Addon: ferne Insel
 - [docs/concepts/phase10_5_p10j_lauf2_eurofleet.md](./concepts/phase10_5_p10j_lauf2_eurofleet.md) — 📗 **6991 B** · Notiz an eurofleet: P10.5-27/28 + alle Instanzen

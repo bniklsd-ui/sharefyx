@@ -502,6 +502,18 @@ _z("kein_stilles_zurueck", "entwurf", False, "S1", "F7b Entwurf ohne Version -> 
 ERWARTET_BASIS = {n: z["basis"] for n, z in ZELLEN.items()}
 
 # ------------------------------------------------------------------------------------------------
+# Staende (Plan §5): jeder Editor-Schritt heilt genau die Zellen, deren `ziel` er ist. `STAND` ist der
+# Stand des **heutigen** Arbeitsbaums; die Probe schreibt ihren Beleg nach `BELEG_JE_STAND[STAND]` und
+# vergleicht ihre Gegenlaeufe mit **diesem** Beleg (gleicher Baum). Die Basislinie (S0) bleibt eingefroren.
+# ------------------------------------------------------------------------------------------------
+
+STAENDE = ["S0", "S1"]
+STAND = "S1"
+BELEG_JE_STAND = {"S0": "p105_ed41_darstellung.json", "S1": "p105_ed41_darstellung_s1.json"}
+ERWARTET = {s: {n: z["basis"] or z["ziel"] in STAENDE[1:STAENDE.index(s) + 1] for n, z in ZELLEN.items()}
+            for s in STAENDE}
+
+# ------------------------------------------------------------------------------------------------
 # Selbsttest (Gegenlaeufe). Jeder Gegenlauf aendert **eine Kopie** — der Fixture-Bytes in der
 # Saat oder der statischen Dateien, die der Wegwerf-Server ausliefert. Arbeitsbaum und
 # `fixtures_ed41/` bleiben unberuehrt. Jeder Anker muss **genau einmal** vorkommen.
@@ -533,6 +545,24 @@ GEGENLAEUFE: dict[str, dict] = {
             ".CodeMirror .cm-keyword, .CodeMirror .cm-tag, .CodeMirror .cm-attribute, "
             ".CodeMirror .cm-string { color: var(--editor-text); }\n"]]},
         "kippt": ["listenzeichen", "kontrast"],
+    },
+    # Plan S1 Gegenlauf (1): Ursprungspruefung raus. **Ehrlich gemessen:** das allein faerbt weder
+    # `oeffnen_schreibt_keinen_entwurf` (der `isDirty()`-Guard haelt: beim Oeffnen ist der Editor sauber)
+    # noch den Entwurf nach der Rueckfrage (er wird **vor** `setBody` gelesen). Es bricht die Szene, in
+    # der die Ursprungspruefung die einzige Schranke ist: `setBody` beim Oeffnen meldet „sauber" ->
+    # der Entwurf wird geloescht, waehrend die Rueckfrage noch offen ist (ein Neuladen jetzt verloere
+    # ihn). Gruen -> rot, nur `entwurf_ueberlebt_neuladen`.
+    "s1_ohne_ursprung": {
+        "static": {"js/editor.js": [['  if (change && change.origin === "setValue") return;\n', ""]]},
+        "kippt": ["entwurf_ueberlebt_neuladen"],
+        "ab": "S1",
+    },
+    # Plan S1 Gegenlauf (2): Versionspruefung raus -> der veraltete Entwurf geht den Weg „gleiche
+    # Version" (Wiederherstellen? -> Strg+S setzt die fremde Fassung still zurueck). Nur `kein_stilles_zurueck`.
+    "s1_ohne_version": {
+        "static": {"js/editor.js": [["  if (draft.version !== item.version) {\n", "  if (false) {\n"]]},
+        "kippt": ["kein_stilles_zurueck"],
+        "ab": "S1",
     },
 }
 
