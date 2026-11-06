@@ -2046,6 +2046,21 @@ select.input:focus {
 .CodeMirror-selected { background: var(--editor-select); }
 .CodeMirror-focused .CodeMirror-selected { background: var(--editor-select); }
 .CodeMirror pre.CodeMirror-line { padding: 0; }
+/* Editor 4.1 S2: das Tabellen-Widget = die `.preview`-Tabelle der Lesesicht (Schrift, Rahmen,
+ * Ausrichtung); breite Tabellen scrollen im Widget statt die Seite zu verbreitern. */
+.CodeMirror .sfx-tabelle {
+  display: block;
+  flex: none;
+  padding: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: normal;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  line-height: 1.6;
+  cursor: text;
+}
+.CodeMirror .sfx-tabelle table { margin: 4px 0; }
 
 /* Die Live-Darstellung: die Markdown-Zeichen bekommen die Optik der Ausgabe.
  *

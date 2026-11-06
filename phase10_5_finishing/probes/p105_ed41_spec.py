@@ -428,8 +428,10 @@ def manifest_soll() -> dict:
 ZELLEN: dict[str, dict] = {}
 
 
-def _z(name, sicht, basis, ziel, grund):
-    ZELLEN[name] = {"sicht": sicht, "basis": basis, "ziel": ziel, "grund": grund}
+def _z(name, sicht, basis, ziel, grund, ab="S0"):
+    """`ab` = der Stand, ab dem die Zelle gemessen wird (S2 bringt neue Zellen; die Belege von S0/S1
+    tragen sie nicht und bleiben gegen **ihren** Zellensatz gueltig, `zellen_fuer()`)."""
+    ZELLEN[name] = {"sicht": sicht, "basis": basis, "ziel": ziel, "grund": grund, "ab": ab}
 
 
 # Lesesicht (fremdes Item im Space beta, `#ro-preview`), Katalog-Item
@@ -499,7 +501,14 @@ _z("oeffnen_schreibt_keinen_entwurf", "entwurf", False, "S1", "F7a setValue -> c
 _z("entwurf_ueberlebt_neuladen", "entwurf", False, "S1", "F7a anderes Item zuerst -> Entwurf ueberschrieben")
 _z("kein_stilles_zurueck", "entwurf", False, "S1", "F7b Entwurf ohne Version -> fremde Aenderung still zurueckgesetzt")
 
-ERWARTET_BASIS = {n: z["basis"] for n, z in ZELLEN.items()}
+# Tabellen-Widget (Plan S2), an 11_tabelle_einfach; jede Zelle verlangt das Widget als Vorbedingung
+_z("klick_zelle", "editor", False, "S2", "S2 Klick auf eine Zelle -> Rohtext, Cursor am Zellanfang, Zeichen nur dort", ab="S2")
+_z("pfeil_erste_zeile", "editor", False, "S2", "S2/A4 Pfeil ab ins Widget landete am Tabellenende", ab="S2")
+_z("pfeil_letzte_zeile", "editor", False, "S2", "S2 Pfeil auf ins Widget -> letzte Tabellenzeile", ab="S2")
+_z("undo", "editor", False, "S2", "S2 Widget-Wechsel schreiben keine Historie; Undo/Redo ueber den Wechsel", ab="S2")
+_z("kopieren_quelle", "editor", False, "S2", "S2 Auswahl/Kopie ueber das Widget = Markdown-Quelle", ab="S2")
+
+ERWARTET_BASIS = {n: z["basis"] for n, z in ZELLEN.items() if z["ab"] == "S0"}
 
 # ------------------------------------------------------------------------------------------------
 # Staende (Plan §5): jeder Editor-Schritt heilt genau die Zellen, deren `ziel` er ist. `STAND` ist der
@@ -507,10 +516,18 @@ ERWARTET_BASIS = {n: z["basis"] for n, z in ZELLEN.items()}
 # vergleicht ihre Gegenlaeufe mit **diesem** Beleg (gleicher Baum). Die Basislinie (S0) bleibt eingefroren.
 # ------------------------------------------------------------------------------------------------
 
-STAENDE = ["S0", "S1"]
-STAND = "S1"
-BELEG_JE_STAND = {"S0": "p105_ed41_darstellung.json", "S1": "p105_ed41_darstellung_s1.json"}
-ERWARTET = {s: {n: z["basis"] or z["ziel"] in STAENDE[1:STAENDE.index(s) + 1] for n, z in ZELLEN.items()}
+STAENDE = ["S0", "S1", "S2"]
+STAND = "S2"
+BELEG_JE_STAND = {"S0": "p105_ed41_darstellung.json", "S1": "p105_ed41_darstellung_s1.json",
+                  "S2": "p105_ed41_darstellung_s2.json"}
+
+
+def zellen_fuer(stand: str) -> list[str]:
+    """Die Zellen, die ein Beleg des Stands `stand` traegt (in Spec-Reihenfolge)."""
+    return [n for n, z in ZELLEN.items() if STAENDE.index(z["ab"]) <= STAENDE.index(stand)]
+
+
+ERWARTET = {s: {n: ZELLEN[n]["basis"] or ZELLEN[n]["ziel"] in STAENDE[1:STAENDE.index(s) + 1] for n in zellen_fuer(s)}
             for s in STAENDE}
 
 # ------------------------------------------------------------------------------------------------
@@ -563,6 +580,47 @@ GEGENLAEUFE: dict[str, dict] = {
         "static": {"js/editor.js": [["  if (draft.version !== item.version) {\n", "  if (false) {\n"]]},
         "kippt": ["kein_stilles_zurueck"],
         "ab": "S1",
+    },
+    # Plan S2 Gegenlauf (1): Installation aus -- der `import()` des Widget-Moduls schlaegt fehl (Datei
+    # gibt es nicht). Zugleich der Rueckfall-Beweis: der Editor arbeitet als Rohtext weiter (Bytes, Entwurf
+    # gruen, 0 Seitenfehler). Rot werden `tabelle_widget` und **die Zellen, die das Widget als Vorbedingung
+    # verlangen** (Klick, beide Pfeile, Undo-ueber-den-Wechsel, Kopieren-ueber-das-Widget).
+    "s2_ohne_installation": {
+        "static": {"js/editor.js": [['import("./editor/tabellen.js")', 'import("./editor/tabellen_fehlt.js")']]},
+        "kippt": ["tabelle_widget", "klick_zelle", "pfeil_erste_zeile", "pfeil_letzte_zeile", "undo",
+                  "kopieren_quelle"],
+        "ab": "S2",
+    },
+    # Plan S2 Gegenlauf (2): die Eintritts-Korrektur (`beforeSelectionChange`) aus -> Pfeil ab landet
+    # wieder am Tabellenende (A4: [6,40]). **Gemessen auch** `pfeil_letzte_zeile`: Pfeil auf landet zwar in
+    # der letzten Zeile (A4 zaehlte nur die Zeile), aber ebenfalls an deren Ende [6,40] statt in der
+    # Spalte der Herkunft [6,0] -- die Korrektur setzt beide, die Zelle prueft Zeile **und** Spalte.
+    "s2_ohne_eintritt": {
+        "static": {"js/editor/tabellen.js": [['  cm.on("beforeSelectionChange", _eintritt);\n', ""]]},
+        "kippt": ["pfeil_erste_zeile", "pfeil_letzte_zeile"],
+        "ab": "S2",
+    },
+    # Klick-Zuordnung kaputt: jeder Klick landet am Tabellenanfang statt in seiner Zelle. Nur `klick_zelle`.
+    "s2_ohne_klickziel": {
+        "static": {"js/editor/tabellen.js": [["    return { line: zeile, ch: typeof ch === \"number\" ? ch : 0 };\n",
+                                              "    return { line: f.from.line, ch: 0 };\n"]]},
+        "kippt": ["klick_zelle"],
+        "ab": "S2",
+    },
+    # Plan S2, Byte-Vertrag V4: ein Widget, das beim Oeffnen die Quelle **neu polstert** (Zellen getrimmt,
+    # `| a | b |`-Form). Rot: `bytes_gleich` -- gemessen: Editor != API-Body, geaendert, und das Strg+S der
+    # V1/V2-Runde **schreibt** die gepolsterte Tabelle auf die Platte (5 Fixtures mit Tabelle). `bytes_zelle`
+    # bleibt gruen, weil sein Vorher dann schon die gepolsterte v2 ist (die Zelle misst nur das eine Zeichen).
+    "s2_polstert": {
+        "static": {"js/editor/tabellen.js": [[
+            "    var html = markdownToHtml(w.text, { itemId: k.itemId, assetIds: k.assetIds });\n",
+            "    var gepolstert = w.text.split(\"\\n\").map(function (z) { return \"| \" + z.trim().replace(/^\\|/, \"\")"
+            ".replace(/\\|$/, \"\").split(\"|\").map(function (c) { return c.trim(); }).join(\" | \") + \" |\"; }).join(\"\\n\");\n"
+            "    if (gepolstert !== w.text) { cm.replaceRange(gepolstert, { line: w.von, ch: 0 }, { line: w.bis, ch: w.laenge }); "
+            "w.text = gepolstert; w.laenge = cm.getLine(w.bis).length; }\n"
+            "    var html = markdownToHtml(w.text, { itemId: k.itemId, assetIds: k.assetIds });\n"]]},
+        "kippt": ["bytes_gleich"],
+        "ab": "S2",
     },
 }
 

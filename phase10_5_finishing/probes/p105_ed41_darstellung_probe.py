@@ -35,9 +35,19 @@ durch Rot-Werden beweist, dass sie misst:
 | `css_rot_nach_gruen` | `app.css`-Kopie: Listenzeichen sichtbar, die vier vendorten Tokenfarben hell | `listenzeichen`, `kontrast` rot → gruen |
 | `s1_ohne_ursprung` | `editor.js`-Kopie: Ursprungspruefung (`change.origin === "setValue"`) raus (Plan S1 Gegenlauf 1) | `entwurf_ueberlebt_neuladen` gruen → rot |
 | `s1_ohne_version` | `editor.js`-Kopie: Versionspruefung des Entwurfs raus (Plan S1 Gegenlauf 2) | `kein_stilles_zurueck` gruen → rot |
+| `s2_ohne_installation` | `editor.js`-Kopie: `import()` des Widget-Moduls zeigt ins Leere (Plan S2 Gegenlauf 1) | `tabelle_widget` + die fuenf Zellen mit Widget-Vorbedingung gruen → rot |
+| `s2_ohne_eintritt` | `tabellen.js`-Kopie: Eintritts-Korrektur (`beforeSelectionChange`) raus (Plan S2 Gegenlauf 2) | `pfeil_erste_zeile`, `pfeil_letzte_zeile` (Spalte) gruen → rot |
+| `s2_ohne_klickziel` | `tabellen.js`-Kopie: Klick landet am Tabellenanfang statt in der Zelle | `klick_zelle` gruen → rot |
+| `s2_polstert` | `tabellen.js`-Kopie: das Widget polstert die Quelle beim Oeffnen neu (V4) | `bytes_gleich` gruen → rot (Strg+S schreibt die Polsterung) |
+
+**S2** (Tabellen-Widget): fuenf neue Zellen (`klick_zelle`, `pfeil_*`, `undo`, `kopieren_quelle`, je mit dem
+Widget als Vorbedingung, an `11_tabelle_einfach`), `tabelle_widget` zaehlt die Widget-Marken gegen die obersten
+Tabellen der Lesesicht; dazu Information `s2_rand` (ein per API angelegtes Item mit den Randfaellen) und
+`tastenkosten_abgleich` (je Taste inkl. Abgleich, Cursor in der gemessenen Zeile). Plan-Gegenlauf (3) „statischer
+Import von `js/editor/`" ist ein pytest-Waechter (`tests/test_ed41_tabellen.py`), kein Browserlauf.
 
 **Staende** (ab S1): `p105_ed41_spec.STAND` ist der Stand des Arbeitsbaums; ein Lauf mit beiden Browsern
-schreibt `BELEG_JE_STAND[STAND]` (S0 = `p105_ed41_darstellung.json`, eingefroren; S1 = `…_s1.json`), und
+schreibt `BELEG_JE_STAND[STAND]` (S0 = `p105_ed41_darstellung.json`, eingefroren; S1 = `…_s1.json`; S2 = `…_s2.json`), und
 ein Gegenlauf vergleicht mit dem Beleg **dieses** Stands (Feld `referenz` im Gegenlauf-Beleg).
 
 Aufruf:   `.venv/bin/python phase10_5_finishing/probes/p105_ed41_darstellung_probe.py [--browser=chromium|firefox|beide] [--gegenlauf=NAME]`
@@ -252,7 +262,14 @@ EDITOR_ZEILEN = """(anker) => {
               todo: v.node.querySelectorAll('input.sfx-todo').length,
               wrap_klassen: v.node.className || ''};
   }
-  out.__tabellen_im_editor = document.querySelectorAll('#detail-editor .CodeMirror table').length;
+  // S2: die Widget-Marken zaehlen (unabhaengig vom Sichtbereich: viewportMargin 20 haelt nur ~30
+  // Zeilen im DOM) und den DOM mit der ersten Tabelle im Bild pruefen.
+  const T = cm.state.sfxTabellen;
+  out.__widget_marken = T ? T.marken().filter(e => e.mark.find()).length : 0;
+  let t0 = -1;
+  for (let i = 0; i < cm.lineCount(); i++) { if (cm.getLine(i).indexOf('| Einstellung | Bedeutung') === 0) { t0 = i; break; } }
+  if (t0 >= 0) cm.scrollIntoView({line: t0, ch: 0}, 200);
+  out.__tabellen_im_editor = document.querySelectorAll('#detail-editor .CodeMirror .sfx-tabelle table').length;
   return out;
 }""" % CM
 
@@ -351,6 +368,7 @@ LESESICHT = r"""() => {
   r.__aufgabe_format_ok = fmt.length > 0 && fmt.every(li => !li.querySelector('input')) && fmt.some(li => !!li.querySelector('.md-c-rot'));
   r.__aufgabe_geordnet_ok = q('ol > li').some(li => txt(li).indexOf('nummerierte Aufgabe') !== -1 && !!li.querySelector('input[type=checkbox]'));
   r.__html = P.innerHTML.length;
+  r.__tabellen_oben = P.querySelectorAll(':scope > table').length;
   return r;
 }"""
 
@@ -394,6 +412,57 @@ TASTEN = """(z) => {
 }""" % CM
 
 
+# S2: Tastenkosten **mit** dem Abgleich des Tabellen-Widgets (wie A5 „bis nach dem Abgleich"): der
+# Cursor steht in der gemessenen Zeile (realistisch: in der Tabelle = Rohtext), je Taste
+# `replaceRange` + Layout + `abgleichen()` + Layout. Ohne Widget-Modul (Gegenlauf) ohne Abgleich.
+TASTEN_ABGLEICH = """(z) => {
+  const cm = %s;
+  const T = cm.state.sfxTabellen;
+  const vorher = cm.getValue();
+  const out = {modul: !!T};
+  for (const [name, zeile] of Object.entries(z)) {
+    cm.setCursor({line: zeile, ch: 0});
+    if (T) T.abgleichen();
+    cm.scrollIntoView({line: zeile, ch: 0}, 50);
+    const laeufe = [];
+    for (let r = 0; r < 3; r++) {
+      const ts = [];
+      for (let k = 0; k < 20; k++) {
+        const t0 = performance.now();
+        cm.replaceRange('x', {line: zeile, ch: 0});
+        cm.getWrapperElement().offsetHeight;
+        if (T) T.abgleichen();
+        cm.getWrapperElement().offsetHeight; cm.display.lineDiv.getBoundingClientRect();
+        ts.push(performance.now() - t0);
+      }
+      cm.replaceRange('', {line: zeile, ch: 0}, {line: zeile, ch: 20});
+      ts.sort((a, b) => a - b);
+      laeufe.push({median: ts[10], p95: ts[18]});
+    }
+    out[name] = laeufe;
+    out[name + '_widgets'] = T ? T.marken().filter(e => e.mark.find()).length : 0;
+  }
+  // Abgleich ohne Aenderung (Cursor ausserhalb, 200-Zeilen-Tabelle als Widget)
+  cm.setCursor({line: 1500, ch: 0});
+  const leer = [];
+  if (T) { T.abgleichen(); for (let k = 0; k < 20; k++) { const t0 = performance.now(); T.abgleichen(); leer.push(performance.now() - t0); } }
+  leer.sort((a, b) => a - b);
+  out.abgleich_leer_median = leer.length ? leer[10] : null;
+  // Zeichnen: Widget der 200-Zeilen-Tabelle neu bauen (Cursor hinein und wieder hinaus)
+  if (T) {
+    cm.setCursor({line: 100, ch: 0}); T.abgleichen();
+    cm.setCursor({line: 1500, ch: 0}); cm.scrollIntoView({line: 2, ch: 0}, 0);
+    const t0 = performance.now(); T.abgleichen(); cm.getWrapperElement().offsetHeight; cm.display.lineDiv.getBoundingClientRect();
+    out.widget_200_zeichnen_ms = performance.now() - t0;
+  }
+  out.text_wie_vorher = cm.getValue() === vorher;
+  return out;
+}""" % CM
+
+WIDGETS = "() => { const t = " + CM + ".state.sfxTabellen; return t ? t.marken().filter(e => e.mark.find()).length : -1; }"
+CURSOR = "() => { const c = " + CM + ".getCursor(); return [c.line, c.ch]; }"
+
+
 def warte_cm(page, item_id):
     page.wait_for_function(CM_DA, timeout=20000)
     page.wait_for_function("(id) => { try { return " + CM + ".getValue() !== undefined; } catch (e) { return false; } }",
@@ -411,6 +480,149 @@ def oeffne(page, iid, editor=True):
 
 def fokus_ende(page):
     page.evaluate("() => { const cm = " + CM + "; cm.focus(); cm.setCursor({line: cm.lineCount() - 1, ch: cm.getLine(cm.lineCount() - 1).length}); }")
+
+
+def s2_zellen(page, iid):
+    s2 = {}
+    oeffne(page, iid)
+    if page.evaluate(DIALOG):
+        page.click("#confirm-cancel")
+    def setze(l, ch):
+        page.evaluate("([l, c]) => { const cm = " + CM + "; cm.focus(); cm.setCursor({line: l, ch: c}); }", [l, ch])
+        page.wait_for_timeout(200)
+    def taste(k):
+        page.keyboard.press(k)
+        page.wait_for_timeout(200)
+    wert = lambda: page.evaluate("() => " + CM + ".getValue()")
+    sauber = lambda: not page.evaluate("async () => (await import('/ui/static/js/editor.js')).isDirty()")
+    orig = page.evaluate("async (id) => (await (await fetch('/api/v1/items/' + id)).json()).body", iid)
+    s2["editor_gleich_api"] = wert() == orig
+    # Pfeil ab von der Leerzeile davor -> erste Tabellenzeile (2); Pfeil auf von der Leerzeile danach -> letzte (6)
+    for name, start, key in (("pfeil_ab", 1, "ArrowDown"), ("pfeil_auf", 7, "ArrowUp")):
+        setze(start, 0)
+        e = {"widget_vorher": page.evaluate(WIDGETS)}
+        taste(key)
+        e["cursor"] = page.evaluate(CURSOR)
+        e["widget_nachher"] = page.evaluate(WIDGETS)
+        s2[name] = e
+    # Klick auf die Zelle „Anzahl der Versuche" (echte Maus) -> Cursor [5,14], Rohtext, Fokus; „Z" nur dort
+    setze(8, 0)
+    k = {"widget_vorher": page.evaluate(WIDGETS)}
+    box = page.evaluate("""() => { const td = Array.from(document.querySelectorAll('#detail-editor .sfx-tabelle td'))
+        .find(t => t.textContent.trim() === 'Anzahl der Versuche'); if (!td) return null;
+        const r = td.getBoundingClientRect(); return {x: r.x, y: r.y, w: r.width, h: r.height}; }""")
+    k["zelle_gefunden"] = box is not None
+    if box:
+        page.mouse.click(box["x"] + box["w"] * 0.6, box["y"] + box["h"] / 2)
+        page.wait_for_timeout(250)
+        k["cursor"] = page.evaluate(CURSOR)
+        k["soll"] = [5, orig.split("\n")[5].index("Anzahl der Versuche")]
+        k["widget_nachher"] = page.evaluate(WIDGETS)
+        k["roh_sichtbar"] = page.evaluate("() => document.querySelectorAll('#detail-editor .sfx-tabelle').length === 0")
+        k["fokus"] = page.evaluate("() => " + CM + ".hasFocus()")
+        page.keyboard.type("Z")
+        page.wait_for_timeout(150)
+        i = orig.index("Anzahl der Versuche")
+        k["nur_die_zelle"] = wert() == orig[:i] + "Z" + orig[i:]
+        taste("Control+z")
+        k["zurueck"] = wert() == orig and sauber()
+    s2["klick"] = k
+    # Undo/Redo ueber Widget-Wechsel: das Ein-/Austreten schreibt keine Historie
+    setze(8, 0)
+    u = {"historie_vorher": page.evaluate("() => " + CM + ".historySize()")}
+    for key in ("ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowDown"):
+        taste(key)
+    u["historie_nach_wechseln"] = page.evaluate("() => " + CM + ".historySize()")
+    u["text_nach_wechseln"] = wert() == orig
+    setze(5, orig.split("\n")[5].index("Anzahl der Versuche"))
+    page.keyboard.type("Q")
+    page.wait_for_timeout(150)
+    for _ in range(3):
+        taste("ArrowDown")
+    u["cursor_draussen"] = page.evaluate(CURSOR)
+    u["widget_mit_q"] = page.evaluate("""() => Array.from(document.querySelectorAll('#detail-editor .sfx-tabelle td'))
+        .some(t => t.textContent.trim() === 'QAnzahl der Versuche')""")
+    taste("Control+z")
+    u["undo_ursprung"] = wert() == orig and sauber()
+    taste("Control+y")
+    u["redo_q"] = "QAnzahl der Versuche" in wert()
+    taste("Control+z")
+    u["ende_sauber"] = wert() == orig and sauber()
+    s2["undo"] = u
+    # Kopieren ueber die Widget-Grenze: Auswahl Zeile 0 bis Ende (Widget bleibt sichtbar) -> Quelle
+    setze(0, 0)
+    c = {"widget_vorher": page.evaluate(WIDGETS)}
+    page.evaluate("""() => { window.__kopie = null; document.addEventListener('copy', (e) => { const t = e.target;
+        window.__kopie = (t && typeof t.value === 'string') ? t.value.slice(t.selectionStart, t.selectionEnd) : String(getSelection()); },
+        {capture: true, once: true}); }""")
+    page.evaluate("() => { const cm = " + CM + "; const n = cm.lineCount() - 1; cm.setSelection({line: 0, ch: 0}, {line: n, ch: cm.getLine(n).length}); }")
+    page.wait_for_timeout(200)
+    c["widget_waehrend_auswahl"] = page.evaluate(WIDGETS)
+    c["auswahl_gleich_quelle"] = page.evaluate("() => " + CM + ".getSelection()") == orig
+    page.keyboard.press("Control+c")
+    page.wait_for_timeout(200)
+    c["kopie_gleich_quelle"] = page.evaluate("() => window.__kopie") == orig
+    page.screenshot(path=str(Path(AUFTRAG["shots"]) / ("%s_s2_auswahl.png" % AUFTRAG["browser"])))
+    setze(0, 0)
+    c["ende_sauber"] = wert() == orig and sauber()
+    s2["kopieren"] = c
+    page.screenshot(path=str(Path(AUFTRAG["shots"]) / ("%s_s2_widget.png" % AUFTRAG["browser"])))
+    return s2
+
+
+#: Randfaelle (Information, keine Zelle): Liste/Ueberschrift davor, zwei Tabellen ohne Leerzeile (= eine),
+#: ungleiche Zeilen, Aufgabe im Koerper, Tabelle im ```-Zaun / ~~~ / :::-Block, sehr breite Tabelle,
+#: Tabelle am Dateiende ohne Newline. Soll: jedes Widget = die oberste Tabelle der Lesesicht, gleiche Reihenfolge.
+S2_RAND = ("# Rand\n- Liste davor\n| a | b |\n|---|---|\n| 1 | 2 |\n- [ ] aufgabe | in tabelle\n\n"
+           "## Ueberschrift\n| h | i |\n|---|---|\n| 3 | 4 |\n\n"
+           "| erste | x |\n|---|---|\n| 5 | 6 |\n| zweite | y |\n|---|---|\n| 7 | 8 |\n\n"
+           "Zeilen ungleich | b | c\n--- | ---\nnur | zwei | drei | vier\n\n"
+           "```\n| im | zaun |\n|---|---|\n```\n\n~~~\n| im | tilde |\n|---|---|\n~~~\n\n"
+           "::: {.zentriert}\n| im | block |\n|---|---|\n:::\n\n"
+           "| breit | " + "W" * 400 + " |\n|---|---|\n| x | y |\n\n"
+           "| e | f |\n|---|---|\n| Ende | ohne Newline |")
+
+
+def s2_rand(page):
+    neu = page.evaluate("""async (body) => { const r = await fetch('/api/v1/items', {method: 'POST', credentials: 'same-origin',
+        headers: {'Content-Type': 'application/json', 'X-CSRF-Token': sessionStorage.getItem('sfx:csrf')},
+        body: JSON.stringify({space: 'alpha', type: 'note', title: 'S2 Rand', body: body})}); return {status: r.status, item: await r.json()}; }""", S2_RAND)
+    out = {"anlegen": neu["status"]}
+    if neu["status"] not in (200, 201):
+        return out
+    iid = neu["item"]["id"]
+    oeffne(page, iid)
+    page.evaluate("() => { const cm = " + CM + "; cm.focus(); cm.setCursor({line: 0, ch: 0}); }")
+    page.wait_for_timeout(400)
+    out.update(page.evaluate("""async ([id, body]) => {
+      const cm = %s;
+      const M = await import('/ui/static/js/markdown.js');
+      const E = await import('/ui/static/js/editor.js');
+      const T = cm.state.sfxTabellen;
+      const marken = T ? T.marken().filter(e => e.mark.find()) : [];
+      const widgets = marken.map(e => e.mark.replacedWith.querySelector('table').outerHTML);
+      const tpl = document.createElement('template');
+      tpl.innerHTML = M.markdownToHtml(body, {itemId: id, assetIds: []});
+      const lese = Array.from(tpl.content.children).filter(x => x.tagName === 'TABLE').map(x => x.outerHTML);
+      const breit = Array.from(document.querySelectorAll('#detail-editor .sfx-tabelle')).find(w => w.textContent.indexOf('WWWW') !== -1);
+      return {widgets: widgets.length, lesesicht_oben: lese.length, gleich_lesesicht: JSON.stringify(widgets) === JSON.stringify(lese),
+              zeilen: marken.map(e => [e.mark.find().from.line, e.mark.find().to.line]),
+              editor_gleich_api: cm.getValue() === body, sauber: !E.isDirty(),
+              seite_breiter_als_fenster: document.documentElement.scrollWidth > window.innerWidth,
+              breites_widget_scrollt: !!breit && breit.scrollWidth > breit.clientWidth,
+              aufgaben_kaestchen: document.querySelectorAll('#detail-editor input.sfx-todo').length};
+    }""" % CM, [iid, S2_RAND]))
+    # Pfeil ab ins letzte Widget (Tabelle am Dateiende ohne Newline)
+    n = page.evaluate("() => " + CM + ".lineCount()")
+    page.evaluate("([l]) => { const cm = " + CM + "; cm.focus(); cm.setCursor({line: l, ch: 0}); }", [n - 4])
+    page.wait_for_timeout(200)
+    page.keyboard.press("ArrowDown")
+    page.wait_for_timeout(200)
+    out["ende_pfeil_cursor"] = page.evaluate(CURSOR)
+    out["ende_pfeil_soll"] = [n - 3, 0]
+    out["editor_gleich_api_danach"] = page.evaluate("(b) => " + CM + ".getValue() === b", S2_RAND)
+    page.screenshot(path=str(Path(AUFTRAG["shots"]) / ("%s_s2_rand.png" % AUFTRAG["browser"])))
+    return out
 
 
 def main():
@@ -480,6 +692,11 @@ def main():
         out["aktive"] = page.evaluate(AKTIVE)
         out["aktive"]["dialoge_nativ"] = list(out["dialoge_nativ"])
 
+        # -- S2: Tabellen-Widget an 11_tabelle_einfach (Zeilen: 0 Einleitung, 1 leer, 2 Kopf, 3 Trenner,
+        #    4-6 Koerper, 7 leer, 8 Schluss ohne Newline). Jede Zelle verlangt das Widget als Vorbedingung.
+        out["s2"] = s2_zellen(page, ids["alpha:11_tabelle_einfach"])
+        out["s2_rand"] = s2_rand(page)
+
         # -- V3: ein Zeichen in eine Tabellenzelle; ein Zeichen am Ende einer Datei ohne Newline ------
         v3 = {}
         for name, finde in (("11_tabelle_einfach", "Anzahl der Versuche"), ("22_ohne_newline", None)):
@@ -510,6 +727,8 @@ def main():
         page.wait_for_timeout(500)
         out["tastenkosten"] = page.evaluate(TASTEN, {"absatzzeile": 1500, "tabellenzeile": 100})
         out["tastenkosten_sauber_danach"] = not page.evaluate("async () => (await import('/ui/static/js/editor.js')).isDirty()")
+        out["tastenkosten_abgleich"] = page.evaluate(TASTEN_ABGLEICH, {"absatzzeile": 1500, "tabellenzeile": 100})
+        out["tastenkosten_abgleich_sauber_danach"] = not page.evaluate("async () => (await import('/ui/static/js/editor.js')).isDirty()")
 
         # -- Entwurf (V7, F7) -----------------------------------------------------------------------
         def entwuerfe_weg():
@@ -740,7 +959,10 @@ def zellen(roh: dict) -> dict:
     z["e_format_farbe"] = any(s["t"] == "Rot" for s in _spans(E["[Rot]{.rot} und"], "cm-md-c-rot"))
     z["e_block_bekannt_versteckt"] = E["::: {.zentriert}"]["sichtbar"].strip() == ""
     z["e_durchgestrichen"] = bool(_spans(E["Durchgestrichen:"], "cm-strikethrough"))
-    z["tabelle_widget"] = E["__tabellen_im_editor"] > 0
+    # S2: so viele Widgets wie oberste Tabellen der Lesesicht (Katalog: 2; die Tabelle im Zitat bleibt in
+    # beiden Sichten Rohtext), und mit der Tabelle im Bild steht eine echte <table> im Editor-DOM.
+    z["tabelle_widget"] = (E["__tabellen_im_editor"] > 0 and E["__widget_marken"] > 0
+                           and E["__widget_marken"] == L["__tabellen_oben"])
     z["listenzeichen"] = all(
         any(s["vis"] == "visible" for s in _spans(E[a], "cm-formatting-list"))
         for a in ("- Punkt eins", "  - verschachtelt zwei Spaces"))
@@ -776,6 +998,21 @@ def zellen(roh: dict) -> dict:
                  and ("v%s" % k["fremd"]["version"]) in k["konflikt_text"])
     z["kein_stilles_zurueck"] = (k["fremd"]["status"] == 200 and k["fremde_fassung_steht"] and angeboten
                                  and bool(k.get("neu", {}).get("hat_entwurf")))
+    s2 = roh["s2"]
+    z["pfeil_erste_zeile"] = (s2["pfeil_ab"]["widget_vorher"] >= 1 and s2["pfeil_ab"]["cursor"] == [2, 0]
+                              and s2["pfeil_ab"]["widget_nachher"] == 0)
+    z["pfeil_letzte_zeile"] = (s2["pfeil_auf"]["widget_vorher"] >= 1 and s2["pfeil_auf"]["cursor"] == [6, 0]
+                               and s2["pfeil_auf"]["widget_nachher"] == 0)
+    k = s2["klick"]
+    z["klick_zelle"] = (k["widget_vorher"] >= 1 and k["zelle_gefunden"] and k["cursor"] == k["soll"]
+                        and k["widget_nachher"] == 0 and k["roh_sichtbar"] and k["fokus"] and k["nur_die_zelle"]
+                        and k["zurueck"])
+    u = s2["undo"]
+    z["undo"] = (u["historie_nach_wechseln"] == u["historie_vorher"] and u["text_nach_wechseln"]
+                 and u["widget_mit_q"] and u["undo_ursprung"] and u["redo_q"] and u["ende_sauber"])
+    c = s2["kopieren"]
+    z["kopieren_quelle"] = (c["widget_vorher"] >= 1 and c["widget_waehrend_auswahl"] >= 1 and c["auswahl_gleich_quelle"]
+                            and c["kopie_gleich_quelle"] and c["ende_sauber"])
     fehlt = set(spec.ZELLEN) - set(z)
     extra = set(z) - set(spec.ZELLEN)
     if fehlt or extra:

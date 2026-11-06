@@ -65,6 +65,8 @@ var cmCursorZeile = null;
 // sie traegt. **Der Text bleibt die Quelle**: das Kaestchen ersetzt nur die Darstellung
 // der Zeichen `[ ]`/`[x]`.
 var cmTodoMarken = [];
+// Editor 4.1 S2: das Tabellen-Widget (`js/editor/tabellen.js`, nachgeladen) -- null = nicht da.
+var cmTabellen = null;
 var saveButtonEl;
 var archiveButtonEl;
 var closeButtonEl;
@@ -566,6 +568,14 @@ function _editorBereit() {
     // Die Cursorzeile von Anfang an markieren (CM feuert „cursorActivity" erst bei einer
     // Bewegung).
     _cursorZeileSetzen();
+    // Editor 4.1 S2: Tabellen als Widget -- nur per `import()` (Budget-Regel §4.4). Scheitert
+    // das Laden, bleibt der Editor wie vorher (Tabellen als Rohtext).
+    import("./editor/tabellen.js").then(function (modul) {
+      cmTabellen = modul.installiere(cm, function () {
+        var s = state.editingSnapshot;
+        return { roh: state.mode === "raw", itemId: s && s.id, assetIds: s ? assetIdsOf(s.assets) : null };
+      });
+    }).catch(function (err) { console.warn("Tabellen-Widget nicht ladbar — Rohtext:", err); });
   });
 }
 
@@ -735,6 +745,7 @@ function setRawMode(on) {
   // auch das `[ ]` eines To-dos. Die Kaestchen werden abgeraeumt und beim Zurueckschalten
   // neu gesetzt.
   _todoMarkenAuffrischen();
+  if (cmTabellen) cmTabellen.abgleichen();
   // Die Formatierhilfen bleiben **aktiv** (sie schreiben in den Puffer, in beiden Ansichten
   // gleich) — sie sind kein Vorschau-Feature, sondern ein Schreibbefehl.
 }

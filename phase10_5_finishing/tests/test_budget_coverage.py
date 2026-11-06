@@ -149,14 +149,17 @@ def test_the_editor_is_counted_as_loaded_later():
     module = _load()
     erstaufruf, nachgeladen = module.static_payload_files(STATIC_DIR)
     assert nachgeladen, "die nachgeladene Liste ist leer — der Editor wird nicht gezaehlt"
+    # Editor 4.1 S2 (Plan §4.4): `js/editor/` ist nachgeladen wie `vendor/` (nur per `import()`).
+    spaet = (STATIC_DIR / "vendor", STATIC_DIR / "js" / "editor")
     for pfad in nachgeladen:
-        assert pfad.is_relative_to(STATIC_DIR / "vendor"), (
-            f"{pfad.name} liegt nicht unter `vendor/` — es wird nicht nachgeladen"
+        assert any(pfad.is_relative_to(d) for d in spaet), (
+            f"{pfad.name} liegt nicht unter `vendor/` oder `js/editor/` — es wird nicht nachgeladen"
         )
     for pfad in erstaufruf:
-        assert not pfad.is_relative_to(STATIC_DIR / "vendor"), (
-            f"{pfad.name} liegt unter `vendor/` und wird doch im Erstaufruf gezaehlt"
+        assert not any(pfad.is_relative_to(d) for d in spaet), (
+            f"{pfad.name} wird nachgeladen und doch im Erstaufruf gezaehlt"
         )
+    assert STATIC_DIR / "js" / "editor" / "tabellen.js" in nachgeladen
 
 
 def test_the_two_corridors_hold():

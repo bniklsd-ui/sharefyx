@@ -20,6 +20,11 @@ wird `ZELLEN[...]["basis"]` in `p105_ed41_spec.py` **bewusst** nachgezogen — n
 (`spec.BELEG_JE_STAND`, `spec.ERWARTET[stand]`): die S0-Basislinie bleibt eingefroren, der S1-Beleg
 `p105_ed41_darstellung_s1.json` weicht von ihr in **genau** den drei Entwurfszellen ab. Ein Gegenlauf
 vergleicht mit dem Beleg, gegen den er gelaufen ist (`referenz`; fehlt das Feld: die S0-Basislinie).
+
+**[2026-11-06, S2]** Das Tabellen-Widget bringt fuenf **neue** Zellen (`ab: "S2"`); die Belege von S0/S1
+tragen sie nicht und werden gegen ihren eigenen Zellensatz geprueft (`spec.zellen_fuer(stand)`). Der S2-Beleg
+`p105_ed41_darstellung_s2.json` weicht vom S1-Beleg in **genau** `tabelle_widget` ab; die Tastenkosten
+(inkl. Abgleich) bleiben unter S1-Basis + 2 ms.
 """
 from __future__ import annotations
 
@@ -40,7 +45,9 @@ import p105_ed41_spec as spec  # noqa: E402
 BROWSER = ("chromium", "firefox")
 BELEG = PROBES / "p105_ed41_darstellung.json"
 BELEG_S1 = PROBES / "p105_ed41_darstellung_s1.json"
+BELEG_S2 = PROBES / "p105_ed41_darstellung_s2.json"
 S1_ZELLEN = ["oeffnen_schreibt_keinen_entwurf", "entwurf_ueberlebt_neuladen", "kein_stilles_zurueck"]
+S2_NEU = ["klick_zelle", "pfeil_erste_zeile", "pfeil_letzte_zeile", "undo", "kopieren_quelle"]
 
 
 def _laden(pfad: Path) -> dict:
@@ -64,7 +71,7 @@ def test_the_baseline_was_measured_in_both_browsers_without_a_counter_run():
 @pytest.mark.parametrize("browser", BROWSER)
 def test_the_baseline_is_red_exactly_where_the_plan_expects_it(browser):
     roh = _laden(BELEG)["browser"][browser]
-    assert list(roh["zellen"]) == list(spec.ZELLEN), "Zellnamen weichen von der Spec ab"
+    assert list(roh["zellen"]) == spec.zellen_fuer("S0"), "Zellnamen weichen von der Spec ab"
     abweichend = {n: v for n, v in roh["zellen"].items() if v != spec.ERWARTET_BASIS[n]}
     assert not abweichend, "Zellen weichen von der erwarteten Basislinie ab: %s" % abweichend
     assert roh["abweichungen"] == []
@@ -110,7 +117,7 @@ def test_the_probe_controls_hold(browser):
 # -- S1: Entwurfsschutz (Plan §5 S1, V7) ----------------------------------------------------------
 
 def test_the_s1_evidence_is_the_current_stand_in_both_browsers():
-    assert spec.STAND == "S1" and spec.BELEG_JE_STAND["S1"] == BELEG_S1.name
+    assert spec.BELEG_JE_STAND["S1"] == BELEG_S1.name
     beleg = _laden(BELEG_S1)
     assert beleg["stand"] == "S1" and beleg["gegenlauf"] is None and beleg["referenz"] == BELEG_S1.name
     assert set(beleg["browser"]) == set(BROWSER)
@@ -120,7 +127,7 @@ def test_the_s1_evidence_is_the_current_stand_in_both_browsers():
 def test_s1_turns_exactly_the_three_draft_cells_green(browser):
     neu = _laden(BELEG_S1)["browser"][browser]
     alt = _laden(BELEG)["browser"][browser]["zellen"]
-    assert list(neu["zellen"]) == list(spec.ZELLEN)
+    assert list(neu["zellen"]) == spec.zellen_fuer("S1")
     assert neu["abweichungen"] == [] and not neu["seitenfehler"], (neu["abweichungen"], neu["seitenfehler"])
     assert {n: v for n, v in neu["zellen"].items() if v != spec.ERWARTET["S1"][n]} == {}
     assert sorted(n for n in neu["zellen"] if neu["zellen"][n] != alt[n]) == sorted(S1_ZELLEN)
@@ -144,6 +151,63 @@ def test_the_stale_draft_was_really_offered_not_just_absent(browser):
     assert u["entwurf_waehrend_dialog"] is True and u["editor_hat_entwurf"] is True
     assert roh["entwurf"]["kontrolle_a_zuerst"] == {"dialog": True, "editor_hat_entwurf": True}
     assert roh["entwurf"]["oeffnen"] == {"schluessel_nach_oeffnen": False}
+
+
+# -- S2: Tabellen-Widget (Plan §5 S2) ------------------------------------------------------------
+
+def test_the_s2_evidence_is_the_current_stand_in_both_browsers():
+    assert spec.STAND == "S2" and spec.BELEG_JE_STAND["S2"] == BELEG_S2.name
+    beleg = _laden(BELEG_S2)
+    assert beleg["stand"] == "S2" and beleg["gegenlauf"] is None and beleg["referenz"] == BELEG_S2.name
+    assert set(beleg["browser"]) == set(BROWSER)
+    assert sorted(spec.ZELLEN[n]["ab"] for n in S2_NEU) == ["S2"] * 5
+
+
+@pytest.mark.parametrize("browser", BROWSER)
+def test_s2_turns_the_table_cells_green_and_leaves_the_rest(browser):
+    """`tabelle_widget` rot -> gruen, die fuenf neuen Zellen gruen, jede S1-Zelle unveraendert."""
+    neu = _laden(BELEG_S2)["browser"][browser]
+    alt = _laden(BELEG_S1)["browser"][browser]["zellen"]
+    assert list(neu["zellen"]) == spec.zellen_fuer("S2") == list(spec.ZELLEN)
+    assert neu["abweichungen"] == [] and not neu["seitenfehler"], (neu["abweichungen"], neu["seitenfehler"])
+    assert {n: v for n, v in neu["zellen"].items() if v != spec.ERWARTET["S2"][n]} == {}
+    assert sorted(n for n in alt if neu["zellen"][n] != alt[n]) == ["tabelle_widget"]
+    assert all(neu["zellen"][n] for n in S2_NEU + ["tabelle_widget", "bytes_gleich", "bytes_zelle", "bytes_ohne_newline"])
+
+
+@pytest.mark.parametrize("browser", BROWSER)
+def test_s2_cells_measured_what_they_claim(browser):
+    roh = _laden(BELEG_S2)["browser"][browser]
+    s2 = roh["s2"]
+    assert s2["editor_gleich_api"] is True
+    assert s2["pfeil_ab"] == {"widget_vorher": 1, "cursor": [2, 0], "widget_nachher": 0}
+    assert s2["pfeil_auf"] == {"widget_vorher": 1, "cursor": [6, 0], "widget_nachher": 0}
+    assert s2["klick"]["cursor"] == s2["klick"]["soll"] == [5, 14]
+    assert s2["undo"]["historie_nach_wechseln"] == s2["undo"]["historie_vorher"]
+    assert s2["kopieren"]["widget_waehrend_auswahl"] == 1
+    # Katalog: 2 Widgets = 2 oberste Tabellen der Lesesicht (die im Zitat bleibt in beiden roh)
+    assert roh["editor"]["__widget_marken"] == roh["lesesicht"]["__tabellen_oben"] == 2
+    # Randfaelle: jedes Widget = die oberste Tabelle der Lesesicht; Seite waechst nicht seitwaerts
+    r = roh["s2_rand"]
+    assert r["anlegen"] == 201 and r["widgets"] == r["lesesicht_oben"] == 7 and r["gleich_lesesicht"] is True
+    assert r["editor_gleich_api"] and r["sauber"] and r["editor_gleich_api_danach"]
+    assert r["seite_breiter_als_fenster"] is False and r["breites_widget_scrollt"] is True
+    assert r["ende_pfeil_cursor"] == r["ende_pfeil_soll"]
+
+
+@pytest.mark.parametrize("browser", BROWSER)
+def test_s2_typing_cost_stays_within_baseline_plus_2ms(browser):
+    """Plan S2: Tastenkosten in der 2.000-Zeilen-Notiz <= Basis + 2 ms (Median von 3 x 20). Basis = der
+    S1-Beleg (A13.5/A14.3); gemessen je Taste **inklusive** Abgleich des Widgets."""
+    basis = _laden(BELEG_S1)["browser"][browser]["tastenkosten"]["absatzzeile"]
+    roh = _laden(BELEG_S2)["browser"][browser]
+    med = lambda laeufe: sorted(x["median"] for x in laeufe)[1]
+    grenze = med(basis) + 2.0
+    a = roh["tastenkosten_abgleich"]
+    assert a["modul"] is True and a["absatzzeile_widgets"] == 1 and a["tabellenzeile_widgets"] == 0
+    assert med(a["absatzzeile"]) <= grenze and med(a["tabellenzeile"]) <= grenze, (a, grenze)
+    assert med(roh["tastenkosten"]["absatzzeile"]) <= grenze
+    assert a["text_wie_vorher"] and roh["tastenkosten_abgleich_sauber_danach"]
 
 
 # -- Gegenlaeufe -----------------------------------------------------------------------------------
@@ -225,7 +289,7 @@ def test_the_katalog_editor_anchors_are_unique_lines():
 
 # -- Geheimnisse -----------------------------------------------------------------------------------
 
-@pytest.mark.parametrize("datei", ["p105_ed41_darstellung.json", "p105_ed41_darstellung_s1.json"]
+@pytest.mark.parametrize("datei", sorted(spec.BELEG_JE_STAND.values())
                          + ["p105_ed41_darstellung_gegenlauf_%s.json" % n for n in sorted(spec.GEGENLAEUFE)])
 def test_no_secret_in_the_evidence(datei):
     text = (PROBES / datei).read_text(encoding="utf-8")

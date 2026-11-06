@@ -1,0 +1,3427 @@
+{
+ "plan": "docs/concepts/phase10_5_editor_4_1_plan.md §5 S2",
+ "stand": "S2",
+ "referenz": "p105_ed41_darstellung_s2.json",
+ "gegenlauf": "s2_ohne_klickziel",
+ "fixtures": 28,
+ "browser": {
+  "chromium": {
+   "browser": "chromium",
+   "bytes": {
+    "m7_01_frontmatter": {
+     "gleich": true,
+     "laenge_api": 126,
+     "laenge_editor": 126,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_02_listen": {
+     "gleich": true,
+     "laenge_api": 135,
+     "laenge_editor": 135,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_03_tabelle": {
+     "gleich": true,
+     "laenge_api": 135,
+     "laenge_editor": 135,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_04_code": {
+     "gleich": true,
+     "laenge_api": 130,
+     "laenge_editor": 130,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_05_links": {
+     "gleich": true,
+     "laenge_api": 156,
+     "laenge_editor": 156,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_06_itm_refs": {
+     "gleich": true,
+     "laenge_api": 124,
+     "laenge_editor": 124,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_07_tasklist": {
+     "gleich": true,
+     "laenge_api": 65,
+     "laenge_editor": 65,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_08_zitat": {
+     "gleich": true,
+     "laenge_api": 52,
+     "laenge_editor": 52,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_09_unicode": {
+     "gleich": true,
+     "laenge_api": 90,
+     "laenge_editor": 90,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_10_whitespace": {
+     "gleich": true,
+     "laenge_api": 191,
+     "laenge_editor": 191,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "11_tabelle_einfach": {
+     "gleich": true,
+     "laenge_api": 204,
+     "laenge_editor": 204,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "12_tabelle_ki": {
+     "gleich": true,
+     "laenge_api": 320,
+     "laenge_editor": 320,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "13_tabelle_im_zitat": {
+     "gleich": true,
+     "laenge_api": 62,
+     "laenge_editor": 62,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "14_listen_verschachtelt": {
+     "gleich": true,
+     "laenge_api": 255,
+     "laenge_editor": 255,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "15_aufgaben": {
+     "gleich": true,
+     "laenge_api": 224,
+     "laenge_editor": 224,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "16_code": {
+     "gleich": true,
+     "laenge_api": 219,
+     "laenge_editor": 219,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "17_ueberschriften": {
+     "gleich": true,
+     "laenge_api": 122,
+     "laenge_editor": 122,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "18_zitate_fussnoten": {
+     "gleich": true,
+     "laenge_api": 142,
+     "laenge_editor": 142,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "19_inline_html": {
+     "gleich": true,
+     "laenge_api": 332,
+     "laenge_editor": 332,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "20_xss": {
+     "gleich": true,
+     "laenge_api": 427,
+     "laenge_editor": 427,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "21_format_konvention": {
+     "gleich": true,
+     "laenge_api": 245,
+     "laenge_editor": 245,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "22_ohne_newline": {
+     "gleich": true,
+     "laenge_api": 38,
+     "laenge_editor": 38,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "23_tabs": {
+     "gleich": true,
+     "laenge_api": 81,
+     "laenge_editor": 81,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "24_doppel_leerzeichen": {
+     "gleich": true,
+     "laenge_api": 150,
+     "laenge_editor": 150,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "25_unicode": {
+     "gleich": true,
+     "laenge_api": 125,
+     "laenge_editor": 125,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "26_crlf": {
+     "gleich": true,
+     "laenge_api": 53,
+     "laenge_editor": 53,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "27_gross": {
+     "gleich": true,
+     "laenge_api": 137612,
+     "laenge_editor": 137612,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "28_katalog": {
+     "gleich": true,
+     "laenge_api": 1749,
+     "laenge_editor": 1749,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    }
+   },
+   "dialoge_nativ": [],
+   "seitenfehler": [],
+   "browser_version": "151.0.7922.34",
+   "editor": {
+    "# Katalog Ueberschrift Eins": {
+     "zeile": 0,
+     "knoten": true,
+     "text": "# Katalog Ueberschrift Eins",
+     "sichtbar": "Katalog Ueberschrift Eins",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-header cm-formatting-header-1 cm-header cm-header-1",
+       "t": "# ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-header cm-header-1",
+       "t": "Katalog Ueberschrift Eins",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "##### Katalog Ueberschrift Fuenf": {
+     "zeile": 4,
+     "knoten": true,
+     "text": "##### Katalog Ueberschrift Fuenf",
+     "sichtbar": "Katalog Ueberschrift Fuenf",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-header cm-formatting-header-5 cm-header cm-header-5",
+       "t": "##### ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-header cm-header-5",
+       "t": "Katalog Ueberschrift Fuenf",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "###### Katalog Ueberschrift Sechs": {
+     "zeile": 5,
+     "knoten": true,
+     "text": "###### Katalog Ueberschrift Sechs",
+     "sichtbar": "Katalog Ueberschrift Sechs",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-header cm-formatting-header-6 cm-header cm-header-6",
+       "t": "###### ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-header cm-header-6",
+       "t": "Katalog Ueberschrift Sechs",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "Setext Katalog Eins": {
+     "zeile": 7,
+     "knoten": true,
+     "text": "Setext Katalog Eins",
+     "sichtbar": "Setext Katalog Eins",
+     "spans": [
+      {
+       "k": "cm-header cm-header-1",
+       "t": "Setext Katalog Eins",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "Durchgestrichen:": {
+     "zeile": 15,
+     "knoten": true,
+     "text": "Durchgestrichen: ~~weg damit~~ steht da.",
+     "sichtbar": "Durchgestrichen: ~~weg damit~~ steht da.",
+     "spans": [],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "> Zitat Ebene eins": {
+     "zeile": 36,
+     "knoten": true,
+     "text": "> Zitat Ebene eins",
+     "sichtbar": "Zitat Ebene eins",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-quote cm-formatting-quote-1 cm-quote cm-quote-1",
+       "t": "> ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-quote cm-quote-1",
+       "t": "Zitat Ebene eins",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "def katalog_zaun(x):": {
+     "zeile": 61,
+     "knoten": true,
+     "text": "def katalog_zaun(x):",
+     "sichtbar": "def katalog_zaun(x):",
+     "spans": [
+      {
+       "k": "cm-comment",
+       "t": "def katalog_zaun(x):",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "Tilde-Zaun Inhalt": {
+     "zeile": 66,
+     "knoten": true,
+     "text": "Tilde-Zaun Inhalt",
+     "sichtbar": "Tilde-Zaun Inhalt",
+     "spans": [
+      {
+       "k": "cm-comment",
+       "t": "Tilde-Zaun Inhalt",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "    eingerueckter Code Inhalt": {
+     "zeile": 69,
+     "knoten": true,
+     "text": "    eingerueckter Code Inhalt",
+     "sichtbar": "    eingerueckter Code Inhalt",
+     "spans": [
+      {
+       "k": "cm-comment",
+       "t": "eingerueckter Code Inhalt",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "- [ ] offene Aufgabe": {
+     "zeile": 52,
+     "knoten": true,
+     "text": "- [ ] offene Aufgabe",
+     "sichtbar": "[W] offene Aufgabe",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-list cm-formatting-list-ul cm-variable-2",
+       "t": "- ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-variable-2",
+       "t": " offene Aufgabe",
+       "vis": "visible"
+      }
+     ],
+     "todo": 1,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "  - [ ] Unteraufgabe tief": {
+     "zeile": 54,
+     "knoten": true,
+     "text": "  - [ ] Unteraufgabe tief",
+     "sichtbar": "  [W] Unteraufgabe tief",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-list cm-formatting-list-ul cm-variable-3",
+       "t": "- ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-variable-3",
+       "t": " Unteraufgabe tief",
+       "vis": "visible"
+      }
+     ],
+     "todo": 1,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "1. [ ] nummerierte Aufgabe": {
+     "zeile": 56,
+     "knoten": true,
+     "text": "1. [ ] nummerierte Aufgabe",
+     "sichtbar": "  nummerierte Aufgabe",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-list cm-formatting-list-ol cm-variable-2",
+       "t": "1. ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link cm-link cm-variable-2",
+       "t": "[",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-link cm-variable-2",
+       "t": " ",
+       "vis": "visible"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link cm-link cm-variable-2",
+       "t": "]",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-variable-2",
+       "t": " nummerierte Aufgabe",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "- [x]{.rot} Format nach dem Kaestchen": {
+     "zeile": 58,
+     "knoten": true,
+     "text": "- [x]{.rot} Format nach dem Kaestchen",
+     "sichtbar": "[W] Format nach dem Kaestchen",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-list cm-formatting-list-ul cm-variable-2",
+       "t": "- ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-variable-2 cm-overlay cm-formatting",
+       "t": "{.rot}",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-variable-2",
+       "t": " Format nach dem Kaestchen",
+       "vis": "visible"
+      }
+     ],
+     "todo": 1,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "- Punkt eins": {
+     "zeile": 43,
+     "knoten": true,
+     "text": "- Punkt eins",
+     "sichtbar": "Punkt eins",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-list cm-formatting-list-ul cm-variable-2",
+       "t": "- ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-variable-2",
+       "t": "Punkt eins",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "  - verschachtelt zwei Spaces": {
+     "zeile": 44,
+     "knoten": true,
+     "text": "  - verschachtelt zwei Spaces",
+     "sichtbar": "  verschachtelt zwei Spaces",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-list cm-formatting-list-ul cm-variable-3",
+       "t": "- ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-variable-3",
+       "t": "verschachtelt zwei Spaces",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "[Rot]{.rot} und": {
+     "zeile": 75,
+     "knoten": true,
+     "text": "[Rot]{.rot} und [Gross]{.gross} und [Unbekannt]{.lila}",
+     "sichtbar": "Rot und Gross und Unbekannt{.lila}",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-link cm-link cm-overlay cm-formatting",
+       "t": "[",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-link cm-overlay cm-md-c-rot",
+       "t": "Rot",
+       "vis": "visible"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link cm-link cm-overlay cm-formatting",
+       "t": "]",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-overlay cm-formatting",
+       "t": "{.rot}",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link cm-link cm-overlay cm-formatting",
+       "t": "[",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-link cm-overlay cm-md-s-gross cm-md-plain",
+       "t": "Gross",
+       "vis": "visible"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link cm-link cm-overlay cm-formatting",
+       "t": "]",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-overlay cm-formatting",
+       "t": "{.gross}",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link cm-link",
+       "t": "[",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-link",
+       "t": "Unbekannt",
+       "vis": "visible"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link cm-link",
+       "t": "]",
+       "vis": "hidden"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "::: {.zentriert}": {
+     "zeile": 77,
+     "knoten": true,
+     "text": "::: {.zentriert}",
+     "sichtbar": "",
+     "spans": [
+      {
+       "k": "cm-overlay cm-formatting",
+       "t": "::: {.zentriert}",
+       "vis": "hidden"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "::: {.warnung}": {
+     "zeile": 81,
+     "knoten": true,
+     "text": "::: {.warnung}",
+     "sichtbar": "",
+     "spans": [
+      {
+       "k": "cm-overlay cm-formatting",
+       "t": "::: {.warnung}",
+       "vis": "hidden"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "Code mit Format:": {
+     "zeile": 71,
+     "knoten": true,
+     "text": "Code mit Format: `[x]{.rot}` bleibt Code.",
+     "sichtbar": "Code mit Format: x bleibt Code.",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-code cm-comment",
+       "t": "`",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-comment cm-overlay cm-formatting",
+       "t": "[",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-comment cm-overlay cm-md-c-rot",
+       "t": "x",
+       "vis": "visible"
+      },
+      {
+       "k": "cm-comment cm-overlay cm-formatting",
+       "t": "]{.rot}",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-formatting cm-formatting-code cm-comment",
+       "t": "`",
+       "vis": "hidden"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "| Einstellung | Bedeutung": {
+     "zeile": 24,
+     "knoten": true,
+     "text": "| Einstellung | Bedeutung | Mitte |",
+     "sichtbar": "[W]​",
+     "spans": [],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "Bild mit Format:": {
+     "zeile": 87,
+     "knoten": true,
+     "text": "Bild mit Format: ![[Alt rot]{.rot}](asset:ast_0000e041)",
+     "sichtbar": "Bild mit Format: !Alt rotasset:ast_0000e041",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-link cm-link cm-overlay cm-formatting",
+       "t": "[",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-link cm-overlay cm-formatting",
+       "t": "[",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-link cm-overlay cm-md-c-rot",
+       "t": "Alt rot",
+       "vis": "visible"
+      },
+      {
+       "k": "cm-link cm-overlay cm-formatting",
+       "t": "]{.rot}",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link cm-link",
+       "t": "]",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link-string cm-string cm-url",
+       "t": "(",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-string cm-url",
+       "t": "asset:ast_0000e041",
+       "vis": "visible"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link-string cm-string cm-url",
+       "t": ")",
+       "vis": "hidden"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "__widget_marken": 2,
+    "__tabellen_im_editor": 2
+   },
+   "kontrast": {
+    "hintergrund": "rgb(12, 16, 23)",
+    "text_kontrast": 16.21,
+    "klassen": {
+     "cm-formatting cm-formatting-header cm-formatting-header-1 cm-header cm-header-1": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "# "
+     },
+     "cm-header cm-header-1": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "Katalog Ueberschrift Ein"
+     },
+     "cm-formatting cm-formatting-header cm-formatting-header-2 cm-header cm-header-2": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "## "
+     },
+     "cm-header cm-header-2": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "Katalog Ueberschrift Zwe"
+     },
+     "cm-formatting cm-formatting-header cm-formatting-header-3 cm-header cm-header-3": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "### "
+     },
+     "cm-header cm-header-3": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "Katalog Ueberschrift Dre"
+     },
+     "cm-formatting cm-formatting-header cm-formatting-header-4 cm-header cm-header-4": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "#### "
+     },
+     "cm-header cm-header-4": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "Katalog Ueberschrift Vie"
+     },
+     "cm-formatting cm-formatting-header cm-formatting-header-5 cm-header cm-header-5": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "##### "
+     },
+     "cm-header cm-header-5": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "Katalog Ueberschrift Fue"
+     },
+     "cm-formatting cm-formatting-header cm-formatting-header-6 cm-header cm-header-6": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "###### "
+     },
+     "cm-header cm-header-6": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "Katalog Ueberschrift Sec"
+     },
+     "cm-formatting cm-formatting-strong cm-strong": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "**"
+     },
+     "cm-strong": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "fett"
+     },
+     "cm-em cm-formatting cm-formatting-em": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "*"
+     },
+     "cm-em": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "kursiv"
+     },
+     "cm-comment cm-formatting cm-formatting-code": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "`"
+     },
+     "cm-comment": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "codespan"
+     },
+     "cm-formatting cm-formatting-link cm-link": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "["
+     },
+     "cm-link": {
+      "farbe": "rgb(62, 141, 243)",
+      "kontrast": 5.72,
+      "beispiel": "Link"
+     },
+     "cm-formatting cm-formatting-link-string cm-string cm-url": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "("
+     },
+     "cm-string cm-url": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "https://example.invalid/"
+     },
+     "cm-formatting cm-formatting-quote cm-formatting-quote-1 cm-quote cm-quote-1": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "> "
+     },
+     "cm-quote cm-quote-1": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "Zitat Ebene eins"
+     },
+     "cm-formatting cm-formatting-quote cm-formatting-quote-2 cm-quote cm-quote-2": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "> "
+     },
+     "cm-quote cm-quote-2": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "Zitat Ebene zwei"
+     },
+     "cm-formatting cm-formatting-list cm-formatting-list-ul cm-variable-2": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "- "
+     },
+     "cm-variable-2": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "Punkt eins"
+     },
+     "cm-formatting cm-formatting-list cm-formatting-list-ul cm-variable-3": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "- "
+     },
+     "cm-variable-3": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "verschachtelt zwei Space"
+     },
+     "cm-formatting cm-formatting-list cm-formatting-list-ul cm-keyword": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "- "
+     },
+     "cm-keyword": {
+      "farbe": "rgb(119, 0, 136)",
+      "kontrast": 1.94,
+      "beispiel": "Ebene drei tief"
+     },
+     "cm-formatting cm-formatting-list cm-formatting-list-ol cm-variable-2": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "1. "
+     },
+     "cm-formatting cm-formatting-link cm-link cm-variable-2": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "["
+     },
+     "cm-formatting cm-overlay cm-variable-2": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "{.rot}"
+     },
+     "cm-comment cm-formatting cm-formatting-code-block": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "```python"
+     },
+     "cm-comment cm-formatting cm-overlay": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "["
+     },
+     "cm-comment cm-md-c-rot cm-overlay": {
+      "farbe": "rgb(229, 72, 77)",
+      "kontrast": 4.87,
+      "beispiel": "x"
+     },
+     "cm-hr": {
+      "farbe": "rgb(153, 153, 153)",
+      "kontrast": 6.69,
+      "beispiel": "* * *"
+     },
+     "cm-formatting cm-formatting cm-formatting-link cm-link cm-overlay": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "["
+     },
+     "cm-link cm-md-c-rot cm-overlay": {
+      "farbe": "rgb(229, 72, 77)",
+      "kontrast": 4.87,
+      "beispiel": "Rot"
+     },
+     "cm-formatting cm-overlay": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "{.rot}"
+     },
+     "cm-link cm-md-plain cm-md-s-gross cm-overlay": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "Gross"
+     },
+     "cm-formatting cm-formatting-image cm-image cm-image-marker": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "!"
+     },
+     "cm-formatting cm-formatting-image cm-image cm-image-alt-text cm-link": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "["
+     },
+     "cm-image cm-image-alt-text cm-link": {
+      "farbe": "rgb(62, 141, 243)",
+      "kontrast": 5.72,
+      "beispiel": "Kontrollbild"
+     },
+     "cm-formatting cm-link cm-overlay": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "["
+     },
+     "cm-bracket cm-tag": {
+      "farbe": "rgb(17, 119, 0)",
+      "kontrast": 3.32,
+      "beispiel": "<"
+     },
+     "cm-tag": {
+      "farbe": "rgb(17, 119, 0)",
+      "kontrast": 3.32,
+      "beispiel": "b"
+     },
+     "cm-attribute": {
+      "farbe": "rgb(0, 0, 204)",
+      "kontrast": 1.7,
+      "beispiel": "class"
+     },
+     "cm-string": {
+      "farbe": "rgb(170, 17, 17)",
+      "kontrast": 2.54,
+      "beispiel": "\"x\""
+     }
+    }
+   },
+   "lesesicht": {
+    "l_ueberschrift_h1_h4": true,
+    "l_ueberschrift_h5_h6": false,
+    "l_setext": false,
+    "l_inline": true,
+    "l_durchgestrichen": false,
+    "l_harter_umbruch": false,
+    "l_autolink": false,
+    "l_entitaet": false,
+    "l_tabelle": true,
+    "l_tabelle_ausrichtung": true,
+    "l_tabelle_pipe_maskiert": false,
+    "l_tabelle_br": false,
+    "l_tabelle_ohne_aussenpipes": true,
+    "l_tabelle_ungleich": false,
+    "l_tabelle_im_zitat": false,
+    "l_zitat": true,
+    "l_zitat_verschachtelt": false,
+    "l_liste": true,
+    "l_liste_verschachtelt": false,
+    "l_liste_geordnet": true,
+    "l_aufgabe": true,
+    "l_aufgabe_verschachtelt": false,
+    "l_zaun": true,
+    "l_zaun_tilde": false,
+    "l_code_eingerueckt": false,
+    "l_codespan_format": true,
+    "l_trennlinie": false,
+    "l_format_farbe": true,
+    "l_format_block": true,
+    "l_format_unbekannt": true,
+    "l_bild": true,
+    "l_fussnote": false,
+    "html_als_text": true,
+    "__bild_format": false,
+    "__aufgabe_format_ok": false,
+    "__aufgabe_geordnet_ok": false,
+    "__html": 2846,
+    "__tabellen_oben": 2
+   },
+   "aktive": {
+    "boese": [],
+    "attrs": [],
+    "text_hat_script": true,
+    "dialoge_nativ": []
+   },
+   "s2": {
+    "editor_gleich_api": true,
+    "pfeil_ab": {
+     "widget_vorher": 1,
+     "cursor": [
+      2,
+      0
+     ],
+     "widget_nachher": 0
+    },
+    "pfeil_auf": {
+     "widget_vorher": 1,
+     "cursor": [
+      6,
+      0
+     ],
+     "widget_nachher": 0
+    },
+    "klick": {
+     "widget_vorher": 1,
+     "zelle_gefunden": true,
+     "cursor": [
+      2,
+      0
+     ],
+     "soll": [
+      5,
+      14
+     ],
+     "widget_nachher": 0,
+     "roh_sichtbar": true,
+     "fokus": true,
+     "nur_die_zelle": false,
+     "zurueck": true
+    },
+    "undo": {
+     "historie_vorher": {
+      "undo": 82,
+      "redo": 1
+     },
+     "historie_nach_wechseln": {
+      "undo": 82,
+      "redo": 1
+     },
+     "text_nach_wechseln": true,
+     "cursor_draussen": [
+      8,
+      15
+     ],
+     "widget_mit_q": true,
+     "undo_ursprung": true,
+     "redo_q": true,
+     "ende_sauber": true
+    },
+    "kopieren": {
+     "widget_vorher": 1,
+     "widget_waehrend_auswahl": 1,
+     "auswahl_gleich_quelle": true,
+     "kopie_gleich_quelle": true,
+     "ende_sauber": true
+    }
+   },
+   "s2_rand": {
+    "anlegen": 201,
+    "widgets": 7,
+    "lesesicht_oben": 7,
+    "gleich_lesesicht": true,
+    "zeilen": [
+     [
+      2,
+      5
+     ],
+     [
+      8,
+      10
+     ],
+     [
+      12,
+      17
+     ],
+     [
+      19,
+      21
+     ],
+     [
+      29,
+      30
+     ],
+     [
+      38,
+      40
+     ],
+     [
+      42,
+      44
+     ]
+    ],
+    "editor_gleich_api": true,
+    "sauber": true,
+    "seite_breiter_als_fenster": false,
+    "breites_widget_scrollt": true,
+    "aufgaben_kaestchen": 0,
+    "ende_pfeil_cursor": [
+     42,
+     0
+    ],
+    "ende_pfeil_soll": [
+     42,
+     0
+    ],
+    "editor_gleich_api_danach": true
+   },
+   "v3": {
+    "11_tabelle_einfach": {
+     "index": 118,
+     "writes": 1,
+     "nur_das_zeichen": true,
+     "endet_wie_vorher": true,
+     "version": [
+      1,
+      2
+     ]
+    },
+    "22_ohne_newline": {
+     "index": 38,
+     "writes": 1,
+     "nur_das_zeichen": true,
+     "endet_wie_vorher": true,
+     "version": [
+      1,
+      2
+     ]
+    }
+   },
+   "tastenkosten": {
+    "absatzzeile": [
+     {
+      "median": 1.600000023841858,
+      "p95": 2.899999976158142
+     },
+     {
+      "median": 1.600000023841858,
+      "p95": 3.300000011920929
+     },
+     {
+      "median": 1.5999999642372131,
+      "p95": 2.099999964237213
+     }
+    ],
+    "tabellenzeile": [
+     {
+      "median": 0.8999999761581421,
+      "p95": 2.300000011920929
+     },
+     {
+      "median": 1.100000023841858,
+      "p95": 1.5999999642372131
+     },
+     {
+      "median": 0.8999999761581421,
+      "p95": 1.800000011920929
+     }
+    ],
+    "text_wie_vorher": true
+   },
+   "tastenkosten_sauber_danach": true,
+   "tastenkosten_abgleich": {
+    "modul": true,
+    "absatzzeile": [
+     {
+      "median": 2.200000047683716,
+      "p95": 3.299999952316284
+     },
+     {
+      "median": 2,
+      "p95": 3.099999964237213
+     },
+     {
+      "median": 2.099999964237213,
+      "p95": 2.699999988079071
+     }
+    ],
+    "absatzzeile_widgets": 1,
+    "tabellenzeile": [
+     {
+      "median": 1.899999976158142,
+      "p95": 2.5
+     },
+     {
+      "median": 2,
+      "p95": 2.600000023841858
+     },
+     {
+      "median": 2,
+      "p95": 4.599999964237213
+     }
+    ],
+    "tabellenzeile_widgets": 0,
+    "abgleich_leer_median": 0.19999998807907104,
+    "widget_200_zeichnen_ms": 19.899999976158142,
+    "text_wie_vorher": true
+   },
+   "tastenkosten_abgleich_sauber_danach": true,
+   "entwurf": {
+    "oeffnen": {
+     "schluessel_nach_oeffnen": false
+    },
+    "ueberlebt": {
+     "entwurf_vor_neuladen": true,
+     "dialog": true,
+     "entwurf_waehrend_dialog": true,
+     "dialog_text": "Für dieses Item liegt ein ungespeicherter Entwurf in diesem Tab. Wiederherstellen?",
+     "editor_hat_entwurf": true
+    },
+    "kontrolle_a_zuerst": {
+     "dialog": true,
+     "editor_hat_entwurf": true
+    },
+    "kein_stilles_zurueck": {
+     "fremd": {
+      "status": 200,
+      "version": 2,
+      "alt": 1
+     },
+     "konflikt_dialog": true,
+     "konflikt_text": "Für dieses Item liegt ein ungespeicherter Entwurf in diesem Tab: Entwurf zu v1, aktuell v2. Ein anderer Client hat das Item inzwischen geändert — der Entwurf wird deshalb nicht einfach übernommen.",
+     "konflikt_fokus": "conflict-cancel",
+     "dialog": false,
+     "dirty": true,
+     "editor_hat_entwurf": true,
+     "konflikt_nach_speichern": true,
+     "neu": {
+      "anders": true,
+      "hat_entwurf": true,
+      "version": 1
+     },
+     "entwurf_nach_entscheidung": false,
+     "server_version": 2,
+     "fremde_fassung_steht": true,
+     "server_hat_entwurf": false
+    }
+   },
+   "schreib_requests": [
+    "POST items",
+    "PATCH items/itm_0000000b",
+    "PATCH items/itm_00000016",
+    "PATCH items/itm_0000000e",
+    "PATCH items/itm_0000000e",
+    "POST items"
+   ],
+   "saat_treue": {
+    "m7_01_frontmatter": {
+     "bytes": 131,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_02_listen": {
+     "bytes": 135,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_03_tabelle": {
+     "bytes": 135,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_04_code": {
+     "bytes": 131,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_05_links": {
+     "bytes": 156,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_06_itm_refs": {
+     "bytes": 124,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_07_tasklist": {
+     "bytes": 65,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_08_zitat": {
+     "bytes": 52,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_09_unicode": {
+     "bytes": 123,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_10_whitespace": {
+     "bytes": 193,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "11_tabelle_einfach": {
+     "bytes": 204,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "12_tabelle_ki": {
+     "bytes": 320,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "13_tabelle_im_zitat": {
+     "bytes": 62,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "14_listen_verschachtelt": {
+     "bytes": 255,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "15_aufgaben": {
+     "bytes": 224,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "16_code": {
+     "bytes": 219,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "17_ueberschriften": {
+     "bytes": 122,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "18_zitate_fussnoten": {
+     "bytes": 142,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "19_inline_html": {
+     "bytes": 332,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "20_xss": {
+     "bytes": 427,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "21_format_konvention": {
+     "bytes": 245,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "22_ohne_newline": {
+     "bytes": 38,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "23_tabs": {
+     "bytes": 81,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "24_doppel_leerzeichen": {
+     "bytes": 150,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "25_unicode": {
+     "bytes": 157,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "26_crlf": {
+     "bytes": 59,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": false,
+     "cr_fixture": 6,
+     "cr_api": 0
+    },
+    "27_gross": {
+     "bytes": 137612,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "28_katalog": {
+     "bytes": 1749,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    }
+   },
+   "platte_unveraendert": {
+    "alpha:m7_01_frontmatter": true,
+    "alpha:m7_02_listen": true,
+    "alpha:m7_03_tabelle": true,
+    "alpha:m7_04_code": true,
+    "alpha:m7_05_links": true,
+    "alpha:m7_06_itm_refs": true,
+    "alpha:m7_07_tasklist": true,
+    "alpha:m7_08_zitat": true,
+    "alpha:m7_09_unicode": true,
+    "alpha:m7_10_whitespace": true,
+    "alpha:12_tabelle_ki": true,
+    "alpha:13_tabelle_im_zitat": true,
+    "alpha:15_aufgaben": true,
+    "alpha:16_code": true,
+    "alpha:17_ueberschriften": true,
+    "alpha:18_zitate_fussnoten": true,
+    "alpha:19_inline_html": true,
+    "alpha:20_xss": true,
+    "alpha:21_format_konvention": true,
+    "alpha:23_tabs": true,
+    "alpha:24_doppel_leerzeichen": true,
+    "alpha:25_unicode": true,
+    "alpha:26_crlf": true,
+    "alpha:27_gross": true,
+    "alpha:28_katalog": true,
+    "beta:m7_01_frontmatter": true,
+    "beta:m7_02_listen": true,
+    "beta:m7_03_tabelle": true,
+    "beta:m7_04_code": true,
+    "beta:m7_05_links": true,
+    "beta:m7_06_itm_refs": true,
+    "beta:m7_07_tasklist": true,
+    "beta:m7_08_zitat": true,
+    "beta:m7_09_unicode": true,
+    "beta:m7_10_whitespace": true,
+    "beta:11_tabelle_einfach": true,
+    "beta:12_tabelle_ki": true,
+    "beta:13_tabelle_im_zitat": true,
+    "beta:14_listen_verschachtelt": true,
+    "beta:15_aufgaben": true,
+    "beta:16_code": true,
+    "beta:17_ueberschriften": true,
+    "beta:18_zitate_fussnoten": true,
+    "beta:19_inline_html": true,
+    "beta:20_xss": true,
+    "beta:21_format_konvention": true,
+    "beta:22_ohne_newline": true,
+    "beta:23_tabs": true,
+    "beta:24_doppel_leerzeichen": true,
+    "beta:25_unicode": true,
+    "beta:26_crlf": true,
+    "beta:27_gross": true,
+    "beta:28_katalog": true
+   },
+   "v6_frontmatter": {
+    "11_tabelle_einfach": {
+     "weg": [
+      "updated",
+      "version"
+     ],
+     "neu": [
+      "format",
+      "updated",
+      "updated_by",
+      "version"
+     ],
+     "datei_body_nur_ein_byte_mehr": true
+    },
+    "22_ohne_newline": {
+     "weg": [
+      "updated",
+      "version"
+     ],
+     "neu": [
+      "format",
+      "updated",
+      "updated_by",
+      "version"
+     ],
+     "datei_body_nur_ein_byte_mehr": true
+    }
+   },
+   "zellen": {
+    "l_ueberschrift_h1_h4": true,
+    "l_ueberschrift_h5_h6": false,
+    "l_setext": false,
+    "l_inline": true,
+    "l_durchgestrichen": false,
+    "l_harter_umbruch": false,
+    "l_autolink": false,
+    "l_entitaet": false,
+    "l_tabelle": true,
+    "l_tabelle_ausrichtung": true,
+    "l_tabelle_pipe_maskiert": false,
+    "l_tabelle_br": false,
+    "l_tabelle_ohne_aussenpipes": true,
+    "l_tabelle_ungleich": false,
+    "l_tabelle_im_zitat": false,
+    "l_zitat": true,
+    "l_zitat_verschachtelt": false,
+    "l_liste": true,
+    "l_liste_verschachtelt": false,
+    "l_liste_geordnet": true,
+    "l_aufgabe": true,
+    "l_aufgabe_verschachtelt": false,
+    "l_zaun": true,
+    "l_zaun_tilde": false,
+    "l_code_eingerueckt": false,
+    "l_codespan_format": true,
+    "l_trennlinie": false,
+    "l_format_farbe": true,
+    "l_format_block": true,
+    "l_format_unbekannt": true,
+    "l_bild": true,
+    "l_fussnote": false,
+    "html_als_text": true,
+    "keine_aktiven": true,
+    "e_ueberschrift": true,
+    "e_ueberschrift_h5_h6": true,
+    "e_zitat": true,
+    "e_zaun": true,
+    "e_aufgabe": true,
+    "e_format_farbe": true,
+    "e_block_bekannt_versteckt": true,
+    "e_durchgestrichen": false,
+    "tabelle_widget": true,
+    "listenzeichen": false,
+    "kontrast": false,
+    "konflikt_a_block_unbekannt": false,
+    "konflikt_b_code_format": false,
+    "konflikt_c_bild_format": false,
+    "konflikt_d_aufgabe_format": false,
+    "konflikt_e_aufgabe_geordnet": false,
+    "konflikt_f_setext_code": false,
+    "bytes_gleich": true,
+    "bytes_zelle": true,
+    "bytes_ohne_newline": true,
+    "oeffnen_schreibt_keinen_entwurf": true,
+    "entwurf_ueberlebt_neuladen": true,
+    "kein_stilles_zurueck": true,
+    "klick_zelle": false,
+    "pfeil_erste_zeile": true,
+    "pfeil_letzte_zeile": true,
+    "undo": true,
+    "kopieren_quelle": true
+   },
+   "rot": [
+    "l_ueberschrift_h5_h6",
+    "l_setext",
+    "l_durchgestrichen",
+    "l_harter_umbruch",
+    "l_autolink",
+    "l_entitaet",
+    "l_tabelle_pipe_maskiert",
+    "l_tabelle_br",
+    "l_tabelle_ungleich",
+    "l_tabelle_im_zitat",
+    "l_zitat_verschachtelt",
+    "l_liste_verschachtelt",
+    "l_aufgabe_verschachtelt",
+    "l_zaun_tilde",
+    "l_code_eingerueckt",
+    "l_trennlinie",
+    "l_fussnote",
+    "e_durchgestrichen",
+    "listenzeichen",
+    "kontrast",
+    "konflikt_a_block_unbekannt",
+    "konflikt_b_code_format",
+    "konflikt_c_bild_format",
+    "konflikt_d_aufgabe_format",
+    "konflikt_e_aufgabe_geordnet",
+    "konflikt_f_setext_code",
+    "klick_zelle"
+   ],
+   "abweichungen": [
+    "klick_zelle"
+   ],
+   "gekippt": [
+    "klick_zelle"
+   ]
+  },
+  "firefox": {
+   "browser": "firefox",
+   "bytes": {
+    "m7_01_frontmatter": {
+     "gleich": true,
+     "laenge_api": 126,
+     "laenge_editor": 126,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_02_listen": {
+     "gleich": true,
+     "laenge_api": 135,
+     "laenge_editor": 135,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_03_tabelle": {
+     "gleich": true,
+     "laenge_api": 135,
+     "laenge_editor": 135,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_04_code": {
+     "gleich": true,
+     "laenge_api": 130,
+     "laenge_editor": 130,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_05_links": {
+     "gleich": true,
+     "laenge_api": 156,
+     "laenge_editor": 156,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_06_itm_refs": {
+     "gleich": true,
+     "laenge_api": 124,
+     "laenge_editor": 124,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_07_tasklist": {
+     "gleich": true,
+     "laenge_api": 65,
+     "laenge_editor": 65,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_08_zitat": {
+     "gleich": true,
+     "laenge_api": 52,
+     "laenge_editor": 52,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_09_unicode": {
+     "gleich": true,
+     "laenge_api": 90,
+     "laenge_editor": 90,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "m7_10_whitespace": {
+     "gleich": true,
+     "laenge_api": 191,
+     "laenge_editor": 191,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "11_tabelle_einfach": {
+     "gleich": true,
+     "laenge_api": 204,
+     "laenge_editor": 204,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "12_tabelle_ki": {
+     "gleich": true,
+     "laenge_api": 320,
+     "laenge_editor": 320,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "13_tabelle_im_zitat": {
+     "gleich": true,
+     "laenge_api": 62,
+     "laenge_editor": 62,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "14_listen_verschachtelt": {
+     "gleich": true,
+     "laenge_api": 255,
+     "laenge_editor": 255,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "15_aufgaben": {
+     "gleich": true,
+     "laenge_api": 224,
+     "laenge_editor": 224,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "16_code": {
+     "gleich": true,
+     "laenge_api": 219,
+     "laenge_editor": 219,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "17_ueberschriften": {
+     "gleich": true,
+     "laenge_api": 122,
+     "laenge_editor": 122,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "18_zitate_fussnoten": {
+     "gleich": true,
+     "laenge_api": 142,
+     "laenge_editor": 142,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "19_inline_html": {
+     "gleich": true,
+     "laenge_api": 332,
+     "laenge_editor": 332,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "20_xss": {
+     "gleich": true,
+     "laenge_api": 427,
+     "laenge_editor": 427,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "21_format_konvention": {
+     "gleich": true,
+     "laenge_api": 245,
+     "laenge_editor": 245,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "22_ohne_newline": {
+     "gleich": true,
+     "laenge_api": 38,
+     "laenge_editor": 38,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "23_tabs": {
+     "gleich": true,
+     "laenge_api": 81,
+     "laenge_editor": 81,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "24_doppel_leerzeichen": {
+     "gleich": true,
+     "laenge_api": 150,
+     "laenge_editor": 150,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "25_unicode": {
+     "gleich": true,
+     "laenge_api": 125,
+     "laenge_editor": 125,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "26_crlf": {
+     "gleich": true,
+     "laenge_api": 53,
+     "laenge_editor": 53,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "27_gross": {
+     "gleich": true,
+     "laenge_api": 137612,
+     "laenge_editor": 137612,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    },
+    "28_katalog": {
+     "gleich": true,
+     "laenge_api": 1749,
+     "laenge_editor": 1749,
+     "cr_api": 0,
+     "dirty": false,
+     "speichern_aus": true,
+     "strg_s_writes": 0,
+     "dirty_nach_tippen_loeschen": false
+    }
+   },
+   "dialoge_nativ": [],
+   "seitenfehler": [],
+   "browser_version": "153.0",
+   "editor": {
+    "# Katalog Ueberschrift Eins": {
+     "zeile": 0,
+     "knoten": true,
+     "text": "# Katalog Ueberschrift Eins",
+     "sichtbar": "Katalog Ueberschrift Eins",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-header cm-formatting-header-1 cm-header cm-header-1",
+       "t": "# ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-header cm-header-1",
+       "t": "Katalog Ueberschrift Eins",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "##### Katalog Ueberschrift Fuenf": {
+     "zeile": 4,
+     "knoten": true,
+     "text": "##### Katalog Ueberschrift Fuenf",
+     "sichtbar": "Katalog Ueberschrift Fuenf",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-header cm-formatting-header-5 cm-header cm-header-5",
+       "t": "##### ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-header cm-header-5",
+       "t": "Katalog Ueberschrift Fuenf",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "###### Katalog Ueberschrift Sechs": {
+     "zeile": 5,
+     "knoten": true,
+     "text": "###### Katalog Ueberschrift Sechs",
+     "sichtbar": "Katalog Ueberschrift Sechs",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-header cm-formatting-header-6 cm-header cm-header-6",
+       "t": "###### ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-header cm-header-6",
+       "t": "Katalog Ueberschrift Sechs",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "Setext Katalog Eins": {
+     "zeile": 7,
+     "knoten": true,
+     "text": "Setext Katalog Eins",
+     "sichtbar": "Setext Katalog Eins",
+     "spans": [
+      {
+       "k": "cm-header cm-header-1",
+       "t": "Setext Katalog Eins",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "Durchgestrichen:": {
+     "zeile": 15,
+     "knoten": true,
+     "text": "Durchgestrichen: ~~weg damit~~ steht da.",
+     "sichtbar": "Durchgestrichen: ~~weg damit~~ steht da.",
+     "spans": [],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "> Zitat Ebene eins": {
+     "zeile": 36,
+     "knoten": true,
+     "text": "> Zitat Ebene eins",
+     "sichtbar": "Zitat Ebene eins",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-quote cm-formatting-quote-1 cm-quote cm-quote-1",
+       "t": "> ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-quote cm-quote-1",
+       "t": "Zitat Ebene eins",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "def katalog_zaun(x):": {
+     "zeile": 61,
+     "knoten": true,
+     "text": "def katalog_zaun(x):",
+     "sichtbar": "def katalog_zaun(x):",
+     "spans": [
+      {
+       "k": "cm-comment",
+       "t": "def katalog_zaun(x):",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "Tilde-Zaun Inhalt": {
+     "zeile": 66,
+     "knoten": true,
+     "text": "Tilde-Zaun Inhalt",
+     "sichtbar": "Tilde-Zaun Inhalt",
+     "spans": [
+      {
+       "k": "cm-comment",
+       "t": "Tilde-Zaun Inhalt",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "    eingerueckter Code Inhalt": {
+     "zeile": 69,
+     "knoten": true,
+     "text": "    eingerueckter Code Inhalt",
+     "sichtbar": "    eingerueckter Code Inhalt",
+     "spans": [
+      {
+       "k": "cm-comment",
+       "t": "eingerueckter Code Inhalt",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "- [ ] offene Aufgabe": {
+     "zeile": 52,
+     "knoten": true,
+     "text": "- [ ] offene Aufgabe",
+     "sichtbar": "[W] offene Aufgabe",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-list cm-formatting-list-ul cm-variable-2",
+       "t": "- ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-variable-2",
+       "t": " offene Aufgabe",
+       "vis": "visible"
+      }
+     ],
+     "todo": 1,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "  - [ ] Unteraufgabe tief": {
+     "zeile": 54,
+     "knoten": true,
+     "text": "  - [ ] Unteraufgabe tief",
+     "sichtbar": "  [W] Unteraufgabe tief",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-list cm-formatting-list-ul cm-variable-3",
+       "t": "- ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-variable-3",
+       "t": " Unteraufgabe tief",
+       "vis": "visible"
+      }
+     ],
+     "todo": 1,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "1. [ ] nummerierte Aufgabe": {
+     "zeile": 56,
+     "knoten": true,
+     "text": "1. [ ] nummerierte Aufgabe",
+     "sichtbar": "  nummerierte Aufgabe",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-list cm-formatting-list-ol cm-variable-2",
+       "t": "1. ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link cm-link cm-variable-2",
+       "t": "[",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-link cm-variable-2",
+       "t": " ",
+       "vis": "visible"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link cm-link cm-variable-2",
+       "t": "]",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-variable-2",
+       "t": " nummerierte Aufgabe",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "- [x]{.rot} Format nach dem Kaestchen": {
+     "zeile": 58,
+     "knoten": true,
+     "text": "- [x]{.rot} Format nach dem Kaestchen",
+     "sichtbar": "[W] Format nach dem Kaestchen",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-list cm-formatting-list-ul cm-variable-2",
+       "t": "- ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-variable-2 cm-overlay cm-formatting",
+       "t": "{.rot}",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-variable-2",
+       "t": " Format nach dem Kaestchen",
+       "vis": "visible"
+      }
+     ],
+     "todo": 1,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "- Punkt eins": {
+     "zeile": 43,
+     "knoten": true,
+     "text": "- Punkt eins",
+     "sichtbar": "Punkt eins",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-list cm-formatting-list-ul cm-variable-2",
+       "t": "- ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-variable-2",
+       "t": "Punkt eins",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "  - verschachtelt zwei Spaces": {
+     "zeile": 44,
+     "knoten": true,
+     "text": "  - verschachtelt zwei Spaces",
+     "sichtbar": "  verschachtelt zwei Spaces",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-list cm-formatting-list-ul cm-variable-3",
+       "t": "- ",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-variable-3",
+       "t": "verschachtelt zwei Spaces",
+       "vis": "visible"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "[Rot]{.rot} und": {
+     "zeile": 75,
+     "knoten": true,
+     "text": "[Rot]{.rot} und [Gross]{.gross} und [Unbekannt]{.lila}",
+     "sichtbar": "Rot und Gross und Unbekannt{.lila}",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-link cm-link cm-overlay cm-formatting",
+       "t": "[",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-link cm-overlay cm-md-c-rot",
+       "t": "Rot",
+       "vis": "visible"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link cm-link cm-overlay cm-formatting",
+       "t": "]",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-overlay cm-formatting",
+       "t": "{.rot}",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link cm-link cm-overlay cm-formatting",
+       "t": "[",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-link cm-overlay cm-md-s-gross cm-md-plain",
+       "t": "Gross",
+       "vis": "visible"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link cm-link cm-overlay cm-formatting",
+       "t": "]",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-overlay cm-formatting",
+       "t": "{.gross}",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link cm-link",
+       "t": "[",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-link",
+       "t": "Unbekannt",
+       "vis": "visible"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link cm-link",
+       "t": "]",
+       "vis": "hidden"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "::: {.zentriert}": {
+     "zeile": 77,
+     "knoten": true,
+     "text": "::: {.zentriert}",
+     "sichtbar": "",
+     "spans": [
+      {
+       "k": "cm-overlay cm-formatting",
+       "t": "::: {.zentriert}",
+       "vis": "hidden"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "::: {.warnung}": {
+     "zeile": 81,
+     "knoten": true,
+     "text": "::: {.warnung}",
+     "sichtbar": "",
+     "spans": [
+      {
+       "k": "cm-overlay cm-formatting",
+       "t": "::: {.warnung}",
+       "vis": "hidden"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "Code mit Format:": {
+     "zeile": 71,
+     "knoten": true,
+     "text": "Code mit Format: `[x]{.rot}` bleibt Code.",
+     "sichtbar": "Code mit Format: x bleibt Code.",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-code cm-comment",
+       "t": "`",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-comment cm-overlay cm-formatting",
+       "t": "[",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-comment cm-overlay cm-md-c-rot",
+       "t": "x",
+       "vis": "visible"
+      },
+      {
+       "k": "cm-comment cm-overlay cm-formatting",
+       "t": "]{.rot}",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-formatting cm-formatting-code cm-comment",
+       "t": "`",
+       "vis": "hidden"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "| Einstellung | Bedeutung": {
+     "zeile": 24,
+     "knoten": true,
+     "text": "| Einstellung | Bedeutung | Mitte |",
+     "sichtbar": "[W]​",
+     "spans": [],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "Bild mit Format:": {
+     "zeile": 87,
+     "knoten": true,
+     "text": "Bild mit Format: ![[Alt rot]{.rot}](asset:ast_0000e041)",
+     "sichtbar": "Bild mit Format: !Alt rotasset:ast_0000e041",
+     "spans": [
+      {
+       "k": "cm-formatting cm-formatting-link cm-link cm-overlay cm-formatting",
+       "t": "[",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-link cm-overlay cm-formatting",
+       "t": "[",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-link cm-overlay cm-md-c-rot",
+       "t": "Alt rot",
+       "vis": "visible"
+      },
+      {
+       "k": "cm-link cm-overlay cm-formatting",
+       "t": "]{.rot}",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link cm-link",
+       "t": "]",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link-string cm-string cm-url",
+       "t": "(",
+       "vis": "hidden"
+      },
+      {
+       "k": "cm-string cm-url",
+       "t": "asset:ast_0000e041",
+       "vis": "visible"
+      },
+      {
+       "k": "cm-formatting cm-formatting-link-string cm-string cm-url",
+       "t": ")",
+       "vis": "hidden"
+      }
+     ],
+     "todo": 0,
+     "wrap_klassen": " CodeMirror-line "
+    },
+    "__widget_marken": 2,
+    "__tabellen_im_editor": 2
+   },
+   "kontrast": {
+    "hintergrund": "rgb(12, 16, 23)",
+    "text_kontrast": 16.21,
+    "klassen": {
+     "cm-formatting cm-formatting-header cm-formatting-header-1 cm-header cm-header-1": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "# "
+     },
+     "cm-header cm-header-1": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "Katalog Ueberschrift Ein"
+     },
+     "cm-formatting cm-formatting-header cm-formatting-header-2 cm-header cm-header-2": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "## "
+     },
+     "cm-header cm-header-2": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "Katalog Ueberschrift Zwe"
+     },
+     "cm-formatting cm-formatting-header cm-formatting-header-3 cm-header cm-header-3": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "### "
+     },
+     "cm-header cm-header-3": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "Katalog Ueberschrift Dre"
+     },
+     "cm-formatting cm-formatting-header cm-formatting-header-4 cm-header cm-header-4": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "#### "
+     },
+     "cm-header cm-header-4": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "Katalog Ueberschrift Vie"
+     },
+     "cm-formatting cm-formatting-header cm-formatting-header-5 cm-header cm-header-5": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "##### "
+     },
+     "cm-header cm-header-5": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "Katalog Ueberschrift Fue"
+     },
+     "cm-formatting cm-formatting-header cm-formatting-header-6 cm-header cm-header-6": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "###### "
+     },
+     "cm-header cm-header-6": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "Katalog Ueberschrift Sec"
+     },
+     "cm-formatting cm-formatting-strong cm-strong": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "**"
+     },
+     "cm-strong": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "fett"
+     },
+     "cm-em cm-formatting cm-formatting-em": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "*"
+     },
+     "cm-em": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "kursiv"
+     },
+     "cm-comment cm-formatting cm-formatting-code": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "`"
+     },
+     "cm-comment": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "codespan"
+     },
+     "cm-formatting cm-formatting-link cm-link": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "["
+     },
+     "cm-link": {
+      "farbe": "rgb(62, 141, 243)",
+      "kontrast": 5.72,
+      "beispiel": "Link"
+     },
+     "cm-formatting cm-formatting-link-string cm-string cm-url": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "("
+     },
+     "cm-string cm-url": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "https://example.invalid/"
+     },
+     "cm-formatting cm-formatting-quote cm-formatting-quote-1 cm-quote cm-quote-1": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "> "
+     },
+     "cm-quote cm-quote-1": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "Zitat Ebene eins"
+     },
+     "cm-formatting cm-formatting-quote cm-formatting-quote-2 cm-quote cm-quote-2": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "> "
+     },
+     "cm-quote cm-quote-2": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "Zitat Ebene zwei"
+     },
+     "cm-formatting cm-formatting-list cm-formatting-list-ul cm-variable-2": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "- "
+     },
+     "cm-variable-2": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "Punkt eins"
+     },
+     "cm-formatting cm-formatting-list cm-formatting-list-ul cm-variable-3": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "- "
+     },
+     "cm-variable-3": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "verschachtelt zwei Space"
+     },
+     "cm-formatting cm-formatting-list cm-formatting-list-ul cm-keyword": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "- "
+     },
+     "cm-keyword": {
+      "farbe": "rgb(119, 0, 136)",
+      "kontrast": 1.94,
+      "beispiel": "Ebene drei tief"
+     },
+     "cm-formatting cm-formatting-list cm-formatting-list-ol cm-variable-2": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "1. "
+     },
+     "cm-formatting cm-formatting-link cm-link cm-variable-2": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "["
+     },
+     "cm-formatting cm-overlay cm-variable-2": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "{.rot}"
+     },
+     "cm-comment cm-formatting cm-formatting-code-block": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "```python"
+     },
+     "cm-comment cm-formatting cm-overlay": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "["
+     },
+     "cm-comment cm-md-c-rot cm-overlay": {
+      "farbe": "rgb(229, 72, 77)",
+      "kontrast": 4.87,
+      "beispiel": "x"
+     },
+     "cm-hr": {
+      "farbe": "rgb(153, 153, 153)",
+      "kontrast": 6.69,
+      "beispiel": "* * *"
+     },
+     "cm-formatting cm-formatting cm-formatting-link cm-link cm-overlay": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "["
+     },
+     "cm-link cm-md-c-rot cm-overlay": {
+      "farbe": "rgb(229, 72, 77)",
+      "kontrast": 4.87,
+      "beispiel": "Rot"
+     },
+     "cm-formatting cm-overlay": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "{.rot}"
+     },
+     "cm-link cm-md-plain cm-md-s-gross cm-overlay": {
+      "farbe": "rgb(233, 237, 242)",
+      "kontrast": 16.21,
+      "beispiel": "Gross"
+     },
+     "cm-formatting cm-formatting-image cm-image cm-image-marker": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "!"
+     },
+     "cm-formatting cm-formatting-image cm-image cm-image-alt-text cm-link": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "["
+     },
+     "cm-image cm-image-alt-text cm-link": {
+      "farbe": "rgb(62, 141, 243)",
+      "kontrast": 5.72,
+      "beispiel": "Kontrollbild"
+     },
+     "cm-formatting cm-link cm-overlay": {
+      "farbe": "rgb(167, 178, 191)",
+      "kontrast": 8.86,
+      "beispiel": "["
+     },
+     "cm-bracket cm-tag": {
+      "farbe": "rgb(17, 119, 0)",
+      "kontrast": 3.32,
+      "beispiel": "<"
+     },
+     "cm-tag": {
+      "farbe": "rgb(17, 119, 0)",
+      "kontrast": 3.32,
+      "beispiel": "b"
+     },
+     "cm-attribute": {
+      "farbe": "rgb(0, 0, 204)",
+      "kontrast": 1.7,
+      "beispiel": "class"
+     },
+     "cm-string": {
+      "farbe": "rgb(170, 17, 17)",
+      "kontrast": 2.54,
+      "beispiel": "\"x\""
+     }
+    }
+   },
+   "lesesicht": {
+    "l_ueberschrift_h1_h4": true,
+    "l_ueberschrift_h5_h6": false,
+    "l_setext": false,
+    "l_inline": true,
+    "l_durchgestrichen": false,
+    "l_harter_umbruch": false,
+    "l_autolink": false,
+    "l_entitaet": false,
+    "l_tabelle": true,
+    "l_tabelle_ausrichtung": true,
+    "l_tabelle_pipe_maskiert": false,
+    "l_tabelle_br": false,
+    "l_tabelle_ohne_aussenpipes": true,
+    "l_tabelle_ungleich": false,
+    "l_tabelle_im_zitat": false,
+    "l_zitat": true,
+    "l_zitat_verschachtelt": false,
+    "l_liste": true,
+    "l_liste_verschachtelt": false,
+    "l_liste_geordnet": true,
+    "l_aufgabe": true,
+    "l_aufgabe_verschachtelt": false,
+    "l_zaun": true,
+    "l_zaun_tilde": false,
+    "l_code_eingerueckt": false,
+    "l_codespan_format": true,
+    "l_trennlinie": false,
+    "l_format_farbe": true,
+    "l_format_block": true,
+    "l_format_unbekannt": true,
+    "l_bild": true,
+    "l_fussnote": false,
+    "html_als_text": true,
+    "__bild_format": false,
+    "__aufgabe_format_ok": false,
+    "__aufgabe_geordnet_ok": false,
+    "__html": 2846,
+    "__tabellen_oben": 2
+   },
+   "aktive": {
+    "boese": [],
+    "attrs": [],
+    "text_hat_script": true,
+    "dialoge_nativ": []
+   },
+   "s2": {
+    "editor_gleich_api": true,
+    "pfeil_ab": {
+     "widget_vorher": 1,
+     "cursor": [
+      2,
+      0
+     ],
+     "widget_nachher": 0
+    },
+    "pfeil_auf": {
+     "widget_vorher": 1,
+     "cursor": [
+      6,
+      0
+     ],
+     "widget_nachher": 0
+    },
+    "klick": {
+     "widget_vorher": 1,
+     "zelle_gefunden": true,
+     "cursor": [
+      2,
+      0
+     ],
+     "soll": [
+      5,
+      14
+     ],
+     "widget_nachher": 0,
+     "roh_sichtbar": true,
+     "fokus": true,
+     "nur_die_zelle": false,
+     "zurueck": true
+    },
+    "undo": {
+     "historie_vorher": {
+      "undo": 82,
+      "redo": 1
+     },
+     "historie_nach_wechseln": {
+      "undo": 82,
+      "redo": 1
+     },
+     "text_nach_wechseln": true,
+     "cursor_draussen": [
+      8,
+      15
+     ],
+     "widget_mit_q": true,
+     "undo_ursprung": true,
+     "redo_q": true,
+     "ende_sauber": true
+    },
+    "kopieren": {
+     "widget_vorher": 1,
+     "widget_waehrend_auswahl": 1,
+     "auswahl_gleich_quelle": true,
+     "kopie_gleich_quelle": true,
+     "ende_sauber": true
+    }
+   },
+   "s2_rand": {
+    "anlegen": 201,
+    "widgets": 7,
+    "lesesicht_oben": 7,
+    "gleich_lesesicht": true,
+    "zeilen": [
+     [
+      2,
+      5
+     ],
+     [
+      8,
+      10
+     ],
+     [
+      12,
+      17
+     ],
+     [
+      19,
+      21
+     ],
+     [
+      29,
+      30
+     ],
+     [
+      38,
+      40
+     ],
+     [
+      42,
+      44
+     ]
+    ],
+    "editor_gleich_api": true,
+    "sauber": true,
+    "seite_breiter_als_fenster": false,
+    "breites_widget_scrollt": true,
+    "aufgaben_kaestchen": 0,
+    "ende_pfeil_cursor": [
+     42,
+     0
+    ],
+    "ende_pfeil_soll": [
+     42,
+     0
+    ],
+    "editor_gleich_api_danach": true
+   },
+   "v3": {
+    "11_tabelle_einfach": {
+     "index": 118,
+     "writes": 1,
+     "nur_das_zeichen": true,
+     "endet_wie_vorher": true,
+     "version": [
+      1,
+      2
+     ]
+    },
+    "22_ohne_newline": {
+     "index": 38,
+     "writes": 1,
+     "nur_das_zeichen": true,
+     "endet_wie_vorher": true,
+     "version": [
+      1,
+      2
+     ]
+    }
+   },
+   "tastenkosten": {
+    "absatzzeile": [
+     {
+      "median": 2,
+      "p95": 3
+     },
+     {
+      "median": 2,
+      "p95": 3
+     },
+     {
+      "median": 2,
+      "p95": 3
+     }
+    ],
+    "tabellenzeile": [
+     {
+      "median": 1,
+      "p95": 2
+     },
+     {
+      "median": 1,
+      "p95": 2
+     },
+     {
+      "median": 1,
+      "p95": 2
+     }
+    ],
+    "text_wie_vorher": true
+   },
+   "tastenkosten_sauber_danach": true,
+   "tastenkosten_abgleich": {
+    "modul": true,
+    "absatzzeile": [
+     {
+      "median": 3,
+      "p95": 4
+     },
+     {
+      "median": 3,
+      "p95": 3
+     },
+     {
+      "median": 3,
+      "p95": 4
+     }
+    ],
+    "absatzzeile_widgets": 1,
+    "tabellenzeile": [
+     {
+      "median": 3,
+      "p95": 3
+     },
+     {
+      "median": 3,
+      "p95": 4
+     },
+     {
+      "median": 3,
+      "p95": 3
+     }
+    ],
+    "tabellenzeile_widgets": 0,
+    "abgleich_leer_median": 0,
+    "widget_200_zeichnen_ms": 18,
+    "text_wie_vorher": true
+   },
+   "tastenkosten_abgleich_sauber_danach": true,
+   "entwurf": {
+    "oeffnen": {
+     "schluessel_nach_oeffnen": false
+    },
+    "ueberlebt": {
+     "entwurf_vor_neuladen": true,
+     "dialog": true,
+     "entwurf_waehrend_dialog": true,
+     "dialog_text": "Für dieses Item liegt ein ungespeicherter Entwurf in diesem Tab. Wiederherstellen?",
+     "editor_hat_entwurf": true
+    },
+    "kontrolle_a_zuerst": {
+     "dialog": true,
+     "editor_hat_entwurf": true
+    },
+    "kein_stilles_zurueck": {
+     "fremd": {
+      "status": 200,
+      "version": 2,
+      "alt": 1
+     },
+     "konflikt_dialog": true,
+     "konflikt_text": "Für dieses Item liegt ein ungespeicherter Entwurf in diesem Tab: Entwurf zu v1, aktuell v2. Ein anderer Client hat das Item inzwischen geändert — der Entwurf wird deshalb nicht einfach übernommen.",
+     "konflikt_fokus": "conflict-cancel",
+     "dialog": false,
+     "dirty": true,
+     "editor_hat_entwurf": true,
+     "konflikt_nach_speichern": true,
+     "neu": {
+      "anders": true,
+      "hat_entwurf": true,
+      "version": 1
+     },
+     "entwurf_nach_entscheidung": false,
+     "server_version": 2,
+     "fremde_fassung_steht": true,
+     "server_hat_entwurf": false
+    }
+   },
+   "schreib_requests": [
+    "POST items",
+    "PATCH items/itm_0000000b",
+    "PATCH items/itm_00000016",
+    "PATCH items/itm_0000000e",
+    "PATCH items/itm_0000000e",
+    "POST items"
+   ],
+   "saat_treue": {
+    "m7_01_frontmatter": {
+     "bytes": 131,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_02_listen": {
+     "bytes": 135,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_03_tabelle": {
+     "bytes": 135,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_04_code": {
+     "bytes": 131,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_05_links": {
+     "bytes": 156,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_06_itm_refs": {
+     "bytes": 124,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_07_tasklist": {
+     "bytes": 65,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_08_zitat": {
+     "bytes": 52,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_09_unicode": {
+     "bytes": 123,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "m7_10_whitespace": {
+     "bytes": 193,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "11_tabelle_einfach": {
+     "bytes": 204,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "12_tabelle_ki": {
+     "bytes": 320,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "13_tabelle_im_zitat": {
+     "bytes": 62,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "14_listen_verschachtelt": {
+     "bytes": 255,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "15_aufgaben": {
+     "bytes": 224,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "16_code": {
+     "bytes": 219,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "17_ueberschriften": {
+     "bytes": 122,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "18_zitate_fussnoten": {
+     "bytes": 142,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "19_inline_html": {
+     "bytes": 332,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "20_xss": {
+     "bytes": 427,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "21_format_konvention": {
+     "bytes": 245,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "22_ohne_newline": {
+     "bytes": 38,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "23_tabs": {
+     "bytes": 81,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "24_doppel_leerzeichen": {
+     "bytes": 150,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "25_unicode": {
+     "bytes": 157,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "26_crlf": {
+     "bytes": 59,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": false,
+     "cr_fixture": 6,
+     "cr_api": 0
+    },
+    "27_gross": {
+     "bytes": 137612,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    },
+    "28_katalog": {
+     "bytes": 1749,
+     "datei_gleich_fixture": true,
+     "api_gleich_fixture": true,
+     "cr_fixture": 0,
+     "cr_api": 0
+    }
+   },
+   "platte_unveraendert": {
+    "alpha:m7_01_frontmatter": true,
+    "alpha:m7_02_listen": true,
+    "alpha:m7_03_tabelle": true,
+    "alpha:m7_04_code": true,
+    "alpha:m7_05_links": true,
+    "alpha:m7_06_itm_refs": true,
+    "alpha:m7_07_tasklist": true,
+    "alpha:m7_08_zitat": true,
+    "alpha:m7_09_unicode": true,
+    "alpha:m7_10_whitespace": true,
+    "alpha:12_tabelle_ki": true,
+    "alpha:13_tabelle_im_zitat": true,
+    "alpha:15_aufgaben": true,
+    "alpha:16_code": true,
+    "alpha:17_ueberschriften": true,
+    "alpha:18_zitate_fussnoten": true,
+    "alpha:19_inline_html": true,
+    "alpha:20_xss": true,
+    "alpha:21_format_konvention": true,
+    "alpha:23_tabs": true,
+    "alpha:24_doppel_leerzeichen": true,
+    "alpha:25_unicode": true,
+    "alpha:26_crlf": true,
+    "alpha:27_gross": true,
+    "alpha:28_katalog": true,
+    "beta:m7_01_frontmatter": true,
+    "beta:m7_02_listen": true,
+    "beta:m7_03_tabelle": true,
+    "beta:m7_04_code": true,
+    "beta:m7_05_links": true,
+    "beta:m7_06_itm_refs": true,
+    "beta:m7_07_tasklist": true,
+    "beta:m7_08_zitat": true,
+    "beta:m7_09_unicode": true,
+    "beta:m7_10_whitespace": true,
+    "beta:11_tabelle_einfach": true,
+    "beta:12_tabelle_ki": true,
+    "beta:13_tabelle_im_zitat": true,
+    "beta:14_listen_verschachtelt": true,
+    "beta:15_aufgaben": true,
+    "beta:16_code": true,
+    "beta:17_ueberschriften": true,
+    "beta:18_zitate_fussnoten": true,
+    "beta:19_inline_html": true,
+    "beta:20_xss": true,
+    "beta:21_format_konvention": true,
+    "beta:22_ohne_newline": true,
+    "beta:23_tabs": true,
+    "beta:24_doppel_leerzeichen": true,
+    "beta:25_unicode": true,
+    "beta:26_crlf": true,
+    "beta:27_gross": true,
+    "beta:28_katalog": true
+   },
+   "v6_frontmatter": {
+    "11_tabelle_einfach": {
+     "weg": [
+      "updated",
+      "version"
+     ],
+     "neu": [
+      "format",
+      "updated",
+      "updated_by",
+      "version"
+     ],
+     "datei_body_nur_ein_byte_mehr": true
+    },
+    "22_ohne_newline": {
+     "weg": [
+      "updated",
+      "version"
+     ],
+     "neu": [
+      "format",
+      "updated",
+      "updated_by",
+      "version"
+     ],
+     "datei_body_nur_ein_byte_mehr": true
+    }
+   },
+   "zellen": {
+    "l_ueberschrift_h1_h4": true,
+    "l_ueberschrift_h5_h6": false,
+    "l_setext": false,
+    "l_inline": true,
+    "l_durchgestrichen": false,
+    "l_harter_umbruch": false,
+    "l_autolink": false,
+    "l_entitaet": false,
+    "l_tabelle": true,
+    "l_tabelle_ausrichtung": true,
+    "l_tabelle_pipe_maskiert": false,
+    "l_tabelle_br": false,
+    "l_tabelle_ohne_aussenpipes": true,
+    "l_tabelle_ungleich": false,
+    "l_tabelle_im_zitat": false,
+    "l_zitat": true,
+    "l_zitat_verschachtelt": false,
+    "l_liste": true,
+    "l_liste_verschachtelt": false,
+    "l_liste_geordnet": true,
+    "l_aufgabe": true,
+    "l_aufgabe_verschachtelt": false,
+    "l_zaun": true,
+    "l_zaun_tilde": false,
+    "l_code_eingerueckt": false,
+    "l_codespan_format": true,
+    "l_trennlinie": false,
+    "l_format_farbe": true,
+    "l_format_block": true,
+    "l_format_unbekannt": true,
+    "l_bild": true,
+    "l_fussnote": false,
+    "html_als_text": true,
+    "keine_aktiven": true,
+    "e_ueberschrift": true,
+    "e_ueberschrift_h5_h6": true,
+    "e_zitat": true,
+    "e_zaun": true,
+    "e_aufgabe": true,
+    "e_format_farbe": true,
+    "e_block_bekannt_versteckt": true,
+    "e_durchgestrichen": false,
+    "tabelle_widget": true,
+    "listenzeichen": false,
+    "kontrast": false,
+    "konflikt_a_block_unbekannt": false,
+    "konflikt_b_code_format": false,
+    "konflikt_c_bild_format": false,
+    "konflikt_d_aufgabe_format": false,
+    "konflikt_e_aufgabe_geordnet": false,
+    "konflikt_f_setext_code": false,
+    "bytes_gleich": true,
+    "bytes_zelle": true,
+    "bytes_ohne_newline": true,
+    "oeffnen_schreibt_keinen_entwurf": true,
+    "entwurf_ueberlebt_neuladen": true,
+    "kein_stilles_zurueck": true,
+    "klick_zelle": false,
+    "pfeil_erste_zeile": true,
+    "pfeil_letzte_zeile": true,
+    "undo": true,
+    "kopieren_quelle": true
+   },
+   "rot": [
+    "l_ueberschrift_h5_h6",
+    "l_setext",
+    "l_durchgestrichen",
+    "l_harter_umbruch",
+    "l_autolink",
+    "l_entitaet",
+    "l_tabelle_pipe_maskiert",
+    "l_tabelle_br",
+    "l_tabelle_ungleich",
+    "l_tabelle_im_zitat",
+    "l_zitat_verschachtelt",
+    "l_liste_verschachtelt",
+    "l_aufgabe_verschachtelt",
+    "l_zaun_tilde",
+    "l_code_eingerueckt",
+    "l_trennlinie",
+    "l_fussnote",
+    "e_durchgestrichen",
+    "listenzeichen",
+    "kontrast",
+    "konflikt_a_block_unbekannt",
+    "konflikt_b_code_format",
+    "konflikt_c_bild_format",
+    "konflikt_d_aufgabe_format",
+    "konflikt_e_aufgabe_geordnet",
+    "konflikt_f_setext_code",
+    "klick_zelle"
+   ],
+   "abweichungen": [
+    "klick_zelle"
+   ],
+   "gekippt": [
+    "klick_zelle"
+   ]
+  }
+ },
+ "kippt_soll": [
+  "klick_zelle"
+ ],
+ "kippt_genau": true
+}

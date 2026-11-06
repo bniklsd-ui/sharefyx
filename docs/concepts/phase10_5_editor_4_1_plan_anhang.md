@@ -7,7 +7,7 @@ up: ./phase10_5_editor_4_1_plan.md
 down:
   - ../../phase10_5_finishing/probes/p105_b14_layout_probe.py   # Muster der Wegwerf-Instanz
   - ../../phase10_5_finishing/probes/p105_b11_roundtrip_probe.py # Muster Roundtrip
-updated: 2026-11-06 (A14 Befunde aus S1) | 2026-11-05 (A13 Korrekturen aus S0) | 2026-11-03 (angelegt — Opus-Planungsagent; alle Messungen an Wegwerf-Instanzen, Skripte im Scratchpad, nicht im Repo)
+updated: 2026-11-06 (A15 Befunde aus S2) | 2026-11-06 (A14 Befunde aus S1) | 2026-11-05 (A13 Korrekturen aus S0) | 2026-11-03 (angelegt — Opus-Planungsagent; alle Messungen an Wegwerf-Instanzen, Skripte im Scratchpad, nicht im Repo)
 ---
 # Anhang — Editor 4.1.0
 
@@ -296,3 +296,12 @@ Beide Browser (Chromium 151, Firefox 153): rot **30 → 27**, genau `oeffnen_sch
 4. **Verhalten:** ein Entwurf zu einer anderen Version kommt **mit seiner alten Basisversion** in den Editor; der Konfliktdialog fragt („Entwurf verwerfen“ / „Entwurf als neues Item anlegen“, Fokus auf „Abbrechen“ = Esc, der Entwurf bleibt); Strg+S aus diesem Zustand läuft in den 409 (Hard Rule 3). Nebenwirkung: CodeMirror nimmt keinen Fokus, solange eine Rückfrage offen ist. **UX-Hinweis:** die blaue Hauptschaltfläche des Dialogs heißt „Entwurf verwerfen“ (geerbt vom Konfliktdialog-Stil).
 5. **Nicht geprüft:** „Entwurf verwerfen“ geklickt, Esc auf dem Dialog, alte Entwürfe ohne `version` (laufen über Basis 0, im Code gelesen, nicht gedrückt); ältere Entwurfsproben (`p105_b11_*`, `p10_m5`) nicht neu gelaufen; ein Firefox-Lauf war zuerst rot wegen fester 1,5-s-Wartezeit der Probe (jetzt Polling bis 10 s, ein Lauf danach grün).
 6. Vor S2: `spec.STAND` anheben, S2 in `STAENDE`/`BELEG_JE_STAND` eintragen.
+
+## A15 Befunde aus S2 (2026-11-06, Ausführer Opus; `p105_ed41_darstellung_s2.json`, vom Hauptagenten neu gefahren)
+
+Beide Browser: rot **27 → 26** (`tabelle_widget` grün; 26 verbleibende = Lesesicht-/Overlay-/Kontrastzellen für S3/S4), 0 Abweichungen, 0 Seitenfehler. Neue Zellen grün: `klick_zelle`, `pfeil_erste_zeile`, `pfeil_letzte_zeile`, `undo`, `kopieren_quelle`; `bytes_gleich`/`bytes_zelle` bleiben grün. Gegenläufe (`kippt_genau` in beiden Browsern): `s2_ohne_installation` (`tabelle_widget` + die fünf widget-abhängigen Zellen rot, Byte-/Entwurfszellen grün, 0 Seitenfehler = der Rückfall trägt), `s2_ohne_eintritt` (beide Pfeilzellen rot), `s2_ohne_klickziel` (`klick_zelle`), `s2_polstert` (nur `bytes_gleich`, weil Strg+S schon die aufgefüllte Tabelle schreibt); „statischer Import“ als pytest-Gegenprobe in `test_ed41_tabellen.py`.
+1. **Tastenkosten** (Median inkl. Abgleich; Basis A13.5: Chromium 1,6–2,2, Firefox 2–3 ms): Chromium 2,3–2,8 ms, Firefox 3 ms (≤ Basis + 2 ms); leerer Abgleich 0,2 ms; Zeichnen der 200-Zeilen-Tabelle 14–18 ms. **ui_budget** alle 6 grün: Erstaufruf 238,1 KB (S1: 237,7) von 250, nachgeladener Editor **74,0 von 80 KB** — die Grenze blieb **80** (E3 sieht 100 vor; S3/marked braucht sie, dann anheben).
+2. **Entscheidungen:** `blockRanges`-Interimsscanner folgt der Schleifenreihenfolge des Renderers; Tabellen in `:::`-Blöcken, Zäunen und Zitaten bleiben Rohtext, Tabellen in `~~~` werden Widget (der Renderer kennt `~~~` nicht); zwei Tabellen ohne Leerzeile = eine; breite Tabellen scrollen im Widget; Tabelle am Dateiende ohne Newline geprüft; `\|`-Teilung und `<br>` als Text sind **treue Renderer-Fehler** (S3, E4) — auch im Widget sichtbar.
+3. **Korrekturen am Plan:** der Pfeil-Eintritt läuft über `beforeSelectionChange` (`beforeCursorEnter` kann nur ein Mark räumen); Änderungen im Widget räumen es sofort (sonst 9 ms je Taste); `editor.js` liegt bei 20,6 KB gz trotz §4.4; ein zusätzliches Enter hinter der letzten Tabellenzeile zeigt die Tabelle kurz wieder als Widget.
+4. **Flake (S1-Zeit):** ein Chromium-Lauf färbte `kein_stilles_zurueck` rot („als neues Item anlegen“ öffnete das neue Item nicht binnen 10 s), der Wiederholungslauf war sauber — Evidenz gelöscht; schwacher Messpunkt der S1-Zelle, bei S2R im Auge behalten (mein Neulauf: sauber).
+5. **Nicht geprüft:** Rohmodus im Browser (nur Wächter), WebKit, IME, Touch, Umschalt+Pfeil in ein Widget, Ziehen der Bildlaufleiste, Chromium-Zwischenablage-API.

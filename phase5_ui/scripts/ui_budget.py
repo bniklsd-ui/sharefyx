@@ -127,6 +127,7 @@ def static_payload_files(static_dir: Path) -> tuple[list[Path], list[Path]]:
       erkennbar.
     * **Nachgeladen** — `vendor/**`: der Editor (CodeMirror 5) wird erst beim **Oeffnen**
       eines Items geladen (P10.5 Block 11.2) und ist damit **nicht** Teil des Erstaufrufs.
+      Dazu `js/editor/**.js` (Editor 4.1, Plan §4.4): nur per `import()` geladen.
 
     **Jede Datei unter `static/` gehoert in genau eine der beiden Listen** — der Wächter
     `phase10_5_finishing/tests/test_budget_coverage.py` prueft das. Zwei Dateien sind
@@ -139,6 +140,9 @@ def static_payload_files(static_dir: Path) -> tuple[list[Path], list[Path]]:
     erstaufruf += [static_dir / "app.css", static_dir / "logo.svg"]
     erstaufruf += sorted((static_dir / "fonts").glob("*.woff2"))
     nachgeladen = sorted(p for p in (static_dir / "vendor").rglob("*") if p.is_file())
+    # Editor 4.1 (Plan §4.4, Schritt S2): eigener Editor-Code unter `js/editor/` wird **nur per
+    # `import()`** geladen (nie statisch, Waechter `test_ed41_tabellen.py`) -- also nachgeladen.
+    nachgeladen += sorted(p for p in (static_dir / "js" / "editor").rglob("*.js") if p.is_file())
     return erstaufruf, nachgeladen
 
 
