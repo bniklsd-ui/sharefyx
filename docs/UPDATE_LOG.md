@@ -9,6 +9,11 @@
      (entries[0]), ein zweiter Deploy am selben Tag bekommt so seinen eigenen, frischen Eintrag
      statt stillschweigend an den ersten drangehängt zu werden. -->
 
+## 2026-11-06
+- Tabellen in deinen Notizen erscheinen im Editor wieder als Tabelle. Klickst du in eine Zelle oder läufst mit den Pfeiltasten hinein, siehst du wieder den Text und kannst ihn wie gewohnt ändern.
+- Ein angefangener Text geht nicht mehr verloren, wenn du die Seite neu lädst und zuerst eine andere Notiz öffnest. Ein bloßes Öffnen legt auch keinen Entwurf mehr an.
+- Hat inzwischen ein anderer Client, zum Beispiel eine KI, die Notiz geändert, setzt ein alter Entwurf diese Änderung nicht mehr stillschweigend zurück — du wirst gefragt, ob du den Entwurf verwirfst oder als neues Item anlegst.
+
 ## 2026-11-03
 - Die Verknüpfungskarte ist mit Tags und Ordnern wieder flüssig: Schwenken, Zoomen und Überfahren reagieren sofort, auch wenn beides eingeschaltet ist.
 - Ordner und Tags verbinden sich auf der Karte als Stern um das zuletzt geänderte Item, nicht mehr jedes mit jedem — das Bild wird ruhiger.
