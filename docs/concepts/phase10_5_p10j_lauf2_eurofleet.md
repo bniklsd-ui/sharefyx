@@ -6,7 +6,7 @@ detail: L2
 up: ../../phase10_5_finishing/CLAUDE.md
 down:
   - ./phase10_5_finishing_plan.md   # 📕 §6.7 Live-Abnahme P10-J (Topologie, Config, V214/V218)
-updated: 2026-11-03 (Nikinger: auch Lauf 1 (P10.5-27) und die Anbindung **aller** opencode-Instanzen gehen an eurofleet; Wegwerf-Generalprobe grün, §6) | 2026-11-01 (angelegt, Claude Code — Nikinger: Lauf 2 geht an eurofleet, weil eurofleet die Container verwaltet)
+updated: 2026-11-07 (eurofleet: Nachtrag zu §7, Sharefyx-MCP auf dieser VM live) | 2026-11-06 (eurofleet: Rückmeldung §7, Läufe 1 und 2 plus Zusatzlauf) | 2026-11-03 (Nikinger: auch Lauf 1 (P10.5-27) und die Anbindung **aller** opencode-Instanzen gehen an eurofleet; Wegwerf-Generalprobe grün, §6) | 2026-11-01 (angelegt, Claude Code — Nikinger: Lauf 2 geht an eurofleet, weil eurofleet die Container verwaltet)
 ---
 # P10.5-28 — P10-J Lauf 2 an eurofleet (Übergabe)
 
@@ -88,3 +88,46 @@ welcher Principal (Space) jede Instanz sehen darf, und ob eine Instanz **schreib
 
 **Phasenschluss:** P10.5-60 (P10-J zweimal live belegt) und das Closeout (Block Z) hängen an **diesen beiden Läufen**.
 Meldet die Belege an den Nikinger; er trägt sie in P10.5-27/28/60 ein.
+
+## 7. Rückmeldung eurofleet 2026-11-06 — Lauf 1, Lauf 2 und ein Zusatzlauf
+
+Belege für P10.5-27 und P10.5-28; der Nikinger trägt sie in P10.5-27/28/60 ein (der Phase-Head wurde nicht angefasst). Alle Läufe:
+opencode 1.18.33 auf der Sharefyx-VM als `savefyx`, `opencode run … --format json </dev/null`, Konfiguration **nur pro Lauf** über
+`OPENCODE_CONFIG` (temporäre Datei), `opencode.json` und `opencode serve` blieben unberührt. Der Login (`opencode mcp auth sharefyx`) kam vom
+Nikinger am Desktop der VM (der SSH-Tunnel zum Callback ging nicht); das Token liegt in `~/.local/share/opencode/mcp-auth.json`, nicht im Repo.
+
+| Lauf | Modell | Zeit (UTC) | Ergebnis | Serverjournal `sharefyx-mcp` |
+|---|---|---|---|---|
+| 1 (P10.5-27) | `minimax/MiniMax-M3.1-Flash` | 2026-11-06 19:59:16–19:59:24 | Tool `sharefyx_list_spaces` `completed`, korrekte Antwort mit den Space-Namen | `ev=tool tool=list_spaces ok=true`, 19:59:21Z, `ua=opencode/1.18.33` |
+| 2 (P10.5-28) | `ollama/qwen3-vl:8b-ctx16k` (CT 111, Ollama 0.34.4) | 20:04:57–20:09:05 | Tool-Aufruf `completed`, Ergebnis kam beim Modell an; **Antworttext unbrauchbar** (leeres `</think>`, danach `read`-Versuche auf `/etc/*`, von opencode automatisch abgelehnt) | `ev=tool tool=list_spaces ok=true`, 20:06:40Z |
+| Zusatz | `ollama/gpt-oss:20b-ctx16k` (CT 111, Ollama 0.34.4) | 21:06:21–21:09:38 | erster Aufruf mit erfundenem Argument `{"action":"list"}` → Toolfehler, zweiter Aufruf `{}` `completed`, **korrekte Antwort** | `ok=false err=internal` 21:09:06Z, danach `ok=true` 21:09:29Z |
+
+Der Zusatzlauf ist ein offenes OpenAI-Modell über Ollama; er belegt, dass der Toolstil funktioniert, nicht die gehosteten GPT-API-Modelle.
+
+Befunde:
+
+1. **Kontext:** Ollama nutzt auf der 12-GB-Karte standardmäßig 4096 Token. Der opencode-Prompt samt Tool-Definitionen (hier etwa 8 200 Token Eingabe) wird abgeschnitten, das Modell sieht dann das Werkzeug nicht (`reason: length`, kein Aufruf). Abhilfe: abgeleitetes Modell mit `num_ctx 16384`.
+2. **Journal ohne `client_id`:** `ev=tool` enthält `tool`, `space`, `ms`, `ok`, `proto`, aber keine `client_id`; nur die `ev=http`-Zeilen tragen den User-Agent. §3 verlangt die `client_id`.
+3. **`GET /mcp`:** ohne Token 401, mit Token 405 (§5 nennt 405 als normal).
+4. **Ablehnung unbekannter Argumente** wird als `err=internal` geloggt, nicht als eigener Fehlerbegriff.
+5. **`opencode run` liest stdin.** Ohne `</dev/null` wird ein Skript-Rest als Prompt gelesen (ein erster Lauf um 19:58:57Z führte dadurch ein harmloses `date` aus; er zählt nicht als Beleg).
+6. **Werkzeug-Umfang:** das Rezept aus §6 (`agent.build.tools = {"sharefyx_*": true}`) schaltet **alle** Sharefyx-Werkzeuge frei, auch schreibende. Der Server sah in allen Läufen nur `list_spaces`. Der Zusatzlauf erlaubte deshalb nur `sharefyx_list_spaces` (`sharefyx_*: false`, `bash/read/write/edit` aus).
+
+Nicht erledigt: die Anbindung **aller** opencode-Instanzen. Das ist eine Entscheidung des Nikinger: ein dauerhafter `mcp.sharefyx`-Eintrag in `opencode.json` öffnet Sharefyx auch für die Agenten von `opencode serve`, und jede Instanz braucht ihren eigenen Login.
+
+### Nachtrag 2026-11-07 (eurofleet)
+
+Dieser Nachtrag überholt den Schlusssatz „Nicht erledigt“ oben.
+
+- **Messung:** `mcp.sharefyx` allein genügt, der Block `agent.build.tools = {"sharefyx_*": true}` aus §6 ist **nicht nötig**. Ein Lauf mit
+  `minimax/MiniMax-M3.1-Flash` ohne diesen Block hat `sharefyx_list_spaces` aufgerufen (`completed`, Serverjournal `ok=true`).
+- **Stand der Anbindung:** Auf dieser VM steht `mcp.sharefyx` dauerhaft in `~/.config/opencode/opencode.json` (Fleet-Rolle
+  `opencode_provider`, Variable `opencode_provider_mcp`), **lesend und schreibend** (Entscheidung Nikinger). `opencode serve` wurde durch den
+  Reboot des Wochen-Updates am 2026-11-07 neu gestartet, `opencode mcp list` zeigt `sharefyx connected`. Seitdem sehen die Agenten von
+  `opencode serve` auf dieser VM **alle** Sharefyx-Werkzeuge, auch die schreibenden. Das Token (Konto des Nikinger) liegt in
+  `~/.local/share/opencode/mcp-auth.json`. Trading-VM: Eintrag und Login noch offen (Lauf und Login durch den Nikinger). Traktion-VM: bewusst
+  nicht angebunden (opencode 1.17.19, `autoupdate:false` im Projekt).
+- **Platte dieser VM:** Am 2026-11-07 stand sie bei 90 %, der Wochenlauf brach im Precheck ab. Gelöscht (Nikinger freigegeben):
+  `/tmp/pytest-of-savefyx` (0,87 GB) und der npm-Cache (2,6 GB); die Platte wurde von 50 auf 65 GB vergrößert (jetzt etwa 60 %). Eigener Platz
+  der Sharefyx-Session: `/tmp/opencode` (1,6 GB, Proben) und `~/.local/share/opencode` (4,9 GB opencode-Daten); der pytest-Temp wächst nach.
+  Bitte regelmäßig aufräumen. Fleet hat dafür ein Zukunfts-Item (Wochenpflege der Dev-VMs: Cache-Aufräumen und Dev-Software-Updates).
