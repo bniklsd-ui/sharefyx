@@ -6,7 +6,7 @@ detail: L2
 up: ../../phase10_5_finishing/CLAUDE.md
 down:
   - ./phase10_5_finishing_plan.md   # 📕 §6.7 Live-Abnahme P10-J (Topologie, Config, V214/V218)
-updated: 2026-11-07 (eurofleet: Nachtrag zu §7, Sharefyx-MCP auf dieser VM live) | 2026-11-06 (eurofleet: Rückmeldung §7, Läufe 1 und 2 plus Zusatzlauf) | 2026-11-03 (Nikinger: auch Lauf 1 (P10.5-27) und die Anbindung **aller** opencode-Instanzen gehen an eurofleet; Wegwerf-Generalprobe grün, §6) | 2026-11-01 (angelegt, Claude Code — Nikinger: Lauf 2 geht an eurofleet, weil eurofleet die Container verwaltet)
+updated: 2026-11-07 (Claude Code: §8 Schreibtest mit drei Modellen, Nikinger-Wunsch) | 2026-11-07 (eurofleet: Nachtrag zu §7, Sharefyx-MCP auf dieser VM live) | 2026-11-06 (eurofleet: Rückmeldung §7, Läufe 1 und 2 plus Zusatzlauf) | 2026-11-03 (Nikinger: auch Lauf 1 (P10.5-27) und die Anbindung **aller** opencode-Instanzen gehen an eurofleet; Wegwerf-Generalprobe grün, §6) | 2026-11-01 (angelegt, Claude Code — Nikinger: Lauf 2 geht an eurofleet, weil eurofleet die Container verwaltet)
 ---
 # P10.5-28 — P10-J Lauf 2 an eurofleet (Übergabe)
 
@@ -131,3 +131,16 @@ Dieser Nachtrag überholt den Schlusssatz „Nicht erledigt“ oben.
   `/tmp/pytest-of-savefyx` (0,87 GB) und der npm-Cache (2,6 GB); die Platte wurde von 50 auf 65 GB vergrößert (jetzt etwa 60 %). Eigener Platz
   der Sharefyx-Session: `/tmp/opencode` (1,6 GB, Proben) und `~/.local/share/opencode` (4,9 GB opencode-Daten); der pytest-Temp wächst nach.
   Bitte regelmäßig aufräumen. Fleet hat dafür ein Zukunfts-Item (Wochenpflege der Dev-VMs: Cache-Aufräumen und Dev-Software-Updates).
+
+## 8. Schreibtest mit drei Modellen (Wunsch des Nikingers, 2026-11-07)
+
+> **Stand der Läufe aus §7:** der Server sah nur `list_spaces`, **kein** Lauf hat ein Item angelegt (die Journalzeilen zeigen kein `create_item`); angelegt wurden nur die temporäre `OPENCODE_CONFIG`-Datei je Lauf und das Token des Logins. Der Nikinger wiederholt die Läufe jetzt in eurofleet mit **`gpt-oss:20b-ctx16k`, `qwen3-vl:8b-ctx16k` und `minimax/MiniMax-M3.1-Flash`** — diesmal **schreibend**: jedes Modell legt **ein** echtes Test-Item an.
+
+**Das schreibt in den echten Home-Space des Nikingers** (sein Token) — und Sharefyx kennt **kein Löschen**, nur `status: archived`. Deshalb jede Spur eindeutig markieren:
+- Werkzeug `create_item` (Parameter laut Server: `type`, `title`, `body`, `folder`, `tags`; `space` leer = eigener Space). Genau **ein** Aufruf je Modell.
+- Titel `[P10-J Test] <Modellname>`, `type: note`, `tags: ["p10j-test"]`, `folder: "p10j-test"`. Nach dem Lauf archiviert der Nikinger die drei Items (oder löscht sie im Papierkorb der Oberfläche).
+- Prompt (je Lauf, `</dev/null`): „Lege mit dem Werkzeug create_item genau ein Item an: type note, Titel ‚[P10-J Test] <Modellname>‘, tags [‚p10j-test‘], folder ‚p10j-test‘. Der Text: eine kurze Zeile und darunter eine Markdown-Tabelle mit den Spalten Modell, Ergebnis, Bemerkung und zwei Zeilen. Rufe kein anderes Werkzeug auf. Nenne danach nur den Titel.“ — Die Tabelle ist Absicht: so entsteht **von einer KI geschriebenes** Markdown, das der Nikinger im Editor ansehen kann (P10.5-85, Widget aus `v4.0.2`); Zeilenumbrüche in Zellen (`<br>`) und maskierte Striche (`\|`) sind bekannte Stolpersteine des Renderers (P11) — ein Modell, das sie schreibt, ist ein echter Fall.
+- **Werkzeug-Umfang je Lauf begrenzen** (Pro-Lauf-Konfiguration): nur `sharefyx_create_item` und `sharefyx_list_spaces` an, die übrigen `sharefyx_*` aus (`tools: {"sharefyx_*": false, "sharefyx_create_item": true, "sharefyx_list_spaces": true}`) — **Musterreihenfolge nicht gemessen**, vorher an einem Lauf **ohne** Schreibwirkung prüfen (z. B. mit `list_spaces` allein), dass `sharefyx_*: false` die beiden Ausnahmen nicht mit abschaltet. `bash/read/write/edit` aus (wie im Zusatzlauf).
+- **Beleg je Lauf:** Mitschnitt (Modellname), Journalzeile `ev=tool tool=create_item ok=true` mit Zeit, und der Titel des angelegten Items. Auch ein **Fehlschlag** ist ein Ergebnis (das 8B-Modell hat in §7 schon einen unbrauchbaren Text geliefert; erfundene Argumente sind bei `gpt-oss` vorgekommen — `err=internal`).
+- Kein Secret in die Notiz oder den Chat; das Token bleibt in `~/.local/share/opencode/mcp-auth.json`.
+
