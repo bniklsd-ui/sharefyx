@@ -1,0 +1,185 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" font-family="'DejaVu Sans','Segoe UI',Helvetica,Arial,sans-serif">
+
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6b7d"/>
+    </marker>
+    <marker id="arG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f7a4d"/>
+    </marker>
+    <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b03030"/>
+    </marker>
+  </defs>
+
+  <rect width="1080" height="1080" fill="#f7f8fa"/>
+
+  <!-- ================= Kopf ================= -->
+  <rect x="0" y="0" width="1080" height="86" fill="#1d2b3a"/>
+  <text x="36" y="36" font-size="19" font-weight="700" fill="#ffffff">Phase 10.5 — Finishing: alle Baustellen schließen</text>
+  <text x="36" y="62" font-size="12" fill="#9db2c6">Sharefyx · phase10_5_finishing/ · 22.10.–07.11.2026 · 169 Commits · live v3.1.4 → v4.0.2</text>
+  <rect x="764" y="14" width="280" height="58" rx="10" fill="#2f7a4d"/>
+  <text x="904" y="36" font-size="14.5" font-weight="700" fill="#ffffff" text-anchor="middle">86 ✅ · 0 ⚠️ · 0 ⬜</text>
+  <text x="904" y="52" font-size="10.5" fill="#cfe6d8" text-anchor="middle">Abnahme · P10-J live belegt</text>
+  <text x="904" y="66" font-size="10.5" font-weight="700" fill="#f3d39a" text-anchor="middle">Editor-Optik nicht erfüllt → P11</text>
+
+  <!-- ================= Mission ================= -->
+  <rect x="36" y="98" width="1008" height="74" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="121" font-size="13.5" font-weight="700" fill="#1d2b3a">Mission: jede Registerzeile mit Ziel P10.5 schließen — Ende erst, wenn ein Nicht-Claude-Client live list_spaces ausführt.</text>
+  <text x="56" y="142" font-size="12" fill="#4a5a6b">Plan: Blöcke 0–12 + Z, <tspan font-weight="700" fill="#1d2b3a">61</tspan> Abnahmezeilen, vier Deploys v3.1.5–v3.1.8 · Ist: Blöcke <tspan font-weight="700" fill="#1d2b3a">0–19</tspan> + Z, <tspan font-weight="700" fill="#1d2b3a">86</tspan> Zeilen, Deploys A–F bis v4.0.2</text>
+  <text x="56" y="161" font-size="12" fill="#4a5a6b">pytest 1268 → <tspan font-weight="700" fill="#1d2b3a">1939</tspan> · Register <tspan font-weight="700" fill="#2f7a4d">48 ✅</tspan> · <tspan font-weight="700" fill="#b03030">1 ⬜</tspan> (AL-1 Zeile 15) · ui_budget 6/6 · doc_health 0 · v4.0.0 = Entscheidung des Nikingers</text>
+
+  <!-- ================= Flussdiagramm ================= -->
+  <rect x="36" y="184" width="1008" height="378" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="206" font-size="14.5" font-weight="700" fill="#1d2b3a">Geplant 0–12 → dazu 13–19 (Aufträge, Review, Live-Funde) → Deploys A–F → P10-J live</text>
+
+  <!-- Lane 1: geplant -->
+  <text x="56" y="226" font-size="11" font-weight="700" fill="#6b7b8c">GEPLANT (Plan 21.10.) — Blöcke 0–11 überwiegend vom Ausführer MiniMax M3.1 Flash (opencode), Proben/Sichtung Claude Code</text>
+
+  <rect x="60" y="234" width="226" height="74" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="173" y="252" font-size="12" font-weight="700" fill="#1d2b3a" text-anchor="middle">0–4 Fundament · Deploy A</text>
+  <text x="173" y="269" font-size="10" fill="#4a5a6b" text-anchor="middle">Betrieb, Fehler, Hygiene</text>
+  <text x="173" y="283" font-size="10" fill="#4a5a6b" text-anchor="middle">EXIF-Strip, Caddy, constraints</text>
+  <text x="173" y="299" font-size="10" fill="#2f7a4d" text-anchor="middle" font-weight="700">/overview 2405 → 107 ms</text>
+
+  <line x1="288" y1="271" x2="303" y2="271" stroke="#5a6b7d" stroke-width="1.8" marker-end="url(#ar)"/>
+  <rect x="306" y="234" width="226" height="74" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="419" y="252" font-size="12" font-weight="700" fill="#1d2b3a" text-anchor="middle">5–6 MCP + Anbieter · B</text>
+  <text x="419" y="269" font-size="10" fill="#4a5a6b" text-anchor="middle">FastMCP 4.1.3, proto im Log</text>
+  <text x="419" y="283" font-size="10" fill="#4a5a6b" text-anchor="middle">/mcp ohne Slash, CSP form-action</text>
+  <text x="419" y="299" font-size="10" fill="#2f7a4d" text-anchor="middle" font-weight="700">Loopback-DCR: 400 → 201</text>
+
+  <line x1="534" y1="271" x2="549" y2="271" stroke="#5a6b7d" stroke-width="1.8" marker-end="url(#ar)"/>
+  <rect x="552" y="234" width="226" height="74" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="665" y="252" font-size="12" font-weight="700" fill="#1d2b3a" text-anchor="middle">7–8 Darstellung + Karte C2</text>
+  <text x="665" y="269" font-size="10" fill="#4a5a6b" text-anchor="middle">404, Logo, Titel, Kontrast</text>
+  <text x="665" y="283" font-size="10" fill="#4a5a6b" text-anchor="middle">Lappen · Furchen · Zellen</text>
+  <text x="665" y="299" font-size="10" fill="#6b7b8c" text-anchor="middle" font-weight="700">C nie einzeln → in D</text>
+
+  <line x1="780" y1="271" x2="795" y2="271" stroke="#5a6b7d" stroke-width="1.8" marker-end="url(#ar)"/>
+  <rect x="798" y="234" width="226" height="74" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="911" y="252" font-size="12" font-weight="700" fill="#1d2b3a" text-anchor="middle">9–12 Rechte · Realtime · Editor</text>
+  <text x="911" y="269" font-size="10" fill="#4a5a6b" text-anchor="middle">rename_folder/space, created_by</text>
+  <text x="911" y="283" font-size="10" fill="#4a5a6b" text-anchor="middle">Volltext, SSE 141 ms, Doku</text>
+  <text x="911" y="299" font-size="10" fill="#a8861f" text-anchor="middle" font-weight="700">Editor 1+2: nur Maß der Zeit</text>
+
+  <!-- Lane 2: ungeplant -->
+  <text x="56" y="328" font-size="11" font-weight="700" fill="#6b7b8c">DAZU — sieben ungeplante Blöcke (Aufträge des Nikingers, Ultra-Review, Live-Funde); 13 und 15–19 baute Claude Code</text>
+
+  <rect x="60" y="336" width="152" height="62" rx="7" fill="#e8eef5" stroke="#7f9ab5" stroke-width="1.4"/>
+  <text x="136" y="354" font-size="11" font-weight="700" fill="#1d2b3a" text-anchor="middle">13 Aufträge</text>
+  <text x="136" y="371" font-size="9.5" fill="#4a5a6b" text-anchor="middle">Größen, Leiste, Farben</text>
+  <text x="136" y="386" font-size="9.5" fill="#4a5a6b" text-anchor="middle">v4.0.0 · Rohtext weg</text>
+
+  <rect x="222" y="336" width="152" height="62" rx="7" fill="#e8eef5" stroke="#7f9ab5" stroke-width="1.4"/>
+  <text x="298" y="354" font-size="11" font-weight="700" fill="#1d2b3a" text-anchor="middle">14 Kartenlayout</text>
+  <text x="298" y="371" font-size="9.5" fill="#4a5a6b" text-anchor="middle">zufällig, aber geordnet</text>
+  <text x="298" y="386" font-size="9.5" fill="#4a5a6b" text-anchor="middle">ein Körper (Option B)</text>
+
+  <rect x="384" y="336" width="152" height="62" rx="7" fill="#fbecec" stroke="#d99a9a" stroke-width="1.4"/>
+  <text x="460" y="354" font-size="11" font-weight="700" fill="#1d2b3a" text-anchor="middle">15 Review-Fixes</text>
+  <text x="460" y="371" font-size="9.5" fill="#b03030" text-anchor="middle" font-weight="700">22 Befunde, B1 kritisch</text>
+  <text x="460" y="386" font-size="9.5" fill="#4a5a6b" text-anchor="middle">B1–B10 vor D behoben</text>
+
+  <rect x="546" y="336" width="152" height="62" rx="7" fill="#e8eef5" stroke="#7f9ab5" stroke-width="1.4"/>
+  <text x="622" y="354" font-size="11" font-weight="700" fill="#1d2b3a" text-anchor="middle">16 + 17 Launch-Film</text>
+  <text x="622" y="371" font-size="9.5" fill="#4a5a6b" text-anchor="middle">48 s, zwei Sichtungen</text>
+  <text x="622" y="386" font-size="9.5" fill="#4a5a6b" text-anchor="middle">Startbild in der App</text>
+
+  <rect x="708" y="336" width="152" height="62" rx="7" fill="#fbecec" stroke="#d99a9a" stroke-width="1.4"/>
+  <text x="784" y="354" font-size="11" font-weight="700" fill="#1d2b3a" text-anchor="middle">18 Live-Funde · E</text>
+  <text x="784" y="371" font-size="9.5" fill="#4a5a6b" text-anchor="middle">Karte 309 → 2,3 ms/Bild</text>
+  <text x="784" y="386" font-size="9.5" fill="#4a5a6b" text-anchor="middle">Einschwingen 55 → 1,6 s</text>
+
+  <rect x="870" y="336" width="152" height="62" rx="7" fill="#fbecec" stroke="#d99a9a" stroke-width="1.4"/>
+  <text x="946" y="354" font-size="11" font-weight="700" fill="#1d2b3a" text-anchor="middle">19 Editor-Hotfix · F</text>
+  <text x="946" y="371" font-size="9.5" fill="#4a5a6b" text-anchor="middle">Tabellen als Widget</text>
+  <text x="946" y="386" font-size="9.5" fill="#4a5a6b" text-anchor="middle">Entwurfsschutz, Probe</text>
+
+  <!-- Deploys -->
+  <text x="56" y="420" font-size="11" font-weight="700" fill="#6b7b8c">DEPLOYS — deploy.sh und health_gate beim Nikinger (Hard Rule 9), Ausgabe im Commit</text>
+
+  <rect x="60" y="428" width="146" height="34" rx="6" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="133" y="442" font-size="10.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">A v3.1.5 · 23.10.</text>
+  <text x="133" y="456" font-size="9.5" fill="#2f7a4d" text-anchor="middle">9/9</text>
+  <line x1="208" y1="445" x2="219" y2="445" stroke="#2f7a4d" stroke-width="1.6" marker-end="url(#arG)"/>
+  <rect x="222" y="428" width="146" height="34" rx="6" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="295" y="442" font-size="10.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">B v3.1.6 · 23.10.</text>
+  <text x="295" y="456" font-size="9.5" fill="#2f7a4d" text-anchor="middle">9/9</text>
+  <line x1="370" y1="445" x2="381" y2="445" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <rect x="384" y="428" width="146" height="34" rx="6" fill="#eef0f3" stroke="#b7c0ca" stroke-dasharray="4 3"/>
+  <text x="457" y="442" font-size="10.5" font-weight="700" fill="#6b7b8c" text-anchor="middle">C v3.1.7</text>
+  <text x="457" y="456" font-size="9.5" fill="#6b7b8c" text-anchor="middle">nie einzeln, in D</text>
+  <line x1="532" y1="445" x2="543" y2="445" stroke="#5a6b7d" stroke-width="1.6" marker-end="url(#ar)"/>
+  <rect x="546" y="428" width="146" height="34" rx="6" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="619" y="442" font-size="10.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">D v4.0.0 · 01.11.</text>
+  <text x="619" y="456" font-size="9.5" fill="#2f7a4d" text-anchor="middle">9/9 · Blöcke 7–17</text>
+  <line x1="694" y1="445" x2="705" y2="445" stroke="#2f7a4d" stroke-width="1.6" marker-end="url(#arG)"/>
+  <rect x="708" y="428" width="146" height="34" rx="6" fill="#eaf4ee" stroke="#8fb59a"/>
+  <text x="781" y="442" font-size="10.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">E v4.0.1 · 03.11.</text>
+  <text x="781" y="456" font-size="9.5" fill="#2f7a4d" text-anchor="middle">9/9 · Karte flüssig</text>
+  <line x1="856" y1="445" x2="867" y2="445" stroke="#2f7a4d" stroke-width="1.6" marker-end="url(#arG)"/>
+  <rect x="870" y="428" width="152" height="34" rx="6" fill="#f6efe0" stroke="#c9a46a"/>
+  <text x="946" y="442" font-size="10.5" font-weight="700" fill="#1d2b3a" text-anchor="middle">F v4.0.2 · 06.11.</text>
+  <text x="946" y="456" font-size="9.5" fill="#a8861f" text-anchor="middle" font-weight="700">8/9 am Folgetag</text>
+
+  <line x1="542" y1="466" x2="542" y2="481" stroke="#2f7a4d" stroke-width="1.8" marker-end="url(#arG)"/>
+
+  <!-- P10-J -->
+  <rect x="60" y="486" width="964" height="64" rx="8" fill="#eaf4ee" stroke="#2f7a4d" stroke-width="2"/>
+  <text x="76" y="507" font-size="12.5" font-weight="700" fill="#1d2b3a">P10-J erfüllt (P10.5-27/28/60): opencode führt live list_spaces aus — zwei Modellanbieter, ein Server</text>
+  <text x="76" y="525" font-size="11" fill="#4a5a6b">MiniMax M3.1 Flash (gehostet) · Ollama auf CT 111: qwen3-vl:8b (Aufruf ok, Antwort unbrauchbar), Zusatzlauf gpt-oss:20b (korrekt)</text>
+  <text x="76" y="541" font-size="11" fill="#4a5a6b">Danach Schreibtest: alle drei Modelle legen je ein Item an; ihre Tabellen erscheinen im Editor als Tabelle (P10.5-85, 07.11.)</text>
+
+  <!-- ================= Nicht erfüllt ================= -->
+  <rect x="36" y="574" width="1008" height="104" rx="8" fill="#fbecec" stroke="#b03030" stroke-width="2"/>
+  <text x="56" y="597" font-size="13.5" font-weight="700" fill="#b03030">Ein Soll ist technisch nicht erfüllt — und war nie ein Abnahmemaß: der Editor sieht aus wie eine Markdown-Datei</text>
+  <text x="56" y="617" font-size="11" fill="#1d2b3a">Soll (Nikinger 07.11.): optisch wie ein Word-/Writer-Dokument, die gespeicherte Datei bleibt Markdown/HTML.</text>
+  <text x="56" y="634" font-size="11" fill="#4a5a6b">Gesehen: Fließtext in Festbreitenschrift · Link als Rohsyntax [Vorgabe](#item/…) · sichtbare „#“-Zeichen · weiße Kästchen · breite Tabelle läuft über</text>
+  <text x="56" y="651" font-size="11" fill="#4a5a6b">Blöcke 11/13 erfüllten das Maß ihrer Zeit (P10.5-50–55, 62–64); eine eigene Zeile öffnen = Entscheidung des Nikingers, nicht gezählt.</text>
+  <text x="56" y="668" font-size="11" fill="#4a5a6b">Gemessen im Editor-Plan: F11 Plex Mono 13 px gegen Lesesicht Plex Sans 16 px · F5 Listenzeichen versteckt → <tspan font-weight="700" fill="#b03030">Leitziel P11</tspan> (S4, S5a)</text>
+
+  <!-- ================= Pannen ================= -->
+  <rect x="36" y="690" width="500" height="150" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="712" font-size="13.5" font-weight="700" fill="#1d2b3a">Pannen und Lehren</text>
+  <text x="56" y="732" font-size="10.5" fill="#b03030" font-weight="700">Abnahmemaß ohne Tabelle und ohne Writer-Optik als Sichtkriterium</text>
+  <text x="56" y="750" font-size="10.5" fill="#4a5a6b">Live-Funde nach D: Karte träge, Schleuder N1, Tabellen als Rohtext</text>
+  <text x="56" y="768" font-size="10.5" fill="#4a5a6b">B1 (Pfad-Traversal) live seit 20.08. — gefunden erst vom Ultra-Review</text>
+  <text x="56" y="786" font-size="10.5" fill="#4a5a6b">Entwurfsschutz: clientseitiges Last-Write-Wins, behoben in S1</text>
+  <text x="56" y="804" font-size="10.5" fill="#4a5a6b">vier zahnlose Gegenläufe, je für die neue Szene neu gebaut</text>
+  <text x="56" y="822" font-size="10.5" fill="#4a5a6b">Plan-Hebel und Zeilenzahl drifteten (61 → 86) · Gate-Datumsfalle bei F</text>
+
+  <!-- ================= VERIFY ================= -->
+  <rect x="548" y="690" width="496" height="150" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="566" y="712" font-size="13.5" font-weight="700" fill="#1d2b3a">[VERIFY] V207–V219: 9 ✅ · 1 ⚠️ · 1 ⬜ · 2 ohne Vermerk</text>
+  <text x="566" y="732" font-size="10.5" fill="#2f7a4d">✅ V207–V209 · V211–V214 · V218 · V219</text>
+  <text x="566" y="750" font-size="10.5" fill="#a8861f">⚠️ V210 — IPv6 in der CSP: nur als Annahme im Code</text>
+  <text x="566" y="768" font-size="10.5" fill="#b03030">⬜ V215 Safari-Favicon (WebKit startet hier nicht)</text>
+  <text x="566" y="786" font-size="10.5" fill="#4a5a6b">V216 · V217 ohne Auflösungsvermerk (implizit erledigt)</text>
+  <text x="566" y="804" font-size="10.5" fill="#4a5a6b">draußen: V203 (Fleet) · V150 (Termin) · nächste freie: V220</text>
+  <text x="566" y="822" font-size="10.5" fill="#4a5a6b">Ausführer (Rohdaten): 61 Commits MiniMax · 88 Claude · 22 ohne</text>
+
+  <!-- ================= Brücke P10.5 → P11 ================= -->
+  <rect x="36" y="852" width="1008" height="118" rx="8" fill="#ffffff" stroke="#d5dce4"/>
+  <text x="56" y="874" font-size="14.5" font-weight="700" fill="#1d2b3a">P10.5 → P11: Handover PHASE10_5_CLOSEOUT_HANDOVER.md — erst planen, dann bauen</text>
+
+  <rect x="60" y="884" width="384" height="76" rx="8" fill="#eaf4ee" stroke="#8fb59a" stroke-width="1.6"/>
+  <text x="76" y="904" font-size="12" font-weight="700" fill="#1d2b3a">P10.5 liefert</text>
+  <text x="76" y="921" font-size="10.5" fill="#4a5a6b">v4.0.2 live · 86 Abnahmezeilen ✅ · P10-J live</text>
+  <text x="76" y="936" font-size="10.5" fill="#4a5a6b">Register 48 von 49 · Editor-Plan S0–S2 gebaut</text>
+  <text x="76" y="951" font-size="10.5" fill="#4a5a6b">Darstellungs-Probe: 26 von 57 Zellen noch rot</text>
+
+  <line x1="450" y1="922" x2="542" y2="922" stroke="#2f7a4d" stroke-width="2.2" marker-end="url(#arG)"/>
+  <text x="494" y="914" font-size="10" font-weight="700" fill="#2f7a4d" text-anchor="middle">Handover</text>
+
+  <rect x="548" y="884" width="476" height="76" rx="8" fill="#e8eef5" stroke="#7f9ab5" stroke-width="1.6"/>
+  <text x="564" y="904" font-size="12" font-weight="700" fill="#1d2b3a">P11 Block 1 = Editor 4.1 (v4.1.0, ~11 Sitzungen)</text>
+  <text x="564" y="921" font-size="10.5" fill="#b03030" font-weight="700">Leitziel: Writer-Optik bei Markdown/HTML-Kern</text>
+  <text x="564" y="936" font-size="10.5" fill="#4a5a6b">nahtlose Tabellen · Feedback-Knopf · Darstellungs-Check</text>
+  <text x="564" y="951" font-size="10.5" fill="#4a5a6b">Green/Blue · client_id im Log · Review-Backlog B11–B22</text>
+
+  <!-- ================= Fuß ================= -->
+  <text x="36" y="996" font-size="11" fill="#4a5a6b">pytest 1268 → 1939 · ui_budget 6/6 · doc_health 0 · Commits d5f6081..8247fc8 · live v4.0.2 (d2ca573) · F: health_gate 8/9 (Datumsartefakt)</text>
+  <text x="36" y="1014" font-size="11" fill="#4a5a6b">Plan: phase10_5_finishing_plan.md (📕) + Blockpläne 14–19 · Head: phase10_5_finishing/CLAUDE.md · Abnahme: ABNAHME_ARCHIVE.md</text>
+  <text x="36" y="1032" font-size="11" fill="#4a5a6b">Editor-Plan: phase10_5_editor_4_1_plan.md (S3a–S11 → P11) · Review: phase10_5_ultra_review_v4.0.0.md · eurofleet-Notiz §7/§8</text>
+</svg>

@@ -5,7 +5,7 @@ read-when: locating any doc, or deciding whether a file is worth reading at all
 detail: L0
 up: ../CLAUDE.md
 down: every project doc (that is the point)
-updated: 2026-11-02 (Block 18: zwei Addons) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
+updated: 2026-11-07 (Closeout P10.5: Handover, Grafik) | ältere Einträge: docs/INDEX_UPDATES_ARCHIVE.md
 ---
 # Doc Index (L0)
 
@@ -28,7 +28,7 @@ updated: 2026-11-02 (Block 18: zwei Addons) | ältere Einträge: docs/INDEX_UPDA
 
 ## Root & governance
 
-- [docs/INDEX.md](./INDEX.md) — 🔗 **diese Karte** (L0) · **37.930 B — unter dem 40-KiB-Softcap** (V145 ✅) · die Karten-Chronik steht in `docs/INDEX_ENTRIES_ARCHIVE.md` · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
+- [docs/INDEX.md](./INDEX.md) — 🔗 **diese Karte** (L0) · **37.760 B — unter dem 40-KiB-Softcap** (V145 ✅) · die Karten-Chronik steht in `docs/INDEX_ENTRIES_ARCHIVE.md` · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [CLAUDE.md](../CLAUDE.md) — 📗 **37.409 B** (vor der Rotation 114.771 B) · Wurzel-Regelwerk: Kernprinzip der dumme Server, **neun Hard Rules**, Working style, Doku-Hygiene und **Current state** (Session-Bloecke, newest-first, **kein** Ein-Block-Limit — P9-A). **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [README.md](../README.md) — 📗 ~7KB · human overview + machine setup (venv, keyring, run, smoke test); **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [ROADMAP.md](../ROADMAP.md) — 📗 **27.213 B** · Phasen 1–10.5, Scope, Status (LG-6: Phase 8.5 → `ROADMAP_ARCHIVE.md`) · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
@@ -44,7 +44,7 @@ updated: 2026-11-02 (Block 18: zwei Addons) | ältere Einträge: docs/INDEX_UPDA
 
 - [phase10_inventory/CLAUDE.md](../phase10_inventory/CLAUDE.md) — 📗 ~8KB · Phase-10-Head: Modulstatus Steps 0–4/Z (✅; Step 4 = Plan P10.5, 2026-10-21), ein Session-Block (Planungschat)
 - [phase10_inventory/SESSIONS_ARCHIVE.md](../phase10_inventory/SESSIONS_ARCHIVE.md) — 📦 ~27KB · ältere Session-Blöcke, verbatim
-- [phase10_inventory/BAUSTELLENREGISTER.md](../phase10_inventory/BAUSTELLENREGISTER.md) — 📗 **36.200 B** (6.094 B Luft) — 76 Baustellen; die Arbeitsliste für P10.5 (Tor P10-8 offen) · die **geschlossenen** Zeilen zeigen auf `REGISTER_ARCHIVE.md`
+- [phase10_inventory/BAUSTELLENREGISTER.md](../phase10_inventory/BAUSTELLENREGISTER.md) — 📗 **37.070 B** — 76 Baustellen; die Arbeitsliste für P10.5 (P10.5: 48 ✅ · 1 ⬜) · die **geschlossenen** Zeilen zeigen auf `REGISTER_ARCHIVE.md`
 - [phase10_inventory/REGISTER_ARCHIVE.md](../phase10_inventory/REGISTER_ARCHIVE.md) — 📦 **16.551 B** · die **geschlossenen** Registerzeilen (25), verbatim (2026-10-24 gewandert)
 - [phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md](../phase10_inventory/ENTSCHEIDUNGEN_ARCHIVE.md) — 📦 **5.615 B** · L3: Entscheidungsliste D-1–D-18 des Registers, verbatim · **Nachtrag: `docs/INDEX_ENTRIES_ARCHIVE.md`**
 - [phase10_inventory/UPDATES_ARCHIVE.md](../phase10_inventory/UPDATES_ARCHIVE.md) — 📦 **4.969 B** · L3-Archiv der `updated:`-Fäden des Phase-10-Registers, verbatim — am 2026-10-24 rotiert, weil das Register an der Grenze stand
@@ -54,18 +54,18 @@ updated: 2026-11-02 (Block 18: zwei Addons) | ältere Einträge: docs/INDEX_UPDA
 - [docs/concepts/phase10_executor_review_glm.md](./concepts/phase10_executor_review_glm.md) — 📗 ~14KB · Auswertung P10-K-Open-Test (GLM via opencode): Kontingent, Qualität Q1–Q6, §5 Entscheidung: GLM verworfen
 - [docs/concepts/phase10_intake.md](./concepts/phase10_intake.md) — 📗 ~28KB · Sammelstelle, Herkunft des Registers: Wünsche, Erbe P9, Fleet-Notizen §5–§7, Notes **an** Fleet §8–§9
 - [docs/concepts/phase10_karte_c_stil_1.svg](./concepts/phase10_karte_c_stil_1.svg) — 📕 Karten-Entwürfe: `phase10_karte_entwurf_{a,b,c}.svg` (Wahl C), `phase10_karte_c_stil_{1,2,3}.svg` (Wahl C2), `phase10_logo_entwuerfe{,_c,_mix,_final}.svg` (Logo D-6)
-- [docs/concepts/PHASE10_CLOSEOUT_HANDOVER.md](./concepts/PHASE10_CLOSEOUT_HANDOVER.md) — 📕 ~14KB · Abschluss-Handover P10 → P10.5: Planungsdossier (Step 4 + Tor wandern), offene Entscheidungen, [VERIFY]-Bilanz
-- [docs/concepts/phase10_5_finishing_plan.md](./concepts/phase10_5_finishing_plan.md) — 📕 ~101KB · Plan P10.5 (`main@e5a1879`, 2026-10-21): Locks A–W, Blöcke 0–13/Z, Deploys A–D
-- [docs/concepts/phase10_inventory_uebersicht.svg](./concepts/phase10_inventory_uebersicht.svg) — 📕 ~16KB · Phase-10-Übersichtsgrafik 1080×1080 (Closeout 2026-10-20, gerendert und angesehen)
+- [docs/concepts/PHASE10_CLOSEOUT_HANDOVER.md](./concepts/PHASE10_CLOSEOUT_HANDOVER.md) — 📕 ~14KB · Abschluss-Handover P10 → P10.5: Planungsdossier, offene Entscheidungen, [VERIFY]-Bilanz
+- [docs/concepts/phase10_5_finishing_plan.md](./concepts/phase10_5_finishing_plan.md) — 📕 ~101KB · Plan P10.5: Locks A–W, Blöcke 0–13/Z, Deploys A–D
+- [docs/concepts/phase10_inventory_uebersicht.svg](./concepts/phase10_inventory_uebersicht.svg) — 📕 ~16KB · Phase-10-Übersichtsgrafik 1080×1080
 
 ## Phase 10.5 — 🔄 in Arbeit (Finishing; Plan siehe unten)
 
-- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **38554 B** · Head: Modulstatus, Deploys, Abnahme (79 ✅ · 4 ⬜)
-- [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **49530 B** · die **geschlossenen** Abnahmezeilen, verbatim
-- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **222157 B** · Session-Blöcke, verbatim
+- [phase10_5_finishing/CLAUDE.md](../phase10_5_finishing/CLAUDE.md) — 📗 **38052 B** · Head: Modulstatus, Deploys, Abnahme (86 ✅)
+- [phase10_5_finishing/ABNAHME_ARCHIVE.md](../phase10_5_finishing/ABNAHME_ARCHIVE.md) — 📦 **50256 B** · alle 86 Abnahmezeilen, verbatim
+- [phase10_5_finishing/SESSIONS_ARCHIVE.md](../phase10_5_finishing/SESSIONS_ARCHIVE.md) — 📦 **224182 B** · Session-Blöcke, verbatim
 - [phase10_5_finishing/STARTUPTRAG_ARCHIVE.md](../phase10_5_finishing/STARTUPTRAG_ARCHIVE.md) — 📦 **14291 B** · Startaufträge Block 7 und 9, verbatim
 - [phase10_5_finishing/FREIGABEN_ARCHIVE.md](../phase10_5_finishing/FREIGABEN_ARCHIVE.md) — 📦 **3.577 B** · die Freigaben der Phase, verbatim aus dem Head
-- [phase10_5_finishing/MODULSTATUS_ARCHIVE.md](../phase10_5_finishing/MODULSTATUS_ARCHIVE.md) — 📦 **23459 B** · Statusspalten 0–17
+- [phase10_5_finishing/MODULSTATUS_ARCHIVE.md](../phase10_5_finishing/MODULSTATUS_ARCHIVE.md) — 📦 **25869 B** · Statusspalten 0–19
 - [docs/concepts/phase10_5_block14_kartenlayout_plan.md](./concepts/phase10_5_block14_kartenlayout_plan.md) — 📗 **33216 B** · Plan Block 14: Kartenlayout
 - [docs/concepts/phase10_5_block14_kartenlayout_plan_anhang.md](./concepts/phase10_5_block14_kartenlayout_plan_anhang.md) — 📦 **20525 B** · Anhang Block 14
 - [docs/concepts/phase10_5_block14_6_plan.md](./concepts/phase10_5_block14_6_plan.md) — 📗 **27332 B** · Plan 14.6
@@ -73,7 +73,7 @@ updated: 2026-11-02 (Block 18: zwei Addons) | ältere Einträge: docs/INDEX_UPDA
 - [docs/concepts/phase10_5_launch_film_plan.md](./concepts/phase10_5_launch_film_plan.md) — 📗 **34170 B** · Plan Block 16: Launch-Film v4.0.0
 - [docs/concepts/phase10_5_block15_review_fixes_plan.md](./concepts/phase10_5_block15_review_fixes_plan.md) — 📗 **31775 B** · Block 15: Review-Fixes B1–B10 (✅)
 - [docs/concepts/phase10_5_block17_film_app_plan.md](./concepts/phase10_5_block17_film_app_plan.md) — 📗 **11012 B** · Plan Block 17: Film in die App (✅)
-- [docs/concepts/phase10_5_block18_live_fixes_plan.md](./concepts/phase10_5_block18_live_fixes_plan.md) — 📗 **33091 B** · Plan Block 18 (🔄)
+- [docs/concepts/phase10_5_block18_live_fixes_plan.md](./concepts/phase10_5_block18_live_fixes_plan.md) — 📗 **33091 B** · Plan Block 18 (✅)
 - [docs/concepts/phase10_5_editor_4_1_plan.md](./concepts/phase10_5_editor_4_1_plan.md) — 📗 **39581 B** · Plan Editor 4.1.0 (v4.0.2 in P10.5, Rest P11)
 - [docs/concepts/phase10_5_editor_4_1_plan_anhang.md](./concepts/phase10_5_editor_4_1_plan_anhang.md) — 📗 **26822 B** · Anhang: Messungen, Prototyp
 - [docs/concepts/phase10_5_block18_addon_render.md](./concepts/phase10_5_block18_addon_render.md) — 📗 **25706 B** · Addon: Render
@@ -81,7 +81,9 @@ updated: 2026-11-02 (Block 18: zwei Addons) | ältere Einträge: docs/INDEX_UPDA
 - [docs/concepts/phase10_5_p10j_lauf2_eurofleet.md](./concepts/phase10_5_p10j_lauf2_eurofleet.md) — 📗 **14714 B** · Notiz an eurofleet: P10.5-27/28 + alle Instanzen
 - [docs/concepts/phase10_5_block15_review_fixes_plan_anhang.md](./concepts/phase10_5_block15_review_fixes_plan_anhang.md) — 📦 **14534 B** · Anhang Block 15: Anmerkungen 15.1–15.3b
 - [docs/concepts/phase10_5_ultra_review_v4.0.0.md](./concepts/phase10_5_ultra_review_v4.0.0.md) — 📕 **19192 B** · Ultra-Review v4.0.0: 22 Befunde, B1 kritisch
-- [phase10_5_finishing/UPDATES_ARCHIVE.md](../phase10_5_finishing/UPDATES_ARCHIVE.md) — 📦 **18517 B** · ältere `updated:`-Fäden des Heads, verbatim
+- [phase10_5_finishing/UPDATES_ARCHIVE.md](../phase10_5_finishing/UPDATES_ARCHIVE.md) — 📦 **19452 B** · ältere `updated:`-Fäden des Heads, verbatim
+- [docs/concepts/PHASE10_5_CLOSEOUT_HANDOVER.md](./concepts/PHASE10_5_CLOSEOUT_HANDOVER.md) — 📕 **25187 B** · Handover P10.5 → P11: Leitziel Writer-Optik, Vormerkungen
+- [docs/concepts/phase10_5_finishing_uebersicht.svg](./concepts/phase10_5_finishing_uebersicht.svg) — 📕 ~17KB · Übersichtsgrafik P10.5
 
 ## Phase 8.6 — ✅ abgeschlossen 2026-09-19 (UI-Politur, live `v3.0.2`; zwei Pläne)
 

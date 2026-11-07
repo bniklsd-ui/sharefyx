@@ -4,7 +4,7 @@ purpose: Menschliche Übersicht + Maschinen-Setup (venv, Keyring, Datenverzeichn
 read-when: erstes Setup auf einer neuen Maschine, oder wenn jemand wissen will, was das Ding überhaupt ist
 detail: L2
 up: docs/INDEX.md
-updated: 2026-09-02 (Sneak-Peak um die zwei Auswahl-Chevron-Screenshots ergaenzt (Vormerkung-3-Fixes, fuer Nikinger-Sichtpruefung 3 via GitHub) | 2026-09-02 (Sneak-Peak-Sektion auf die vier c4c5_*-Screenshots aus Block C4+C5 umgestellt -- Liquid-Glas-Akzente, Auswahl-Sheen 3px + Outline, Editor-72ch, Anlege-Dialog-Glas; ersetzt die sechs sp2_*-Screenshots aus Block D, die jetzt nur noch als historische Referenz unter docs/screenshots/ liegen)
+updated: 2026-11-07 (Closeout P10.5, Ultra-Review B18: der Smoke-Abschnitt nennt elf Tools statt sechs) | 2026-09-02 (Sneak-Peak um die zwei Auswahl-Chevron-Screenshots ergaenzt (Vormerkung-3-Fixes, fuer Nikinger-Sichtpruefung 3 via GitHub) | 2026-09-02 (Sneak-Peak-Sektion auf die vier c4c5_*-Screenshots aus Block C4+C5 umgestellt -- Liquid-Glas-Akzente, Auswahl-Sheen 3px + Outline, Editor-72ch, Anlege-Dialog-Glas; ersetzt die sechs sp2_*-Screenshots aus Block D, die jetzt nur noch als historische Referenz unter docs/screenshots/ liegen)
 ---
 # Space-Server
 
@@ -142,7 +142,9 @@ python phase2_mcp/scripts/mcp_smoke.py --json     # maschinenlesbar auf stdout
 
 Baut ein **temporäres** `DATA_ROOT` (nie das echte), zwei Fixture-Spaces und zwei Tokens, die
 nur in diesem Lauf existieren — der echte Keyring (Service `nikinger-space`) bleibt unangetastet.
-Fährt die sechs Tools einmal komplett durch (beide Rule-4-Fälle: fremd lesen mit Wrap, fremd
+Fährt die **elf** Tools einmal komplett durch (**[2026-11-07, Closeout P10.5, Ultra-Review B18]** hier stand
+„sechs“ — der Stand von P2; heute registriert `phase2_mcp/mcpserver/tools.py` elf Werkzeuge, und
+`mcp_smoke.py` ruft jedes davon auf) (beide Rule-4-Fälle: fremd lesen mit Wrap, fremd
 schreiben mit `write_denied`) und misst die Antwortgröße je Aufruf. Exit-Code `0` nur, wenn alle
 Prüfungen grün sind.
 
