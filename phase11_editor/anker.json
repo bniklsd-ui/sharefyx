@@ -1,0 +1,654 @@
+{
+ "B0.1": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "scripts/doc_health.py",
+    "text": "def check_index_lines(repo_root: Path, index_text: str) -> list[str]:",
+    "zeile": 65
+   },
+   {
+    "datei": "scripts/doc_health.py",
+    "text": "def _read_index_lines(index_path: Path) -> str:",
+    "zeile": 61
+   },
+   {
+    "datei": "phase10_5_finishing/tests/test_register_archive.py",
+    "text": "def test_the_register_and_the_index_keep_their_reserve():",
+    "zeile": 129
+   },
+   {
+    "datei": "phase1_storage/storage/frontmatter.py",
+    "text": "# Geschrieben wird weiter nur `\\n` (`serialize()`); der Body behaelt seine Zeilenenden byteweise.",
+    "zeile": 20
+   }
+  ]
+ },
+ "B0.2": {
+  "status": "offen",
+  "anker": []
+ },
+ "B0.3": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "phase3_edge/scripts/install_units.sh",
+    "text": "SYSTEMD_DEST=\"/etc/systemd/system\"",
+    "zeile": 34
+   },
+   {
+    "datei": "phase3_edge/scripts/install_units.sh",
+    "text": "STAGING_BASE_URL=\"${STAGING_BASE_URL:-${PUBLIC_BASE_URL}:${STAGING_PORT}}\"",
+    "zeile": 82
+   },
+   {
+    "datei": "phase3_edge/scripts/install_units.sh",
+    "text": "    -e \"s#__STAGING_BASE_URL__#${STAGING_BASE_URL}#g\" \\",
+    "zeile": 110
+   },
+   {
+    "datei": "phase3_edge/scripts/install_units.sh",
+    "text": "systemctl enable --now sharefyx-mcp.service",
+    "zeile": 124
+   },
+   {
+    "datei": "phase5_ui/systemd/sharefyx-staging.service",
+    "text": "Documentation=file://__REPO_ROOT__/phase5_ui/CLAUDE.md",
+    "zeile": 3
+   },
+   {
+    "datei": "phase5_ui/systemd/sharefyx-staging.service",
+    "text": "WorkingDirectory=__REPO_ROOT__",
+    "zeile": 24
+   },
+   {
+    "datei": "phase5_ui/systemd/sharefyx-staging.service",
+    "text": "ExecStart=__VENV__/bin/python __REPO_ROOT__/phase2_mcp/scripts/serve.py",
+    "zeile": 35
+   },
+   {
+    "datei": "phase3_edge/tests/test_units.py",
+    "text": "    for placeholder in (\"__STAGING_PORT__\", \"__STAGING_DATA_ROOT__\", \"__STAGING_BASE_URL__\"):",
+    "zeile": 199
+   }
+  ]
+ },
+ "B1.0": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "phase10_5_finishing/probes/p105_ed41_darstellung_probe.py",
+    "text": "WEICHE = '''_ed41_static = os.environ.get(\"ED41_STATIC_DIR\")",
+    "zeile": 108
+   }
+  ]
+ },
+ "B1.1": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "return withLoading(detailEl, api(\"/items/\" + encodeURIComponent(id))).then(function (item) {",
+    "zeile": 939
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/loading.js",
+    "text": "export function withLoading(el, promise, { delayMs = 200 } = {}) {",
+    "zeile": 30
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/loading.js",
+    "text": "if (!finished) el.classList.add(\"is-loading\");",
+    "zeile": 59
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".is-loading::after {\n  content: \"\";",
+    "zeile": 3025
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".rail, .list, .detail {\n  min-width: 0;\n  overflow-y: auto;\n}",
+    "zeile": 429
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".rail__tree { padding: 0 var(--space); }",
+    "zeile": 689
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".rail__account {\n  margin-top: auto;",
+    "zeile": 762
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.html",
+    "text": "<div class=\"rail__tree\" id=\"rail-tree\"></div>",
+    "zeile": 34
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/tree.js",
+    "text": "railTreeEl.appendChild(el(\"div\", \"tree__group\", \"Alles\"));",
+    "zeile": 349
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/tree.js",
+    "text": "  railTreeEl = document.getElementById(\"rail-tree\");",
+    "zeile": 429
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/tree.js",
+    "text": "  railTreeEl.textContent = \"\";",
+    "zeile": 400
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".list__head {\n  /* Liquid-Glas-Träger",
+    "zeile": 824
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": "   Capability vorhanden ist, der Default-Block läuft sonst. */",
+    "zeile": 2976
+   }
+  ]
+ },
+ "B1.2": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".CodeMirror {\n  flex: 1;",
+    "zeile": 2022
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": "  line-height: 21px;\n}",
+    "zeile": 2042
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".CodeMirror .cm-header-1 { font-size: 1.3em; }",
+    "zeile": 2072
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".CodeMirror .cm-md-s-klein { font-size: .85em; line-height: 0; }",
+    "zeile": 2106
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".CodeMirror-lines { padding: calc(var(--space) * 2) calc(var(--space) * 3); }",
+    "zeile": 2044
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".CodeMirror .sfx-tabelle {\n  display: block;",
+    "zeile": 2051
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".editor__textarea {\n  flex: 1;",
+    "zeile": 1981
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".preview {\n  flex: 1;",
+    "zeile": 1509
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": "  --editor-bg:     #0C1017;",
+    "zeile": 71
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": "  --panel-body:    #10151B;",
+    "zeile": 167
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".editor__append {\n  display: flex;",
+    "zeile": 2197
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".version-band__number {",
+    "zeile": 1971
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".toolbar-btn--wide { font-family: var(--font-ui); padding: 0 10px; }",
+    "zeile": 1918
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.html",
+    "text": "<div class=\"preview editor__preview\" id=\"editor-preview\" hidden></div>",
+    "zeile": 365
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "var editorPreviewEl;",
+    "zeile": 53
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "editorPreviewEl = document.getElementById(\"editor-preview\");",
+    "zeile": 1076
+   }
+  ]
+ },
+ "B1.3": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "phase5_ui/webui/static/js/markdown.js",
+    "text": "export function markdownToHtml(src, options) {",
+    "zeile": 203
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/markdown.js",
+    "text": "function _markdownZeilen(lines, itemId, assetIds) {",
+    "zeile": 214
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/markdown.js",
+    "text": "var ALLOWED_TAGS = new Set([",
+    "zeile": 376
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/markdown.js",
+    "text": "function sanitizeHtml(html) {",
+    "zeile": 426
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "import { markdownToHtml, FORMAT_VOKABULAR } from \"./markdown.js\";",
+    "zeile": 8
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "  roPreviewEl.innerHTML = markdownToHtml(item.body, {",
+    "zeile": 834
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "import(\"./editor/tabellen.js\").then(function (modul) {",
+    "zeile": 573
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/updates.js",
+    "text": "body.innerHTML = markdownToHtml(markdownList(entry.lines));",
+    "zeile": 41
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/updates.js",
+    "text": "bannerBodyEl.innerHTML = markdownToHtml(zeilen.length ? zeilen[0] : \"\");",
+    "zeile": 67
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor/tabellen.js",
+    "text": "var html = markdownToHtml(w.text, { itemId: k.itemId, assetIds: k.assetIds });",
+    "zeile": 172
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor/tabellen.js",
+    "text": "if (html.indexOf(\"<table>\") !== 0 || html.indexOf(\"<table>\", 1) !== -1",
+    "zeile": 174
+   },
+   {
+    "datei": "phase5_ui/scripts/ui_budget.py",
+    "text": "\"Editor nachgeladen (gzip)\", editor_total, 80 * KB, \", \".join(editor_parts),",
+    "zeile": 314
+   },
+   {
+    "datei": "phase5_ui/scripts/ui_budget.py",
+    "text": "nachgeladen = sorted(p for p in (static_dir / \"vendor\").rglob(\"*\") if p.is_file())",
+    "zeile": 142
+   },
+   {
+    "datei": "phase5_ui/THIRD_PARTY_LICENSES.md",
+    "text": "## CodeMirror 5 (Editor Stufe 1+2)",
+    "zeile": 34
+   },
+   {
+    "datei": "phase10_5_finishing/probes/p105_ed41_spec.py",
+    "text": "STAENDE = [\"S0\", \"S1\", \"S2\"]",
+    "zeile": 519
+   },
+   {
+    "datei": "phase10_5_finishing/probes/p105_ed41_spec.py",
+    "text": "STAND = \"S2\"",
+    "zeile": 520
+   }
+  ]
+ },
+ "B1.4": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "phase5_ui/webui/static/js/markdown.js",
+    "text": "var FORMAT_INLINE_RE =",
+    "zeile": 50
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/markdown.js",
+    "text": "function _todoHtml(inhalt, itemId, assetIds) {",
+    "zeile": 195
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/markdown.js",
+    "text": "var ALLOWED_CELL_CLASSES = new Set([\"ta-l\", \"ta-c\", \"ta-r\"]);",
+    "zeile": 396
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor/tabellen.js",
+    "text": "export function blockRanges(zeilen) {",
+    "zeile": 43
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor/tabellen.js",
+    "text": "var TRENNER =",
+    "zeile": 22
+   },
+   {
+    "datei": "phase2_mcp/mcpserver/tools.py",
+    "text": "\"Weboberfläche zeigt dieselben Formate.\"",
+    "zeile": 223
+   }
+  ]
+ },
+ "B1.5": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "      mode: { name: \"markdown\", highlightFormatting: true },\n      lineWrapping: true,",
+    "zeile": 540
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "    cm.setOption(\"mode\", on ? null : { name: \"markdown\", highlightFormatting: true });",
+    "zeile": 740
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "function _formatOverlayToken(stream) {",
+    "zeile": 462
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "if (stream.sol() && /^:::/.test(rest)) { stream.skipToEnd(); return \"formatting\"; }",
+    "zeile": 504
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "var TODO_MUSTER = /^([ \\t]*[-*+][ \\t]+)\\[([ xX])\\]/;",
+    "zeile": 625
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor_cm.js",
+    "text": "const VENDOR_SCRIPTS = [",
+    "zeile": 25
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".CodeMirror .cm-variable-2, .CodeMirror .cm-variable-3 { color: var(--editor-text); }",
+    "zeile": 2110
+   }
+  ]
+ },
+ "B1.6": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "    cm.addOverlay({ token: _formatOverlayToken });",
+    "zeile": 559
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "    cm.on(\"cursorActivity\", function () { _cursorZeileSetzen(); });",
+    "zeile": 555
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "function _cursorZeileSetzen() {",
+    "zeile": 584
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".CodeMirror .cm-formatting { visibility: hidden; }",
+    "zeile": 2114
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".CodeMirror .sfx-active-line .cm-formatting { visibility: visible; }",
+    "zeile": 2115
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".CodeMirror.is-raw .cm-formatting { visibility: visible; }",
+    "zeile": 2118
+   }
+  ]
+ },
+ "B1.7": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "var cmTodoMarken = [];",
+    "zeile": 67
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "function _todoKasten(erledigt) {",
+    "zeile": 630
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "function _todoUmschalten(kasten) {",
+    "zeile": 653
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "function _todoMarkenAuffrischen() {",
+    "zeile": 679
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "    cm.on(\"change\", _todoMarkenAuffrischen);",
+    "zeile": 551
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "  _todoMarkenAuffrischen();\n  if (cmTabellen) cmTabellen.abgleichen();",
+    "zeile": 747
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": ".sfx-todo,\n.preview .md-todo {",
+    "zeile": 2132
+   }
+  ]
+ },
+ "B1.8": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "  var TOOLBAR_ACTIONS = {",
+    "zeile": 1196
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "  function wrapSelection(marker) {",
+    "zeile": 1183
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor.js",
+    "text": "  function insertLinePrefix(prefix) {",
+    "zeile": 1190
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.html",
+    "text": "<button type=\"button\" class=\"toolbar-btn\" data-md=\"code\" title=\"Code\" aria-label=\"Code\">",
+    "zeile": 321
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.html",
+    "text": "<button type=\"button\" class=\"toolbar-btn\" data-md=\"ol\" title=\"Nummerierung\" aria-label=\"Nummerierung\">",
+    "zeile": 336
+   }
+  ]
+ },
+ "B1.9": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "phase5_ui/webui/static/js/editor/tabellen.js",
+    "text": "    huelle.addEventListener(\"mousedown\", function (e) { _klick(e, mark); });",
+    "zeile": 183
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor/tabellen.js",
+    "text": "    var mark = cm.markText({ line: w.von, ch: 0 }, { line: w.bis, ch: w.laenge },",
+    "zeile": 181
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor/tabellen.js",
+    "text": "  cm.on(\"change\", function (_cm, ch) {",
+    "zeile": 243
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor/tabellen.js",
+    "text": "  function _eintritt(_cm, obj) {",
+    "zeile": 222
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor/tabellen.js",
+    "text": "export function zellAnfaenge(zeile) {",
+    "zeile": 90
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor/tabellen.js",
+    "text": "  function _klick(e, mark) {",
+    "zeile": 201
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/editor/tabellen.js",
+    "text": "  cm.state.sfxTabellen = {",
+    "zeile": 257
+   }
+  ]
+ },
+ "B1.10": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "phase5_ui/webui/static/app.html",
+    "text": "<div class=\"toolbar-group\" data-word-group=\"einfuegen\">",
+    "zeile": 349
+   }
+  ]
+ },
+ "B1.11": {
+  "status": "offen",
+  "anker": []
+ },
+ "B1.12": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "phase5_ui/webui/static/js/editor_cm.js",
+    "text": "  \"markdown.min.js\",\n];",
+    "zeile": 29
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/app.js",
+    "text": "      else if (state.selectedId !== null) Editor.closeEditor();",
+    "zeile": 337
+   },
+   {
+    "datei": "phase5_ui/THIRD_PARTY_LICENSES.md",
+    "text": "| `meta.min.js` |",
+    "zeile": 51
+   },
+   {
+    "datei": "phase10_5_finishing/tests/test_codemirror_vendor.py",
+    "text": "    \"meta.min.js\",",
+    "zeile": 31
+   }
+  ]
+ },
+ "B1.13": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "phase5_ui/webui/static/app.html",
+    "text": "<div class=\"toolbar-group\" data-word-group=\"vorlagen\">",
+    "zeile": 345
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.html",
+    "text": "<div class=\"editor__append\">",
+    "zeile": 369
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.html",
+    "text": "<p id=\"conflict-message\"></p>",
+    "zeile": 728
+   },
+   {
+    "datei": "phase5_ui/webui/static/js/dialogs.js",
+    "text": "export function showConflictDialog(current, opts) {",
+    "zeile": 455
+   },
+   {
+    "datei": "phase5_ui/scripts/build_font_subset_plex.sh",
+    "text": "UNICODES=\"U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD\"",
+    "zeile": 32
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": "  src: url(\"/ui/static/fonts/IBMPlexSans-subset.6c21979f.woff2\") format(\"woff2\");",
+    "zeile": 15
+   },
+   {
+    "datei": "phase5_ui/webui/static/app.css",
+    "text": "  src: url(\"/ui/static/fonts/IBMPlexMono-subset.a8d5dfa6.woff2\") format(\"woff2\");",
+    "zeile": 22
+   }
+  ]
+ },
+ "B1.14": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "phase8_5_picker_release/scripts/health_gate.sh",
+    "text": "    --expected-sha=*)     EXPECTED_SHA=\"${1#*=}\" ;;",
+    "zeile": 44
+   }
+  ]
+ },
+ "B1.15": {
+  "status": "offen",
+  "anker": []
+ },
+ "B1.16": {
+  "status": "offen",
+  "anker": [
+   {
+    "datei": "phase5_ui/webui/static/app.html",
+    "text": "<span class=\"rail__version\">v4.0.2</span>",
+    "zeile": 25
+   },
+   {
+    "datei": "docs/UPDATE_LOG.md",
+    "text": "## 2026-11-06\n",
+    "zeile": 12
+   }
+  ]
+ }
+}
