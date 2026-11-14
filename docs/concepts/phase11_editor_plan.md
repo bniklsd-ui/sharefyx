@@ -57,7 +57,7 @@ updated: 2026-11-14 (Abschluss-Durchgang vor dem ersten Commit: B0.3-Befehle, Un
 | **P11-S** | **Nummern:** Locks `P11-A…`, Abnahme `P11-1…`, `[VERIFY]` ab **V220**, Schritte `B<Block>.<n>`. | Closeout §10 |
 | **P11-T** | **Head ≤ 40.960 B, genau ein Session-Block ≤ 4 KiB**, Rotation per `scripts/rotate_session_block.sh phase11_editor`. | P10.5-T |
 | **P11-U** | **Tastenkosten:** Median synchron ≤ **8 ms** in der 2000-Zeilen-Notiz `27_gross`, harte Grenze 16 ms. | Ersetzt „Basis + 2 ms" für die Einklapp-Schritte. Gemessen 2026-11-13: heute 2,8–3,2 ms, Prototyp 5,0–6,1 ms; die Mehrkosten kommen von den Marken, nicht von der Schrift. Datierte Lockerung. |
-| **P11-V** | **Feedback 5 — Lesart:** der Listenkopf trägt denselben Flächenton wie die Fläche um ihn. Die Sichtung in B1.1 entscheidet; trifft die Lesart nicht, ist das ein Befund an den Nikinger, kein zweiter Versuch auf Verdacht. | Nikinger 2026-11-13: „weder noch, Hintergrundfarbe angleichen". Suchfeld und Auswahl tragen schon denselben Ton (gemessen). |
+| **P11-V** | **Feedback 5 — Lesart:** der Listenkopf trägt denselben Flächenton wie die Fläche um ihn. Die Sichtung in B1.1 entscheidet; trifft die Lesart nicht, ist das ein Befund an den Nikinger, kein zweiter Versuch auf Verdacht. **Bestätigt 2026-11-14** an Ist-Bild und Variante A der Wegwerf-Instanz: Kopf `--bg-void` ohne Glas, Trennstrich bleibt. | Nikinger 2026-11-13: „weder noch, Hintergrundfarbe angleichen". Suchfeld und Auswahl tragen schon denselben Ton (gemessen). |
 | **P11-W** | **Anker:** jede Edit-Stelle steht als wörtlicher String in `phase11_editor/anker.json`. Ein Wächter verlangt, dass jeder Anker eines **offenen** Schritts genau einmal vorkommt. Ändert ein Schritt den Anker eines späteren, zieht **er** die Datei nach. | Schritte verschieben einander die Zeilen; ein doppelter Anker beißt still nicht (Falle 18.2b). |
 
 ### §0.1 Was P11 ausdrücklich nicht tut
@@ -282,7 +282,7 @@ diesmal in der Tabelle (P11-7 bis P11-13 und P11-26).
 | V228 | ✅ 2026-11-14: die installierte Staging-Unit läuft aus `/opt/sharefyx/current`; `deploy.sh` kennt `SHAREFYX_CURRENT_LINK`, `SHAREFYX_SERVICE`, `SHAREFYX_PORT` — eigener Symlink, Befehle in B0.3 | — | — |
 | V229 | Form echter Daten: die größte Notiz (1836 Zeilen), Fabians Tabellen, `<br>` in Zellen | B1.15 | Korpus deckt sie |
 | V230 | Browser-Hit-Test in Firefox: `caretRangeFromPoint` fehlt oder weicht ab, dann `caretPositionFromPoint` | B1.0 | Probe braucht beide Wege |
-| V231 | Feedback 5: trifft die Lesart P11-V? | B1.1 | Sichtung |
+| V231 | ✅ 2026-11-14: die Lesart P11-V trifft (Nikinger, am Vergleichsbild Ist/Variante A) | — | — |
 | V232 | Icons „durchgestrichen" und „Aufgabe" im Sprite (`build_icon_sprite.py`) | B1.8 | fehlen heute |
 | V233 | Wirksame Kontextgrenze des Ausführers in opencode | vor jedem E-Schritt | ≤ 200.000 (Bedarf 2) |
 | V234 | ✅ 2026-11-14: `searchcursor.js` unminifiziert aus dem npm-Cache, SHA-256 in B1.12; `continuelist` wird nicht vendort (B1.8 baut die Listenregeln selbst) | — | — |
