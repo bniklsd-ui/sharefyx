@@ -170,7 +170,7 @@ Blue/Green-Umschalten · ein Leseweg für Feedback.
 | **1** | Editor 4.1 „Writer-Optik": 17 Schritte B1.0–B1.16 | Claude Code + Ausführer | `v4.1.0` | Block-1-Datei |
 | **2** | Oberfläche nach Regeln; Feedback-Knopf | offen | Entscheidung Nikinger | §3.1 |
 | **3** | Review-Rest und Betrieb | Ausführer | mit Block 2 | §3.2 |
-| **Z** | Closeout P11 (Handover, Grafik, Rotationen) | Claude Code + Nikinger | — | Prompt 3 |
+| **Z** | Closeout P11 (Handover, Grafik, Rotationen); dazu die Regel „Sichtung zuerst als Bild an der Wegwerf-Instanz" in die Wurzel-`CLAUDE.md` (Nikinger 2026-11-14) | Claude Code + Nikinger | — | Prompt 3 |
 
 ### §3.1 Block 2 — Oberfläche nach Regeln, Feedback-Knopf (Ziel, Abnahme, Abhängigkeiten; noch keine Anker)
 
@@ -278,7 +278,7 @@ diesmal in der Tabelle (P11-7 bis P11-13 und P11-26).
 | V224 | Safari/WebKit | B1.14 | nicht gemessen, solange Bedarf 8 offen ist |
 | V225 | Rollbalken und Sprungziele in langen Notizen mit Proportionalschrift (CM5 schätzt Zeilenhöhen aus der Zeichenzahl) | B1.2, B1.7 | Sprung auf Zeile 1500 landet ± eine Zeile |
 | V226 | `tailscale serve` für die Probe-Instanz neben dem Funnel der Produktion auf demselben Knoten (geerbt: V36) | B0.3 | geht mit eigenem Port |
-| V227 | Die Staging-Unit lädt denselben verschlüsselten DEK wie die Produktion bei eigener `auth.sqlite3` — **Fakt** (dieselbe Datei `/etc/sharefyx/auth-dek.cred`, gelesen 2026-11-14); offen ist nur, ob das gewollt ist | B0.3 | unkritisch; der Nikinger entscheidet |
+| V227 | ✅ 2026-11-14: die Staging-Unit lädt denselben verschlüsselten DEK wie die Produktion (dieselbe Datei `/etc/sharefyx/auth-dek.cred`) bei eigener `auth.sqlite3` — **gewollt** (Nikinger 2026-11-14) | — | — |
 | V228 | ✅ 2026-11-14: die installierte Staging-Unit läuft aus `/opt/sharefyx/current`; `deploy.sh` kennt `SHAREFYX_CURRENT_LINK`, `SHAREFYX_SERVICE`, `SHAREFYX_PORT` — eigener Symlink, Befehle in B0.3 | — | — |
 | V229 | Form echter Daten: die größte Notiz (1836 Zeilen), Fabians Tabellen, `<br>` in Zellen | B1.15 | Korpus deckt sie |
 | V230 | Browser-Hit-Test in Firefox: `caretRangeFromPoint` fehlt oder weicht ab, dann `caretPositionFromPoint` | B1.0 | Probe braucht beide Wege |
